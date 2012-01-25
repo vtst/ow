@@ -1,0 +1,324 @@
+grammar net.vtst.ow.eclipse.soy.Soy hidden(ML_COMMENT, SL_COMMENT, WS)
+
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+generate soy "http://www.vtst.net/ow/eclipse/soy/Soy"
+
+// ****************************************************************************
+// Parser
+
+// TODO: Rules with {{
+
+// ----------------------------------------------------------------------------
+// File structure
+
+SoyFile:
+  delpackage=Delpackage? namespace=Namespace declaration+=Declaration* template+=Template*
+;
+
+Delpackage:
+  "{delpackage" ident=IDENT "}"
+;
+
+Namespace:
+  "{namespace" ident=NamespaceDottedIdent "}"
+;
+
+Template: RegularTemplate | DelTemplate;
+
+RegularTemplate:
+  SOY_DOC_OPEN SOY_DOC_TEXT? (param+=TemplateParameter SOY_DOC_TEXT?)* SOY_DOC_CLOSE
+  "{template" ident=TemplateDefinitionDotIdent attribute+=CommandAttribute* "}" items=Items "{/template}"
+;
+
+DelTemplate:
+  SOY_DOC_OPEN SOY_DOC_TEXT? (param+=TemplateParameter SOY_DOC_TEXT?)* SOY_DOC_CLOSE
+  "{deltemplate" ident=TemplateDefinitionDottedIdent attribute+=CommandAttribute* "}" items=Items "{/deltemplate}"
+;
+
+TemplateParameter:
+  (SOY_DOC_TAG_PARAM | optional?=SOY_DOC_TAG_PARAM_OPTIONAL)  ident=SOY_DOC_IDENT
+;
+
+Items:
+  {Items} item+=RawText (item+=Command item+=RawText)*
+;
+
+// RawText? (Command RawText?)*
+
+Item:
+  RawText | Command | HTMLTag
+;
+
+RawText: {RawText} item+=RawTextItem*;
+
+RawTextItem:
+  =>HtmlTagBegin | =>HtmlAttribute | HtmlTagEnd
+  | "<" | "</"
+  | AnyTerminalWithoutBraceOrAngle
+  
+;
+
+// This is useful only for syntax coloring
+HtmlTagBegin: ("<" | "</") IDENT;
+HtmlTagEnd: ">";
+HtmlAttribute: IDENT '=';
+
+AnyTerminalWithoutBraceOrAngle:
+  IDENT | HEX_INTEGER | FLOAT | DEC_DIGITS_DOT | STRING_SQ | STRING_DQ | DEC_DIGITS | DOLLAR_IJ | DOLLAR_IDENT 
+  | "in" | "range(" | ")" | ":" | "?" | "or" | "and" | "not" | "==" | "!=" | "="
+  | "<=" | ">=" | "+" | "-" | "*" | "/" | "%" | "(" | "false" | "true" | "null" | "[" | "]" | "," | "." | "|"
+  | UNTERMINATED_NUMBER | ANY_OTHER_CHAR
+;
+
+
+// ----------------------------------------------------------------------------
+// Declarations
+// They are special form comments which allow declaring functions and print
+// directives
+
+Declaration: FunctionDeclaration | PrintDirectiveDeclaration;
+
+FunctionDeclaration:
+  FUNCTION_TAG ident=IDENT
+  number_of_required_arguments=DEC_DIGITS number_of_optional_arguments=DEC_DIGITS?
+;
+
+PrintDirectiveDeclaration:
+  PRINT_DIRECTIVE_TAG ident=IDENT
+  number_of_required_arguments=DEC_DIGITS number_of_optional_arguments=DEC_DIGITS?
+;
+
+
+// ----------------------------------------------------------------------------
+// Soy commands
+
+Command: 
+  SpecialCharCommand 
+  | LiteralCommand 
+  | PrintCommand 
+  | MsgCommand 
+  | IfCommand 
+  | SwitchCommand 
+  | ForeachCommand 
+  | ForCommand 
+  | CallCommand 
+  | CssCommand 
+;
+
+SpecialCharCommand:
+  {SpecialCharCommand} ("{sp}" | "{nil}" | "{\\r}" | "{\\n}" | "{\\t}" | "{lb}" | "{rb}"
+    | "{{sp}}" | "{{nil}}" | "{{\\r}}" | "{{\\n}}" | "{{\\t}}" | "{{lb}}" | "{{rb}}"
+  )
+;
+
+// There is a special lexing of the literal content by CustomizedSoyLexer
+LiteralCommand:
+  ("{literal}" | "{{literal}}") literal=STRING_SQ ("{/literal}" | "{{/literal}}")  
+;
+
+PrintCommand: 
+  ("{print" | "{") expr=Expr (directive+=PrintDirective)* "}"
+  | ("{{print" | "{{") expr=Expr (directive+=PrintDirective)* "}}"
+;
+
+// See validation rule checkPrintDirective
+PrintDirective: "|" ident=[PrintDirectiveDeclaration|IDENT] (':' parameter+=Expr (',' parameter+=Expr)*)?;
+
+// See validation rule checkNestedMsgCommand
+MsgCommand:
+  ("{msg" attribute+=CommandAttribute* "}" | "{{msg" attribute+=CommandAttribute* "}}") 
+  items=Items 
+  ("{/msg}" | "{{/msg}}")  
+;
+
+IfCommand:
+  ("{if" cond+=Expr "}" | "{{if" cond+=Expr "}}") 
+  if_items+=Items
+  (("{elseif" cond+=Expr"}" | "{{elseif" cond+=Expr "}}") if_items+=Items)* 
+  (("{else}" | "{{else}}") else_items=Items)? ("{/if}" | "{{/if}}")  
+;
+
+SwitchCommand:
+  ("{switch" cond=Expr "}" | "{{switch" cond=Expr "}}")
+    (("{case" case+=ExprList "}" | "{{case" case+=ExprList "}}") case_items+=Items)*
+    (("{default}" | "{{default}}") default_items+=Items)? 
+  ("{/switch}" | "{{/switch}}")  
+;
+
+ForeachCommand:
+  ("{foreach" range=ForeachRange "}" | "{{foreach" range=ForeachRange "}}")
+    for_items=Items
+  (("{ifempty}" | "{{ifempty}}") ifempty_items=Items)? 
+  ("{/foreach}" | "{{/foreach}}")  
+;
+
+ForeachRange:
+  for_variable=ForVariableDefinition "in" for_range=DataReference
+;
+
+ForCommand:
+  ("{for" range=ForRange "}" |"{{for" range=ForRange "}}")
+    for_items=Items
+  ("{/for}" | "{{/for}}")  
+;
+
+ForRange:
+  for_variable=ForVariableDefinition "in" "range(" lb=Expr ("," ub=Expr ("," step=Expr)?)? ")"
+;
+
+ForVariableDefinition:
+  ident=DOLLAR_IDENT
+;
+
+CallCommand: RegularCallCommand | DelCallCommand;
+RegularCallCommand:
+  ("{call" (ident=[RegularTemplate|TemplateDotIdent] | ident=[RegularTemplate|TemplateDottedIdent]) attribute+=CommandAttribute* 
+   ("}" param+=CallParam* ("{/call}" | "{{/call}}") | "/}"))
+  |
+  ("{{call" (ident=[RegularTemplate|TemplateDotIdent] | ident=[RegularTemplate|TemplateDottedIdent]) attribute+=CommandAttribute* 
+   ("}}" param+=CallParam* ("{/call}" | "{{/call}}") | "/}}"))
+;
+
+DelCallCommand:
+  ("{delcall" (ident=[DelTemplate|TemplateDottedIdent]) attribute+=CommandAttribute* 
+   ("}" param+=CallParam* ("{/delcall}" | "{{/delcall}}") | "/}"))
+  |
+  ("{{delcall" (ident=[DelTemplate|TemplateDottedIdent]) attribute+=CommandAttribute* 
+   ("}}" param+=CallParam* ("{/delcall}" | "{{/delcall}}") | "/}}"))
+;
+
+CallParam:
+  ("{param" CallParamIdentExpr "/}")
+  | ("{{param" CallParamIdentExpr "/}}")
+  | (("{param" CallParamIdent "}" | "{{param" CallParamIdent "}}") items=Items ("{/param}" | "{{/param}}"))
+;
+
+CallParamIdentExpr: ident=IDENT ":" expr=Expr;
+CallParamIdent: ident=IDENT;
+
+CssCommand:
+  {CssCommand} ("{css" class_name=CSS_IDENT "}" | "{{css" class_name=CSS_IDENT "}}")  
+;
+
+// ----------------------------------------------------------------------------
+// Command stuff
+
+// See validation rule checkWhiteSpaceInCommandAttributes
+CommandAttribute: 
+  ident=IDENT '=' value=STRING_DQ
+  | ident=IDENT '=' CALL_COMMAND_ATTRIBUTE_DQ expr=Expr CALL_COMMAND_ATTRIBUTE_DQ
+  ;
+
+// ----------------------------------------------------------------------------
+// Soy expressions
+
+Expr: Expr1;
+// This is maybe slightly more restrictive than the Soy syntax, but I think it is ok
+Expr1 returns Expr: expr+=Expr2 ('?' expr_true+=Expr2 ':' expr_false+=Expr2)*;
+Expr2 returns Expr: expr+=Expr3 (operator+=('or') expr+=Expr3)*;
+Expr3 returns Expr: expr+=Expr4 (operator+=('and') expr+=Expr4)*;
+Expr4 returns Expr: expr+=Expr5 (operator+=('==' | '!=') expr+=Expr5)*;
+Expr5 returns Expr: expr+=Expr6 (operator+=('<' | '>' | '<=' | '>=') expr+=Expr6)*;
+Expr6 returns Expr: expr+=Expr7 (operator+=('+' | '-') expr+=Expr7)*;
+Expr7 returns Expr: expr+=SimpleExpr (operator+=('*' | '/' | '%') expr+=SimpleExpr)*;
+SimpleExpr:
+  {UnaryOperator} operator+=('-' | 'not') expr=SimpleExpr
+  | {ParenthesizedExpr} '(' expr=Expr ')'
+  | DataReference
+  | Global
+  | {BooleanLiteral} literal=('false' | 'true')
+  | {NullLiteral} literal='null'
+  | {IntegerLiteral} literal=INTEGER
+  | {FloatLiteral} literal=FLOAT
+  | {StringLiteral} literal=STRING_SQ
+  // See validation rule checkListOrMapLiteral
+  | {ListOrMapLiteral} '[' (item+=ListOrMapLiteralItem (',' item+=ListOrMapLiteralItem)*)? ']'
+  // TODO: Linking of global function names
+  | {FunctionCall} function=[FunctionDeclaration|IDENT] '(' (argument+=Expr (',' argument+=Expr)*)? ')'
+;
+
+// Super-class of rules that binds a variable
+VariableDefinition: TemplateParameter | ForVariableDefinition;
+Variable: ident=[VariableDefinition|DOLLAR_IDENT] | {Variable} DOLLAR_IJ;
+DataReference: ((ident=[VariableDefinition|DOLLAR_IDENT] | DOLLAR_IJ) part+=DataReferencePart+) | Variable;
+DataReferencePart:
+  {DataReferencePartDotIdent} ident=DataReferenceDotIdent
+  | {DataReferencePartDotIndex} index=DataReferenceDotIndex
+  | {DataReferencePartBrackets} '[' expr=Expr ']'
+;
+Global: ident=GlobalDottedIdent;
+ListOrMapLiteralItem: first=Expr (':' second=Expr)?;
+
+ExprList: expr+=Expr (',' expr+=Expr)*;
+
+// ----------------------------------------------------------------------------
+// HTML tags
+
+HTMLTag:
+  {HTMLTag} "tag"
+;
+
+// ----------------------------------------------------------------------------
+// Identifiers
+
+// From SoyFileParser.jj
+
+GlobalDottedIdent returns ecore::EString: IDENT ('.' IDENT)*;
+NamespaceDottedIdent returns ecore::EString: IDENT ('.' IDENT)*;
+TemplateDottedIdent returns ecore::EString: IDENT ('.' IDENT)*;
+TemplateDefinitionDottedIdent returns ecore::EString: IDENT ('.' IDENT)*;
+
+TemplateDotIdent returns ecore::EString: '.' IDENT;
+TemplateDefinitionDotIdent returns ecore::EString: '.' IDENT;
+DataReferenceDotIdent returns ecore::EString: '.' IDENT;
+
+DataReferenceDotIndex: '.' index=DEC_DIGITS_AS_STRING | '.' index=FLOAT | '.' index=DEC_DIGITS_DOT ident=IDENT;  // DEC_INTEGER == DEC_DIGITS
+
+INTEGER returns ecore::EString: DEC_DIGITS | HEX_INTEGER;
+CSS_IDENT returns ecore::EString: '-'? IDENT ('-' | IDENT)*;  // TODO
+DEC_DIGITS_AS_STRING returns ecore::EString: DEC_DIGITS;
+
+// ****************************************************************************
+// Lexer
+
+// From ExpressionParser.jj
+terminal HEX_INTEGER: "0x" HEX_DIGIT+;
+terminal DEC_DIGITS_DOT: DEC_DIGITS '.';
+terminal FLOAT: 
+  (DEC_DIGITS '.' DEC_DIGITS ('e' ('+' | '-')? DEC_DIGITS)?)
+  | (DEC_DIGITS 'e' ('+' | '-')? DEC_DIGITS)
+;
+
+// This is a hack.  Lexing of string is context-dependent.  Hence, the following terminal rules
+// glob only the opening character of a string.  The remainder of the string is globbed by 
+// CustomizedSoyLexer.
+terminal STRING_SQ:  "'";
+terminal STRING_DQ: '"'; 
+
+terminal DEC_DIGITS returns ecore::EInt: ('0'..'9')+;
+terminal fragment HEX_DIGIT: ('0'..'9' | 'A'..'F');
+
+terminal IDENT: ('a'..'z' | 'A'..'Z' | '_') ('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*;
+terminal DOLLAR_IJ: '$ij';
+terminal DOLLAR_IDENT: '$' IDENT;
+terminal WS: (" " | "\t" | "\n" | "\r")+;
+
+terminal SOY_DOC_OPEN : '/**';
+terminal SOY_DOC_TEXT : '*/1';  // Fake terminal used by the CustomizedSoyLexer
+terminal SOY_DOC_TAG_PARAM : '*/2';  // Fake terminal used by the CustomizedSoyLexer
+terminal SOY_DOC_TAG_PARAM_OPTIONAL : '*/3';  // Fake terminal used by the CustomizedSoyLexer
+terminal SOY_DOC_IDENT : '*/4';  // Fake terminal used by the CustomizedSoyLexer
+terminal SOY_DOC_CLOSE : '*/5';  // Fake terminal used by the CustomizedSoyLexer
+terminal ML_COMMENT : ('/*' !'*') -> '*/';
+// The remainder of the comment is lexed by CustomSoyLexer
+// terminal SL_COMMENT   : '//' !('\n'|'\r')* ('\r'? '\n')?;
+terminal SL_COMMENT : '//';
+terminal FUNCTION_TAG : '*/6';  // Fake terminal used by the CustomizedSoyLexer
+terminal PRINT_DIRECTIVE_TAG : '*/7';  // Fake terminal used by the CustomizedSoyLexer
+terminal CALL_COMMAND_ATTRIBUTE_DQ : '*/8';  // Fake terminal used by the CustomizedSoyLexer
+// This is required to properly parse a command like {foo}. It's split by CustomSoyLexer
+terminal PRINT_IDENT : "{" IDENT;
+
+// Fallback tokens used for parsing raw text
+terminal UNTERMINATED_NUMBER: "0x" | DEC_DIGITS 'e';  // For HEX_INTEGER and FLOAT
+terminal ANY_OTHER_CHAR : !('{' | '}');

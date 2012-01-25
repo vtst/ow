@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+/*******************************************************************************
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
+ -->
+<!--<!DOCTYPE css-profile SYSTEM "css-profile.dtd" >-->
+<css-profile>
+	<profile-import name="cssprofile-css2.xml"/>
+	<stylesheet-def>
+		<description>%mobile1_0.stylesheet-def.description</description>
+		<charset-rule/>
+		<import-rule/>
+		<media-rule/>
+		<style-rule/>
+	</stylesheet-def>
+
+	<!-- Which properties can style rule include ? -->
+	<!-- using "overwrite" method: only disabled properties are written. -->
+
+	<style-rule-def overwrite="true">
+		<selector-expression name="child" enabled="false"/>
+		<selector-expression name="adjacent" enabled="false"/>
+		<selector-expression name="attribute" enabled="false"/>
+		<pseudo-class name="first-child" enabled="false"/>
+		<pseudo-class name="link" enabled="false"/>
+		<pseudo-class name="active" enabled="false"/>
+		<pseudo-class name="lang" enabled="false"/>
+		<property name="azimuth" enabled="false"/>
+		<property name="border-collapse" enabled="false"/>
+		<property name="border-spacing" enabled="false"/>
+		<property name="bottom" enabled="false"/>
+		<property name="caption-side" enabled="false"/>
+		<property name="clip" enabled="false"/>
+		<property name="content" enabled="false"/>
+		<property name="counter-increment" enabled="false"/>
+		<property name="counter-reset" enabled="false"/>
+		<property name="cue" enabled="false"/>
+		<property name="cue-after" enabled="false"/>
+		<property name="cue-before" enabled="false"/>
+		<property name="cursor" enabled="false"/>
+		<property name="direction" enabled="false"/>
+		<property name="elevation" enabled="false"/>
+		<property name="empty-cells" enabled="false"/>
+		<property name="font-size-adjust" enabled="false"/>
+		<property name="font-stretch" enabled="false"/>
+		<property name="left" enabled="false"/>
+		<property name="letter-spacing" enabled="false"/>
+		<property name="line-height" enabled="false"/>
+		<property name="marker-offset" enabled="false"/>
+		<property name="marks" enabled="false"/>
+		<property name="max-height" enabled="false"/>
+		<property name="max-width" enabled="false"/>
+		<property name="min-height" enabled="false"/>
+		<property name="min-width" enabled="false"/>
+		<property name="orphans" enabled="false"/>
+		<property name="outline" enabled="false"/>
+		<property name="outline-color" enabled="false"/>
+		<property name="outline-style" enabled="false"/>
+		<property name="outline-width" enabled="false"/>
+		<property name="overflow" enabled="false"/>
+		<property name="page" enabled="false"/>
+		<property name="page-break-after" enabled="false"/>
+		<property name="page-break-before" enabled="false"/>
+		<property name="page-break-inside" enabled="false"/>
+		<property name="pause" enabled="false"/>
+		<property name="pause-after" enabled="false"/>
+		<property name="pause-before" enabled="false"/>
+		<property name="pitch" enabled="false"/>
+		<property name="pitch-range" enabled="false"/>
+		<property name="play-during" enabled="false"/>
+		<property name="position" enabled="false"/>
+		<property name="quotes" enabled="false"/>
+		<property name="richness" enabled="false"/>
+		<property name="right" enabled="false"/>
+		<property name="size" enabled="false"/>
+		<property name="speak" enabled="false"/>
+		<property name="speak-header" enabled="false"/>
+		<property name="speak-numeral" enabled="false"/>
+		<property name="speak-punctuation" enabled="false"/>
+		<property name="speech-rate" enabled="false"/>
+		<property name="stress" enabled="false"/>
+		<property name="table-layout" enabled="false"/>
+		<property name="text-shadow" enabled="false"/>
+		<property name="top" enabled="false"/>
+		<property name="unicode-bidi" enabled="false"/>
+		<property name="voice-family" enabled="false"/>
+		<property name="volume" enabled="false"/>
+		<property name="widows" enabled="false"/>
+		<property name="word-spacing" enabled="false"/>
+		<property name="z-index" enabled="false"/>
+	</style-rule-def>
+
+	<!-- property definition -->
+	<!-- using "redifine" method: if "overwrite" attribute is set to
+	"false"	or not set, it means the node is cleanly redifined -->
+
+    <property-def name="background-attachment"
+		inherited="no" mediagroup="visual" category="colorandbackground">
+        <keyword name="scroll"/>
+        <keyword name="inherit"/>
+    </property-def>
+	<property-def name="display"
+		inherited="no" mediagroup="all" category="visual">
+		<keyword name="inline"/>
+		<keyword name="block"/>
+		<keyword name="list-item"/>
+		<keyword name="none"/>
+	</property-def>
+	<property-def name="list-style-type"
+		inherited="yes" mediagroup="visual" category="content">
+		<keyword name="disc"/>
+		<keyword name="circle"/>
+		<keyword name="square"/>
+		<keyword name="decimal"/>
+		<keyword name="lower-roman"/>
+		<keyword name="upper-roman"/>
+		<keyword name="lower-greek"/>
+		<keyword name="lower-alpha"/>
+		<keyword name="upper-alpha"/>
+		<keyword name="none"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="text-align"
+		inherited="yes" mediagroup="visual" category="text">
+		<keyword name="left"/>
+		<keyword name="right"/>
+		<keyword name="center"/>
+		<keyword name="justify"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="text-decoration"
+		inherited="no" mediagroup="visual" category="text">
+		<keyword name="none"/>
+		<keyword name="underline"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="vertical-align"
+		inherited="no" mediagroup="visual" category="visual">
+		<keyword name="baseline"/>
+		<keyword name="sub"/>
+		<keyword name="super"/>
+		<keyword name="inherit"/>
+	</property-def>
+
+	<!-- container definition : Container is the lump of values.
+	It can be used like macros. -->
+	<container-def name="color" overwrite="true">
+		<container name="system-color" enabled="false"/>
+	</container-def>
+</css-profile>

@@ -1,0 +1,31 @@
+EasyXtext
+(c) Vincent Simonet, 2011.  All rights reserved.
+
+********************************************************************************
+OVERVIEW
+
+EasyXtext provides helper classes which ease the implementation of plugins for
+domain-specific languages with Xtext (http://www.eclipse.org/Xtext/).  It comes
+in two plugins: net.vtst.ow.eclipse.easyxtext and 
+net.vtst.ow.eclipse.easyxtext.ui.
+
+
+********************************************************************************
+REQUIREMENTS
+
+This Eclipse plugin requires:
+* Eclipse Indigo
+* XText 2.1.0 (http://www.eclipse.org/Xtext/)
+
+
+********************************************************************************
+LICENSE
+
+This plugin is distributed under the Eclipse Public License Version 1.0.
+A copy of the EPL is available at http://www.eclipse.org/org/documents/epl-v10.php
+
+
+********************************************************************************
+TODO
+
+* Can save launch configuration / check launch configuration before launch

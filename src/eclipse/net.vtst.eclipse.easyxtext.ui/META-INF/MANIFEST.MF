@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: EasyXtext UI
+Bundle-SymbolicName: net.vtst.eclipse.easyxtext.ui
+Bundle-Version: 1.0.0
+Bundle-Activator: net.vtst.eclipse.easyxtext.ui.Activator
+Bundle-Vendor: Vincent Simonet
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.xtext.ui;bundle-version="2.0.1",
+ org.eclipse.debug.core;bundle-version="3.7.0",
+ org.eclipse.debug.ui;bundle-version="3.7.0",
+ org.eclipse.ui.console;bundle-version="3.5.100",
+ net.vtst.eclipse.easyxtext;bundle-version="0.9.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Export-Package: net.vtst.eclipse.easyxtext.ui.folding,
+ net.vtst.eclipse.easyxtext.ui.launching,
+ net.vtst.eclipse.easyxtext.ui.launching.attributes,
+ net.vtst.eclipse.easyxtext.ui.launching.tab,
+ net.vtst.eclipse.easyxtext.ui.syntaxcoloring
+Import-Package: org.eclipse.jdt.core,
+ org.eclipse.jdt.launching

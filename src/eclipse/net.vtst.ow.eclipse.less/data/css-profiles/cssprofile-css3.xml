@@ -1,0 +1,2566 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+/*******************************************************************************
+ * Copyright (c) 2010, 2011 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
+ -->
+<!--<!DOCTYPE css-profile SYSTEM "css-profile.dtd" >-->
+<css-profile>
+	<stylesheet-def>
+		<description>%css3.stylesheet-def.description</description>
+		<charset-rule/>
+		<import-rule/>
+		<page-rule/>
+		<media-rule/>
+		<fontface-rule/>
+		<style-rule/>
+	</stylesheet-def>
+
+	<charset-rule-def>
+	</charset-rule-def>
+	<import-rule-def>
+	</import-rule-def>
+	<media-rule-def>
+	</media-rule-def>
+
+	<page-rule-def>
+		<pseudo-class name="left"/>
+		<pseudo-class name="right"/>
+		<pseudo-class name="first"/>
+		<property name="size"/>
+		<property name="marks"/>
+		<property name="page-break-after"/>
+		<property name="page-break-before"/>
+		<property name="page-break-inside"/>
+		<property name="orphans"/>
+		<property name="widows"/>
+	</page-rule-def>
+
+	<fontface-rule-def>
+		<descriptor name="ascent"/>
+		<descriptor name="baseline"/>
+		<descriptor name="bbox"/>
+		<descriptor name="cap-height"/>
+		<descriptor name="centerline"/>
+		<descriptor name="definition-src"/>
+		<descriptor name="descent"/>
+		<descriptor name="font-family"/>
+		<descriptor name="font-size"/>
+		<descriptor name="font-stretch"/>
+		<descriptor name="font-style"/>
+		<descriptor name="font-variant"/>
+		<descriptor name="font-weight"/>
+		<descriptor name="mathline"/>
+		<descriptor name="panose-1"/>
+		<descriptor name="slope"/>
+		<descriptor name="slope"/>
+		<descriptor name="src"/>
+		<descriptor name="stemh"/>
+		<descriptor name="stemv"/>
+		<descriptor name="topline"/>
+		<descriptor name="unicode-range"/>
+		<descriptor name="units-per-em"/>
+		<descriptor name="widths"/>
+		<descriptor name="x-height"/>
+	</fontface-rule-def>
+
+	<!-- Which properties can style rule include ? -->
+
+	<style-rule-def>
+		<selector-expression name="descendant"/>
+		<selector-expression name="child"/>
+		<selector-expression name="adjacent"/>
+		<selector-expression name="universal"/>
+		<selector-expression name="attribute"/>
+		<pseudo-element name="first-line"/>
+		<pseudo-element name="first-letter"/>
+		<pseudo-element name="before"/>
+		<pseudo-element name="after"/>
+		<pseudo-element name="selection"/>
+		<pseudo-class name="first-child"/>
+		<pseudo-class name="link"/>
+		<pseudo-class name="visited"/>
+		<pseudo-class name="hover"/>
+		<pseudo-class name="active"/>
+		<pseudo-class name="focus"/>
+		<pseudo-class name="empty"/>
+		<pseudo-class name="enabled"/>
+		<pseudo-class name="disabled"/>
+		<pseudo-class name="checked"/>
+		<pseudo-class name="first-of-type"/>
+		<pseudo-class name="last-child"/>
+		<pseudo-class name="last-of-type"/>
+		<pseudo-class name="not()"/>
+		<pseudo-class name="nth-child()"/>
+		<pseudo-class name="nth-last-child()"/>
+		<pseudo-class name="nth-last-of-type()"/>
+		<pseudo-class name="nth-of-type()"/>
+		<pseudo-class name="only-child"/>
+		<pseudo-class name="only-of-type"/>
+		<pseudo-class name="root"/>
+		<pseudo-class name="target"/>
+		<property name="azimuth"/>
+		<property name="background"/>
+		<property name="background-attachment"/>
+		<property name="background-clip"/>
+		<property name="background-color"/>
+		<property name="background-image"/>
+		<property name="background-origin"/>
+		<property name="background-position"/>
+		<property name="background-repeat"/>
+		<property name="background-size"/>
+		<property name="border"/>
+		<property name="border-collapse"/>
+		<property name="border-color"/>
+		<property name="border-spacing"/>
+		<property name="border-style"/>
+		<property name="border-top"/>
+		<property name="border-right"/>
+		<property name="border-bottom"/>
+		<property name="border-left"/>
+		<property name="border-top-color"/>
+		<property name="border-right-color"/>
+		<property name="border-bottom-color"/>
+		<property name="border-left-color"/>
+		<property name="border-top-style"/>
+		<property name="border-right-style"/>
+		<property name="border-bottom-style"/>
+		<property name="border-left-style"/>
+		<property name="border-top-width"/>
+		<property name="border-right-width"/>
+		<property name="border-bottom-width"/>
+		<property name="border-left-width"/>
+		<property name="border-width"/>
+		<property name="border-top-left-radius"/>
+		<property name="border-top-right-radius"/>
+		<property name="border-bottom-left-radius"/>
+		<property name="border-bottom-right-radius"/>
+		<property name="border-radius"/>
+		<property name="bottom"/>
+		<property name="box-shadow"/>
+		<property name="box-sizing"/>
+		<property name="caption-side"/>
+		<property name="clear"/>
+		<property name="clip"/>
+		<property name="color"/>
+		<property name="content"/>
+		<property name="columns"/>
+		<property name="column-count"/>
+		<property name="column-width"/>
+		<property name="column-gap"/>
+		<property name="column-rule-color"/>
+		<property name="column-rule-style"/>
+		<property name="column-rule-width"/>
+		<property name="column-rule"/>
+		<property name="column-span"/>
+		<property name="column-fill"/>
+		<property name="counter-increment"/>
+		<property name="counter-reset"/>
+		<property name="cue"/>
+		<property name="cue-after"/>
+		<property name="cue-before"/>
+		<property name="cursor"/>
+		<property name="direction"/>
+		<property name="display"/>
+		<property name="elevation"/>
+		<property name="empty-cells"/>
+		<property name="float"/>
+		<property name="font"/>
+		<property name="font-family"/>
+		<property name="font-size"/>
+		<property name="font-size-adjust"/>
+		<property name="font-stretch"/>
+		<property name="font-style"/>
+		<property name="font-variant"/>
+		<property name="font-weight"/>
+		<property name="height"/>
+		<property name="left"/>
+		<property name="letter-spacing"/>
+		<property name="line-height"/>
+		<property name="list-style"/>
+		<property name="list-style-image"/>
+		<property name="list-style-position"/>
+		<property name="list-style-type"/>
+		<property name="margin"/>
+		<property name="margin-top"/>
+		<property name="margin-right"/>
+		<property name="margin-bottom"/>
+		<property name="margin-left"/>
+		<property name="marker-offset"/>
+		<property name="marks"/>
+		<property name="max-height"/>
+		<property name="max-width"/>
+		<property name="min-height"/>
+		<property name="min-width"/>
+		<property name="opacity"/>
+		<property name="orphans"/>
+		<property name="outline"/>
+		<property name="outline-color"/>
+		<property name="outline-style"/>
+		<property name="outline-width"/>
+		<property name="overflow"/>
+		<property name="padding"/>
+		<property name="padding-top"/>
+		<property name="padding-right"/>
+		<property name="padding-bottom"/>
+		<property name="padding-left"/>
+		<property name="page"/>
+		<property name="page-break-after"/>
+		<property name="page-break-before"/>
+		<property name="page-break-inside"/>
+		<property name="pause"/>
+		<property name="pause-after"/>
+		<property name="pause-before"/>
+		<property name="pitch"/>
+		<property name="pitch-range"/>
+		<property name="play-during"/>
+		<property name="position"/>
+		<property name="quotes"/>
+		<property name="resize"/>
+		<property name="richness"/>
+		<property name="right"/>
+		<property name="size"/>
+		<property name="speak"/>
+		<property name="speak-header"/>
+		<property name="speak-numeral"/>
+		<property name="speak-punctuation"/>
+		<property name="speech-rate"/>
+		<property name="stress"/>
+		<property name="table-layout"/>
+		<property name="text-align"/>
+		<property name="text-decoration"/>
+		<property name="text-indent"/>
+		<property name="text-overflow"/>
+		<property name="text-shadow"/>
+		<property name="text-transform"/>
+		<property name="top"/>
+		<property name="unicode-bidi"/>
+		<property name="vertical-align"/>
+		<property name="visibility"/>
+		<property name="voice-family"/>
+		<property name="volume"/>
+		<property name="white-space"/>
+		<property name="widows"/>
+		<property name="width"/>
+		<property name="word-spacing"/>
+		<property name="z-index"/>
+	</style-rule-def>
+
+	<pseudo-class-def name="checked" version="3">
+		<selector-value>checked</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="disabled" version="3">
+		<selector-value>disabled</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="empty" version="3">
+		<selector-value>empty</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="enabled" version="3">
+		<selector-value>enabled</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="first-of-type" version="3">
+		<selector-value>first-of-type</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="last-child" version="3">
+		<selector-value>last-child</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="last-of-type" version="3">
+		<selector-value>last-of-type</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="not()" version="3">
+		<selector-value>not()</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="nth-child()" version="3">
+		<selector-value>nth-child()</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="nth-last-child()" version="3">
+		<selector-value>nth-last-child()</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="nth-last-of-type()" version="3">
+		<selector-value>nth-last-of-type()</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="nth-of-type()" version="3">
+		<selector-value>nth-of-type()</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="only-child" version="3">
+		<selector-value>only-child</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="only-of-type" version="3">
+		<selector-value>only-of-type</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="root" version="3">
+		<selector-value>root</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="target" version="3">
+		<selector-value>target</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="first-child">
+		<selector-value>first-child</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="link">
+		<selector-value>link</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="visited">
+		<selector-value>visited</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="hover">
+		<selector-value>hover</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="active">
+		<selector-value>active</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="focus">
+		<selector-value>focus</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="lang">
+		<selector-value>lang</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="left">
+		<selector-value>left</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="right">
+		<selector-value>right</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="first">
+		<selector-value>first</selector-value>
+	</pseudo-class-def>
+
+	<pseudo-element-def name="first-line">
+		<selector-value>first-line</selector-value>
+	</pseudo-element-def>
+	<pseudo-element-def name="first-letter">
+		<selector-value>first-letter</selector-value>
+	</pseudo-element-def>
+	<pseudo-element-def name="before">
+		<selector-value>before</selector-value>
+	</pseudo-element-def>
+	<pseudo-element-def name="after">
+		<selector-value>after</selector-value>
+	</pseudo-element-def>
+	<pseudo-element-def name="selection" version="3">
+		<selector-value>selection</selector-value>
+	</pseudo-element-def>
+
+	<!-- property definition -->
+
+	<property-def name="azimuth"
+		inherited="yes" mediagroup="aural" category="aural">
+        <description>This provides spatial audio property for aural
+        presentation</description>
+        <number name="angle"/>
+        <keyword name="left-side"/>
+        <keyword name="far-left"/>
+        <keyword name="left"/>
+        <keyword name="center-left"/>
+        <keyword name="center"/>
+        <keyword name="center-right"/>
+        <keyword name="right"/>
+        <keyword name="far-right"/>
+        <keyword name="right-side"/>
+        <keyword name="behind"/>
+        <keyword name="leftwards"/>
+        <keyword name="rightwards"/>
+        <keyword name="inherit"/>
+    </property-def>
+    <property-def name="background"
+		inherited="no" mediagroup="visual" category="colorandbackground">
+        <property name="background-color"/>
+        <property name="background-image"/>
+        <property name="background-repeat"/>
+        <property name="background-attachment"/>
+        <property name="background-position"/>
+        <keyword name="inherit"/>
+    </property-def>
+    <property-def name="background-attachment"
+		inherited="no" mediagroup="visual" category="colorandbackground">
+        <keyword name="scroll"/>
+        <keyword name="fixed"/>
+        <keyword name="local"/>
+        <keyword name="inherit"/>
+    </property-def>
+    <property-def name="background-clip"
+		inherited="no" mediagroup="visual" category="colorandbackground" version="3">
+        <keyword name="border-box"/>
+        <keyword name="content-box"/>
+        <keyword name="padding-box"/>
+        <keyword name="inherit"/>
+    </property-def>
+    <property-def name="background-color"
+		inherited="no" mediagroup="visual" category="colorandbackground">
+        <container name="color"/>
+        <keyword name="transparent"/>
+        <keyword name="inherit"/>
+    </property-def>
+    <property-def name="background-image"
+		inherited="no" mediagroup="visual" category="colorandbackground">
+        <function name="uri"/>
+        <keyword name="none"/>
+        <keyword name="inherit"/>
+    </property-def>
+    <property-def name="background-origin"
+		inherited="no" mediagroup="visual" category="colorandbackground" version="3">
+		<keyword name="padding-box"/>
+        <keyword name="border-box"/>
+        <keyword name="content-box"/>
+        <keyword name="inherit"/>
+    </property-def>
+	<property-def name="background-position"
+		inherited="no" mediagroup="visual" category="colorandbackground">
+		<number name="percentage"/>
+		<number name="length"/>
+		<keyword name="top"/>
+		<keyword name="center"/>
+		<keyword name="bottom"/>
+		<keyword name="left"/>
+		<keyword name="right"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="background-repeat"
+		inherited="no" mediagroup="visual" category="colorandbackground">
+		<keyword name="repeat"/>
+		<keyword name="repeat-x"/>
+		<keyword name="repeat-y"/>
+		<keyword name="space"/>
+		<keyword name="round"/>
+		<keyword name="no-repeat"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="background-size"
+		inherited="no" mediagroup="visual" category="colorandbackground" version="3">
+		<number name="percentage"/>
+		<number name="length"/>
+		<keyword name="contain"/>
+		<keyword name="cover"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border"
+		inherited="no" mediagroup="visual" category="box">
+		<property name="border-width"/>
+		<property name="border-style"/>
+		<container name="color"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-collapse"
+		inherited="yes" mediagroup="visual" category="tables">
+		<keyword name="collapse"/>
+		<keyword name="separate"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-color"
+		inherited="no" mediagroup="visual" category="box">
+		<container name="color"/>
+		<keyword name="transparent"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-spacing"
+		inherited="yes" mediagroup="visual" category="tables">
+		<number name="length"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-style"
+		inherited="no" mediagroup="visual" category="box">
+		<container name="border-style"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-top"
+		inherited="no" mediagroup="visual" category="box">
+		<property name="border-top-width"/>
+		<property name="border-style"/>
+		<container name="color"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-top-left-radius"
+		inherited="no" mediagroup="visual" category="box" version="3">
+		<number name="length"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-top-right-radius"
+		inherited="no" mediagroup="visual" category="box" version="3">
+		<number name="length"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-bottom-right-radius"
+		inherited="no" mediagroup="visual" category="box" version="3">
+		<number name="length"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-bottom-left-radius"
+		inherited="no" mediagroup="visual" category="box" version="3">
+		<number name="length"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-radius"
+		inherited="no" mediagroup="visual" category="box" version="3">
+		<number name="length"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-right"
+		inherited="no" mediagroup="visual" category="box">
+		<property name="border-right-width"/>
+		<property name="border-style"/>
+		<container name="color"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-bottom"
+		inherited="no" mediagroup="visual" category="box">
+		<property name="border-bottom-width"/>
+		<property name="border-style"/>
+		<container name="color"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-left"
+		inherited="no" mediagroup="visual" category="box">
+		<property name="border-left-width"/>
+		<property name="border-style"/>
+		<container name="color"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-top-color"
+		inherited="no" mediagroup="visual" category="box">
+		<container name="color"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-right-color"
+		inherited="no" mediagroup="visual" category="box">
+		<container name="color"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-bottom-color"
+		inherited="no" mediagroup="visual" category="box">
+		<container name="color"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-left-color"
+		inherited="no" mediagroup="visual" category="box">
+		<container name="color"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-top-style"
+		inherited="no" mediagroup="visual" category="box">
+		<container name="border-style"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-right-style"
+		inherited="no" mediagroup="visual" category="box">
+		<container name="border-style"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-bottom-style"
+		inherited="no" mediagroup="visual" category="box">
+		<container name="border-style"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-left-style"
+		inherited="no" mediagroup="visual" category="box">
+		<container name="border-style"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-top-width"
+		inherited="no" mediagroup="visual" category="box">
+		<container name="border-width"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-right-width"
+		inherited="no" mediagroup="visual" category="box">
+		<container name="border-width"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-bottom-width"
+		inherited="no" mediagroup="visual" category="box">
+		<container name="border-width"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-left-width"
+		inherited="no" mediagroup="visual" category="box">
+		<container name="border-width"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="border-width"
+		inherited="no" mediagroup="visual" category="box">
+		<container name="border-width"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="bottom"
+		inherited="no" mediagroup="visual" category="visual">
+		<number name="length"/>
+		<number name="percentage"/>
+		<keyword name="auto"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="box-shadow"
+		inherited="no" mediagroup="visual" category="visual" version="3">
+		<number name="length"/>
+		<container name="color"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="box-sizing"
+		inherited="no" mediagroup="visual" category="box" version="3">
+		<keyword name="border-box"/>
+		<keyword name="content-box"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="caption-side"
+		inherited="yes" mediagroup="visual" category="tables">
+		<keyword name="top"/>
+		<keyword name="bottom"/>
+		<keyword name="left"/>
+		<keyword name="right"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="clear"
+		inherited="no" mediagroup="visual" category="visual">
+		<keyword name="none"/>
+		<keyword name="left"/>
+		<keyword name="right"/>
+		<keyword name="both"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="clip"
+		inherited="no" mediagroup="visual" category="visual">
+		<container name="shape"/>
+		<keyword name="auto"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="color"
+		inherited="yes" mediagroup="visual" category="colorandbackground">
+		<container name="color"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="columns"
+		inherited="no" mediagroup="visual" category="visual" version="3">
+		<property name="column-width"/>
+		<property name="column-count"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="column-width"
+		inherited="no" mediagroup="visual" category="visual" version="3">
+		<number name="length"/>
+		<keyword name="auto"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="column-count"
+		inherited="no" mediagroup="visual" category="visual" version="3">
+		<number name="integer"/>
+		<keyword name="auto"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="column-fill"
+		inherited="no" mediagroup="visual" category="visual" version="3">
+		<keyword name="auto"/>
+		<keyword name="balance"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="column-gap"
+		inherited="no" mediagroup="visual" category="visual" version="3">
+		<number name="length"/>
+		<keyword name="normal"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="column-rule"
+		inherited="no" mediagroup="visual" category="visual" version="3">
+		<property name="column-rule-width"/>
+		<property name="column-rule-style"/>
+		<property name="column-rule-color"/>
+	</property-def>
+	<property-def name="column-rule-color"
+		inherited="no" mediagroup="visual" category="visual" version="3">
+		<container name="color"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="column-rule-style"
+		inherited="no" mediagroup="visual" category="visual" version="3">
+		<container name="border-style"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="column-rule-width"
+		inherited="no" mediagroup="visual" category="visual" version="3">
+		<container name="border-width"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="column-span"
+		inherited="no" mediagroup="visual" category="visual" version="3">
+		<keyword name="all"/>
+		<keyword name="1"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="content"
+		inherited="no" mediagroup="all" category="content">
+		<string name="any"/>
+		<function name="uri"/>
+		<function name="counter"/>
+		<function name="attr"/>
+		<keyword name="open-quote"/>
+		<keyword name="close-quote"/>
+		<keyword name="none"/>
+		<keyword name="normal"/>
+		<keyword name="no-open-quote"/>
+		<keyword name="no-close-quote"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="counter-increment"
+		inherited="no" mediagroup="all" category="content">
+		<string name="counter-identifier"/>
+		<number name="integer"/>
+		<keyword name="none"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="counter-reset"
+		inherited="no" mediagroup="all" category="content">
+		<string name="counter-identifier"/>
+		<number name="integer"/>
+		<keyword name="none"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="cue"
+		inherited="no" mediagroup="aural" category="aural">
+		<property name="cue-before"/>
+		<property name="cue-after"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="cue-after"
+		inherited="no" mediagroup="aural" category="aural">
+		<function name="uri"/>
+		<keyword name="none"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="cue-before"
+		inherited="no" mediagroup="aural" category="aural">
+		<function name="uri"/>
+		<keyword name="none"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="cursor"
+		inherited="yes" mediagroup="visual,interactive" category="ui">
+		<function name="uri"/>
+		<keyword name="auto"/>
+		<keyword name="crosshair"/>
+		<keyword name="default"/>
+		<keyword name="pointer"/>
+		<keyword name="progress"/>
+		<keyword name="move"/>
+		<keyword name="e-resize"/>
+		<keyword name="ne-resize"/>
+		<keyword name="nw-resize"/>
+		<keyword name="n-resize"/>
+		<keyword name="se-resize"/>
+		<keyword name="sw-resize"/>
+		<keyword name="s-resize"/>
+		<keyword name="w-resize"/>
+		<keyword name="text"/>
+		<keyword name="wait"/>
+		<keyword name="help"/>
+		<keyword name="inherit"/>
+		<separator name="comma"/>
+	</property-def>
+	<property-def name="direction"
+		inherited="yes" mediagroup="visual" category="visual">
+		<keyword name="ltr"/>
+		<keyword name="rtl"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="display"
+		inherited="no" mediagroup="all" category="visual">
+		<keyword name="inline"/>
+		<keyword name="inline-block"/>
+		<keyword name="block"/>
+		<keyword name="list-item"/>
+		<keyword name="run-in"/>
+		<keyword name="compact"/>
+		<keyword name="marker"/>
+		<keyword name="table"/>
+		<keyword name="inline-table"/>
+		<keyword name="table-row-group"/>
+		<keyword name="table-header-group"/>
+		<keyword name="table-footer-group"/>
+		<keyword name="table-row"/>
+		<keyword name="table-column-group"/>
+		<keyword name="table-column"/>
+		<keyword name="table-cell"/>
+		<keyword name="table-caption"/>
+		<keyword name="none"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="elevation"
+		inherited="yes" mediagroup="aural" category="aural">
+		<number name="angle"/>
+		<keyword name="below"/>
+		<keyword name="level"/>
+		<keyword name="above"/>
+		<keyword name="higher"/>
+		<keyword name="lower"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="empty-cells"
+		inherited="yes" mediagroup="visual" category="tables">
+		<keyword name="show"/>
+		<keyword name="hide"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="float"
+		inherited="no" mediagroup="visual" category="visual">
+		<keyword name="left"/>
+		<keyword name="right"/>
+		<keyword name="none"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="font"
+		inherited="yes" mediagroup="visual" category="font">
+		<property name="font-style"/>
+		<property name="font-variant"/>
+		<property name="font-weight"/>
+		<property name="font-size"/>
+		<property name="line-height"/>
+		<property name="font-family"/>
+		<keyword name="caption"/>
+		<keyword name="icon"/>
+		<keyword name="menu"/>
+		<keyword name="message-box"/>
+		<keyword name="small-caption"/>
+		<keyword name="status-bar"/>
+		<keyword name="inherit"/>
+		<separator name="slash"/>
+	</property-def>
+	<property-def name="font-family"
+		inherited="yes" mediagroup="visual" category="font">
+		<string name="family-name"/>
+		<container name="generic-family"/>
+		<keyword name="inherit"/>
+		<separator name="comma"/>
+	</property-def>
+	<property-def name="font-size"
+		inherited="yes" mediagroup="visual" category="font">
+		<container name="absolute-size"/>
+		<container name="relative-size"/>
+		<number name="length"/>
+		<number name="percentage"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="font-size-adjust"
+		inherited="yes" mediagroup="visual" category="font">
+		<number name="number"/>
+		<keyword name="none"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="font-stretch"
+		inherited="yes" mediagroup="visual" category="font">
+		<keyword name="normal"/>
+		<keyword name="wider"/>
+		<keyword name="narrower"/>
+		<keyword name="ultra-condensed"/>
+		<keyword name="extra-condensed"/>
+		<keyword name="condensed"/>
+		<keyword name="semi-condensed"/>
+		<keyword name="semi-expanded"/>
+		<keyword name="expanded"/>
+		<keyword name="extra-expanded"/>
+		<keyword name="ultra-expanded"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="font-style"
+		inherited="yes" mediagroup="visual" category="font">
+		<keyword name="normal"/>
+		<keyword name="italic"/>
+		<keyword name="oblique"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="font-variant"
+		inherited="yes" mediagroup="visual" category="font">
+		<keyword name="normal"/>
+		<keyword name="small-caps"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="font-weight"
+		inherited="yes" mediagroup="visual" category="font">
+		<keyword name="normal"/>
+		<keyword name="bold"/>
+		<keyword name="bolder"/>
+		<keyword name="lighter"/>
+		<keyword name="100"/>
+		<keyword name="200"/>
+		<keyword name="300"/>
+		<keyword name="400"/>
+		<keyword name="500"/>
+		<keyword name="600"/>
+		<keyword name="700"/>
+		<keyword name="800"/>
+		<keyword name="900"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="height"
+		inherited="no" mediagroup="visual" category="visual">
+		<number name="length"/>
+		<number name="percentage"/>
+		<keyword name="auto"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="left"
+		inherited="no" mediagroup="visual" category="visual">
+		<number name="length"/>
+		<number name="percentage"/>
+		<keyword name="auto"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="letter-spacing"
+		inherited="yes" mediagroup="visual" category="text">
+		<keyword name="normal"/>
+		<number name="length"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="line-height"
+		inherited="yes" mediagroup="visual" category="visual">
+		<keyword name="normal"/>
+		<number name="number"/>
+		<number name="length"/>
+		<number name="percentage"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="list-style"
+		inherited="yes" mediagroup="visual" category="content">
+		<property name="list-style-type"/>
+		<property name="list-style-position"/>
+		<property name="list-style-image"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="list-style-image"
+		inherited="yes" mediagroup="visual" category="content">
+		<function name="uri"/>
+		<keyword name="none"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="list-style-position"
+		inherited="yes" mediagroup="visual" category="content">
+		<keyword name="inside"/>
+		<keyword name="outside"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="list-style-type"
+		inherited="yes" mediagroup="visual" category="content">
+		<keyword name="disc"/>
+		<keyword name="circle"/>
+		<keyword name="square"/>
+		<keyword name="decimal"/>
+		<keyword name="decimal-leading-zero"/>
+		<keyword name="lower-roman"/>
+		<keyword name="upper-roman"/>
+		<keyword name="lower-greek"/>
+		<keyword name="lower-alpha"/>
+		<keyword name="lower-latin"/>
+		<keyword name="upper-alpha"/>
+		<keyword name="upper-latin"/>
+		<keyword name="hebrew"/>
+		<keyword name="armenian"/>
+		<keyword name="georgian"/>
+		<keyword name="cjk-ideographic"/>
+		<keyword name="hiragana"/>
+		<keyword name="katakana"/>
+		<keyword name="hiragana-iroha"/>
+		<keyword name="katakana-iroha"/>
+		<keyword name="none"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="margin"
+		inherited="no" mediagroup="visual" category="box">
+		<container name="margin-width"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="margin-top"
+		inherited="no" mediagroup="visual" category="box">
+		<container name="margin-width"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="margin-right"
+		inherited="no" mediagroup="visual" category="box">
+		<container name="margin-width"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="margin-bottom"
+		inherited="no" mediagroup="visual" category="box">
+		<container name="margin-width"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="margin-left"
+		inherited="no" mediagroup="visual" category="box">
+		<container name="margin-width"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="marker-offset"
+		inherited="no" mediagroup="visual" category="content">
+		<number name="length"/>
+		<keyword name="auto"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="marks"
+		inherited="na" mediagroup="visual,paged" category="page">
+		<keyword name="crop"/>
+		<keyword name="cross"/>
+		<keyword name="none"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="max-height"
+		inherited="no" mediagroup="visual" category="visual">
+		<number name="length"/>
+		<number name="percentage"/>
+		<keyword name="none"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="max-width"
+		inherited="no" mediagroup="visual" category="visual">
+		<number name="length"/>
+		<number name="percentage"/>
+		<keyword name="none"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="min-height"
+		inherited="no" mediagroup="visual" category="visual">
+		<number name="length"/>
+		<number name="percentage"/>
+		<keyword name="none"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="min-width"
+		inherited="no" mediagroup="visual" category="visual">
+		<number name="length"/>
+		<number name="percentage"/>
+		<keyword name="none"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="opacity"
+		inherited="yes" mediagroup="visual" category="visual" version="3">
+		<number name="number"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="orphans"
+		inherited="yes" mediagroup="visual,paged" category="page">
+		<number name="integer"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="outline"
+		inherited="no" mediagroup="visual,interactive" category="ui">
+		<property name="outline-color"/>
+		<property name="outline-style"/>
+		<property name="outline-width"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="outline-color"
+		inherited="no" mediagroup="visual,interactive" category="ui">
+		<container name="color"/>
+		<keyword name="invert"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="outline-style"
+		inherited="no" mediagroup="visual,interactive" category="ui">
+		<container name="border-style"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="outline-width"
+		inherited="no" mediagroup="visual,interactive" category="ui">
+		<container name="border-width"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="overflow"
+		inherited="no" mediagroup="visual" category="visual">
+		<keyword name="visible"/>
+		<keyword name="hidden"/>
+		<keyword name="scroll"/>
+		<keyword name="auto"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="padding"
+		inherited="no" mediagroup="visual" category="box">
+		<container name="padding-width"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="padding-top"
+		inherited="no" mediagroup="visual" category="box">
+		<container name="padding-width"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="padding-right"
+		inherited="no" mediagroup="visual" category="box">
+		<container name="padding-width"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="padding-bottom"
+		inherited="no" mediagroup="visual" category="box">
+		<container name="padding-width"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="padding-left"
+		inherited="no" mediagroup="visual" category="box">
+		<container name="padding-width"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="page"
+		inherited="yes" mediagroup="visual,paged" category="page">
+		<string name="page-identifier"/>
+		<keyword name="auto"/>
+	</property-def>
+	<property-def name="page-break-after"
+		inherited="no" mediagroup="visual,paged" category="page">
+		<keyword name="auto"/>
+		<keyword name="always"/>
+		<keyword name="avoid"/>
+		<keyword name="left"/>
+		<keyword name="right"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="page-break-before"
+		inherited="no" mediagroup="visual,paged" category="page">
+		<keyword name="auto"/>
+		<keyword name="always"/>
+		<keyword name="avoid"/>
+		<keyword name="left"/>
+		<keyword name="right"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="page-break-inside"
+		inherited="yes" mediagroup="visual,paged" category="page">
+		<keyword name="avoid"/>
+		<keyword name="auto"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="pause"
+		inherited="no" mediagroup="aural" category="aural">
+		<number name="time"/>
+		<number name="percentage"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="pause-after"
+		inherited="no" mediagroup="aural" category="aural">
+		<number name="time"/>
+		<number name="percentage"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="pause-before"
+		inherited="no" mediagroup="aural" category="aural">
+		<number name="time"/>
+		<number name="percentage"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="pitch"
+		inherited="yes" mediagroup="aural" category="aural">
+		<number name="frequency"/>
+		<keyword name="x-low"/>
+		<keyword name="low"/>
+		<keyword name="medium"/>
+		<keyword name="high"/>
+		<keyword name="x-high"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="pitch-range"
+		inherited="yes" mediagroup="aural" category="aural">
+		<number name="number"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="play-during"
+		inherited="no" mediagroup="aural" category="aural">
+		<function name="uri"/>
+		<keyword name="mix"/>
+		<keyword name="repeat"/>
+		<keyword name="auto"/>
+		<keyword name="none"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="position"
+		inherited="no" mediagroup="visual" category="visual">
+		<keyword name="static"/>
+		<keyword name="relative"/>
+		<keyword name="absolute"/>
+		<keyword name="fixed"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="quotes"
+		inherited="yes" mediagroup="visual" category="content">
+		<string name="any"/>
+		<keyword name="none"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="resize"
+		inherited="yes" mediagroup="visual" category="visual" version="3">
+		<keyword name="both"/>
+		<keyword name="horizontal"/>
+		<keyword name="none"/>
+		<keyword name="vertical"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="richness"
+		inherited="yes" mediagroup="aural" category="aural">
+		<number name="number"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="right"
+		inherited="no" mediagroup="visual" category="visual">
+		<number name="length"/>
+		<number name="percentage"/>
+		<keyword name="auto"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="size"
+		inherited="na" mediagroup="visual,paged" category="page">
+		<number name="length"/>
+		<keyword name="auto"/>
+		<keyword name="portrait"/>
+		<keyword name="landscape"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="speak"
+		inherited="yes" mediagroup="aural" category="aural">
+		<keyword name="normal"/>
+		<keyword name="none"/>
+		<keyword name="spell-out"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="speak-header"
+		inherited="yes" mediagroup="aural" category="tables">
+		<keyword name="once"/>
+		<keyword name="always"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="speak-numeral"
+		inherited="yes" mediagroup="aural" category="aural">
+		<keyword name="digits"/>
+		<keyword name="continuous"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="speak-punctuation"
+		inherited="yes" mediagroup="aural" category="aural">
+		<keyword name="code"/>
+		<keyword name="none"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="speech-rate"
+		inherited="yes" mediagroup="aural" category="aural">
+		<number name="number"/>
+		<keyword name="x-slow"/>
+		<keyword name="slow"/>
+		<keyword name="medium"/>
+		<keyword name="fast"/>
+		<keyword name="x-fast"/>
+		<keyword name="faster"/>
+		<keyword name="slower"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="stress"
+		inherited="yes" mediagroup="aural" category="aural">
+		<number name="number"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="table-layout"
+		inherited="no" mediagroup="visual" category="tables">
+		<keyword name="auto"/>
+		<keyword name="fixed"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="text-align"
+		inherited="yes" mediagroup="visual" category="text">
+		<keyword name="left"/>
+		<keyword name="right"/>
+		<keyword name="center"/>
+		<keyword name="justify"/>
+		<string name="any"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="text-decoration"
+		inherited="no" mediagroup="visual" category="text">
+		<keyword name="none"/>
+		<keyword name="underline"/>
+		<keyword name="overline"/>
+		<keyword name="line-through"/>
+		<keyword name="blink"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="text-indent"
+		inherited="yes" mediagroup="visual" category="text">
+		<number name="length"/>
+		<number name="percentage"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="text-overflow"
+		inherited="no" mediagroup="visual" category="text" version="3">
+		<keyword name="clip"/>
+		<keyword name="ellipsis"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="text-shadow"
+		inherited="no" mediagroup="visual" category="text" version="3">
+		<keyword name="none"/>
+		<container name="color"/>
+		<number name="length"/>
+		<keyword name="inherit"/>
+		<separator name="comma"/>
+	</property-def>
+	<property-def name="text-transform"
+		inherited="yes" mediagroup="visual" category="text">
+		<keyword name="capitalize"/>
+		<keyword name="uppercase"/>
+		<keyword name="lowercase"/>
+		<keyword name="none"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="top"
+		inherited="no" mediagroup="visual" category="visual">
+		<number name="length"/>
+		<number name="percentage"/>
+		<keyword name="auto"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="unicode-bidi"
+		inherited="no" mediagroup="visual" category="visual">
+		<keyword name="normal"/>
+		<keyword name="embed"/>
+		<keyword name="bidi-override"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="vertical-align"
+		inherited="no" mediagroup="visual" category="visual">
+		<keyword name="baseline"/>
+		<keyword name="sub"/>
+		<keyword name="super"/>
+		<keyword name="top"/>
+		<keyword name="text-top"/>
+		<keyword name="middle"/>
+		<keyword name="bottom"/>
+		<keyword name="text-bottom"/>
+		<number name="percentage"/>
+		<number name="length"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="visibility"
+		inherited="no" mediagroup="visual" category="visual">
+		<keyword name="visible"/>
+		<keyword name="hidden"/>
+		<keyword name="collapse"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="voice-family"
+		inherited="yes" mediagroup="aural" category="aural">
+		<string name="specific-voice"/>
+		<container name="generic-voice"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="volume"
+		inherited="yes" mediagroup="aural" category="aural">
+		<number name="number"/>
+		<number name="percentage"/>
+		<keyword name="silent"/>
+		<keyword name="x-soft"/>
+		<keyword name="soft"/>
+		<keyword name="medium"/>
+		<keyword name="loud"/>
+		<keyword name="x-loud"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="white-space"
+		inherited="yes" mediagroup="visual" category="text">
+		<keyword name="normal"/>
+		<keyword name="pre"/>
+		<keyword name="pre-line"/>
+		<keyword name="pre-wrap"/>
+		<keyword name="nowrap"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="widows"
+		inherited="yes" mediagroup="visual,paged" category="page">
+		<number name="integer"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="width"
+		inherited="no" mediagroup="visual" category="visual">
+		<number name="length"/>
+		<number name="percentage"/>
+		<keyword name="auto"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="word-spacing"
+		inherited="yes" mediagroup="visual" category="text">
+		<keyword name="normal"/>
+		<number name="length"/>
+		<keyword name="inherit"/>
+	</property-def>
+	<property-def name="z-index"
+		inherited="no" mediagroup="visual" category="visual">
+		<keyword name="auto"/>
+		<number name="integer"/>
+		<keyword name="inherit"/>
+	</property-def>
+
+	<!-- descriptor definition : These are for @font-face -->
+
+	<descriptor-def name="ascent">
+		<number name="number"/>
+	</descriptor-def>
+	<descriptor-def name="baseline">
+		<number name="number"/>
+	</descriptor-def>
+	<descriptor-def name="bbox">
+		<number name="number"/>
+		<separator name="comma"/>
+	</descriptor-def>
+	<descriptor-def name="cap-height">
+		<number name="number"/>
+	</descriptor-def>
+	<descriptor-def name="centerline">
+		<number name="number"/>
+	</descriptor-def>
+	<descriptor-def name="definition-src">
+		<function name="uri"/>
+	</descriptor-def>
+	<descriptor-def name="descent">
+		<number name="number"/>
+	</descriptor-def>
+	<descriptor-def name="font-family">
+		<string name="family-name"/>
+		<container name="generic-family"/>
+		<separator name="comma"/>
+	</descriptor-def>
+	<descriptor-def name="font-size">
+		<keyword name="all"/>
+		<number name="length"/>
+		<separator name="comma"/>
+	</descriptor-def>
+	<descriptor-def name="font-stretch">
+		<keyword name="all"/>
+		<keyword name="normal"/>
+		<keyword name="ultra-condensed"/>
+		<keyword name="extra-condensed"/>
+		<keyword name="condensed"/>
+		<keyword name="semi-condensed"/>
+		<keyword name="semi-expanded"/>
+		<keyword name="expanded"/>
+		<keyword name="extra-expanded"/>
+		<keyword name="ultra-expanded"/>
+		<separator name="comma"/>
+	</descriptor-def>
+	<descriptor-def name="font-style">
+		<keyword name="all"/>
+		<keyword name="normal"/>
+		<keyword name="italic"/>
+		<keyword name="oblique"/>
+		<separator name="comma"/>
+	</descriptor-def>
+	<descriptor-def name="font-variant">
+		<keyword name="normal"/>
+		<keyword name="small-caps"/>
+		<separator name="comma"/>
+	</descriptor-def>
+	<descriptor-def name="font-weight">
+		<keyword name="all"/>
+		<keyword name="normal"/>
+		<keyword name="bold"/>
+		<keyword name="100"/>
+		<keyword name="200"/>
+		<keyword name="300"/>
+		<keyword name="400"/>
+		<keyword name="500"/>
+		<keyword name="600"/>
+		<keyword name="700"/>
+		<keyword name="800"/>
+		<keyword name="900"/>
+		<separator name="comma"/>
+	</descriptor-def>
+	<descriptor-def name="mathline">
+		<number name="number"/>
+	</descriptor-def>
+	<descriptor-def name="panose-1">
+		<number name="integer"/>
+	</descriptor-def>
+	<descriptor-def name="slope">
+		<number name="number"/>
+	</descriptor-def>
+	<descriptor-def name="src">
+		<function name="uri"/>
+		<function name="format"/>
+		<container name="font-face-name"/>
+	</descriptor-def>
+	<descriptor-def name="stemh">
+		<number name="number"/>
+	</descriptor-def>
+	<descriptor-def name="stemv">
+		<number name="number"/>
+	</descriptor-def>
+	<descriptor-def name="topline">
+		<number name="number"/>
+	</descriptor-def>
+	<descriptor-def name="unicode-range">
+		<string name="urange"/>
+	</descriptor-def>
+	<descriptor-def name="units-per-em">
+		<number name="number"/>
+	</descriptor-def>
+	<descriptor-def name="widths">
+		<string name="urange"/>
+		<number name="length"/>
+	</descriptor-def>
+	<descriptor-def name="x-height">
+		<number name="number"/>
+	</descriptor-def>
+
+	<!-- container definition : Container is the lump of values.
+	It can be used like macros. -->
+    <container-def name="absolute-size">
+        <keyword name="xx-small"/>
+        <keyword name="x-small"/>
+        <keyword name="small"/>
+        <keyword name="medium"/>
+        <keyword name="large"/>
+        <keyword name="x-large"/>
+        <keyword name="xx-large"/>
+    </container-def>
+    <container-def name="border-style">
+        <keyword name="none"/>
+        <keyword name="hidden"/>
+        <keyword name="dotted"/>
+        <keyword name="dashed"/>
+        <keyword name="solid"/>
+        <keyword name="double"/>
+        <keyword name="groove"/>
+        <keyword name="ridge"/>
+        <keyword name="inset"/>
+        <keyword name="outset"/>
+    </container-def>
+    <container-def name="border-width">
+        <keyword name="thin"/>
+        <keyword name="medium"/>
+        <keyword name="thick"/>
+        <number name="length"/>
+    </container-def>
+	<container-def name="color">
+		<keyword name="aqua"/>
+		<keyword name="black"/>
+		<keyword name="blue"/>
+		<keyword name="fuchsia"/>
+		<keyword name="gray"/>
+		<keyword name="green"/>
+		<keyword name="lime"/>
+		<keyword name="maroon"/>
+		<keyword name="navy"/>
+		<keyword name="olive"/>
+		<keyword name="orange"/>
+		<keyword name="purple"/>
+		<keyword name="red"/>
+		<keyword name="silver"/>
+		<keyword name="teal"/>
+		<keyword name="white"/>
+		<keyword name="yellow"/>
+		<container name="system-color"/>
+		<function name="rgb"/>
+		<function name="rgba"/>
+		<number name="hash"/>
+	</container-def>
+	<container-def name="generic-family">
+		<keyword name="serif"/>
+		<keyword name="sans-serif"/>
+		<keyword name="cursive"/>
+		<keyword name="fantasy"/>
+		<keyword name="monospace"/>
+	</container-def>
+	<container-def name="font-face-name">
+		<function name="local"/>
+	</container-def>
+	<container-def name="generic-voice">
+		<keyword name="male"/>
+		<keyword name="female"/>
+		<keyword name="child"/>
+	</container-def>
+	<container-def name="margin-width">
+		<number name="length"/>
+		<number name="percentage"/>
+		<keyword name="auto"/>
+	</container-def>
+	<container-def name="padding-width">
+		<number name="length"/>
+		<number name="percentage"/>
+	</container-def>
+	<container-def name="relative-size">
+		<keyword name="smaller"/>
+		<keyword name="larger"/>
+	</container-def>
+	<container-def name="shape">
+		<function name="rect"/>
+	</container-def>
+	<container-def name="system-color">
+		<keyword name="ActiveBorder"/>
+		<keyword name="ActiveCaption"/>
+		<keyword name="AppWorkspace"/>
+		<keyword name="Background"/>
+		<keyword name="ButtonFace"/>
+		<keyword name="ButtonHighlight"/>
+		<keyword name="ButtonShadow"/>
+		<keyword name="ButtonText"/>
+		<keyword name="CaptionText"/>
+		<keyword name="GrayText"/>
+		<keyword name="Highlight"/>
+		<keyword name="HighlightText"/>
+		<keyword name="InactiveBorder"/>
+		<keyword name="InactiveCaption"/>
+		<keyword name="InactiveCaptionText"/>
+		<keyword name="InfoBackground"/>
+		<keyword name="InfoText"/>
+		<keyword name="Menu"/>
+		<keyword name="MenuText"/>
+		<keyword name="Scrollbar"/>
+		<keyword name="ThreeDDarkShadow"/>
+		<keyword name="ThreeDFace"/>
+		<keyword name="ThreeDHighlight"/>
+		<keyword name="ThreeDLightShadow"/>
+		<keyword name="ThreeDShadow"/>
+		<keyword name="Window"/>
+		<keyword name="WindowFrame"/>
+		<keyword name="WindowText"/>
+	</container-def>
+
+	<!-- category definition : This is used to categorize properties
+	in Properties View. -->
+	<category-def name="aural">
+		<caption>%css2.category-def.aural.caption</caption>
+	</category-def>
+	<category-def name="box">
+		<caption>%css2.category-def.box.caption</caption>
+	</category-def>
+	<category-def name="colorandbackground">
+		<caption>%css2.category-def.colorandbackground.caption</caption>
+	</category-def>
+	<category-def name="content">
+		<caption>%css2.category-def.content.caption</caption>
+	</category-def>
+	<category-def name="font">
+		<caption>%css2.category-def.font.caption</caption>
+	</category-def>
+	<category-def name="page">
+		<caption>%css2.category-def.page.caption</caption>
+	</category-def>
+	<category-def name="tables">
+		<caption>%css2.category-def.tables.caption</caption>
+	</category-def>
+	<category-def name="text">
+		<caption>%css2.category-def.text.caption</caption>
+	</category-def>
+	<category-def name="ui">
+		<caption>%css2.category-def.ui.caption</caption>
+	</category-def>
+	<category-def name="visual">
+<!--		<caption>%css2.category-def.visual.caption</caption>-->
+		<caption>%css2.category-def.visual.caption</caption>
+	</category-def>
+	
+	<!-- function definition -->
+	<function-def name="attr">
+		<function-value>attr</function-value>
+	</function-def>
+	<function-def name="counter">
+		<function-value>counter</function-value>
+	</function-def>
+	<function-def name="rect">
+		<function-value>rect</function-value>
+	</function-def>
+	<function-def name="rgb">
+		<function-value>rgb</function-value>
+	</function-def>
+	<function-def name="rgba" version="3">
+		<function-value>rgba</function-value>
+	</function-def>
+	<function-def name="uri">
+		<function-value>url</function-value>
+	</function-def>
+	<function-def name="format">
+		<function-value>format</function-value>
+	</function-def>
+	<function-def name="local">
+		<function-value>local</function-value>
+	</function-def>
+
+	<!-- number definition : What unit types be acceptable for each
+	number type? -->
+    <number-def name="angle">
+        <unit name="deg"/>
+        <unit name="grad"/>
+        <unit name="rad"/>
+    </number-def>
+    <number-def name="frequency">
+        <unit name="hz"/>
+        <unit name="khz"/>
+    </number-def>
+    <number-def name="hash">
+        <unit name="hash"/>
+    </number-def>
+	<number-def name="integer">
+	</number-def>
+    <number-def name="length">
+        <unit name="em"/>
+        <unit name="ex"/>
+        <unit name="px"/>
+        <unit name="in"/>
+        <unit name="cm"/>
+        <unit name="mm"/>
+        <unit name="pt"/>
+        <unit name="pc"/>
+    </number-def>
+	<number-def name="number">
+	</number-def>
+	<number-def name="percentage">
+		<unit name="percentage"/>
+	</number-def>
+	<number-def name="time">
+		<unit name="ms"/>
+		<unit name="s"/>
+	</number-def>
+
+	<unit-def name="cm">
+		<unit-value>cm</unit-value>
+	</unit-def>
+	<unit-def name="deg">
+		<unit-value>deg</unit-value>
+	</unit-def>
+	<unit-def name="em">
+		<unit-value>em</unit-value>
+	</unit-def>
+	<unit-def name="ex">
+		<unit-value>ex</unit-value>
+	</unit-def>
+	<unit-def name="grad">
+		<unit-value>grad</unit-value>
+	</unit-def>
+	<unit-def name="hash">
+		<unit-value>#</unit-value>
+	</unit-def>
+	<unit-def name="hz">
+		<unit-value>Hz</unit-value>
+	</unit-def>
+	<unit-def name="in">
+		<unit-value>in</unit-value>
+	</unit-def>
+	<unit-def name="khz">
+		<unit-value>kHz</unit-value>
+	</unit-def>
+	<unit-def name="mm">
+		<unit-value>mm</unit-value>
+	</unit-def>
+	<unit-def name="ms">
+		<unit-value>ms</unit-value>
+	</unit-def>
+	<unit-def name="pc">
+		<unit-value>pc</unit-value>
+	</unit-def>
+	<unit-def name="percentage">
+		<unit-value>%</unit-value>
+	</unit-def>
+	<unit-def name="pt">
+		<unit-value>pt</unit-value>
+	</unit-def>
+	<unit-def name="px">
+		<unit-value>px</unit-value>
+	</unit-def>
+	<unit-def name="rad">
+		<unit-value>rad</unit-value>
+	</unit-def>
+	<unit-def name="s">
+		<unit-value>s</unit-value>
+	</unit-def>
+
+    <!-- keywords : string constants (this is last part..) -->
+    <keyword-def name="1" version="3">
+        <keyword-value>1</keyword-value>
+    </keyword-def>
+    <keyword-def name="100">
+        <keyword-value>100</keyword-value>
+    </keyword-def>
+    <keyword-def name="200">
+        <keyword-value>200</keyword-value>
+    </keyword-def>
+    <keyword-def name="300">
+        <keyword-value>300</keyword-value>
+    </keyword-def>
+    <keyword-def name="400">
+        <keyword-value>400</keyword-value>
+    </keyword-def>
+    <keyword-def name="500">
+        <keyword-value>500</keyword-value>
+    </keyword-def>
+    <keyword-def name="600">
+        <keyword-value>600</keyword-value>
+    </keyword-def>
+    <keyword-def name="700">
+        <keyword-value>700</keyword-value>
+    </keyword-def>
+    <keyword-def name="800">
+        <keyword-value>800</keyword-value>
+    </keyword-def>
+    <keyword-def name="900">
+        <keyword-value>900</keyword-value>
+    </keyword-def>
+    <keyword-def name="above">
+        <keyword-value>above</keyword-value>
+    </keyword-def>
+    <keyword-def name="absolute">
+        <keyword-value>absolute</keyword-value>
+    </keyword-def>
+    <keyword-def name="ActiveBorder">
+        <keyword-value>ActiveBorder</keyword-value>
+    </keyword-def>
+    <keyword-def name="ActiveCaption">
+        <keyword-value>ActiveCaption</keyword-value>
+    </keyword-def>
+    <keyword-def name="all">
+        <keyword-value>all</keyword-value>
+    </keyword-def>
+    <keyword-def name="always">
+        <keyword-value>always</keyword-value>
+    </keyword-def>
+    <keyword-def name="AppWorkspace">
+        <keyword-value>AppWorkspace</keyword-value>
+    </keyword-def>
+    <keyword-def name="aqua">
+        <keyword-value>aqua</keyword-value>
+    </keyword-def>
+    <keyword-def name="armenian">
+        <keyword-value>armenian</keyword-value>
+    </keyword-def>
+    <keyword-def name="auto">
+        <keyword-value>auto</keyword-value>
+    </keyword-def>
+    <keyword-def name="avoid">
+        <keyword-value>avoid</keyword-value>
+    </keyword-def>
+    <keyword-def name="balance" version="3">
+        <keyword-value>balance</keyword-value>
+    </keyword-def>
+    <keyword-def name="Background">
+        <keyword-value>Background</keyword-value>
+    </keyword-def>
+    <keyword-def name="baseline">
+        <keyword-value>baseline</keyword-value>
+    </keyword-def>
+    <keyword-def name="behind">
+        <keyword-value>behind</keyword-value>
+    </keyword-def>
+    <keyword-def name="below">
+        <keyword-value>below</keyword-value>
+    </keyword-def>
+    <keyword-def name="bidi-override">
+        <keyword-value>bidi-override</keyword-value>
+    </keyword-def>
+    <keyword-def name="black">
+        <keyword-value>black</keyword-value>
+    </keyword-def>
+    <keyword-def name="blink">
+        <keyword-value>blink</keyword-value>
+    </keyword-def>
+    <keyword-def name="block">
+        <keyword-value>block</keyword-value>
+    </keyword-def>
+    <keyword-def name="blue">
+        <keyword-value>blue</keyword-value>
+    </keyword-def>
+    <keyword-def name="bold">
+        <keyword-value>bold</keyword-value>
+    </keyword-def>
+    <keyword-def name="bolder">
+        <keyword-value>bolder</keyword-value>
+    </keyword-def>
+    <keyword-def name="border-box" version="3">
+    	<keyword-value>border-box</keyword-value>
+    </keyword-def>
+    <keyword-def name="both">
+        <keyword-value>both</keyword-value>
+    </keyword-def>
+    <keyword-def name="bottom">
+        <keyword-value>bottom</keyword-value>
+    </keyword-def>
+    <keyword-def name="ButtonFace">
+        <keyword-value>ButtonFace</keyword-value>
+    </keyword-def>
+    <keyword-def name="ButtonHighlight">
+        <keyword-value>ButtonHighlight</keyword-value>
+    </keyword-def>
+    <keyword-def name="ButtonShadow">
+        <keyword-value>ButtonShadow</keyword-value>
+    </keyword-def>
+    <keyword-def name="ButtonText">
+        <keyword-value>ButtonText</keyword-value>
+    </keyword-def>
+    <keyword-def name="capitalize">
+        <keyword-value>capitalize</keyword-value>
+    </keyword-def>
+    <keyword-def name="caption">
+        <keyword-value>caption</keyword-value>
+    </keyword-def>
+    <keyword-def name="CaptionText">
+        <keyword-value>CaptionText</keyword-value>
+    </keyword-def>
+    <keyword-def name="center">
+        <keyword-value>center</keyword-value>
+    </keyword-def>
+    <keyword-def name="center-left">
+        <keyword-value>center-left</keyword-value>
+    </keyword-def>
+    <keyword-def name="center-right">
+        <keyword-value>center-right</keyword-value>
+    </keyword-def>
+    <keyword-def name="child">
+        <keyword-value>child</keyword-value>
+    </keyword-def>
+    <keyword-def name="circle">
+        <keyword-value>circle</keyword-value>
+    </keyword-def>
+    <keyword-def name="cjk-ideographic">
+        <keyword-value>cjk-ideographic</keyword-value>
+    </keyword-def>
+    <keyword-def name="clip" version="3">
+    	<keyword-value>clip</keyword-value>
+    </keyword-def>
+    <keyword-def name="close-quote">
+        <keyword-value>close-quote</keyword-value>
+    </keyword-def>
+    <keyword-def name="code">
+        <keyword-value>code</keyword-value>
+    </keyword-def>
+    <keyword-def name="collapse">
+        <keyword-value>collapse</keyword-value>
+    </keyword-def>
+    <keyword-def name="compact">
+        <keyword-value>compact</keyword-value>
+    </keyword-def>
+    <keyword-def name="condensed">
+        <keyword-value>condensed</keyword-value>
+    </keyword-def>
+    <keyword-def name="contain" version="3">
+    	<keyword-value>contain</keyword-value>
+    </keyword-def>
+    <keyword-def name="content-box" version="3">
+    	<keyword-value>content-box</keyword-value>
+    </keyword-def>
+    <keyword-def name="continuous">
+        <keyword-value>continuous</keyword-value>
+    </keyword-def>
+    <keyword-def name="cover" version="3">
+    	<keyword-value>cover</keyword-value>
+    </keyword-def>
+    <keyword-def name="crop">
+        <keyword-value>crop</keyword-value>
+    </keyword-def>
+    <keyword-def name="cross">
+        <keyword-value>cross</keyword-value>
+    </keyword-def>
+    <keyword-def name="crosshair">
+        <keyword-value>crosshair</keyword-value>
+    </keyword-def>
+    <keyword-def name="cursive">
+        <keyword-value>cursive</keyword-value>
+    </keyword-def>
+    <keyword-def name="dashed">
+        <keyword-value>dashed</keyword-value>
+    </keyword-def>
+    <keyword-def name="decimal">
+        <keyword-value>decimal</keyword-value>
+    </keyword-def>
+    <keyword-def name="decimal-leading-zero">
+        <keyword-value>decimal-leading-zero</keyword-value>
+    </keyword-def>
+    <keyword-def name="default">
+        <keyword-value>default</keyword-value>
+    </keyword-def>
+    <keyword-def name="digits">
+        <keyword-value>digits</keyword-value>
+    </keyword-def>
+    <keyword-def name="disc">
+        <keyword-value>disc</keyword-value>
+    </keyword-def>
+    <keyword-def name="dotted">
+        <keyword-value>dotted</keyword-value>
+    </keyword-def>
+    <keyword-def name="double">
+        <keyword-value>double</keyword-value>
+    </keyword-def>
+    <keyword-def name="e-resize">
+        <keyword-value>e-resize</keyword-value>
+    </keyword-def>
+    <keyword-def name="ellipsis" version="3">
+    	<keyword-value>ellipsis</keyword-value>
+    </keyword-def>
+    <keyword-def name="embed">
+        <keyword-value>embed</keyword-value>
+    </keyword-def>
+    <keyword-def name="expanded">
+        <keyword-value>expanded</keyword-value>
+    </keyword-def>
+    <keyword-def name="extra-condensed">
+        <keyword-value>extra-condensed</keyword-value>
+    </keyword-def>
+    <keyword-def name="extra-expanded">
+        <keyword-value>extra-expanded</keyword-value>
+    </keyword-def>
+    <keyword-def name="fantasy">
+        <keyword-value>fantasy</keyword-value>
+    </keyword-def>
+    <keyword-def name="far-left">
+        <keyword-value>far-left</keyword-value>
+    </keyword-def>
+    <keyword-def name="far-right">
+        <keyword-value>far-right</keyword-value>
+    </keyword-def>
+    <keyword-def name="fast">
+        <keyword-value>fast</keyword-value>
+    </keyword-def>
+    <keyword-def name="faster">
+        <keyword-value>faster</keyword-value>
+    </keyword-def>
+    <keyword-def name="female">
+        <keyword-value>female</keyword-value>
+    </keyword-def>
+    <keyword-def name="fixed">
+        <keyword-value>fixed</keyword-value>
+    </keyword-def>
+    <keyword-def name="fuchsia">
+        <keyword-value>fuchsia</keyword-value>
+    </keyword-def>
+    <keyword-def name="georgian">
+        <keyword-value>georgian</keyword-value>
+    </keyword-def>
+    <keyword-def name="gray">
+        <keyword-value>gray</keyword-value>
+    </keyword-def>
+    <keyword-def name="GrayText">
+        <keyword-value>GrayText</keyword-value>
+    </keyword-def>
+    <keyword-def name="green">
+        <keyword-value>green</keyword-value>
+    </keyword-def>
+    <keyword-def name="groove">
+        <keyword-value>groove</keyword-value>
+    </keyword-def>
+    <keyword-def name="hebrew">
+        <keyword-value>hebrew</keyword-value>
+    </keyword-def>
+    <keyword-def name="help">
+        <keyword-value>help</keyword-value>
+    </keyword-def>
+    <keyword-def name="hidden">
+        <keyword-value>hidden</keyword-value>
+    </keyword-def>
+    <keyword-def name="hide">
+        <keyword-value>hide</keyword-value>
+    </keyword-def>
+    <keyword-def name="high">
+        <keyword-value>high</keyword-value>
+    </keyword-def>
+    <keyword-def name="Highlight">
+        <keyword-value>Highlight</keyword-value>
+    </keyword-def>
+    <keyword-def name="HighlightText">
+        <keyword-value>HighlightText</keyword-value>
+    </keyword-def>
+    <keyword-def name="higher">
+        <keyword-value>higher</keyword-value>
+    </keyword-def>
+    <keyword-def name="hiragana">
+        <keyword-value>hiragana</keyword-value>
+    </keyword-def>
+    <keyword-def name="hiragana-iroha">
+        <keyword-value>hiragana-iroha</keyword-value>
+    </keyword-def>
+    <keyword-def name="horizontal" version="3">
+    	<keyword-value>horizontal</keyword-value>
+    </keyword-def>
+    <keyword-def name="icon">
+        <keyword-value>icon</keyword-value>
+    </keyword-def>
+    <keyword-def name="InactiveBorder">
+        <keyword-value>InactiveBorder</keyword-value>
+    </keyword-def>
+    <keyword-def name="InactiveCaption">
+        <keyword-value>InactiveCaption</keyword-value>
+    </keyword-def>
+    <keyword-def name="InactiveCaptionText">
+        <keyword-value>InactiveCaptionText</keyword-value>
+    </keyword-def>
+    <keyword-def name="InfoBackground">
+        <keyword-value>InfoBackground</keyword-value>
+    </keyword-def>
+    <keyword-def name="InfoText">
+        <keyword-value>InfoText</keyword-value>
+    </keyword-def>
+    <keyword-def name="inherit">
+        <keyword-value>inherit</keyword-value>
+    </keyword-def>
+    <keyword-def name="inline">
+        <keyword-value>inline</keyword-value>
+    </keyword-def>
+    <keyword-def name="inline-block">
+        <keyword-value>inline-block</keyword-value>
+    </keyword-def>
+    <keyword-def name="inline-table">
+        <keyword-value>inline-table</keyword-value>
+    </keyword-def>
+    <keyword-def name="inset">
+        <keyword-value>inset</keyword-value>
+    </keyword-def>
+    <keyword-def name="inside">
+        <keyword-value>inside</keyword-value>
+    </keyword-def>
+    <keyword-def name="invert">
+        <keyword-value>invert</keyword-value>
+    </keyword-def>
+    <keyword-def name="italic">
+        <keyword-value>italic</keyword-value>
+    </keyword-def>
+    <keyword-def name="justify">
+        <keyword-value>justify</keyword-value>
+    </keyword-def>
+    <keyword-def name="katakana">
+        <keyword-value>katakana</keyword-value>
+    </keyword-def>
+    <keyword-def name="katakana-iroha">
+        <keyword-value>katakana-iroha</keyword-value>
+    </keyword-def>
+    <keyword-def name="landscape">
+        <keyword-value>landscape</keyword-value>
+    </keyword-def>
+    <keyword-def name="large">
+        <keyword-value>large</keyword-value>
+    </keyword-def>
+    <keyword-def name="larger">
+        <keyword-value>larger</keyword-value>
+    </keyword-def>
+    <keyword-def name="left">
+        <keyword-value>left</keyword-value>
+    </keyword-def>
+    <keyword-def name="left-side">
+        <keyword-value>left-side</keyword-value>
+    </keyword-def>
+    <keyword-def name="leftwards">
+        <keyword-value>leftwards</keyword-value>
+    </keyword-def>
+    <keyword-def name="level">
+        <keyword-value>level</keyword-value>
+    </keyword-def>
+    <keyword-def name="lighter">
+        <keyword-value>lighter</keyword-value>
+    </keyword-def>
+    <keyword-def name="lime">
+        <keyword-value>lime</keyword-value>
+    </keyword-def>
+    <keyword-def name="line-through">
+        <keyword-value>line-through</keyword-value>
+    </keyword-def>
+    <keyword-def name="list-item">
+        <keyword-value>list-item</keyword-value>
+    </keyword-def>
+    <keyword-def name="local" version="3">
+        <keyword-value>local</keyword-value>
+    </keyword-def>
+    <keyword-def name="loud">
+        <keyword-value>loud</keyword-value>
+    </keyword-def>
+    <keyword-def name="low">
+        <keyword-value>low</keyword-value>
+    </keyword-def>
+    <keyword-def name="lower">
+        <keyword-value>lower</keyword-value>
+    </keyword-def>
+    <keyword-def name="lower-alpha">
+        <keyword-value>lower-alpha</keyword-value>
+    </keyword-def>
+    <keyword-def name="lower-greek">
+        <keyword-value>lower-greek</keyword-value>
+    </keyword-def>
+    <keyword-def name="lower-latin">
+        <keyword-value>lower-latin</keyword-value>
+    </keyword-def>
+    <keyword-def name="lower-roman">
+        <keyword-value>lower-roman</keyword-value>
+    </keyword-def>
+    <keyword-def name="lowercase">
+        <keyword-value>lowercase</keyword-value>
+    </keyword-def>
+    <keyword-def name="ltr">
+        <keyword-value>ltr</keyword-value>
+    </keyword-def>
+    <keyword-def name="male">
+        <keyword-value>male</keyword-value>
+    </keyword-def>
+    <keyword-def name="marker">
+        <keyword-value>marker</keyword-value>
+    </keyword-def>
+    <keyword-def name="maroon">
+        <keyword-value>maroon</keyword-value>
+    </keyword-def>
+    <keyword-def name="medium">
+        <keyword-value>medium</keyword-value>
+    </keyword-def>
+    <keyword-def name="Menu">
+        <keyword-value>Menu</keyword-value>
+    </keyword-def>
+    <keyword-def name="MenuText">
+        <keyword-value>MenuText</keyword-value>
+    </keyword-def>
+    <keyword-def name="message-box">
+        <keyword-value>message-box</keyword-value>
+    </keyword-def>
+    <keyword-def name="middle">
+        <keyword-value>middle</keyword-value>
+    </keyword-def>
+    <keyword-def name="mix">
+        <keyword-value>mix</keyword-value>
+    </keyword-def>
+    <keyword-def name="monospace">
+        <keyword-value>monospace</keyword-value>
+    </keyword-def>
+    <keyword-def name="move">
+        <keyword-value>move</keyword-value>
+    </keyword-def>
+    <keyword-def name="n-resize">
+        <keyword-value>n-resize</keyword-value>
+    </keyword-def>
+    <keyword-def name="narrower">
+        <keyword-value>narrower</keyword-value>
+    </keyword-def>
+    <keyword-def name="navy">
+        <keyword-value>navy</keyword-value>
+    </keyword-def>
+    <keyword-def name="ne-resize">
+        <keyword-value>ne-resize</keyword-value>
+    </keyword-def>
+    <keyword-def name="no-close-quote">
+        <keyword-value>no-close-quote</keyword-value>
+    </keyword-def>
+    <keyword-def name="no-open-quote">
+        <keyword-value>no-open-quote</keyword-value>
+    </keyword-def>
+    <keyword-def name="no-repeat">
+        <keyword-value>no-repeat</keyword-value>
+    </keyword-def>
+    <keyword-def name="none">
+        <keyword-value>none</keyword-value>
+    </keyword-def>
+    <keyword-def name="normal">
+        <keyword-value>normal</keyword-value>
+    </keyword-def>
+    <keyword-def name="nowrap">
+        <keyword-value>nowrap</keyword-value>
+    </keyword-def>
+    <keyword-def name="nw-resize">
+        <keyword-value>nw-resize</keyword-value>
+    </keyword-def>
+    <keyword-def name="oblique">
+        <keyword-value>oblique</keyword-value>
+    </keyword-def>
+    <keyword-def name="olive">
+        <keyword-value>olive</keyword-value>
+    </keyword-def>
+    <keyword-def name="once">
+        <keyword-value>once</keyword-value>
+    </keyword-def>
+    <keyword-def name="open-quote">
+        <keyword-value>open-quote</keyword-value>
+    </keyword-def>
+    <keyword-def name="orange">
+        <keyword-value>orange</keyword-value>
+    </keyword-def>
+    <keyword-def name="outset">
+        <keyword-value>outset</keyword-value>
+    </keyword-def>
+    <keyword-def name="outside">
+        <keyword-value>outside</keyword-value>
+    </keyword-def>
+    <keyword-def name="overline">
+        <keyword-value>overline</keyword-value>
+    </keyword-def>
+    <keyword-def name="padding-box" version="3">
+        <keyword-value>padding-box</keyword-value>
+    </keyword-def>
+    <keyword-def name="pointer">
+        <keyword-value>pointer</keyword-value>
+    </keyword-def>
+    <keyword-def name="portrait">
+        <keyword-value>portrait</keyword-value>
+    </keyword-def>
+    <keyword-def name="pre">
+        <keyword-value>pre</keyword-value>
+    </keyword-def>
+    <keyword-def name="pre-line">
+        <keyword-value>pre-line</keyword-value>
+    </keyword-def>
+    <keyword-def name="pre-wrap">
+        <keyword-value>pre-wrap</keyword-value>
+    </keyword-def>
+    <keyword-def name="progress">
+        <keyword-value>progress</keyword-value>
+    </keyword-def>
+    <keyword-def name="purple">
+        <keyword-value>purple</keyword-value>
+    </keyword-def>
+    <keyword-def name="red">
+        <keyword-value>red</keyword-value>
+    </keyword-def>
+    <keyword-def name="relative">
+        <keyword-value>relative</keyword-value>
+    </keyword-def>
+    <keyword-def name="repeat">
+        <keyword-value>repeat</keyword-value>
+    </keyword-def>
+    <keyword-def name="repeat-x">
+        <keyword-value>repeat-x</keyword-value>
+    </keyword-def>
+    <keyword-def name="repeat-y">
+        <keyword-value>repeat-y</keyword-value>
+    </keyword-def>
+    <keyword-def name="ridge">
+        <keyword-value>ridge</keyword-value>
+    </keyword-def>
+    <keyword-def name="right">
+        <keyword-value>right</keyword-value>
+    </keyword-def>
+    <keyword-def name="right-side">
+        <keyword-value>right-side</keyword-value>
+    </keyword-def>
+    <keyword-def name="rightwards">
+        <keyword-value>rightwards</keyword-value>
+    </keyword-def>
+    <keyword-def name="round" version="3">
+        <keyword-value>round</keyword-value>
+    </keyword-def>
+    <keyword-def name="rtl">
+        <keyword-value>rtl</keyword-value>
+    </keyword-def>
+    <keyword-def name="run-in">
+        <keyword-value>run-in</keyword-value>
+    </keyword-def>
+    <keyword-def name="s-resize">
+        <keyword-value>s-resize</keyword-value>
+    </keyword-def>
+    <keyword-def name="sans-serif">
+        <keyword-value>sans-serif</keyword-value>
+    </keyword-def>
+    <keyword-def name="scroll">
+        <keyword-value>scroll</keyword-value>
+    </keyword-def>
+    <keyword-def name="Scrollbar">
+        <keyword-value>Scrollbar</keyword-value>
+    </keyword-def>
+    <keyword-def name="se-resize">
+        <keyword-value>se-resize</keyword-value>
+    </keyword-def>
+    <keyword-def name="semi-condensed">
+        <keyword-value>semi-condensed</keyword-value>
+    </keyword-def>
+    <keyword-def name="semi-expanded">
+        <keyword-value>semi-expanded</keyword-value>
+    </keyword-def>
+    <keyword-def name="separate">
+        <keyword-value>separate</keyword-value>
+    </keyword-def>
+    <keyword-def name="serif">
+        <keyword-value>serif</keyword-value>
+    </keyword-def>
+    <keyword-def name="show">
+        <keyword-value>show</keyword-value>
+    </keyword-def>
+    <keyword-def name="silent">
+        <keyword-value>silent</keyword-value>
+    </keyword-def>
+    <keyword-def name="silver">
+        <keyword-value>silver</keyword-value>
+    </keyword-def>
+    <keyword-def name="slow">
+        <keyword-value>slow</keyword-value>
+    </keyword-def>
+    <keyword-def name="slower">
+        <keyword-value>slower</keyword-value>
+    </keyword-def>
+    <keyword-def name="small">
+        <keyword-value>small</keyword-value>
+    </keyword-def>
+    <keyword-def name="small-caps">
+        <keyword-value>small-caps</keyword-value>
+    </keyword-def>
+    <keyword-def name="small-caption">
+        <keyword-value>small-caption</keyword-value>
+    </keyword-def>
+    <keyword-def name="smaller">
+        <keyword-value>smaller</keyword-value>
+    </keyword-def>
+    <keyword-def name="soft">
+        <keyword-value>soft</keyword-value>
+    </keyword-def>
+    <keyword-def name="solid">
+        <keyword-value>solid</keyword-value>
+    </keyword-def>
+    <keyword-def name="space" version="3">
+        <keyword-value>space</keyword-value>
+    </keyword-def>
+    <keyword-def name="spell-out">
+        <keyword-value>spell-out</keyword-value>
+    </keyword-def>
+    <keyword-def name="square">
+        <keyword-value>square</keyword-value>
+    </keyword-def>
+    <keyword-def name="static">
+        <keyword-value>static</keyword-value>
+    </keyword-def>
+    <keyword-def name="status-bar">
+        <keyword-value>status-bar</keyword-value>
+    </keyword-def>
+    <keyword-def name="sub">
+        <keyword-value>sub</keyword-value>
+    </keyword-def>
+    <keyword-def name="super">
+        <keyword-value>super</keyword-value>
+    </keyword-def>
+    <keyword-def name="sw-resize">
+        <keyword-value>sw-resize</keyword-value>
+    </keyword-def>
+    <keyword-def name="table">
+        <keyword-value>table</keyword-value>
+    </keyword-def>
+    <keyword-def name="table-caption">
+        <keyword-value>table-caption</keyword-value>
+    </keyword-def>
+    <keyword-def name="table-cell">
+        <keyword-value>table-cell</keyword-value>
+    </keyword-def>
+    <keyword-def name="table-column">
+        <keyword-value>table-column</keyword-value>
+    </keyword-def>
+    <keyword-def name="table-column-group">
+        <keyword-value>table-column-group</keyword-value>
+    </keyword-def>
+    <keyword-def name="table-footer-group">
+        <keyword-value>table-footer-group</keyword-value>
+    </keyword-def>
+    <keyword-def name="table-header-group">
+        <keyword-value>table-header-group</keyword-value>
+    </keyword-def>
+    <keyword-def name="table-row">
+        <keyword-value>table-row</keyword-value>
+    </keyword-def>
+    <keyword-def name="table-row-group">
+        <keyword-value>table-row-group</keyword-value>
+    </keyword-def>
+    <keyword-def name="teal">
+        <keyword-value>teal</keyword-value>
+    </keyword-def>
+    <keyword-def name="text">
+        <keyword-value>text</keyword-value>
+    </keyword-def>
+    <keyword-def name="text-top">
+        <keyword-value>text-top</keyword-value>
+    </keyword-def>
+    <keyword-def name="text-bottom">
+        <keyword-value>text-bottom</keyword-value>
+    </keyword-def>
+    <keyword-def name="thick">
+        <keyword-value>thick</keyword-value>
+    </keyword-def>
+    <keyword-def name="thin">
+        <keyword-value>thin</keyword-value>
+    </keyword-def>
+    <keyword-def name="ThreeDDarkShadow">
+        <keyword-value>ThreeDDarkShadow</keyword-value>
+    </keyword-def>
+    <keyword-def name="ThreeDFace">
+        <keyword-value>ThreeDFace</keyword-value>
+    </keyword-def>
+    <keyword-def name="ThreeDHighlight">
+        <keyword-value>ThreeDHighlight</keyword-value>
+    </keyword-def>
+    <keyword-def name="ThreeDLightShadow">
+        <keyword-value>ThreeDLightShadow</keyword-value>
+    </keyword-def>
+    <keyword-def name="ThreeDShadow">
+        <keyword-value>ThreeDShadow</keyword-value>
+    </keyword-def>
+    <keyword-def name="top">
+        <keyword-value>top</keyword-value>
+    </keyword-def>
+    <keyword-def name="transparent">
+        <keyword-value>transparent</keyword-value>
+    </keyword-def>
+    <keyword-def name="ultra-condensed">
+        <keyword-value>ultra-condensed</keyword-value>
+    </keyword-def>
+    <keyword-def name="ultra-expanded">
+        <keyword-value>ultra-expanded</keyword-value>
+    </keyword-def>
+    <keyword-def name="underline">
+        <keyword-value>underline</keyword-value>
+    </keyword-def>
+    <keyword-def name="upper-alpha">
+        <keyword-value>upper-alpha</keyword-value>
+    </keyword-def>
+    <keyword-def name="upper-latin">
+        <keyword-value>upper-latin</keyword-value>
+    </keyword-def>
+    <keyword-def name="upper-roman">
+        <keyword-value>upper-roman</keyword-value>
+    </keyword-def>
+    <keyword-def name="uppercase">
+        <keyword-value>uppercase</keyword-value>
+    </keyword-def>
+    <keyword-def name="vertical" version="3">
+    	<keyword-value>vertical</keyword-value>
+    </keyword-def>
+    <keyword-def name="visible">
+        <keyword-value>visible</keyword-value>
+    </keyword-def>
+    <keyword-def name="w-resize">
+        <keyword-value>w-resize</keyword-value>
+    </keyword-def>
+    <keyword-def name="wait">
+        <keyword-value>wait</keyword-value>
+    </keyword-def>
+    <keyword-def name="white">
+        <keyword-value>white</keyword-value>
+    </keyword-def>
+    <keyword-def name="wider">
+        <keyword-value>wider</keyword-value>
+    </keyword-def>
+    <keyword-def name="Window">
+        <keyword-value>Window</keyword-value>
+    </keyword-def>
+    <keyword-def name="WindowFrame">
+        <keyword-value>WindowFrame</keyword-value>
+    </keyword-def>
+    <keyword-def name="WindowText">
+        <keyword-value>WindowText</keyword-value>
+    </keyword-def>
+    <keyword-def name="x-fast">
+        <keyword-value>x-fast</keyword-value>
+    </keyword-def>
+    <keyword-def name="x-high">
+        <keyword-value>x-high</keyword-value>
+    </keyword-def>
+    <keyword-def name="x-large">
+        <keyword-value>x-large</keyword-value>
+    </keyword-def>
+    <keyword-def name="x-loud">
+        <keyword-value>x-loud</keyword-value>
+    </keyword-def>
+    <keyword-def name="x-low">
+        <keyword-value>x-low</keyword-value>
+    </keyword-def>
+    <keyword-def name="x-slow">
+        <keyword-value>x-slow</keyword-value>
+    </keyword-def>
+    <keyword-def name="x-small">
+        <keyword-value>x-small</keyword-value>
+    </keyword-def>
+    <keyword-def name="x-soft">
+        <keyword-value>x-soft</keyword-value>
+    </keyword-def>
+    <keyword-def name="xx-small">
+        <keyword-value>xx-small</keyword-value>
+    </keyword-def>
+    <keyword-def name="xx-large">
+        <keyword-value>xx-large</keyword-value>
+    </keyword-def>
+    <keyword-def name="yellow">
+        <keyword-value>yellow</keyword-value>
+    </keyword-def>
+</css-profile>

@@ -1,0 +1,133 @@
+net.vtst.ow.eclipse.soy: An Eclipse module for Google Closure Templates
+(c) Vincent Simonet, 2011.  All rights reserved.
+
+
+********************************************************************************
+OVERVIEW
+
+This plugin provides support for the Google Closure Templates language (a.k.a.
+Soy) in Eclipse. Its main features are:
+* Syntax highlighting,
+* Outline tree,
+* Automatic cross-references (templates and variables).
+
+
+********************************************************************************
+REQUIREMENTS
+
+This Eclipse plugin requires:
+* Eclipse Indigo
+* XText 2.0.0 (http://www.eclipse.org/Xtext/)
+
+
+********************************************************************************
+KNOWN ISSUES
+
+
+********************************************************************************
+LICENSE
+
+
+********************************************************************************
+TODO
+
+* template + deltemplate de meme nom
+* Check for unused parameters in case of data="all"
+
+* Launch compiler
+* Task tags?
+
+Improvements:
+* Error message when soydoc is missing
+
+
+********************************************************************************
+Launch configuration
+
+Usage:
+java com.google.template.soy.SoyToJsSrcCompiler  \
+     [<flag1> <flag2> ...] --outputPathFormat <formatString>  \
+     <soyFile1> <soyFile2> ...
+
+OPTIONS TO CONFIGURE THE COMPILATION
+
+ --bidiGlobalDir N                    : The bidi global directionality (ltr=1, rtl=-1). Only
+                                        applicable if your Soy code uses bidi functions/directives.
+                                        Also note that this flag is usually not necessary if a
+                                        message file is provided, because by default the bidi
+                                        global directionality is simply inferred from the message
+                                        file.
+ --codeStyle [STRINGBUILDER | CONCAT] : The code style to use when generating JS code ('stringbuilde
+                                        r' or 'concat').
+ --cssHandlingScheme VAL              : The scheme to use for handling 'css' commands. Specifying
+                                        'literal' will cause command text to be inserted as literal
+                                        text. Specifying 'reference' will cause command text to be
+                                        evaluated as a data or global reference. Specifying 'goog'
+                                        will cause generation of calls goog.getCssName. This option
+                                        has no effect if the Soy code does not contain 'css'
+                                        commands.
+ --isUsingIjData                      : Whether to enable use of injected data (syntax is '$ij.*').
+ --shouldDeclareTopLevelNamespaces    : [Only applicable when generating regular JS code to define
+                                        namespaces (i.e. not generating goog.provide/goog.require).]
+                                        When this option is set to false, each generated JS file
+                                        will not attempt to declare the top-level name in its
+                                        namespace, instead assuming the top-level name is already
+                                        declared in the global scope. E.g. for namespace aaa.bbb,
+                                        the code will not attempt to declare aaa, but will still
+                                        define aaa.bbb if it's not already defined.
+ --shouldGenerateJsdoc                : Whether we should generate JSDoc with type info for the
+                                        Closure Compiler. Note the generated JSDoc does not have
+                                        description text, only types for the benefit of the Closure
+                                        Compiler.
+ --shouldProvideRequireSoyNamespaces  : When this option is used, each generated JS file will
+                                        contain (a) one single goog.provide statement for the
+                                        corresponding Soy file's namespace and (b) goog.require
+                                        statements for the namespaces of the called templates.
+
+PLUGINS:
+ --messagePluginModule VAL            : Specifies the full class name of a Guice module that binds
+                                        a SoyMsgPlugin. If not specified, the default is
+                                        com.google.template.soy.xliffmsgplugin.XliffMsgPluginModule,
+                                        which binds the XliffMsgPlugin.
+ --pluginModules VAL                  : Specifies the full class names of Guice modules for
+                                        function plugins and print directive plugins (comma-delimite
+                                        d list).
+
+
+INPUT AND OUTPUT FILES:
+
+ --compileTimeGlobalsFile VAL         : The path to a file containing the mappings for global names
+                                        to be substituted at compile time. Each line of the file
+                                        should have the format "<global_name> = <primitive_data>"
+                                        where primitive_data is a valid Soy expression literal for
+                                        a primitive type (null, boolean, integer, float, or
+                                        string). Empty lines and lines beginning with "//" are
+                                        ignored. The file should be encoded in UTF-8. If you need
+                                        to generate a file in this format from Java, consider using
+                                        the utility SoyUtils.generateCompileTimeGlobalsFile().
+ --inputPrefix VAL                    : If provided, this path prefix will be prepended to each
+                                        input file path listed on the command line. This is a
+                                        literal string prefix, so you'll need to include a trailing
+                                        slash if necessary.
+ --locales ITEM,ITEM,...              : [Required for generating localized JS] Comma-delimited list
+                                        of locales for which to generate localized JS. There will
+                                        be one output JS file for each combination of input Soy
+                                        file and locale.
+ --messageFilePathFormat VAL          : [Required for generating localized JS] A format string that
+                                        specifies how to build the path to each translated messages
+                                        file. The format string can include literal characters as
+                                        well as the placeholders {INPUT_PREFIX}, {LOCALE}, and
+                                        {LOCALE_LOWER_CASE}. Note {LOCALE_LOWER_CASE} also turns
+                                        dash into underscore, e.g. pt-BR becomes pt_br. The format
+                                        string must end with an extension matching the message file
+                                        format (case-insensitive).
+ --outputPathFormat VAL               : [Required] A format string that specifies how to build the
+                                        path to each output file. If not generating localized JS,
+                                        then there will be one output JS file (UTF-8) for each
+                                        input Soy file. If generating localized JS, then there will
+                                        be one output JS file for each combination of input Soy
+                                        file and locale. The format string can include literal
+                                        characters as well as the placeholders {INPUT_PREFIX},
+                                        {INPUT_DIRECTORY}, {INPUT_FILE_NAME}, {INPUT_FILE_NAME_NO_EX
+                                        T}, {LOCALE}, {LOCALE_LOWER_CASE}. Note {LOCALE_LOWER_CASE}
+                                        also turns dash into underscore, e.g. pt-BR becomes pt_br.

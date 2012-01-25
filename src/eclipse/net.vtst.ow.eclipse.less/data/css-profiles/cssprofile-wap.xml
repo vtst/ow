@@ -1,0 +1,630 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+/*******************************************************************************
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
+ -->
+<!--<!DOCTYPE css-profile SYSTEM "css-profile.dtd" >-->
+<css-profile>
+        <profile-import name="cssprofile-css2.xml"/>
+        <stylesheet-def>
+                <description>%wap.stylesheet-def.description</description>
+                <charset-rule/>
+                <import-rule/>
+                <media-rule/>
+                <style-rule/>
+        </stylesheet-def>
+
+        <!-- Which properties can style rule include ? -->
+        <!-- using "overwrite" method: only disabled properties are written. -->
+
+        <style-rule-def overwrite="true">
+                <property name="azimuth" enabled="false"/>
+                <property name="border-collapse" enabled="false"/>
+                <property name="border-spacing" enabled="false"/>
+                <property name="bottom" enabled="false"/>
+                <property name="caption-side" enabled="false"/>
+                <property name="clip" enabled="false"/>
+                <property name="content" enabled="false"/>
+                <property name="cue" enabled="false"/>
+                <property name="cue-after" enabled="false"/>
+                <property name="cue-before" enabled="false"/>
+                <property name="cursor" enabled="false"/>
+                <property name="direction" enabled="false"/>
+                <property name="elevation" enabled="false"/>
+                <property name="empty-cells" enabled="false"/>
+                <property name="font-size-adjust" enabled="false"/>
+                <property name="font-stretch" enabled="false"/>
+                <property name="left" enabled="false"/>
+                <property name="letter-spacing" enabled="false"/>
+                <property name="line-height" enabled="false"/>
+                <property name="marker-offset" enabled="false"/>
+                <property name="marks" enabled="false"/>
+                <property name="max-height" enabled="false"/>
+                <property name="max-width" enabled="false"/>
+                <property name="min-height" enabled="false"/>
+                <property name="min-width" enabled="false"/>
+                <property name="orphans" enabled="false"/>
+                <property name="outline" enabled="false"/>
+                <property name="outline-color" enabled="false"/>
+                <property name="outline-style" enabled="false"/>
+                <property name="outline-width" enabled="false"/>
+                <property name="overflow" enabled="false"/>
+                <property name="page" enabled="false"/>
+                <property name="page-break-after" enabled="false"/>
+                <property name="page-break-before" enabled="false"/>
+                <property name="page-break-inside" enabled="false"/>
+                <property name="pause" enabled="false"/>
+                <property name="pause-after" enabled="false"/>
+                <property name="pause-before" enabled="false"/>
+                <property name="pitch" enabled="false"/>
+                <property name="pitch-range" enabled="false"/>
+                <property name="play-during" enabled="false"/>
+                <property name="position" enabled="false"/>
+                <property name="quotes" enabled="false"/>
+                <property name="richness" enabled="false"/>
+                <property name="right" enabled="false"/>
+                <property name="size" enabled="false"/>
+                <property name="speak" enabled="false"/>
+                <property name="speak-header" enabled="false"/>
+                <property name="speak-numeral" enabled="false"/>
+                <property name="speak-punctuation" enabled="false"/>
+                <property name="speech-rate" enabled="false"/>
+                <property name="stress" enabled="false"/>
+                <property name="table-layout" enabled="false"/>
+                <property name="text-shadow" enabled="false"/>
+                <property name="top" enabled="false"/>
+                <property name="unicode-bidi" enabled="false"/>
+                <property name="voice-family" enabled="false"/>
+                <property name="volume" enabled="false"/>
+                <property name="widows" enabled="false"/>
+                <property name="word-spacing" enabled="false"/>
+                <property name="z-index" enabled="false"/>
+                <property name="-wap-marquee-style"/>
+                <property name="-wap-marquee-loop"/>
+                <property name="-wap-marquee-dir"/>
+                <property name="-wap-marquee-speed"/>
+                <property name="-wap-accesskey"/>
+                <property name="-wap-input-format"/>
+                <property name="-wap-input-required"/>
+        </style-rule-def>
+
+        <!-- property definition -->
+        <!-- using "redifine" method: if "overwrite" attribute is set to
+        "false" or not set, it means the node is cleanly redifined -->
+
+        <property-def name="display"
+                inherited="no" mediagroup="all" category="visual">
+                <keyword name="inline"/>
+                <keyword name="block"/>
+                <keyword name="list-item"/>
+                <keyword name="-wap-marquee"/>
+                <keyword name="none"/>
+        </property-def>
+        <property-def name="list-style-type"
+                inherited="yes" mediagroup="visual" category="content">
+                <keyword name="disc"/>
+                <keyword name="circle"/>
+                <keyword name="square"/>
+                <keyword name="decimal"/>
+                <keyword name="lower-roman"/>
+                <keyword name="upper-roman"/>
+                <keyword name="lower-alpha"/>
+                <keyword name="upper-alpha"/>
+                <keyword name="none"/>
+                <keyword name="inherit"/>
+        </property-def>
+        <property-def name="text-align"
+                inherited="yes" mediagroup="visual" category="text">
+                <keyword name="left"/>
+                <keyword name="right"/>
+                <keyword name="center"/>
+                <keyword name="justify"/>
+                <keyword name="inherit"/>
+        </property-def>
+        <property-def name="text-decoration"
+                inherited="no" mediagroup="visual" category="text">
+                <keyword name="none"/>
+                <keyword name="underline"/>
+                <keyword name="blink"/>
+                <keyword name="inherit"/>
+        </property-def>
+        <property-def name="vertical-align"
+                inherited="no" mediagroup="visual" category="visual">
+                <keyword name="baseline"/>
+                <keyword name="sub"/>
+                <keyword name="super"/>
+                <keyword name="top"/>
+                <keyword name="middle"/>
+                <keyword name="bottom"/>
+                <keyword name="inherit"/>
+        </property-def>
+    <property-def name="-wap-marquee-style"
+                inherited="no" mediagroup="visual" category="wap">
+                <keyword name="scroll"/>
+                <keyword name="slide"/>
+                <keyword name="alternate"/>
+                <keyword name="inherit"/>
+        </property-def>
+    <property-def name="-wap-marquee-loop"
+                inherited="no" mediagroup="visual" category="wap">
+                <number name="integer"/>
+                <keyword name="infinite"/>
+                <keyword name="inherit"/>
+        </property-def>
+    <property-def name="-wap-marquee-dir"
+                inherited="no" mediagroup="visual" category="wap">
+                <keyword name="ltr"/>
+                <keyword name="rtl"/>
+                <keyword name="inherit"/>
+        </property-def>
+    <property-def name="-wap-marquee-speed"
+                inherited="no" mediagroup="visual" category="wap">
+                <keyword name="slow"/>
+                <keyword name="normal"/>
+                <keyword name="fast"/>
+                <keyword name="inherit"/>
+        </property-def>
+    <property-def name="-wap-accesskey"
+                inherited="no" mediagroup="interactive" category="wap">
+                <container name="keycombination"/>
+                <keyword name="inherit"/>
+        </property-def>
+    <property-def name="-wap-input-format"
+                inherited="no" mediagroup="interactive" category="wap">
+                <container name="format"/>
+                <keyword name="inherit"/>
+        </property-def>
+    <property-def name="-wap-input-required"
+                inherited="no" mediagroup="interactive" category="wap">
+                <keyword name="true"/>
+                <keyword name="false"/>
+                <keyword name="inherit"/>
+        </property-def>
+
+        <!-- container definition : Container is the lump of values.
+        It can be used like macros. -->
+        <container-def name="color" overwrite="true">
+                <container name="system-color" enabled="false"/>
+        </container-def>
+        <container-def name="format">
+                <string name="any"/>
+        </container-def>
+        <container-def name="keycombination">
+                <container name="key"/>
+                <keyword name="-"/>
+        </container-def>
+        <container-def name="key">
+                <keyword name="space"/>
+                <container name="specialkey"/>
+        </container-def>
+        <container-def name="specialkey">
+                <container name="modifierkey"/>
+                <container name="functionkey"/>
+                <container name="navigationkey"/>
+                <container name="editkey"/>
+                <container name="misckey"/>
+                <container name="volumecontrolkey"/>
+                <container name="applicationkey"/>
+                <container name="phonekey"/>
+                <container name="vendorkey"/>
+        </container-def>
+        <container-def name="modifierkey">
+                <keyword name="accesskey"/>
+                <container name="cmdkey"/>
+                <container name="optkey"/>
+                <container name="ctrlkey"/>
+                <container name="shiftkey"/>
+                <container name="altkey"/>
+                <container name="winkey"/>
+                <container name="metakey"/>
+                <keyword name="fn"/>
+                <keyword name="fcn"/>
+                <keyword name="caps"/>
+        </container-def>
+        <container-def name="cmdkey">
+                <keyword name="cmd"/>
+                <keyword name="rcmd"/>
+                <keyword name="lcmd"/>
+        </container-def>
+        <container-def name="optkey">
+                <keyword name="opt"/>
+                <keyword name="ropt"/>
+                <keyword name="lopt"/>
+        </container-def>
+        <container-def name="ctrlkey">
+                <keyword name="ctrl"/>
+                <keyword name="rctrl"/>
+                <keyword name="lctrl"/>
+        </container-def>
+        <container-def name="shiftkey">
+                <keyword name="shift"/>
+                <keyword name="rshift"/>
+                <keyword name="lshift"/>
+        </container-def>
+        <container-def name="altkey">
+                <keyword name="alt"/>
+                <keyword name="ralt"/>
+                <keyword name="lalt"/>
+        </container-def>
+        <container-def name="winkey">
+                <keyword name="win"/>
+                <keyword name="rwin"/>
+                <keyword name="lwin"/>
+        </container-def>
+        <container-def name="metakey">
+                <keyword name="meta"/>
+                <keyword name="rmeta"/>
+                <keyword name="lmeta"/>
+        </container-def>
+        <container-def name="functionkey">
+                <keyword name="f1"/>
+                <keyword name="f2"/>
+                <keyword name="f3"/>
+                <keyword name="f4"/>
+                <keyword name="f5"/>
+                <keyword name="f6"/>
+                <keyword name="f7"/>
+                <keyword name="f8"/>
+                <keyword name="f9"/>
+                <keyword name="f10"/>
+                <keyword name="f11"/>
+                <keyword name="f12"/>
+                <keyword name="f13"/>
+                <keyword name="f14"/>
+                <keyword name="f15"/>
+        </container-def>
+        <container-def name="navigationkey">
+                <keyword name="tab"/>
+                <keyword name="esc"/>
+                <keyword name="enter"/>
+                <keyword name="return"/>
+                <keyword name="menu"/>
+                <keyword name="help"/>
+                <keyword name="namemenu"/>
+                <keyword name="rcl"/>
+                <keyword name="snd"/>
+                <keyword name="arrowkey"/>
+                <keyword name="pagekey"/>
+        </container-def>
+        <container-def name="arrowkey">
+                <keyword name="up"/>
+                <keyword name="down"/>
+                <keyword name="left"/>
+                <keyword name="right"/>
+        </container-def>
+        <container-def name="pagekey">
+                <keyword name="home"/>
+                <keyword name="end"/>
+                <keyword name="pgup"/>
+                <keyword name="pgdn"/>
+        </container-def>
+        <container-def name="editkey">
+                <keyword name="bs"/>
+                <keyword name="del"/>
+                <keyword name="ins"/>
+                <keyword name="undo"/>
+                <keyword name="cut"/>
+                <keyword name="copy"/>
+                <keyword name="paste"/>
+                <keyword name="clr"/>
+                <keyword name="sto"/>
+        </container-def>
+        <container-def name="misckey">
+                <keyword name="prtsc"/>
+                <keyword name="sysrq"/>
+                <keyword name="scrlock"/>
+                <keyword name="pause"/>
+                <keyword name="brk"/>
+                <keyword name="numlock"/>
+                <keyword name="pwr"/>
+        </container-def>
+        <container-def name="volumecontrolkey">
+                <keyword name="volumeup"/>
+                <keyword name="volumedown"/>
+        </container-def>
+        <container-def name="applicationkey">
+                <keyword name="memo"/>
+                <keyword name="todo"/>
+                <keyword name="calendar"/>
+                <keyword name="mail"/>
+                <keyword name="address"/>
+        </container-def>
+        <container-def name="phonekey">
+                <keyword name="phone-send"/>
+                <keyword name="phone-end"/>
+                <keyword name="phone-accept"/>
+        </container-def>
+        <container-def name="vendorkey">
+                <keyword name="vnd."/>
+        </container-def>
+
+        <category-def name="wap">
+                <caption>%wap.category-def.wap.caption</caption>
+        </category-def>
+
+        <number-def name="length">
+        <unit name="em"/>
+        <unit name="ex"/>
+        <unit name="px"/>
+        </number-def>
+
+    <keyword-def name="-wap-marquee">
+        <keyword-value>-wap-marquee</keyword-value>
+    </keyword-def>
+        <keyword-def name="slide">
+                <keyword-value>slide</keyword-value>
+        </keyword-def>
+        <keyword-def name="alternate">
+                <keyword-value>alternate</keyword-value>
+        </keyword-def>
+        <keyword-def name="infinite">
+                <keyword-value>infinite</keyword-value>
+        </keyword-def>
+        <keyword-def name="-">
+                <keyword-value>-</keyword-value>
+        </keyword-def>
+        <keyword-def name="space">
+                <keyword-value>space</keyword-value>
+        </keyword-def>
+        <keyword-def name="accesskey">
+                <keyword-value>accesskey</keyword-value>
+        </keyword-def>
+        <keyword-def name="fn">
+                <keyword-value>fn</keyword-value>
+        </keyword-def>
+        <keyword-def name="fcn">
+                <keyword-value>fcn</keyword-value>
+        </keyword-def>
+        <keyword-def name="caps">
+                <keyword-value>caps</keyword-value>
+        </keyword-def>
+        <keyword-def name="cmd">
+                <keyword-value>cmd</keyword-value>
+        </keyword-def>
+        <keyword-def name="rcmd">
+                <keyword-value>rcmd</keyword-value>
+        </keyword-def>
+        <keyword-def name="lcmd">
+                <keyword-value>lcmd</keyword-value>
+        </keyword-def>
+        <keyword-def name="opt">
+                <keyword-value>opt</keyword-value>
+        </keyword-def>
+        <keyword-def name="ropt">
+                <keyword-value>ropt</keyword-value>
+        </keyword-def>
+        <keyword-def name="lopt">
+                <keyword-value>lopt</keyword-value>
+        </keyword-def>
+        <keyword-def name="ctrl">
+                <keyword-value>ctrl</keyword-value>
+        </keyword-def>
+        <keyword-def name="rctrl">
+                <keyword-value>rctrl</keyword-value>
+        </keyword-def>
+        <keyword-def name="lctrl">
+                <keyword-value>lctrl</keyword-value>
+        </keyword-def>
+        <keyword-def name="shift">
+                <keyword-value>shift</keyword-value>
+        </keyword-def>
+        <keyword-def name="rshift">
+                <keyword-value>rshift</keyword-value>
+        </keyword-def>
+        <keyword-def name="lshift">
+                <keyword-value>lshift</keyword-value>
+        </keyword-def>
+        <keyword-def name="alt">
+                <keyword-value>alt</keyword-value>
+        </keyword-def>
+        <keyword-def name="ralt">
+                <keyword-value>ralt</keyword-value>
+        </keyword-def>
+        <keyword-def name="lalt">
+                <keyword-value>lalt</keyword-value>
+        </keyword-def>
+        <keyword-def name="win">
+                <keyword-value>win</keyword-value>
+        </keyword-def>
+        <keyword-def name="rwin">
+                <keyword-value>rwin</keyword-value>
+        </keyword-def>
+        <keyword-def name="lwin">
+                <keyword-value>lwin</keyword-value>
+        </keyword-def>
+        <keyword-def name="meta">
+                <keyword-value>meta</keyword-value>
+        </keyword-def>
+        <keyword-def name="rmeta">
+                <keyword-value>rmeta</keyword-value>
+        </keyword-def>
+        <keyword-def name="lmeta">
+                <keyword-value>lmeta</keyword-value>
+        </keyword-def>
+        <keyword-def name="f1">
+                <keyword-value>f1</keyword-value>
+        </keyword-def>
+        <keyword-def name="f2">
+                <keyword-value>f2</keyword-value>
+        </keyword-def>
+        <keyword-def name="f3">
+                <keyword-value>f3</keyword-value>
+        </keyword-def>
+        <keyword-def name="f4">
+                <keyword-value>f4</keyword-value>
+        </keyword-def>
+        <keyword-def name="f5">
+                <keyword-value>f5</keyword-value>
+        </keyword-def>
+        <keyword-def name="f6">
+                <keyword-value>f6</keyword-value>
+        </keyword-def>
+        <keyword-def name="f7">
+                <keyword-value>f7</keyword-value>
+        </keyword-def>
+        <keyword-def name="f8">
+                <keyword-value>f8</keyword-value>
+        </keyword-def>
+        <keyword-def name="f9">
+                <keyword-value>f9</keyword-value>
+        </keyword-def>
+        <keyword-def name="f10">
+                <keyword-value>f10</keyword-value>
+        </keyword-def>
+        <keyword-def name="f11">
+                <keyword-value>f11</keyword-value>
+        </keyword-def>
+        <keyword-def name="f12">
+                <keyword-value>f12</keyword-value>
+        </keyword-def>
+        <keyword-def name="f13">
+                <keyword-value>f13</keyword-value>
+        </keyword-def>
+        <keyword-def name="f14">
+                <keyword-value>f14</keyword-value>
+        </keyword-def>
+        <keyword-def name="f15">
+                <keyword-value>f15</keyword-value>
+        </keyword-def>
+        <keyword-def name="tab">
+                <keyword-value>tab</keyword-value>
+        </keyword-def>
+        <keyword-def name="esc">
+                <keyword-value>esc</keyword-value>
+        </keyword-def>
+        <keyword-def name="enter">
+                <keyword-value>enter</keyword-value>
+        </keyword-def>
+        <keyword-def name="return">
+                <keyword-value>return</keyword-value>
+        </keyword-def>
+        <keyword-def name="namemenu">
+                <keyword-value>namemenu</keyword-value>
+        </keyword-def>
+        <keyword-def name="rcl">
+                <keyword-value>rcl</keyword-value>
+        </keyword-def>
+        <keyword-def name="snd">
+                <keyword-value>snd</keyword-value>
+        </keyword-def>
+        <keyword-def name="arrowkey">
+                <keyword-value>arrowkey</keyword-value>
+        </keyword-def>
+        <keyword-def name="pagekey">
+                <keyword-value>pagekey</keyword-value>
+        </keyword-def>
+        <keyword-def name="up">
+                <keyword-value>up</keyword-value>
+        </keyword-def>
+        <keyword-def name="down">
+                <keyword-value>down</keyword-value>
+        </keyword-def>
+        <keyword-def name="home">
+                <keyword-value>home</keyword-value>
+        </keyword-def>
+        <keyword-def name="end">
+                <keyword-value>end</keyword-value>
+        </keyword-def>
+        <keyword-def name="pgup">
+                <keyword-value>pgup</keyword-value>
+        </keyword-def>
+        <keyword-def name="pgdn">
+                <keyword-value>pgdn</keyword-value>
+        </keyword-def>
+        <keyword-def name="bs">
+                <keyword-value>bs</keyword-value>
+        </keyword-def>
+        <keyword-def name="del">
+                <keyword-value>del</keyword-value>
+        </keyword-def>
+        <keyword-def name="ins">
+                <keyword-value>ins</keyword-value>
+        </keyword-def>
+        <keyword-def name="undo">
+                <keyword-value>undo</keyword-value>
+        </keyword-def>
+        <keyword-def name="cut">
+                <keyword-value>cut</keyword-value>
+        </keyword-def>
+        <keyword-def name="copy">
+                <keyword-value>copy</keyword-value>
+        </keyword-def>
+        <keyword-def name="paste">
+                <keyword-value>paste</keyword-value>
+        </keyword-def>
+        <keyword-def name="clr">
+                <keyword-value>clr</keyword-value>
+        </keyword-def>
+        <keyword-def name="sto">
+                <keyword-value>sto</keyword-value>
+        </keyword-def>
+        <keyword-def name="prtsc">
+                <keyword-value>prtsc</keyword-value>
+        </keyword-def>
+        <keyword-def name="sysrq">
+                <keyword-value>sysrq</keyword-value>
+        </keyword-def>
+        <keyword-def name="scrlock">
+                <keyword-value>scrlock</keyword-value>
+        </keyword-def>
+        <keyword-def name="brk">
+                <keyword-value>brk</keyword-value>
+        </keyword-def>
+        <keyword-def name="numlock">
+                <keyword-value>numlock</keyword-value>
+        </keyword-def>
+        <keyword-def name="pwr">
+                <keyword-value>pwr</keyword-value>
+        </keyword-def>
+        <keyword-def name="volumeup">
+                <keyword-value>volumeup</keyword-value>
+        </keyword-def>
+        <keyword-def name="volumedown">
+                <keyword-value>volumedown</keyword-value>
+        </keyword-def>
+        <keyword-def name="memo">
+                <keyword-value>memo</keyword-value>
+        </keyword-def>
+        <keyword-def name="todo">
+                <keyword-value>todo</keyword-value>
+        </keyword-def>
+        <keyword-def name="calendar">
+                <keyword-value>calendar</keyword-value>
+        </keyword-def>
+        <keyword-def name="mail">
+                <keyword-value>mail</keyword-value>
+        </keyword-def>
+        <keyword-def name="address">
+                <keyword-value>address</keyword-value>
+        </keyword-def>
+        <keyword-def name="phone-send">
+                <keyword-value>phone-send</keyword-value>
+        </keyword-def>
+        <keyword-def name="phone-end">
+                <keyword-value>phone-end</keyword-value>
+        </keyword-def>
+        <keyword-def name="phone-accept">
+                <keyword-value>phone-accept</keyword-value>
+        </keyword-def>
+        <keyword-def name="vnd.">
+                <keyword-value>vnd.</keyword-value>
+        </keyword-def>
+        <keyword-def name="true">
+                <keyword-value>true</keyword-value>
+        </keyword-def>
+        <keyword-def name="false">
+                <keyword-value>false</keyword-value>
+        </keyword-def>
+        <keyword-def name="pause">
+                <keyword-value>pause</keyword-value>
+        </keyword-def>
+
+</css-profile>

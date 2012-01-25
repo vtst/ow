@@ -1,0 +1,64 @@
+net.vtst.ow.eclipse.less: An Eclipse module for LESS (http://lesscss.org)
+(c) Vincent Simonet, 2011.  All rights reserved.
+
+
+********************************************************************************
+OVERVIEW
+
+This plugin provides support for the LESS stylesheet language
+(http://lesscss.org) in Eclipse.   Its main feature are:
+* Syntax highlighting,
+* Outline tree,
+* Validation (duplicated properties and variables),
+* Content assist (for property names and property expressions),
+* Automatic cross-references (variables and mixins).
+* Launch compilation with LESS compiler
+
+
+********************************************************************************
+REQUIREMENTS
+
+This Eclipse plugin requires:
+* Eclipse Indigo
+* XText 2.0.0 (http://www.eclipse.org/Xtext/)
+
+
+********************************************************************************
+KNOWN ISSUES
+
+The following constructs of the LESS language are not (yet) supported:
+- Media queries (media.less, http://www.w3.org/TR/css3-mediaqueries/)
+- CSS3 selectors (css-3.less)
+- CSS escapes (css-escapes.less)
+- Empty property values (css.less)
+- Special case of the font: property
+(The file names in parenthesis are the names of the test files from LESS
+distribution in which the limitation becomes visible).
+
+The following features are not supported in the editor:
+- Refactoring,
+- Cross-references between files.
+
+
+********************************************************************************
+LICENSE
+
+This Eclipse plugin includes some files from the Eclipse Webtools
+Project [http://www.eclipse.org/webtools/]:
+* CSS profiles (in net.vtst.ow.eclipse.less/data/css-profiles),
+* Icons (in net.vtst.ow.eclipse.less.ui/icons).
+These files are distributed under the Eclipse Public License Version 1.0.
+A copy of the EPL is available at http://www.eclipse.org/org/documents/epl-v10.php
+
+
+********************************************************************************
+TODO
+
+* Bug in encoding
+* Bug in folding
+* Use EasyResourceBundle
+
+* Create constants for rule names
+* Limit what can be put in @font-face and @page blocks?
+* Refactoring
+* Use Tuples.pair instead of Pair

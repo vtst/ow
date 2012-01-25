@@ -1,0 +1,838 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+/*******************************************************************************
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
+ -->
+<!--<!DOCTYPE css-profile SYSTEM "css-profile.dtd" >-->
+<css-profile>
+	<stylesheet-def>
+		<description>%css1.stylesheet-def.description</description>
+		<import-rule/>
+		<style-rule/>
+	</stylesheet-def>
+
+	<import-rule-def>
+	</import-rule-def>
+
+	<style-rule-def>
+		<selector-expression name="descendant"/>
+		<pseudo-element name="first-line"/>
+		<pseudo-element name="first-letter"/>
+		<pseudo-class name="link"/>
+		<pseudo-class name="visited"/>
+		<pseudo-class name="active"/>
+		<property name="background"/>
+		<property name="background-attachment"/>
+		<property name="background-color"/>
+		<property name="background-image"/>
+		<property name="background-position"/>
+		<property name="background-repeat"/>
+		<property name="border"/>
+		<property name="border-bottom"/>
+		<property name="border-bottom-width"/>
+		<property name="border-color"/>
+		<property name="border-left"/>
+		<property name="border-left-width"/>
+		<property name="border-right"/>
+		<property name="border-right-width"/>
+		<property name="border-style"/>
+		<property name="border-top"/>
+		<property name="border-top-width"/>
+		<property name="border-width"/>
+		<property name="clear"/>
+		<property name="color"/>
+		<property name="display"/>
+		<property name="float"/>
+		<property name="font"/>
+		<property name="font-family"/>
+		<property name="font-size"/>
+		<property name="font-style"/>
+		<property name="font-variant"/>
+		<property name="font-weight"/>
+		<property name="height"/>
+		<property name="letter-spacing"/>
+		<property name="line-height"/>
+		<property name="list-style"/>
+		<property name="list-style-image"/>
+		<property name="list-style-position"/>
+		<property name="list-style-type"/>
+		<property name="margin"/>
+		<property name="margin-bottom"/>
+		<property name="margin-left"/>
+		<property name="margin-right"/>
+		<property name="margin-top"/>
+		<property name="padding"/>
+		<property name="padding-bottom"/>
+		<property name="padding-left"/>
+		<property name="padding-right"/>
+		<property name="padding-top"/>
+		<property name="text-align"/>
+		<property name="text-decoration"/>
+		<property name="text-indent"/>
+		<property name="text-transform"/>
+		<property name="vertical-align"/>
+		<property name="white-space"/>
+		<property name="width"/>
+		<property name="word-spacing"/>
+	</style-rule-def>
+
+	<pseudo-class-def name="link">
+		<selector-value>link</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="visited">
+		<selector-value>visited</selector-value>
+	</pseudo-class-def>
+	<pseudo-class-def name="active">
+		<selector-value>active</selector-value>
+	</pseudo-class-def>
+
+	<pseudo-element-def name="first-line">
+		<selector-value>first-line</selector-value>
+	</pseudo-element-def>
+	<pseudo-element-def name="first-letter">
+		<selector-value>first-letter</selector-value>
+	</pseudo-element-def>
+
+	<!-- property definition -->
+
+    <property-def name="background" inherited="no" category="colorandbackground">
+        <property name="background-color"/>
+        <property name="background-image"/>
+        <property name="background-repeat"/>
+        <property name="background-attachment"/>
+        <property name="background-position"/>
+    </property-def>
+    <property-def name="background-attachment" inherited="no" category="colorandbackground">
+        <keyword name="scroll"/>
+        <keyword name="fixed"/>
+    </property-def>
+    <property-def name="background-color" inherited="no" category="colorandbackground">
+        <container name="color"/>
+        <keyword name="transparent"/>
+    </property-def>
+    <property-def name="background-image" inherited="no" category="colorandbackground">
+        <function name="uri"/>
+        <keyword name="none"/>
+    </property-def>
+	<property-def name="background-position" inherited="no" category="colorandbackground">
+		<number name="percentage"/>
+		<number name="length"/>
+		<keyword name="top"/>
+		<keyword name="center"/>
+		<keyword name="bottom"/>
+		<keyword name="left"/>
+		<keyword name="right"/>
+	</property-def>
+	<property-def name="background-repeat" inherited="no" category="colorandbackground">
+		<keyword name="repeat"/>
+		<keyword name="repeat-x"/>
+		<keyword name="repeat-y"/>
+		<keyword name="no-repeat"/>
+	</property-def>
+	<property-def name="border" inherited="no" category="box">
+		<property name="border-width"/>
+		<property name="border-style"/>
+		<container name="color"/>
+	</property-def>
+	<property-def name="border-color" inherited="no" category="box">
+		<container name="color"/>
+	</property-def>
+	<property-def name="border-style" inherited="no" category="box">
+		<keyword name="none"/>
+		<keyword name="dotted"/>
+		<keyword name="dashed"/>
+		<keyword name="solid"/>
+		<keyword name="double"/>
+		<keyword name="groove"/>
+		<keyword name="ridge"/>
+		<keyword name="inset"/>
+		<keyword name="outset"/>
+	</property-def>
+	<property-def name="border-top" inherited="no" category="box">
+		<property name="border-top-width"/>
+		<property name="border-style"/>
+		<container name="color"/>
+	</property-def>
+	<property-def name="border-right" inherited="no" category="box">
+		<property name="border-right-width"/>
+		<property name="border-style"/>
+		<container name="color"/>
+	</property-def>
+	<property-def name="border-bottom" inherited="no" category="box">
+		<property name="border-bottom-width"/>
+		<property name="border-style"/>
+		<container name="color"/>
+	</property-def>
+	<property-def name="border-left" inherited="no" category="box">
+		<property name="border-left-width"/>
+		<property name="border-style"/>
+		<container name="color"/>
+	</property-def>
+	<property-def name="border-top-width" inherited="no" category="box">
+		<keyword name="thin"/>
+		<keyword name="medium"/>
+		<keyword name="thick"/>
+		<number name="length"/>
+	</property-def>
+	<property-def name="border-right-width" inherited="no" category="box">
+		<keyword name="thin"/>
+		<keyword name="medium"/>
+		<keyword name="thick"/>
+		<number name="length"/>
+	</property-def>
+	<property-def name="border-bottom-width" inherited="no" category="box">
+		<keyword name="thin"/>
+		<keyword name="medium"/>
+		<keyword name="thick"/>
+		<number name="length"/>
+	</property-def>
+	<property-def name="border-left-width" inherited="no" category="box">
+		<keyword name="thin"/>
+		<keyword name="medium"/>
+		<keyword name="thick"/>
+		<number name="length"/>
+	</property-def>
+	<property-def name="border-width" inherited="no" category="box">
+		<keyword name="thin"/>
+		<keyword name="medium"/>
+		<keyword name="thick"/>
+		<number name="length"/>
+	</property-def>
+	<property-def name="clear" inherited="no" category="box">
+		<keyword name="none"/>
+		<keyword name="left"/>
+		<keyword name="right"/>
+		<keyword name="both"/>
+	</property-def>
+	<property-def name="color" inherited="yes" category="colorandbackground">
+		<container name="color"/>
+	</property-def>
+	<property-def name="display" inherited="no" category="classification">
+		<keyword name="block"/>
+		<keyword name="inline"/>
+		<keyword name="list-item"/>
+		<keyword name="none"/>
+	</property-def>
+	<property-def name="float" inherited="no" category="box">
+		<keyword name="left"/>
+		<keyword name="right"/>
+		<keyword name="none"/>
+	</property-def>
+	<property-def name="font"
+		inherited="yes" category="font">
+		<property name="font-style"/>
+		<property name="font-variant"/>
+		<property name="font-weight"/>
+		<property name="font-size"/>
+		<property name="line-height"/>
+		<property name="font-family"/>
+		<separator name="slash"/>
+	</property-def>
+	<property-def name="font-family" inherited="yes" category="font">
+		<string name="family-name"/>
+		<container name="generic-family"/>
+		<separator name="comma"/>
+	</property-def>
+	<property-def name="font-size" inherited="yes" category="font">
+		<container name="absolute-size"/>
+		<container name="relative-size"/>
+		<number name="length"/>
+		<number name="percentage"/>
+	</property-def>
+	<property-def name="font-style" inherited="yes" category="font">
+		<keyword name="normal"/>
+		<keyword name="italic"/>
+		<keyword name="oblique"/>
+	</property-def>
+	<property-def name="font-variant" inherited="yes" category="font">
+		<keyword name="normal"/>
+		<keyword name="small-caps"/>
+	</property-def>
+	<property-def name="font-weight" inherited="yes" category="font">
+		<keyword name="normal"/>
+		<keyword name="bold"/>
+		<keyword name="bolder"/>
+		<keyword name="lighter"/>
+		<keyword name="100"/>
+		<keyword name="200"/>
+		<keyword name="300"/>
+		<keyword name="400"/>
+		<keyword name="500"/>
+		<keyword name="600"/>
+		<keyword name="700"/>
+		<keyword name="800"/>
+		<keyword name="900"/>
+	</property-def>
+	<property-def name="height" inherited="no" category="box">
+		<number name="length"/>
+		<number name="percentage"/>
+		<keyword name="auto"/>
+	</property-def>
+	<property-def name="letter-spacing" inherited="yes" category="text">
+		<keyword name="normal"/>
+		<number name="length"/>
+	</property-def>
+	<property-def name="line-height" inherited="yes" category="text">
+		<keyword name="normal"/>
+		<number name="number"/>
+		<number name="length"/>
+		<number name="percentage"/>
+	</property-def>
+	<property-def name="list-style" inherited="yes" category="classification">
+		<keyword name="disc"/>
+		<keyword name="circle"/>
+		<keyword name="square"/>
+		<keyword name="decimal"/>
+		<keyword name="lower-roman"/>
+		<keyword name="upper-roman"/>
+		<keyword name="lower-alpha"/>
+		<keyword name="upper-alpha"/>
+		<keyword name="none"/>
+		<keyword name="inside"/>
+		<keyword name="outside"/>
+		<function name="uri"/>
+		<keyword name="none"/>
+	</property-def>
+	<property-def name="list-style-image" inherited="yes" category="classification">
+		<function name="uri"/>
+		<keyword name="none"/>
+	</property-def>
+	<property-def name="list-style-position" inherited="yes" category="classification">
+		<keyword name="inside"/>
+		<keyword name="outside"/>
+	</property-def>
+	<property-def name="list-style-type" inherited="yes" category="classification">
+		<keyword name="disc"/>
+		<keyword name="circle"/>
+		<keyword name="square"/>
+		<keyword name="decimal"/>
+		<keyword name="lower-roman"/>
+		<keyword name="upper-roman"/>
+		<keyword name="lower-alpha"/>
+		<keyword name="upper-alpha"/>
+		<keyword name="none"/>
+	</property-def>
+	<property-def name="margin" inherited="no" category="box">
+		<number name="length"/>
+		<number name="percentage"/>
+		<keyword name="auto"/>
+	</property-def>
+	<property-def name="margin-top" inherited="no" category="box">
+		<number name="length"/>
+		<number name="percentage"/>
+		<keyword name="auto"/>
+	</property-def>
+	<property-def name="margin-right" inherited="no" category="box">
+		<number name="length"/>
+		<number name="percentage"/>
+		<keyword name="auto"/>
+	</property-def>
+	<property-def name="margin-bottom" inherited="no" category="box">
+		<number name="length"/>
+		<number name="percentage"/>
+		<keyword name="auto"/>
+	</property-def>
+	<property-def name="margin-left" inherited="no" category="box">
+		<number name="length"/>
+		<number name="percentage"/>
+		<keyword name="auto"/>
+	</property-def>
+	<property-def name="padding" inherited="no" category="box">
+		<number name="length"/>
+		<number name="percentage"/>
+	</property-def>
+	<property-def name="padding-top" inherited="no" category="box">
+		<number name="length"/>
+		<number name="percentage"/>
+	</property-def>
+	<property-def name="padding-right" inherited="no" category="box">
+		<number name="length"/>
+		<number name="percentage"/>
+	</property-def>
+	<property-def name="padding-bottom" inherited="no" category="box">
+		<number name="length"/>
+		<number name="percentage"/>
+	</property-def>
+	<property-def name="padding-left" inherited="no" category="box">
+		<number name="length"/>
+		<number name="percentage"/>
+	</property-def>
+	<property-def name="text-align" inherited="yes" category="text">
+		<keyword name="left"/>
+		<keyword name="right"/>
+		<keyword name="center"/>
+		<keyword name="justify"/>
+	</property-def>
+	<property-def name="text-decoration" inherited="no" category="text">
+		<keyword name="none"/>
+		<keyword name="underline"/>
+		<keyword name="overline"/>
+		<keyword name="line-through"/>
+		<keyword name="blink"/>
+	</property-def>
+	<property-def name="text-indent" inherited="yes" category="text">
+		<number name="length"/>
+		<number name="percentage"/>
+	</property-def>
+	<property-def name="text-transform" inherited="yes" category="text">
+		<keyword name="capitalize"/>
+		<keyword name="uppercase"/>
+		<keyword name="lowercase"/>
+		<keyword name="none"/>
+	</property-def>
+	<property-def name="vertical-align" inherited="no" category="text">
+		<keyword name="baseline"/>
+		<keyword name="sub"/>
+		<keyword name="super"/>
+		<keyword name="top"/>
+		<keyword name="text-top"/>
+		<keyword name="middle"/>
+		<keyword name="bottom"/>
+		<keyword name="text-bottom"/>
+		<number name="percentage"/>
+	</property-def>
+	<property-def name="white-space" inherited="yes" category="classification">
+		<keyword name="normal"/>
+		<keyword name="pre"/>
+		<keyword name="nowrap"/>
+	</property-def>
+	<property-def name="width" inherited="no" category="box">
+		<number name="length"/>
+		<number name="percentage"/>
+		<keyword name="auto"/>
+	</property-def>
+	<property-def name="word-spacing" inherited="yes" category="text">
+		<keyword name="normal"/>
+		<number name="length"/>
+	</property-def>
+
+	<!-- container definition : Container is the lump of values.
+	It can be used like macros. -->
+    <container-def name="absolute-size">
+        <keyword name="xx-small"/>
+        <keyword name="x-small"/>
+        <keyword name="small"/>
+        <keyword name="medium"/>
+        <keyword name="large"/>
+        <keyword name="x-large"/>
+        <keyword name="xx-large"/>
+    </container-def>
+	<container-def name="color">
+		<keyword name="aqua"/>
+		<keyword name="black"/>
+		<keyword name="blue"/>
+		<keyword name="fuchsia"/>
+		<keyword name="gray"/>
+		<keyword name="green"/>
+		<keyword name="lime"/>
+		<keyword name="maroon"/>
+		<keyword name="navy"/>
+		<keyword name="olive"/>
+		<keyword name="purple"/>
+		<keyword name="red"/>
+		<keyword name="silver"/>
+		<keyword name="teal"/>
+		<keyword name="white"/>
+		<keyword name="yellow"/>
+		<function name="rgb"/>
+		<number name="hash"/>
+	</container-def>
+	<container-def name="generic-family">
+		<keyword name="serif"/>
+		<keyword name="sans-serif"/>
+		<keyword name="cursive"/>
+		<keyword name="fantasy"/>
+		<keyword name="monospace"/>
+	</container-def>
+	<container-def name="relative-size">
+		<keyword name="smaller"/>
+		<keyword name="larger"/>
+	</container-def>
+
+	<!-- category definition : This is used to categorize properties
+	in Properties View. -->
+	<category-def name="box">
+		<caption>%css1.category-def.box.caption</caption>
+	</category-def>
+	<category-def name="colorandbackground">
+		<caption>%css1.category-def.colorandbackground.caption</caption>
+	</category-def>
+	<category-def name="classification">
+		<caption>%css1.category-def.classification.caption</caption>
+	</category-def>
+	<category-def name="font">
+		<caption>%css1.category-def.font.caption</caption>
+	</category-def>
+	<category-def name="text">
+		<caption>%css1.category-def.text.caption</caption>
+	</category-def>
+
+	<function-def name="rgb">
+		<function-value>rgb</function-value>
+	</function-def>
+	<function-def name="uri">
+		<function-value>url</function-value>
+	</function-def>
+	
+	<!-- number definition : What unit types be acceptable for each
+	number type? -->
+    <number-def name="hash">
+        <unit name="hash"/>
+    </number-def>
+    <number-def name="length">
+        <unit name="em"/>
+        <unit name="ex"/>
+        <unit name="px"/>
+        <unit name="in"/>
+        <unit name="cm"/>
+        <unit name="mm"/>
+        <unit name="pt"/>
+        <unit name="pc"/>
+    </number-def>
+	<number-def name="number">
+	</number-def>
+	<number-def name="percentage">
+		<unit name="percentage"/>
+	</number-def>
+
+	<unit-def name="cm">
+		<unit-value>cm</unit-value>
+	</unit-def>
+	<unit-def name="em">
+		<unit-value>em</unit-value>
+	</unit-def>
+	<unit-def name="ex">
+		<unit-value>ex</unit-value>
+	</unit-def>
+	<unit-def name="hash">
+		<unit-value>#</unit-value>
+	</unit-def>
+	<unit-def name="in">
+		<unit-value>in</unit-value>
+	</unit-def>
+	<unit-def name="mm">
+		<unit-value>mm</unit-value>
+	</unit-def>
+	<unit-def name="pc">
+		<unit-value>pc</unit-value>
+	</unit-def>
+	<unit-def name="percentage">
+		<unit-value>%</unit-value>
+	</unit-def>
+	<unit-def name="pt">
+		<unit-value>pt</unit-value>
+	</unit-def>
+	<unit-def name="px">
+		<unit-value>px</unit-value>
+	</unit-def>
+
+    <!-- keywords : string constants (this is last part..) -->
+    <keyword-def name="100">
+        <keyword-value>100</keyword-value>
+    </keyword-def>
+    <keyword-def name="200">
+        <keyword-value>200</keyword-value>
+    </keyword-def>
+    <keyword-def name="300">
+        <keyword-value>300</keyword-value>
+    </keyword-def>
+    <keyword-def name="400">
+        <keyword-value>400</keyword-value>
+    </keyword-def>
+    <keyword-def name="500">
+        <keyword-value>500</keyword-value>
+    </keyword-def>
+    <keyword-def name="600">
+        <keyword-value>600</keyword-value>
+    </keyword-def>
+    <keyword-def name="700">
+        <keyword-value>700</keyword-value>
+    </keyword-def>
+    <keyword-def name="800">
+        <keyword-value>800</keyword-value>
+    </keyword-def>
+    <keyword-def name="900">
+        <keyword-value>900</keyword-value>
+    </keyword-def>
+    <keyword-def name="aqua">
+        <keyword-value>aqua</keyword-value>
+    </keyword-def>
+    <keyword-def name="auto">
+        <keyword-value>auto</keyword-value>
+    </keyword-def>
+    <keyword-def name="baseline">
+        <keyword-value>baseline</keyword-value>
+    </keyword-def>
+    <keyword-def name="black">
+        <keyword-value>black</keyword-value>
+    </keyword-def>
+    <keyword-def name="blink">
+        <keyword-value>blink</keyword-value>
+    </keyword-def>
+    <keyword-def name="block">
+        <keyword-value>block</keyword-value>
+    </keyword-def>
+    <keyword-def name="blue">
+        <keyword-value>blue</keyword-value>
+    </keyword-def>
+    <keyword-def name="bold">
+        <keyword-value>bold</keyword-value>
+    </keyword-def>
+    <keyword-def name="bolder">
+        <keyword-value>bolder</keyword-value>
+    </keyword-def>
+    <keyword-def name="both">
+        <keyword-value>both</keyword-value>
+    </keyword-def>
+    <keyword-def name="bottom">
+        <keyword-value>bottom</keyword-value>
+    </keyword-def>
+    <keyword-def name="capitalize">
+        <keyword-value>capitalize</keyword-value>
+    </keyword-def>
+    <keyword-def name="center">
+        <keyword-value>center</keyword-value>
+    </keyword-def>
+    <keyword-def name="circle">
+        <keyword-value>circle</keyword-value>
+    </keyword-def>
+    <keyword-def name="cursive">
+        <keyword-value>cursive</keyword-value>
+    </keyword-def>
+    <keyword-def name="dashed">
+        <keyword-value>dashed</keyword-value>
+    </keyword-def>
+    <keyword-def name="decimal">
+        <keyword-value>decimal</keyword-value>
+    </keyword-def>
+    <keyword-def name="disc">
+        <keyword-value>disc</keyword-value>
+    </keyword-def>
+    <keyword-def name="dotted">
+        <keyword-value>dotted</keyword-value>
+    </keyword-def>
+    <keyword-def name="double">
+        <keyword-value>double</keyword-value>
+    </keyword-def>
+    <keyword-def name="fantasy">
+        <keyword-value>fantasy</keyword-value>
+    </keyword-def>
+    <keyword-def name="fixed">
+        <keyword-value>fixed</keyword-value>
+    </keyword-def>
+    <keyword-def name="fuchsia">
+        <keyword-value>fuchsia</keyword-value>
+    </keyword-def>
+    <keyword-def name="gray">
+        <keyword-value>gray</keyword-value>
+    </keyword-def>
+    <keyword-def name="green">
+        <keyword-value>green</keyword-value>
+    </keyword-def>
+    <keyword-def name="groove">
+        <keyword-value>groove</keyword-value>
+    </keyword-def>
+    <keyword-def name="inline">
+        <keyword-value>inline</keyword-value>
+    </keyword-def>
+    <keyword-def name="inset">
+        <keyword-value>inset</keyword-value>
+    </keyword-def>
+    <keyword-def name="inside">
+        <keyword-value>inside</keyword-value>
+    </keyword-def>
+    <keyword-def name="italic">
+        <keyword-value>italic</keyword-value>
+    </keyword-def>
+    <keyword-def name="justify">
+        <keyword-value>justify</keyword-value>
+    </keyword-def>
+    <keyword-def name="large">
+        <keyword-value>large</keyword-value>
+    </keyword-def>
+    <keyword-def name="larger">
+        <keyword-value>larger</keyword-value>
+    </keyword-def>
+    <keyword-def name="left">
+        <keyword-value>left</keyword-value>
+    </keyword-def>
+    <keyword-def name="lighter">
+        <keyword-value>lighter</keyword-value>
+    </keyword-def>
+    <keyword-def name="lime">
+        <keyword-value>lime</keyword-value>
+    </keyword-def>
+    <keyword-def name="line-through">
+        <keyword-value>line-through</keyword-value>
+    </keyword-def>
+    <keyword-def name="list-item">
+        <keyword-value>list-item</keyword-value>
+    </keyword-def>
+    <keyword-def name="lower-alpha">
+        <keyword-value>lower-alpha</keyword-value>
+    </keyword-def>
+    <keyword-def name="lower-roman">
+        <keyword-value>lower-roman</keyword-value>
+    </keyword-def>
+    <keyword-def name="lowercase">
+        <keyword-value>lowercase</keyword-value>
+    </keyword-def>
+    <keyword-def name="maroon">
+        <keyword-value>maroon</keyword-value>
+    </keyword-def>
+    <keyword-def name="medium">
+        <keyword-value>medium</keyword-value>
+    </keyword-def>
+    <keyword-def name="middle">
+        <keyword-value>middle</keyword-value>
+    </keyword-def>
+    <keyword-def name="monospace">
+        <keyword-value>monospace</keyword-value>
+    </keyword-def>
+    <keyword-def name="navy">
+        <keyword-value>navy</keyword-value>
+    </keyword-def>
+    <keyword-def name="no-repeat">
+        <keyword-value>no-repeat</keyword-value>
+    </keyword-def>
+    <keyword-def name="none">
+        <keyword-value>none</keyword-value>
+    </keyword-def>
+    <keyword-def name="normal">
+        <keyword-value>normal</keyword-value>
+    </keyword-def>
+    <keyword-def name="nowrap">
+        <keyword-value>nowrap</keyword-value>
+    </keyword-def>
+    <keyword-def name="oblique">
+        <keyword-value>oblique</keyword-value>
+    </keyword-def>
+    <keyword-def name="olive">
+        <keyword-value>olive</keyword-value>
+    </keyword-def>
+    <keyword-def name="outset">
+        <keyword-value>outset</keyword-value>
+    </keyword-def>
+    <keyword-def name="outside">
+        <keyword-value>outside</keyword-value>
+    </keyword-def>
+    <keyword-def name="overline">
+        <keyword-value>overline</keyword-value>
+    </keyword-def>
+    <keyword-def name="pre">
+        <keyword-value>pre</keyword-value>
+    </keyword-def>
+    <keyword-def name="purple">
+        <keyword-value>purple</keyword-value>
+    </keyword-def>
+    <keyword-def name="red">
+        <keyword-value>red</keyword-value>
+    </keyword-def>
+    <keyword-def name="repeat">
+        <keyword-value>repeat</keyword-value>
+    </keyword-def>
+    <keyword-def name="repeat-x">
+        <keyword-value>repeat-x</keyword-value>
+    </keyword-def>
+    <keyword-def name="repeat-y">
+        <keyword-value>repeat-y</keyword-value>
+    </keyword-def>
+    <keyword-def name="ridge">
+        <keyword-value>ridge</keyword-value>
+    </keyword-def>
+    <keyword-def name="right">
+        <keyword-value>right</keyword-value>
+    </keyword-def>
+    <keyword-def name="sans-serif">
+        <keyword-value>sans-serif</keyword-value>
+    </keyword-def>
+    <keyword-def name="scroll">
+        <keyword-value>scroll</keyword-value>
+    </keyword-def>
+    <keyword-def name="serif">
+        <keyword-value>serif</keyword-value>
+    </keyword-def>
+    <keyword-def name="silver">
+        <keyword-value>silver</keyword-value>
+    </keyword-def>
+    <keyword-def name="small">
+        <keyword-value>small</keyword-value>
+    </keyword-def>
+    <keyword-def name="small-caps">
+        <keyword-value>small-caps</keyword-value>
+    </keyword-def>
+    <keyword-def name="smaller">
+        <keyword-value>smaller</keyword-value>
+    </keyword-def>
+    <keyword-def name="solid">
+        <keyword-value>solid</keyword-value>
+    </keyword-def>
+    <keyword-def name="square">
+        <keyword-value>square</keyword-value>
+    </keyword-def>
+    <keyword-def name="sub">
+        <keyword-value>sub</keyword-value>
+    </keyword-def>
+    <keyword-def name="super">
+        <keyword-value>super</keyword-value>
+    </keyword-def>
+    <keyword-def name="teal">
+        <keyword-value>teal</keyword-value>
+    </keyword-def>
+    <keyword-def name="text-top">
+        <keyword-value>text-top</keyword-value>
+    </keyword-def>
+    <keyword-def name="text-bottom">
+        <keyword-value>text-bottom</keyword-value>
+    </keyword-def>
+    <keyword-def name="thick">
+        <keyword-value>thick</keyword-value>
+    </keyword-def>
+    <keyword-def name="thin">
+        <keyword-value>thin</keyword-value>
+    </keyword-def>
+    <keyword-def name="top">
+        <keyword-value>top</keyword-value>
+    </keyword-def>
+    <keyword-def name="transparent">
+        <keyword-value>transparent</keyword-value>
+    </keyword-def>
+    <keyword-def name="underline">
+        <keyword-value>underline</keyword-value>
+    </keyword-def>
+    <keyword-def name="upper-alpha">
+        <keyword-value>upper-alpha</keyword-value>
+    </keyword-def>
+    <keyword-def name="upper-roman">
+        <keyword-value>upper-roman</keyword-value>
+    </keyword-def>
+    <keyword-def name="uppercase">
+        <keyword-value>uppercase</keyword-value>
+    </keyword-def>
+    <keyword-def name="white">
+        <keyword-value>white</keyword-value>
+    </keyword-def>
+    <keyword-def name="x-large">
+        <keyword-value>x-large</keyword-value>
+    </keyword-def>
+    <keyword-def name="x-small">
+        <keyword-value>x-small</keyword-value>
+    </keyword-def>
+    <keyword-def name="xx-small">
+        <keyword-value>xx-small</keyword-value>
+    </keyword-def>
+    <keyword-def name="xx-large">
+        <keyword-value>xx-large</keyword-value>
+    </keyword-def>
+    <keyword-def name="yellow">
+        <keyword-value>yellow</keyword-value>
+    </keyword-def>
+</css-profile>

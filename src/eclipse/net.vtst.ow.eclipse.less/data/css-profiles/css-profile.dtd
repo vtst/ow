@@ -1,0 +1,143 @@
+<!-- DTD for CSS Meta Model Profile -->
+<!--
+/*******************************************************************************
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
+ -->
+<!-- Entities -->
+
+<!-- name-definition	: In defining meta model object, object name -->
+<!-- is given by using this attribute. -->
+
+<!ENTITY % name-definition 'name CDATA #REQUIRED' >
+
+<!-- name-reference		: used to refer meta model object that defined -->
+<!-- by name-definition -->
+
+<!ENTITY % name-reference 'name CDATA #REQUIRED' >
+
+<!-- availability		: CSS Meta Model Profile permit importing -->
+<!-- other profile and describe difference for it. -->
+
+<!ENTITY % availability 'enabled (true | false) "true"' >
+<!ENTITY % overwrite 'overwrite (true | false) "false"' >
+
+<!-- ******************** -->
+<!--  elments/attributes  -->
+<!-- ******************** -->
+
+<!ELEMENT css-profile (profile-import? , (stylesheet-def | charset-rule-def | import-rule-def | page-rule-def | media-rule-def | fontface-rule-def | style-rule-def | property-def | descriptor-def | container-def | function-def | number-def | unit-def | keyword-def | category-def | pseudo-element-def | pseudo-class-def)*) >
+
+<!-- a profile can include other profile -->
+
+<!ELEMENT profile-import EMPTY >
+<!ATTLIST profile-import name CDATA #REQUIRED >
+
+<!-- which type of rule can be used? -->
+
+<!ELEMENT stylesheet-def (description? , (charset-rule | import-rule | page-rule | media-rule | fontface-rule | style-rule)*) >
+<!ATTLIST stylesheet-def %overwrite; >
+
+<!ELEMENT charset-rule EMPTY >
+<!ATTLIST charset-rule %availability; >
+<!ELEMENT import-rule EMPTY >
+<!ATTLIST import-rule %availability; >
+<!ELEMENT page-rule EMPTY >
+<!ATTLIST page-rule %availability; >
+<!ELEMENT media-rule EMPTY >
+<!ATTLIST media-rule %availability; >
+<!ELEMENT fontface-rule EMPTY >
+<!ATTLIST fontface-rule %availability; >
+<!ELEMENT style-rule EMPTY >
+<!ATTLIST style-rule %availability; >
+
+<!ELEMENT charset-rule-def (description?) >
+<!ATTLIST charset-rule-def %overwrite; >
+
+<!ELEMENT import-rule-def (description?) >
+<!ATTLIST import-rule-def %overwrite; >
+
+<!ELEMENT page-rule-def (description? , (property | pseudo-class)*) >
+<!ATTLIST page-rule-def %overwrite; >
+
+<!ELEMENT media-rule-def (description?) >
+<!ATTLIST media-rule-def %overwrite; >
+
+<!ELEMENT fontface-rule-def (description? , descriptor*) >
+<!ATTLIST fontface-rule-def %overwrite; >
+
+<!ELEMENT style-rule-def (description? , (property | selector-expression | pseudo-class | pseudo-element)*) >
+<!ATTLIST style-rule-def %overwrite; >
+
+<!ELEMENT selector-expression EMPTY >
+<!ATTLIST selector-expression name (descendant | child | adjacent | universal | attribute) #REQUIRED %availability; >
+
+<!ELEMENT pseudo-class EMPTY >
+<!ATTLIST pseudo-class %name-reference; %availability; >
+
+<!ELEMENT pseudo-element EMPTY >
+<!ATTLIST pseudo-element %name-reference; %availability; >
+
+<!ELEMENT pseudo-class-def (description?, selector-value) >
+<!ATTLIST pseudo-class-def %name-definition; %overwrite; >
+<!ELEMENT selector-value (#PCDATA) >
+
+<!ELEMENT pseudo-element-def (description?, selector-value) >
+<!ATTLIST pseudo-element-def %name-definition; %overwrite; >
+
+<!ELEMENT keyword-def (description? , keyword-value) >
+<!ATTLIST keyword-def %name-definition; %overwrite; >
+<!ELEMENT keyword-value (#PCDATA) >
+<!ELEMENT description (#PCDATA) >
+
+<!ELEMENT function-def (description? , function-value) >
+<!ATTLIST function-def %name-definition; %overwrite; >
+<!ELEMENT function-value (#PCDATA) >
+
+<!ELEMENT number-def (description? , unit*) >
+<!ATTLIST number-def %name-definition; %overwrite; >
+<!ELEMENT unit EMPTY >
+<!ATTLIST unit %name-reference; %availability; >
+
+<!ELEMENT unit-def (description? , unit-value) >
+<!ATTLIST unit-def %name-definition; %overwrite; >
+<!ELEMENT unit-value (#PCDATA) >
+
+<!ELEMENT container-def (description? , (number | keyword | function | container)*) >
+<!ATTLIST container-def %name-definition; %overwrite; >
+
+<!ELEMENT category-def (description?, caption) >
+<!ATTLIST category-def %name-definition; %overwrite; >
+<!ELEMENT caption (#PCDATA) >
+
+<!ELEMENT property-def (description? , (number | keyword | function | container | string | separator | property)*) >
+<!ATTLIST property-def %name-definition; %overwrite;
+					   inherited (yes | no | na) "na"
+					   mediagroup CDATA #IMPLIED
+					   category CDATA #IMPLIED >
+<!ELEMENT descriptor-def (description?, (number | keyword | function | container | string | separator | property)*) >
+<!ATTLIST descriptor-def %name-definition; %overwrite; >
+
+<!ELEMENT number EMPTY >
+<!ATTLIST number %name-reference; %availability; > 
+<!ELEMENT keyword EMPTY >
+<!ATTLIST keyword %name-reference; %availability; > 
+<!ELEMENT function EMPTY >
+<!ATTLIST function %name-reference; %availability; >
+<!ELEMENT container EMPTY >
+<!ATTLIST container %name-reference; %availability; > 
+<!ELEMENT string EMPTY >
+<!ATTLIST string %name-reference; %availability; >
+<!ELEMENT separator EMPTY >
+<!ATTLIST separator name (comma | slash) #REQUIRED %availability; >
+<!ELEMENT property EMPTY >
+<!ATTLIST property %name-reference; %availability; > 
+<!ELEMENT descriptor EMPTY >
+<!ATTLIST descriptor %name-reference; %availability; >

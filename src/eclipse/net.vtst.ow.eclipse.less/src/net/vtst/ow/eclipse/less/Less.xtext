@@ -1,0 +1,377 @@
+// net.vtst.ow.eclipse.less: An Eclipse module for LESS (http://lesscss.org)
+// (c) Vincent Simonet, 2011.  All rights reserved.
+//
+// This file defines an ANTLR grammar for LESS, to be used by Xtext.
+// The current version corresponds to LESS 1.1.4 (with a few limitations, see
+// ../README).
+//
+// One of the main particularities of this grammar is that whitespaces are not
+// discarded by the lexer (see below that SPACE is not defined as a "hidden"
+// terminal in the grammar definition).  This is because parsing CSS selectors
+// requires to consider whitespace (.foo .bar { ... } is not the same as
+// .foo.bar { ... }.  An alternative would have been to parse selectors in the
+// lexer, but this would have been over-complicated.
+// Spaces are handled everywhere in the syntactic rules by the OPT_SPACE rule.
+// The convention is that every rule shall include the OPT_SPACE to grab the
+// potential space at the end of it.  In other words, this means that a
+// call to OPT_SPACE has to be inserted *after* every terminal.  There are a few
+// exceptions, because of the SPACE separator, and the priority of operators.  They
+// are mentioned by comments in the grammar definition.
+// (The reason for *after* instead of *before* is that this works much better
+// for content assist, because the context contains the node you're currently
+// filling.)
+
+grammar net.vtst.ow.eclipse.less.Less hidden(ML_COMMENT, SL_COMMENT)
+
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+generate less "http://www.vtst.net/ow/eclipse/less/Less"
+
+
+// ****************************************************************************
+// Parser
+
+StyleSheet:
+  {StyleSheet} OPT_SPACE statements+=ToplevelStatement*
+;
+
+// This is WS*, not WS?, because whjte-spaces may be split by comments.
+OPT_SPACE returns ecore::EString:
+  WS*
+;
+
+// This is WS+, not WS, because whjte-spaces may be split by comments.
+SPACE returns ecore::EString:
+  WS+
+;
+
+
+// ----------------------------------------------------------------------------
+// Statements
+
+ToplevelOrInnerStatement:
+  MixinDefinition
+;
+  
+ToplevelStatement:
+  VariableDefinition ';' OPT_SPACE
+  | ToplevelRuleSet
+  | ImportStatement
+  | MediaStatement
+  | PageStatement
+  | FontFaceStatement
+  | CharsetStatement
+  | ToplevelOrInnerStatement
+  // This is required to avoid issues with syntax coloring when typing a variable definition.
+  // There is a validation rule to report the error.
+  | {IncompleteToplevelStatement} '@' OPT_SPACE 
+;
+
+InnerStatement:
+  InnerRuleSet
+  | ToplevelOrInnerStatement
+;
+
+UnterminatedInnerStatement:
+  Declaration
+  | VariableDefinition
+  | MixinCall
+;
+
+// Several statements include a block.  This rule would accept some ';' that are not legal.
+// They are detected by the LessJavaValidator.checkBlockSemicolons
+// The rule is written like that in order to meet the three following constraints:
+// 1. LL(*) grammar,
+// 2. All items of a Block linked to the same node.
+/*
+Block:
+  {Block} '{' OPT_SPACE 
+    (item+=InnerStatement)* 
+    (item+=UnterminatedInnerStatement 
+      (item+=BlockSemicolon (item+=InnerStatement)* (item+=UnterminatedInnerStatement)?)*
+    )?
+  '}' OPT_SPACE
+;
+*/
+
+Block:
+  {Block} '{' OPT_SPACE contents=BlockContents? '}' OPT_SPACE
+;
+
+BlockContents:
+  item=UnterminatedInnerStatement (';' OPT_SPACE next=BlockContents?)?
+  | item=InnerStatement next=BlockContents?
+;
+
+BlockSemicolon:
+  {BlockSemicolon}';' OPT_SPACE
+;
+
+
+// @ statements
+
+ImportStatement:
+  '@import' OPT_SPACE uri=(STRING | Uri) OPT_SPACE medias=MediaList? ';' OPT_SPACE
+;
+
+MediaStatement:
+  '@media' OPT_SPACE medias=MediaList block=Block
+;
+
+MediaList:
+  media+=IDENT OPT_SPACE (',' OPT_SPACE media+=IDENT OPT_SPACE)*
+;
+
+PageStatement:
+  '@page' OPT_SPACE (':' pseudo_page=IDENT OPT_SPACE)? block=Block
+;
+
+FontFaceStatement:
+  '@font-face' OPT_SPACE block=Block
+;
+
+CharsetStatement:
+  '@charset' OPT_SPACE charset=STRING OPT_SPACE ';' OPT_SPACE
+;
+
+// LESS-specific statements
+
+// There is a trailing OPT_SPACE in this rule, because there is no in Term
+VariableDefinition:
+  variable=VariableDefinitionIdent OPT_SPACE ':' OPT_SPACE term+=Term
+  ((SPACE term+=Term)* | (OPT_SPACE ',' OPT_SPACE term+=Term)+) OPT_SPACE
+;
+
+VariableDefinitionIdent:
+  ident=AT_IDENT 
+;
+
+/* Note this only consider mixins with arguments, mixins without arguments are like normal blocks */
+MixinDefinition:
+  selector=HashOrClass OPT_SPACE
+  '(' OPT_SPACE 
+  (parameter+=MixinDefinitionParameter 
+    (',' OPT_SPACE parameter+=MixinDefinitionParameter)*
+  )? ')' OPT_SPACE
+  block=Block
+;
+
+// There is a trailing OPT_SPACE in this rule, because there is no in Term
+MixinDefinitionParameter: 
+  {MixinDefinitionVariable} variable=VariableDefinitionIdent OPT_SPACE
+    (':' OPT_SPACE default_value+=Term (SPACE default_value+=Term)* OPT_SPACE)?
+  | {MixinDefinitionPattern} ident=IDENT OPT_SPACE
+  | {MixinDefinitionPattern} string=STRING OPT_SPACE
+  | {MixinDefinitionPattern} number=NumericLiteral OPT_SPACE
+;
+
+// There are trailing OPT_SPACE after Hash/Class, because there is no in
+// Hash/Class.
+MixinCall:
+  selector+=HashOrClassCrossReference
+  (combinator+=MixinCallCombinator selector+=HashOrClassCrossReference)* OPT_SPACE 
+  ('(' OPT_SPACE (parameter+=Term OPT_SPACE (',' OPT_SPACE parameter+=Term OPT_SPACE)*)? ')' OPT_SPACE)?
+;
+
+// RuleSets
+
+ToplevelRuleSet:
+  selector+=ToplevelSelector (',' OPT_SPACE selector+=ToplevelSelector)* 
+  block=Block
+;
+
+InnerRuleSet:
+  selector+=InnerSelector (',' OPT_SPACE selector+=InnerSelector)*
+  block=Block
+;
+
+// Selectors
+
+// There is a trailing OPT_SPACE in this rule, because there is no in SimpleSelector
+ToplevelSelector:
+  selector+=SimpleSelector
+  (combinator+=Combinator selector+=SimpleSelector)* OPT_SPACE
+;
+
+// There is a trailing OPT_SPACE in this rule, because there is no in SimpleSelector
+InnerSelector:
+  combinator+=RootCombinator selector+=SimpleSelector
+  (combinator+=Combinator selector+=SimpleSelector)* OPT_SPACE
+;
+
+Combinator:
+  {ChildCombinator} OPT_SPACE '>' OPT_SPACE
+  | {AdjacentSiblingCombinator} OPT_SPACE '+' OPT_SPACE
+  | {DescendantSelector} SPACE
+;
+
+RootCombinator returns Combinator:
+  {ChildCombinator} '>' OPT_SPACE
+  | {AdjacentSiblingCombinator} '+' OPT_SPACE
+  | {DescendantSelector}
+;
+
+MixinCallCombinator returns Combinator:
+  {ChildCombinator} OPT_SPACE '>' OPT_SPACE
+  | {DescendantSelector} SPACE
+;
+
+// This rule does not end with OPT_SPACE, because of combinators
+SimpleSelector:
+  {SimpleSelectorWithRoot} root=(IDENT | '*' | '&')
+  (criteria+=HashOrClass | criteria+=Attrib | criteria+=Pseudo)*
+  | {SimpleSelectorWithoutRoot} (
+      criteria+=HashOrClass | criteria+=Attrib | criteria+=Pseudo
+    )+
+;
+
+HashOrClass: Hash | Class;
+HashOrClassCrossReference: ident=[HashOrClass|HASH_OR_CLASS_IDENT];
+HASH_OR_CLASS_IDENT returns ecore::EString: HASH_IDENT | CLASS_IDENT;
+
+// This rule does not end with OPT_SPACE, because of combinators
+Hash: ident=HASH_IDENT;
+HASH_IDENT returns ecore::EString: HASH_COLOR | HASH_OTHER;
+
+// This rule does not end with OPT_SPACE, because of combinators
+Class: ident=CLASS_IDENT;
+CLASS_IDENT returns ecore::EString: '.' IDENT;
+
+// This rule does not end with OPT_SPACE, because of combinators
+Attrib:
+  '[' OPT_SPACE attribute=IDENT OPT_SPACE 
+  (operator=('=' | '~=' | '|=') OPT_SPACE ((value=IDENT | value=STRING) OPT_SPACE)?)? ']'
+;
+
+// This rule does not end with OPT_SPACE, because of combinators
+Pseudo:
+  {PseudoIdent} ':' ident=IDENT
+  | {PseudoFunction} ':' function=IDENT '(' OPT_SPACE (arg=IDENT OPT_SPACE)? ')'
+;
+
+// Declarations
+
+Declaration:
+  property=Property OPT_SPACE ':' OPT_SPACE expr=Expr 
+  ('!' OPT_SPACE important?='important' OPT_SPACE)?
+;
+
+Property: IDENT;
+
+// There is a trailing OPT_SPACE in this rule, because there is no in SimpleSelector
+// '/' disabled, as it is not properly handled by LESS.
+Expr:
+  terms+=Term (operators+=Operator terms+=Term)* OPT_SPACE
+;
+
+Operator:
+  {SpaceOperator} SPACE
+  | {ComaOperator} ',' OPT_SPACE
+;
+
+// This rule does not end with OPT_SPACE, because of operators in Expr
+Term:
+  {IdentTerm} ident=IDENT
+  | {StringTerm} string=STRING
+  | {UriTerm} uri=Uri
+  | {EscapedStringTerm} '~' string=STRING
+  | {JsEvaluationTerm} js=JS_EVALUATION
+  | {EscapedJsEvaluationTerm} '~' js=JS_EVALUATION
+  | ExtendedTerm
+;
+
+/*
+  a: 2 - 1; -> 3
+  b: 2- 1; -> 3
+  c: 2 -1; -> 2 -1
+  d: 2-1; -> 3
+ 
+ */
+ExtendedTerm: ExtendedTerm1;
+
+ExtendedTerm1 returns ExtendedTerm:
+  term+=ExtendedTerm2 
+  ((SPACE operator+=('+' | '-') SPACE | operator+=('+' | '-')) 
+    term+=ExtendedTerm2
+  )*
+;
+
+ExtendedTerm11 returns ExtendedTerm:
+  term+=ExtendedTerm2 
+  (OPT_SPACE operator+=('+' | '-') OPT_SPACE term+=ExtendedTerm2)*
+;
+
+ExtendedTerm2 returns ExtendedTerm:
+  term+=SimpleTerm
+  (OPT_SPACE operator+=('*' | '/') OPT_SPACE term+=SimpleTerm)*
+;
+
+// This rule does not end with OPT_SPACE, because of operators in Expr
+SimpleTerm:
+  NumericLiteral
+  | {AtVariableTerm} var=[VariableDefinitionIdent|AT_IDENT]
+  | {At2VariableTerm} var=AT2_IDENT
+  | FunctionTerm
+  | {ParenthesizedTerm} '(' OPT_SPACE term=ExtendedTerm11 OPT_SPACE ')'
+  | {UnaryTerm} operator='-' term=SimpleTerm
+;
+
+// This rule does not end with OPT_SPACE, because of operators in Expr
+FunctionTerm:
+  function=(IDENT | PERCENT) 
+  '(' OPT_SPACE (arg=IDENT OPT_SPACE '=' OPT_SPACE)? (expr=Expr)? ')'
+;
+
+// This rule does not end with OPT_SPACE, because of operators in Expr
+NumericLiteral:
+  {NumberTerm} value=NUMBER
+  | {PercentageTerm} value=PERCENTAGE
+  | {LengthTerm} value=LENGTH
+  | {EmsTerm} value=EMS
+  | {ExsTerm} value=EXS
+  | {AngleTerm} value=ANGLE
+  | {AngleTerm} value=TIME
+  | {FreqTerm} value=FREQ
+  | {HashColorTerm} value=HASH_COLOR
+;
+
+// This rule does not end with OPT_SPACE, because of operators in Expr
+Uri:
+  'url(' STRING ')'
+  | URL
+;
+
+
+// ****************************************************************************
+// Lexer
+
+// The character \f is deleted from the terminals STRING and SPACE, because it
+// causes Xtext to crash.  A workaround was to configure Xtext to use XML 1.1,
+// but this reveals another bug.
+
+terminal fragment IDENT_CHAR : ('_'|'a'..'z'|'A'..'Z'|'0'..'9'|'-');
+terminal IDENT : '-'? ('_'|'a'..'z'|'A'..'Z') IDENT_CHAR*;
+terminal PERCENT : '%';
+terminal AT_IDENT: '@' IDENT_CHAR+;
+terminal AT2_IDENT: '@' '@' IDENT_CHAR+;
+terminal STRING : 
+      '"' ( !('\n' | '\r' /*| '\f'*/ | '"') | ('\\' ('\n' | '\n' '\r' | '\r' /*| '\f'*/)) )* '"' |
+      "'" ( '\\' ('b'|'t'|'n'|'f'|'r'|'u'|'"'|"'"|'\\') | !('\\'|"'") )* "'"
+    ; 
+terminal JS_EVALUATION : '`' (!'`')* '`';
+terminal HASH_COLOR : '#' ('0'..'9'|'a'..'f'|'A'..'F')('0'..'9'|'a'..'f'|'A'..'F')('0'..'9'|'a'..'f'|'A'..'F')
+  (('0'..'9'|'a'..'f'|'A'..'F')('0'..'9'|'a'..'f'|'A'..'F')('0'..'9'|'a'..'f'|'A'..'F'))?
+;
+terminal HASH_OTHER : '#' ('_'|'a'..'z'|'A'..'Z'|'0'..'9'|'-')+;
+terminal NUMBER :  (('0' .. '9')+) | (('0' .. '9')* '.' ('0' .. '9')+);
+terminal PERCENTAGE : NUMBER '%';
+terminal LENGTH : NUMBER ('px' | 'cm' | 'mm' | 'in' | 'pt' | 'pc');
+terminal EMS : NUMBER 'em';
+terminal EXS : NUMBER 'ex';
+terminal ANGLE : NUMBER ('deg' | 'rad' | 'grad');
+terminal TIME : NUMBER ('ms' | 's');
+terminal FREQ : NUMBER ('hz' | 'khz');
+terminal ML_COMMENT : '/*' -> '*/';
+terminal SL_COMMENT   : '//' !('\n'|'\r')* ('\r'? '\n')?;
+terminal WS : (' ' | '\t' | '\r' | '\n' /*| '\f'*/)+;
+terminal URL : 'url(' (!('"' | "'") (!')')*) ')';
+terminal ANY_OTHER: .;

@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: EasyXtext
+Bundle-SymbolicName: net.vtst.eclipse.easyxtext
+Bundle-Version: 1.0.0
+Bundle-Activator: net.vtst.eclipse.easyxtext.Activator
+Bundle-Vendor: Vincent Simonet
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.xtext;bundle-version="2.0.1"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Export-Package: net.vtst.eclipse.easyxtext.guice,
+ net.vtst.eclipse.easyxtext.parser,
+ net.vtst.eclipse.easyxtext.resource,
+ net.vtst.eclipse.easyxtext.scoping,
+ net.vtst.eclipse.easyxtext.util
