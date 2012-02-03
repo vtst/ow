@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: JSDT for Closure
+Bundle-SymbolicName: net.vtst.ow.eclipse.js.closure;singleton:=true
+Bundle-Version: 0.0.1
+Bundle-Activator: net.vtst.ow.eclipse.js.closure.Activator
+Bundle-Vendor: Vincent Simonet
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
