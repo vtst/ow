@@ -3,7 +3,10 @@
    <description name="net.vtst.ow" url="http://www.normalesup.org/~simonet/soft/ow/update/">
       net.vtst.ow
    </description>
-   <feature url="features/net.vtst.ow.eclipse.less.feature_0.9.0.jar" id="net.vtst.ow.eclipse.less.feature" version="0.9.0">
+   <feature url="features/net.vtst.ow.eclipse.soy.feature_0.9.0.jar" id="net.vtst.ow.eclipse.soy.feature" version="0.9.0">
+      <category name="net.vtst.ow"/>
+   </feature>
+   <feature url="features/net.vtst.ow.eclipse.less.feature_1.0.0.jar" id="net.vtst.ow.eclipse.less.feature" version="1.0.0">
       <category name="net.vtst.ow"/>
    </feature>
    <category-def name="net.vtst.ow" label="net.vtst.ow"/>
