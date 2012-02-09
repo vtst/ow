@@ -1,5 +1,97 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-
+   <extension
+         id="closureBuilder"
+         name="Closure JavaScript Builder"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="true">
+         <run
+               class="net.vtst.ow.eclipse.js.closure.builder.ClosureBuilder">
+         </run>
+      </builder>
+   </extension>
+   <extension
+         id="closureNature"
+         name="Closure JavaScript Nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="net.vtst.ow.eclipse.js.closure.builder.ClosureNature">
+         </run>
+      </runtime>
+      <builder
+            id="net.vtst.ow.eclipse.js.closure.closureBuilder">
+      </builder>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="true"
+            id="net.vtst.ow.eclipse.js.closure.contribution1"
+            nameFilter="*"
+            objectClass="org.eclipse.core.resources.IProject">
+         <action
+               class="net.vtst.ow.eclipse.js.closure.builder.ToggleNatureAction"
+               enablesFor="+"
+               id="net.vtst.ow.eclipse.js.closure.addRemoveNatureAction"
+               label="Add/Remove Sample Nature"
+               menubarPath="additions">
+         </action>
+      </objectContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="true"
+            id="net.vtst.ow.eclipse.js.closure.contribution2"
+            nameFilter="*"
+            objectClass="org.eclipse.core.resources.IProject">
+         <visibility> 
+           <not>
+         <objectState name="projectNature" value="net.vtst.ow.eclipse.js.closure.closureNature"/>
+         </not>
+          </visibility> 
+<!--            
+            
+               <filter
+         name="projectNature"
+         value="net.vtst.ow.eclipse.js.closure.closureNature">
+      </filter>
+         -->
+         <action
+               class="net.vtst.ow.eclipse.js.closure.builder.ToggleNatureAction"
+               enablesFor="+"
+               id="net.vtst.ow.eclipse.js.closure.addRemoveNatureAction2"
+               label="YOU HAVE THE NATURE"
+               menubarPath="additions">
+         </action>
+      </objectContribution>
+   </extension>
+   <extension
+         id="xmlProblem"
+         name="XML Problem"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="net.vtst.ow.eclipse.js.closure.properties.ClosurePropertyPage"
+            id="net.vtst.ow.eclipse.js.closure.properties.samplePropertyPage"
+            name="Closure"
+            nameFilter="*">
+         <enabledWhen>
+            <instanceof
+                  value="org.eclipse.core.resources.IProject">
+            </instanceof>
+         </enabledWhen>
+      </page>
+   </extension>
 </plugin>

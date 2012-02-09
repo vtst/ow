@@ -6,6 +6,10 @@ Bundle-Version: 0.0.1
 Bundle-Activator: net.vtst.ow.eclipse.js.closure.Activator
 Bundle-Vendor: Vincent Simonet
 Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources;bundle-version="3.7.100"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
+Import-Package: org.eclipse.jface.text,
+ org.eclipse.ui,
+ org.eclipse.ui.texteditor

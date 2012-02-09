@@ -1,5 +1,9 @@
 package net.vtst.ow.eclipse.js.closure;
 
+import net.vtst.ow.eclipse.js.closure.listeners.ClosureDocumentListener;
+import net.vtst.ow.eclipse.js.closure.listeners.ClosurePartListener;
+import net.vtst.ow.eclipse.js.closure.listeners.ClosureWindowListener;
+
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -25,8 +29,12 @@ public class Activator extends AbstractUIPlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
 	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		plugin = this;
+    super.start(context);
+    plugin = this;
+    // Add listeners for monitoring changes in JavaScript editors.
+    ClosureWindowListener.addTo(getWorkbench());
+    ClosurePartListener.addTo(getWorkbench());
+    ClosureDocumentListener.addTo(getWorkbench());
 	}
 
 	/*
@@ -35,6 +43,7 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
+    ClosureWindowListener.removeFrom(getWorkbench());
 		super.stop(context);
 	}
 
