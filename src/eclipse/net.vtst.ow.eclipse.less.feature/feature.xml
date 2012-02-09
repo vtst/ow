@@ -2,7 +2,7 @@
 <feature
       id="net.vtst.ow.eclipse.less.feature"
       label="LESS"
-      version="0.9.0"
+      version="1.0.0"
       provider-name="Vincent Simonet">
 
    <description url="http://www.normalesup.org/~simonet/soft/ow/eclipse-less.en.html">
@@ -18,31 +18,31 @@
    </license>
 
    <plugin
-         id="net.vtst.ow.eclipse.easyxtext"
-         download-size="0"
-         install-size="0"
-         version="0.9.0"
-         unpack="false"/>
-
-   <plugin
-         id="net.vtst.ow.eclipse.easyxtext.ui"
-         download-size="0"
-         install-size="0"
-         version="0.9.0"
-         unpack="false"/>
-
-   <plugin
          id="net.vtst.ow.eclipse.less"
          download-size="0"
          install-size="0"
-         version="0.9.0"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="net.vtst.ow.eclipse.less.ui"
          download-size="0"
          install-size="0"
-         version="0.9.0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.vtst.eclipse.easyxtext"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.vtst.eclipse.easyxtext.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
          unpack="false"/>
 
 </feature>
