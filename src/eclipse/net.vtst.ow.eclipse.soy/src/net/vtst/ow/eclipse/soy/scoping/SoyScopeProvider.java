@@ -117,7 +117,7 @@ public class SoyScopeProvider extends AbstractDeclarativeScopeProvider {
       public IScope get() {
         if (context instanceof Template) {
           List<IEObjectDescription> variableDefinitions = new ArrayList<IEObjectDescription>();
-          for (TemplateParameter param: ((Template) context).getParam()) {
+          for (TemplateParameter param: ((Template) context).getSoydoc().getParam()) {
             variableDefinitions.add(EObjectDescription.create(QualifiedName.create("$" + param.getIdent()), param));            
           }
           return MapBasedScope.createScope(IScope.NULLSCOPE, variableDefinitions);

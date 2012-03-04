@@ -5,6 +5,7 @@ package net.vtst.ow.eclipse.soy;
 
 import net.vtst.eclipse.easyxtext.guice.EasyXtextModule;
 import net.vtst.ow.eclipse.soy.parser.CustomizedSoyLexer;
+import net.vtst.ow.eclipse.soy.parser.CustomizedSoyLexer;
 import net.vtst.ow.eclipse.soy.parser.SoyValueConverterService;
 import net.vtst.ow.eclipse.soy.parser.antlr.internal.InternalSoyLexer;
 import net.vtst.ow.eclipse.soy.resource.SoyLocationInFileProvider;

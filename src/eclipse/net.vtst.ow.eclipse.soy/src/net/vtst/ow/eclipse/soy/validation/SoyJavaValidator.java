@@ -228,12 +228,16 @@ public class SoyJavaValidator extends AbstractSoyJavaValidator {
   @Check
   public void checkTemplateParameters(Template template) {
     // Check use.
-    Set<TemplateParameter> templateParameters = new HashSet<TemplateParameter>(template.getParam());
+    Set<TemplateParameter> templateParameters = new HashSet<TemplateParameter>(template.getSoydoc().getParam());
     TreeIterator<EObject> iterator = template.eAllContents();
     while (iterator.hasNext() && !templateParameters.isEmpty()) {
       EObject object = iterator.next();
       for (EObject crossReferencedObject: object.eCrossReferences()) {
         templateParameters.remove(crossReferencedObject);
+      }
+      if (object instanceof CommandAttribute && isDataAttributeEqualToAll((CommandAttribute) object)) {
+        // TODO: This is conservative because some of the parameters may in fact be unused.
+        templateParameters.clear();
       }
     }
     for (TemplateParameter templateParameter: templateParameters) {
@@ -243,12 +247,12 @@ public class SoyJavaValidator extends AbstractSoyJavaValidator {
     // Check unicity
     int index = 0;
     Set<String> seenIdents = new HashSet<String>();
-    for (TemplateParameter param: template.getParam()) {
+    for (TemplateParameter param: template.getSoydoc().getParam()) {
       String ident = param.getIdent();
       if (ident != null) {
         if (!seenIdents.add(ident)) {
-          error(messages.getString("duplicated_template_parameter"), template,
-              SoyPackage.eINSTANCE.getTemplate_Param(), index);        
+          error(messages.getString("duplicated_template_parameter"), template.getSoydoc(),
+              SoyPackage.eINSTANCE.getSoyDoc_Param(), index);        
         }
       }
       ++index;
@@ -270,7 +274,7 @@ public class SoyJavaValidator extends AbstractSoyJavaValidator {
     Set<String> seenCallParams = new HashSet<String>();
     Set<String> requiredParams = new HashSet<String>();
     Set<String> optionalParams = new HashSet<String>();
-    for (TemplateParameter templateParam: template.getParam()) {
+    for (TemplateParameter templateParam: template.getSoydoc().getParam()) {
       if (templateParam.isOptional()) optionalParams.add(templateParam.getIdent());
       else requiredParams.add(templateParam.getIdent());
     }
@@ -343,7 +347,7 @@ public class SoyJavaValidator extends AbstractSoyJavaValidator {
       object = object.eContainer();
     }
     if (object == null) return Collections.emptySet();;
-    return ((Template) object).getParam();
+    return ((Template) object).getSoydoc().getParam();
   }
   
   /**

@@ -32,7 +32,7 @@ Workflow {
         language = {
             uri = grammarURI
             fileExtensions = file.extensions
-
+            
             // Java API to access grammar elements (required by several other fragments)
             fragment = grammarAccess.GrammarAccessFragment {}
 

@@ -12,7 +12,11 @@ generate soy "http://www.vtst.net/ow/eclipse/soy/Soy"
 // File structure
 
 SoyFile:
-  delpackage=Delpackage? namespace=Namespace declaration+=Declaration* template+=Template*
+  delpackage=Delpackage? 
+  namespace=Namespace
+  declaration+=Declaration*
+  (orphan_soydoc+=SoyDoc* template+=Template)*
+  orphan_soydoc+=SoyDoc*
 ;
 
 Delpackage:
@@ -26,17 +30,21 @@ Namespace:
 Template: RegularTemplate | DelTemplate;
 
 RegularTemplate:
-  SOY_DOC_OPEN SOY_DOC_TEXT? (param+=TemplateParameter SOY_DOC_TEXT?)* SOY_DOC_CLOSE
+  soydoc=SoyDoc
   "{template" ident=TemplateDefinitionDotIdent attribute+=CommandAttribute* "}" items=Items "{/template}"
 ;
 
 DelTemplate:
-  SOY_DOC_OPEN SOY_DOC_TEXT? (param+=TemplateParameter SOY_DOC_TEXT?)* SOY_DOC_CLOSE
+  soydoc=SoyDoc
   "{deltemplate" ident=TemplateDefinitionDottedIdent attribute+=CommandAttribute* "}" items=Items "{/deltemplate}"
 ;
 
+SoyDoc:
+  {SoyDoc} SOY_DOC_OPEN SOY_DOC_TEXT? (param+=TemplateParameter SOY_DOC_TEXT?)* SOY_DOC_CLOSE
+;
+
 TemplateParameter:
-  (SOY_DOC_TAG_PARAM | optional?=SOY_DOC_TAG_PARAM_OPTIONAL)  ident=SOY_DOC_IDENT
+  SOY_DOC_TAG_PARAM optional?=SOY_DOC_TAG_PARAM_OPTIONAL?  ident=SOY_DOC_IDENT
 ;
 
 Items:
@@ -46,7 +54,7 @@ Items:
 // RawText? (Command RawText?)*
 
 Item:
-  RawText | Command | HTMLTag
+  RawText | Command
 ;
 
 RawText: {RawText} item+=RawTextItem*;
@@ -250,13 +258,6 @@ Global: ident=GlobalDottedIdent;
 ListOrMapLiteralItem: first=Expr (':' second=Expr)?;
 
 ExprList: expr+=Expr (',' expr+=Expr)*;
-
-// ----------------------------------------------------------------------------
-// HTML tags
-
-HTMLTag:
-  {HTMLTag} "tag"
-;
 
 // ----------------------------------------------------------------------------
 // Identifiers
