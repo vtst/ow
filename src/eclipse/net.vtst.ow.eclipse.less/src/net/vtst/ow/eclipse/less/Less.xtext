@@ -251,7 +251,7 @@ Pseudo:
 // Declarations
 
 Declaration:
-  property=Property OPT_SPACE ':' OPT_SPACE expr=Expr 
+  star_property_hack?='*'? property=Property OPT_SPACE ':' OPT_SPACE expr=Expr 
   ('!' OPT_SPACE important?='important' OPT_SPACE)?
 ;
 

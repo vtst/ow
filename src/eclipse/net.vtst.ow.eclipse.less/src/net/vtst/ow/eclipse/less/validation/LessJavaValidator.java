@@ -50,6 +50,16 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     }
   }
   
+  // Check for star property hack
+  @Check
+  public void checkStarPropertyHack(Declaration declaration) {
+    if (declaration.isStar_property_hack()) {
+      warning(
+          messages.getString("star_property_hack"), declaration, 
+          LessPackage.eINSTANCE.getDeclaration_Star_property_hack(), 0);
+    }
+  }
+  
   // Check for multiple variables in block
   @Check
   public void checkBlockUniqueVariables(Block block) {
