@@ -29,3 +29,11 @@ A copy of the EPL is available at http://www.eclipse.org/org/documents/epl-v10.p
 TODO
 
 * Can save launch configuration / check launch configuration before launch
+* More efficient custom lexers. Use cases:
+  - Strings: emit one token, which includes the trigerring one
+  - Literal: emit the current token, generate a new one which exclude the closing char sequence
+  - Soy doc: emit the current token, generate a sequence of new ones
+  - Special comment: emit either the current token, or a replacement one
+  In each case, the lexing can be done linearly. So either we store tokens into a list, or we store
+  only a state.  Storing only a state has the advantage that we do not have to change the machinery
+  so much.  Let's do that.
