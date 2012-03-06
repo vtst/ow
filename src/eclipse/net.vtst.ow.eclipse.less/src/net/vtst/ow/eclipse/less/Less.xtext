@@ -217,12 +217,13 @@ MixinCallCombinator returns Combinator:
 
 // This rule does not end with OPT_SPACE, because of combinators
 SimpleSelector:
-  {SimpleSelectorWithRoot} root=(IDENT | '*' | '&')
+  {SimpleSelectorWithRoot} root=(IDENT | '*' | AMPERSAND_IDENT)
   (criteria+=HashOrClass | criteria+=Attrib | criteria+=Pseudo)*
   | {SimpleSelectorWithoutRoot} (
       criteria+=HashOrClass | criteria+=Attrib | criteria+=Pseudo
     )+
 ;
+AMPERSAND_IDENT returns ecore::EString: '&' IDENT?;
 
 HashOrClass: Hash | Class;
 HashOrClassCrossReference: ident=[HashOrClass|HASH_OR_CLASS_IDENT];
