@@ -24,7 +24,7 @@ Delpackage:
 ;
 
 Namespace:
-  "{namespace" ident=NamespaceDottedIdent "}"
+  "{namespace" ident=NamespaceDottedIdent attribute+=CommandAttribute* "}"
 ;
 
 Template: RegularTemplate | DelTemplate;

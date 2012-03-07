@@ -20,6 +20,7 @@ import net.vtst.ow.eclipse.soy.soy.Items;
 import net.vtst.ow.eclipse.soy.soy.ListOrMapLiteral;
 import net.vtst.ow.eclipse.soy.soy.ListOrMapLiteralItem;
 import net.vtst.ow.eclipse.soy.soy.MsgCommand;
+import net.vtst.ow.eclipse.soy.soy.Namespace;
 import net.vtst.ow.eclipse.soy.soy.PrintDirective;
 import net.vtst.ow.eclipse.soy.soy.PrintDirectiveDeclaration;
 import net.vtst.ow.eclipse.soy.soy.RegularCallCommand;
@@ -121,6 +122,18 @@ public class SoyJavaValidator extends AbstractSoyJavaValidator {
   
   // **************************************************************************
   // Command attributes
+  
+  /**
+   * Check the attributes of namespace commands.
+   */
+  @Check
+  public void checkNamespaceCommandAttributes(Namespace namespace) {
+    doCheckCommandAttributes(namespace, namespace.getAttribute(), namespaceRequiredAttributes, namespaceOptionalAttributes);
+  }
+  private static Set<String> namespaceRequiredAttributes = new HashSet<String>(
+      Arrays.asList(new String[]{}));
+  private static Set<String> namespaceOptionalAttributes = new HashSet<String>(
+      Arrays.asList(new String[]{"autoescape"}));
   
   /**
    * Check the attributes of template commands.
