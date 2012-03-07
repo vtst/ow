@@ -1,7 +1,9 @@
 package net.vtst.ow.eclipse.soy.validation;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -235,13 +237,32 @@ public class SoyJavaValidator extends AbstractSoyJavaValidator {
     }
   }
 
+  private static class TemplateParameterRegister {
+    private Set<TemplateParameter> set;
+    private HashMap<String, TemplateParameter> map = new HashMap<String, TemplateParameter>();
+    public TemplateParameterRegister(Collection<TemplateParameter> parameters) {
+      this.set = new HashSet<TemplateParameter>(parameters);
+      for (TemplateParameter parameter: parameters) map.put(parameter.getIdent(), parameter);
+    }
+    public void remove(TemplateParameter parameter) { set.remove(parameter); }
+    public void remove(EObject object) {
+      if (object instanceof TemplateParameter) remove((TemplateParameter) object);
+    }
+    public void remove(String name) {
+      TemplateParameter parameter = map.get(name);
+      if (parameter != null) remove(parameter);
+    }
+    public boolean isEmpty() { return set.isEmpty(); }
+    public Iterable<TemplateParameter> get() { return set; }
+  }
+  
   /**
    * Check the parameters of a template: unique and use.
    */
   @Check
   public void checkTemplateParameters(Template template) {
     // Check use.
-    Set<TemplateParameter> templateParameters = new HashSet<TemplateParameter>(template.getSoydoc().getParam());
+    TemplateParameterRegister templateParameters = new TemplateParameterRegister(template.getSoydoc().getParam());
     TreeIterator<EObject> iterator = template.eAllContents();
     while (iterator.hasNext() && !templateParameters.isEmpty()) {
       EObject object = iterator.next();
@@ -249,11 +270,18 @@ public class SoyJavaValidator extends AbstractSoyJavaValidator {
         templateParameters.remove(crossReferencedObject);
       }
       if (object instanceof CommandAttribute && isDataAttributeEqualToAll((CommandAttribute) object)) {
-        // TODO: This is conservative because some of the parameters may in fact be unused.
-        templateParameters.clear();
+        EObject parent = object.eContainer();
+        if (parent instanceof CallCommand) {
+          Template calledTemplate = getCallCommandTemplate((CallCommand) parent);
+          if (calledTemplate != null) {
+            for (TemplateParameter calledParameter: calledTemplate.getSoydoc().getParam()) {
+              templateParameters.remove(calledParameter.getIdent());
+            }
+          }
+        }
       }
     }
-    for (TemplateParameter templateParameter: templateParameters) {
+    for (TemplateParameter templateParameter: templateParameters.get()) {
       error(messages.getString("unused_template_parameter"), templateParameter, SoyPackage.eINSTANCE.getVariableDefinition_Ident(), 0);
     }
     

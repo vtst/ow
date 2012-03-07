@@ -45,7 +45,7 @@ public class SoyScopeProvider extends AbstractDeclarativeScopeProvider {
 
   public final static String GLOBAL_SCOPE_PROVIDER_WITH_BUILTINS = "net.vtst.ow.eclipse.soy.SoyScopeProvider.builtin";
 
-  // The cache contains pairs (SoyScopeProvider.class, context) for variable scopes
+  // The cache is keyed by triples (SoyScopeProvider.class, function name, context)
   @Inject
   private IResourceScopeCache cache;
   
@@ -72,7 +72,7 @@ public class SoyScopeProvider extends AbstractDeclarativeScopeProvider {
   }
   
   public IScope getToplevelScopeFromSoyFile(final SoyFile soyFile, final EReference ref) {
-    return cache.get(Tuples.create(SoyScopeProvider.class, "getTemplateScope", Tuples.pair(soyFile, ref)), soyFile.eResource(), new Provider<IScope>() {
+    return cache.get(Tuples.create(SoyScopeProvider.class, "getToplevelScope", Tuples.pair(soyFile, ref)), soyFile.eResource(), new Provider<IScope>() {
       public IScope get() {
         Iterable<IEObjectDescription> localScope = SoyResourceDescriptionStrategy.getEObjectDescriptions(converter, soyFile, true);
         return MapBasedScope.createScope(getGlobalScope(soyFile.eResource(), ref, null), localScope);
@@ -137,5 +137,4 @@ public class SoyScopeProvider extends AbstractDeclarativeScopeProvider {
       }
     });
   }
-
 }
