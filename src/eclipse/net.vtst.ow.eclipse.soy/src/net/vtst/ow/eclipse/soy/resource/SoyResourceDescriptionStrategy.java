@@ -40,6 +40,9 @@ public class SoyResourceDescriptionStrategy implements IDefaultResourceDescripti
     return false;
   }
   
+  // The following static functions are used for the current class (SoyResourceDescriptionStrategy)
+  // and for SoyScopeProvider.
+  
   public static void getEObjectDescriptionsFromTemplates(IQualifiedNameConverter converter, SoyFile soyFile, boolean localNames, IAcceptor<IEObjectDescription> acceptor) {
     QualifiedName namespaceQN = getNamespaceQualifiedName(converter, soyFile.getNamespace());
     for (Template template: soyFile.getTemplate()) {
