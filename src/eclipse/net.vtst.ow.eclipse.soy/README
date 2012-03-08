@@ -31,6 +31,32 @@ LICENSE
 ********************************************************************************
 TODO
 
+http://stackoverflow.com/questions/7039426/how-to-declare-local-variable-in-closure-javascript-template/9516927#9516927
+
+Yes, this is now possible! If you have a build of Closure Templates that was cut in 2011, you can declare local variables as follows:
+
+{let $first: $person.firstName /}
+{$first}
+
+Note that like {param}, you can also define a local variable with a more complex expression between opening and closing tags:
+
+{let $name}
+  {$person.firstName} {$person.lastName}
+{/let}
+
+Sometimes you need to use this form if you want to use other commands to define your variable:
+
+{let $className}
+  {css name_class}
+{/let}
+
+<div class="{$name_class}"></div>
+
+Unfortunately, {let} is not documented in the Closure Templates documentation, which is otherwise quite comprehensive.
+
+
+
+
 * template + deltemplate de meme nom
 
 * Launch compiler

@@ -9,7 +9,9 @@ import java.util.List;
 import net.vtst.ow.eclipse.soy.resource.SoyResourceDescriptionStrategy;
 import net.vtst.ow.eclipse.soy.soy.ForCommand;
 import net.vtst.ow.eclipse.soy.soy.ForeachCommand;
+import net.vtst.ow.eclipse.soy.soy.LetCommand;
 import net.vtst.ow.eclipse.soy.soy.SoyFile;
+import net.vtst.ow.eclipse.soy.soy.SoyPackage;
 import net.vtst.ow.eclipse.soy.soy.Template;
 import net.vtst.ow.eclipse.soy.soy.TemplateParameter;
 import net.vtst.ow.eclipse.soy.soy.VariableDefinition;
@@ -112,29 +114,33 @@ public class SoyScopeProvider extends AbstractDeclarativeScopeProvider {
   }
 
   public IScope computeVariableScope(final EObject context) {
-    if (context == null) return IScope.NULLSCOPE;
+    final EObject container = context.eContainer();
+    if (container == null) return IScope.NULLSCOPE;
     return cache.get(Tuples.create(SoyScopeProvider.class, "computeVariableScope", context), context.eResource(), new Provider<IScope>() {
       public IScope get() {
-        if (context instanceof Template) {
+        if (container instanceof Template) {
           List<IEObjectDescription> variableDefinitions = new ArrayList<IEObjectDescription>();
-          for (TemplateParameter param: ((Template) context).getSoydoc().getParam()) {
+          for (TemplateParameter param: ((Template) container).getSoydoc().getParam()) {
             variableDefinitions.add(EObjectDescription.create(QualifiedName.create("$" + param.getIdent()), param));            
           }
           return MapBasedScope.createScope(IScope.NULLSCOPE, variableDefinitions);
-        } else if (context instanceof ForCommand) {
-          VariableDefinition variableDefinition = ((ForCommand) context).getRange().getFor_variable();
-          return new SingletonScope(
-              EObjectDescription.create(QualifiedName.create(variableDefinition.getIdent()), variableDefinition),
-              computeVariableScope(context.eContainer()));
-        } else if (context instanceof ForeachCommand) {
-          VariableDefinition variableDefinition = ((ForeachCommand) context).getRange().getFor_variable();
-          return new SingletonScope(
-              EObjectDescription.create(QualifiedName.create(variableDefinition.getIdent()), variableDefinition),
-              computeVariableScope(context.eContainer()));
+        } else if (container instanceof ForCommand) {
+          return computeVariableScope(container, ((ForCommand) container).getRange().getFor_variable());
+        } else if (container instanceof ForeachCommand) {
+          return computeVariableScope(container, ((ForeachCommand) container).getRange().getFor_variable());
+        } else if (container instanceof LetCommand && 
+            context.eContainingFeature() == SoyPackage.eINSTANCE.getLetCommand_Items()) {
+          return computeVariableScope(container, ((LetCommand) container).getLet_variable());
         } else {
-          return computeVariableScope(context.eContainer());
+          return computeVariableScope(container);
         }
       }
     });
+  }
+  
+  public IScope computeVariableScope(final EObject container, VariableDefinition variableDefinition) {
+    return new SingletonScope(
+        EObjectDescription.create(QualifiedName.create(variableDefinition.getIdent()), variableDefinition),
+        computeVariableScope(container));    
   }
 }

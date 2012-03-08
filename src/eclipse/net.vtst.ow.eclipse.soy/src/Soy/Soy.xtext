@@ -48,7 +48,7 @@ TemplateParameter:
 ;
 
 Items:
-  {Items} item+=RawText (item+=Command item+=RawText)*
+  {Items} item+=RawText (item+=NonGlobbingCommand item+=RawText)* item+=GlobbingCommand?
 ;
 
 // RawText? (Command RawText?)*
@@ -100,7 +100,16 @@ PrintDirectiveDeclaration:
 // ----------------------------------------------------------------------------
 // Soy commands
 
-Command: 
+Command:
+  GlobbingCommand
+  | NonGlobbingCommand
+; 
+
+GlobbingCommand:
+  LetCommand
+;
+
+NonGlobbingCommand:
   SpecialCharCommand 
   | LiteralCommand 
   | PrintCommand 
@@ -108,7 +117,7 @@ Command:
   | IfCommand 
   | SwitchCommand 
   | ForeachCommand 
-  | ForCommand 
+  | ForCommand
   | CallCommand 
   | CssCommand 
 ;
@@ -160,8 +169,13 @@ ForeachCommand:
   ("{/foreach}" | "{{/foreach}}")  
 ;
 
+
+LocalVariableDefinition:
+  ident=DOLLAR_IDENT
+;
+
 ForeachRange:
-  for_variable=ForVariableDefinition "in" for_range=DataReference
+  for_variable=LocalVariableDefinition "in" for_range=DataReference
 ;
 
 ForCommand:
@@ -171,11 +185,14 @@ ForCommand:
 ;
 
 ForRange:
-  for_variable=ForVariableDefinition "in" "range(" lb=Expr ("," ub=Expr ("," step=Expr)?)? ")"
+  for_variable=LocalVariableDefinition "in" "range(" lb=Expr ("," ub=Expr ("," step=Expr)?)? ")"
 ;
 
-ForVariableDefinition:
-  ident=DOLLAR_IDENT
+// From http://stackoverflow.com/questions/7039426/how-to-declare-local-variable-in-closure-javascript-template/9516927
+LetCommand:
+  (("{let" let_variable=LocalVariableDefinition (":" expr=Expr "/}" | "}" let_items=Items ("{/let}" | "{{/let}}")))
+   | ("{{let" let_variable=LocalVariableDefinition (":" expr=Expr "/}}" | "}}" let_items=Items ("{/let}" | "{{/let}}"))))
+ items=Items
 ;
 
 CallCommand: RegularCallCommand | DelCallCommand;
@@ -246,7 +263,7 @@ SimpleExpr:
 ;
 
 // Super-class of rules that binds a variable
-VariableDefinition: TemplateParameter | ForVariableDefinition;
+VariableDefinition: TemplateParameter | LocalVariableDefinition;
 Variable: ident=[VariableDefinition|DOLLAR_IDENT] | {Variable} DOLLAR_IJ;
 DataReference: ((ident=[VariableDefinition|DOLLAR_IDENT] | DOLLAR_IJ) part+=DataReferencePart+) | Variable;
 DataReferencePart:
