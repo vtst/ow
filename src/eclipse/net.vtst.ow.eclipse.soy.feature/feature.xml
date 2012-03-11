@@ -1,35 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="net.vtst.ow.eclipse.less.feature"
-      label="LESS"
-      version="1.0.1"
+      id="net.vtst.ow.eclipse.soy.feature"
+      label="Closure Templates"
+      version="1.0.0"
       provider-name="Vincent Simonet">
 
-   <description url="http://www.normalesup.org/~simonet/soft/ow/eclipse-less.en.html">
-      IDE for the LESS stylesheet language (http://lesscss.org/)
+   <description url="http://www.normalesup.org/~simonet/soft/ow/eclipse-closure-templates.en.html">
+      IDE for the Closure Templates (http://code.google.com/closure/templates/)
    </description>
 
-   <copyright url="http://www.normalesup.org/~simonet/soft/ow/eclipse-less/">
-      (c) Vincent Simonet, 2011.
+   <copyright url="http://www.normalesup.org/~simonet/soft/ow/eclipse-closure-templates.en.html">
+      (c) Vincent Simonet, 2012.
    </copyright>
 
    <license url="http://eclipse.org/legal/epl-v10.html">
-      This software is distributed under the terms of the Eclipse Public License, version 1.0.
+      This software is distributed under the terms of the Eclipse Public License, version 1.0
    </license>
-
-   <plugin
-         id="net.vtst.ow.eclipse.less"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="net.vtst.ow.eclipse.less.ui"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
 
    <plugin
          id="net.vtst.eclipse.easyxtext"
@@ -40,6 +26,20 @@
 
    <plugin
          id="net.vtst.eclipse.easyxtext.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.vtst.ow.eclipse.soy"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.vtst.ow.eclipse.soy.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"
