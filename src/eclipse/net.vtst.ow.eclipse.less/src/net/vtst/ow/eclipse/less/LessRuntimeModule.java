@@ -5,9 +5,11 @@ package net.vtst.ow.eclipse.less;
 
 import net.vtst.eclipse.easyxtext.guice.EasyXtextModule;
 import net.vtst.ow.eclipse.less.resource.LessLocationInFileProvider;
+import net.vtst.ow.eclipse.less.resource.LessResourceDescriptionStrategy;
 import net.vtst.ow.eclipse.less.scoping.LessQualifiedNameProvider;
 
 import org.eclipse.xtext.linking.ILinkingDiagnosticMessageProvider;
+import org.eclipse.xtext.resource.IDefaultResourceDescriptionStrategy;
 import org.eclipse.xtext.resource.ILocationInFileProvider;
 
 import com.google.inject.Binder;
@@ -38,6 +40,12 @@ public class LessRuntimeModule extends net.vtst.ow.eclipse.less.AbstractLessRunt
   
   public Class<? extends ILocationInFileProvider> bindILocationInFileProvider() {
     return LessLocationInFileProvider.class;
+  }
+
+  // Scoping
+  
+  public Class<? extends IDefaultResourceDescriptionStrategy> bindIDefaultResourceDescriptionStrategy() {
+    return LessResourceDescriptionStrategy.class;
   }
 
 }

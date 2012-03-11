@@ -12,6 +12,7 @@ import net.vtst.ow.eclipse.less.less.BlockUtils;
 import net.vtst.ow.eclipse.less.less.Declaration;
 import net.vtst.ow.eclipse.less.less.HashOrClass;
 import net.vtst.ow.eclipse.less.less.HashOrClassCrossReference;
+import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.less.IncompleteToplevelStatement;
 import net.vtst.ow.eclipse.less.less.LessPackage;
 import net.vtst.ow.eclipse.less.less.MixinCall;
@@ -20,6 +21,7 @@ import net.vtst.ow.eclipse.less.less.MixinDefinitionParameter;
 import net.vtst.ow.eclipse.less.less.MixinDefinitionVariable;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
 import net.vtst.ow.eclipse.less.less.VariableDefinition;
+import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
@@ -34,6 +36,22 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   
   @Inject
   LessMessages messages;
+  
+  @Inject
+  LessImportStatementResolver importStatementResolver;
+  
+  // Check import statements
+  @Check
+  public void checkImportStatement(ImportStatement importStatement) {
+    switch (importStatementResolver.checkImportStatement(importStatement)) {
+    case INVALID_URI:
+      warning(messages.getString("import_invalid_uri"), importStatement, LessPackage.eINSTANCE.getImportStatement_Uri(), 0);
+      break;
+    case LOOP:
+      warning(messages.getString("import_loop"), importStatement, LessPackage.eINSTANCE.getImportStatement_Uri(), 0);
+      break;
+    }
+  }
   
   // Check for multiple properties in block
   @Check

@@ -6,6 +6,7 @@ package net.vtst.ow.eclipse.less.ui;
 import net.vtst.eclipse.easyxtext.util.IEasyMessages;
 import net.vtst.ow.eclipse.less.ui.folding.LessFoldingRegionProvider;
 import net.vtst.ow.eclipse.less.ui.folding.LessFoldingStructureProvider;
+import net.vtst.ow.eclipse.less.ui.hyperlinking.LessHyperlinkHelper;
 import net.vtst.ow.eclipse.less.ui.syntaxcoloring.LessAntlrTokenToAttributeIdMapper;
 import net.vtst.ow.eclipse.less.ui.syntaxcoloring.LessHighlightingConfiguration;
 import net.vtst.ow.eclipse.less.ui.syntaxcoloring.LessSemanticHighlightingCalculator;
@@ -59,6 +60,12 @@ public class LessUiModule extends net.vtst.ow.eclipse.less.ui.AbstractLessUiModu
 
   public Class<? extends IFoldingStructureProvider> bindIFoldingStructureProvider() {
     return LessFoldingStructureProvider.class;
+  }
+  
+  // Hyper-linking
+  
+  public Class<? extends org.eclipse.xtext.ui.editor.hyperlinking.IHyperlinkHelper> bindIHyperlinkHelper() {
+    return LessHyperlinkHelper.class;
   }
   
 }

@@ -11,8 +11,8 @@ This plugin provides support for the LESS stylesheet language
 * Outline tree,
 * Validation (duplicated properties and variables),
 * Content assist (for property names and property expressions),
-* Automatic cross-references (variables and mixins).
-* Launch compilation with LESS compiler
+* Automatic cross-references (variables and mixins),
+* Launch compilation with LESS compiler.
 
 
 ********************************************************************************
@@ -20,7 +20,7 @@ REQUIREMENTS
 
 This Eclipse plugin requires:
 * Eclipse Indigo
-* XText 2.0.0 (http://www.eclipse.org/Xtext/)
+* XText 2.1.0 (http://www.eclipse.org/Xtext/)
 
 
 ********************************************************************************
@@ -36,9 +36,7 @@ The following constructs of the LESS language are not (yet) supported:
 distribution in which the limitation becomes visible).
 
 The following features are not supported in the editor:
-- Refactoring,
-- Cross-references between files.
-
+- Refactoring.
 
 ********************************************************************************
 LICENSE
@@ -49,16 +47,3 @@ Project [http://www.eclipse.org/webtools/]:
 * Icons (in net.vtst.ow.eclipse.less.ui/icons).
 These files are distributed under the Eclipse Public License Version 1.0.
 A copy of the EPL is available at http://www.eclipse.org/org/documents/epl-v10.php
-
-
-********************************************************************************
-TODO
-
-* Bug in encoding
-* Bug in folding
-* Use EasyResourceBundle
-
-* Create constants for rule names
-* Limit what can be put in @font-face and @page blocks?
-* Refactoring
-* Use Tuples.pair instead of Pair
