@@ -1,2 +1,52 @@
 org.eclipse.wst.jsdt.internal.ui.preferences.BuildPathsPropertyPage
-How to monitor changes in an editor?
+
+NATURE: org.eclipse.wst.jsdt.core.jsNature
+NATURE: net.vtst.ow.eclipse.js.closure.closureNature
+
+-------------------------------------------------------------------------------
+CONFIGURATION TAB
+
+1. Manage paths properly whatever the operating system
+2. Variables?
+
+-------------------------------------------------------------------------------
+THREADING
+
+Potential threads:
+1. Project builder
+2. Document listener
+3. Resource listener (for deletion of projects)
+4. Window and Part listener
+5. The project nature
+6. Caller of the compiler
+
+-------------------------------------------------------------------------------
+TODO
+
+1. Hovers with types
+2. Run compiler in background
+3. /?\ How to manage compilation errors / ensure that the compiler is run only
+   when there is no compilation error. [In particular, missing ;]
+4. Report errors and warning from the compiler.
+5. Catch exceptions from the compiler.  Example: top-level function(x) {};
+6. See TODOs in ClosureCompletionProposalCollector
+
+-------------------------------------------------------------------------------
+COMPLETION PROPOSALS
+
+1. Investigate extensions
+2. Clarify how to get the list of completion proposals => See below.
+3. Clarify how to sort completion proposals => Implement IJavaCompletionProposal.
+
+How to get the list of completion proposals.
+1. In a synchronous way:
+   * Get the current position
+   * Get the prefix of the current position
+   * Get the scope at the beginning at this prefix
+   * Take all proposals that begin by this prefix.  If the prefix has no dot, look into global
+     variables.  If the prefix has a dot, look into members.
+2. In an asynchronous way:
+   * Do the same
+   * Check that the last compiled version is still valid, by checking that the text before the prefix
+   is not changed
+   => We need to keep a copy of what has been compiled.

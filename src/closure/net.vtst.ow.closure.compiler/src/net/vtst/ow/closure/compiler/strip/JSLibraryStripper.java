@@ -6,8 +6,8 @@ import java.io.PrintStream;
 import java.util.logging.Level;
 
 import net.vtst.ow.closure.compiler.magic.MagicException;
+import net.vtst.ow.closure.compiler.util.CompilerUtils;
 import net.vtst.ow.closure.compiler.util.FileTreeVisitor;
-import net.vtst.ow.closure.compiler.util.Utils;
 
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.ErrorManager;
@@ -33,7 +33,7 @@ public class JSLibraryStripper {
   
   public JSLibraryStripper(PrintStream out, PrintStream err) {
     this.outputStream = out;
-    this.errorManager = Utils.makeErrorManager(err);
+    this.errorManager = CompilerUtils.makePrintingErrorManager(err);
     this.fileStripper = new JSFileStripper(this.errorManager);
   }
   
@@ -54,7 +54,7 @@ public class JSLibraryStripper {
         return true;
       }
       public void visitFile(File input, File output) throws IOException {
-        if (!Utils.isJavaScriptFile(input)) return;
+        if (!CompilerUtils.isJavaScriptFile(input)) return;
         ++number_of_files;
         outputStream.println("Processing: " + input.getAbsolutePath());
         fileStripper.strip(input, output);

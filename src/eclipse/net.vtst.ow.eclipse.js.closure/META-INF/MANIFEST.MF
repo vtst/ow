@@ -3,13 +3,17 @@ Bundle-ManifestVersion: 2
 Bundle-Name: JSDT for Closure
 Bundle-SymbolicName: net.vtst.ow.eclipse.js.closure;singleton:=true
 Bundle-Version: 0.0.1
-Bundle-Activator: net.vtst.ow.eclipse.js.closure.Activator
+Bundle-Activator: net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin
 Bundle-Vendor: Vincent Simonet
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.core.resources;bundle-version="3.7.100"
+ org.eclipse.core.resources;bundle-version="3.7.100",
+ org.eclipse.wst.jsdt.ui;bundle-version="1.1.101",
+ org.eclipse.jface.text;bundle-version="3.7.1",
+ net.vtst.ow.closure.compiler;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Import-Package: org.eclipse.jface.text,
+Import-Package: org.eclipse.debug.internal.ui,
  org.eclipse.ui,
- org.eclipse.ui.texteditor
+ org.eclipse.ui.texteditor,
+ org.eclipse.ui.texteditor.link

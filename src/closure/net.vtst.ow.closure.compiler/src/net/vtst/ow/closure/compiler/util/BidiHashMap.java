@@ -61,5 +61,10 @@ public class BidiHashMap<K, V> {
     }
     getKeysAsCollection(value).addAll(keys);
   }
+
+  public void clear() {
+    map.clear();
+    reverseMap.clear();
+  }
   
 }

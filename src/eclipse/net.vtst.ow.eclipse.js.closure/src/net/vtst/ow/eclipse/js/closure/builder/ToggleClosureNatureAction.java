@@ -70,6 +70,9 @@ public class ToggleClosureNatureAction implements IObjectActionDelegate {
 		try {
 			IProjectDescription description = project.getDescription();
 			String[] natures = description.getNatureIds();
+			for (String nature: natures) {
+			  System.out.println("NATURE: " + nature);
+			}
 
 			for (int i = 0; i < natures.length; ++i) {
 				if (ClosureNature.NATURE_ID.equals(natures[i])) {

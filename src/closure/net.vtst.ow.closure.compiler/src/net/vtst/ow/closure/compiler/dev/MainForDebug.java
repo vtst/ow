@@ -5,14 +5,13 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
-import net.vtst.ow.closure.compiler.compile.AstFactory;
-import net.vtst.ow.closure.compiler.compile.CompilationSet;
-import net.vtst.ow.closure.compiler.compile.CompilationUnit;
-import net.vtst.ow.closure.compiler.compile.CompilationUnitProvider;
-import net.vtst.ow.closure.compiler.compile.Library;
+import net.vtst.ow.closure.compiler.deps.AstFactory;
+import net.vtst.ow.closure.compiler.deps.CompilationSet;
+import net.vtst.ow.closure.compiler.deps.CompilationUnit;
+import net.vtst.ow.closure.compiler.deps.CompilationUnitProvider;
+import net.vtst.ow.closure.compiler.deps.Library;
+import net.vtst.ow.closure.compiler.util.CompilerUtils;
 import net.vtst.ow.closure.compiler.util.FileTreeVisitor;
-import net.vtst.ow.closure.compiler.util.FileUtils;
-import net.vtst.ow.closure.compiler.util.Utils;
 
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerInput;
@@ -23,24 +22,9 @@ import com.google.javascript.jscomp.JSModule;
 import com.google.javascript.jscomp.JSSourceFile;
 import com.google.javascript.jscomp.PassConfig;
 import com.google.javascript.jscomp.Scope;
+import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.jstype.JSType;
-
-/*
- * TODO:
- * 
- * 3. Can we save the state of the compiler?
- *    Idea 1: Fill the global scope before running a file.
- *    Idea 2: Avoid re-parsing.
- * 4. Handle the case where a source file cannot be read NullPointerException.
- * 5. Add a path to library which is the reference path for the deps file.
- */
-
-/*
- * debug/error.js
-asserts/asserts.js
-Are output from Google closure deps file but not from mine.
- */
 
 /*
  * Some performance measurements.
@@ -71,7 +55,7 @@ public class MainForDebug {
     final ArrayList<AstFactory> listAsts = new ArrayList<AstFactory>(); 
     FileTreeVisitor.Simple<RuntimeException> visitor = new FileTreeVisitor.Simple<RuntimeException>() {
       public void visitFile(File file) {
-        if (!Utils.isJavaScriptFile(file)) return;
+        if (!CompilerUtils.isJavaScriptFile(file)) return;
         listFiles.add(file);
         JSSourceFile sourceFile = JSSourceFile.fromFile(file);
         listSourceFiles.add(sourceFile);
@@ -94,8 +78,8 @@ public class MainForDebug {
 //      for (File file: listFiles) {
 //        module.add(new CompilerInput(JSSourceFile.fromFile(file)));
 //      }
-      Compiler compiler = Utils.makeCompiler(Utils.makeErrorManager(System.out));
-      CompilerOptions options = Utils.makeOptions();
+      Compiler compiler = CompilerUtils.makeCompiler(CompilerUtils.makePrintingErrorManager(System.out));
+      CompilerOptions options = CompilerUtils.makeOptions();
       options.checkTypes = true;
       compiler.compile(new JSSourceFile[]{}, new JSModule[]{module}, options);
       System.out.println(compiler.toSource().length());
@@ -125,8 +109,8 @@ INFO: processDefines
 
      */
     Compiler.setLoggingLevel(Level.OFF);
-    Compiler compiler = Utils.makeCompiler(Utils.makeErrorManager(System.out));
-    CompilerOptions options = Utils.makeOptions();
+    Compiler compiler = CompilerUtils.makeCompiler(CompilerUtils.makePrintingErrorManager(System.out));
+    CompilerOptions options = CompilerUtils.makeOptions();
     options.checkTypes = true;
     compiler.initOptions(options);
     PassConfig passes = new DefaultPassConfig(options);
@@ -151,8 +135,8 @@ INFO: processDefines
     compilationSet.updateDependencies(compiler);
     long t0 = System.nanoTime();
     for (int i = 0; i < 1; i++) {
-      Compiler compiler2 = Utils.makeCompiler(Utils.makeErrorManager(System.out));
-      CompilerOptions options2 = Utils.makeOptions();
+      Compiler compiler2 = CompilerUtils.makeCompiler(CompilerUtils.makePrintingErrorManager(System.out));
+      CompilerOptions options2 = CompilerUtils.makeOptions();
       options2.checkTypes = true;
       compiler.initOptions(options2);
       PassConfig passes2 = new DefaultPassConfig(options2);
@@ -179,8 +163,8 @@ INFO: processDefines
   }
   
   public static void compile(JSModule module) {
-    Compiler compiler = Utils.makeCompiler(Utils.makeErrorManager(System.out));    
-    CompilerOptions options = Utils.makeOptions();
+    Compiler compiler = CompilerUtils.makeCompiler(CompilerUtils.makePrintingErrorManager(System.out));    
+    CompilerOptions options = CompilerUtils.makeOptions();
     compiler.initOptions(options);
     
     JSSourceFile extern = JSSourceFile.fromCode("externs.js", "");
@@ -202,13 +186,10 @@ INFO: processDefines
       try {
         method.invoke(passConfig, compiler, root);
       } catch (IllegalArgumentException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       } catch (IllegalAccessException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       } catch (InvocationTargetException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       }
       CompilerInput input = compiler.getInput(root.getInputId());
@@ -219,19 +200,14 @@ INFO: processDefines
         meth.invoke(scope, "test_vtst", root, compiler.getTypeRegistry().getType("number"), input);
         System.out.println(scope.getVar("test_vtst"));
       } catch (IllegalArgumentException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       } catch (IllegalAccessException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       } catch (InvocationTargetException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       } catch (SecurityException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       } catch (NoSuchMethodException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       }
 
@@ -239,6 +215,7 @@ INFO: processDefines
   }
   
   public static void main(String[] args) {
+    Visibility visibility;
     //System.out.println(FileUtils.makeRelative(new File("/x/bar/zop"), new File("/x/y/")));
     //System.out.println(FileUtils.join(new File("/home/vtst"), new File("array/array.js")));
     //measureTime();

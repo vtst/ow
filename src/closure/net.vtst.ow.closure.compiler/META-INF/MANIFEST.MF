@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Closure Compiler support
+Bundle-SymbolicName: net.vtst.ow.closure.compiler
+Bundle-Version: 1.0.0
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: com.google.common.base,
+ com.google.common.collect,
+ com.google.javascript.jscomp,
+ com.google.javascript.rhino,
+ com.google.javascript.rhino.jstype,
+ net.vtst.ow.closure.compiler.compile,
+ net.vtst.ow.closure.compiler.deps,
+ net.vtst.ow.closure.compiler.util
+Bundle-ClassPath: lib/compiler.jar,
+ .

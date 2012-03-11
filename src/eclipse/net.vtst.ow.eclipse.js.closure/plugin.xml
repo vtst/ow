@@ -1,30 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension
-         id="closureBuilder"
-         name="Closure JavaScript Builder"
-         point="org.eclipse.core.resources.builders">
-      <builder
-            hasNature="true">
-         <run
-               class="net.vtst.ow.eclipse.js.closure.builder.ClosureBuilder">
-         </run>
-      </builder>
-   </extension>
-   <extension
-         id="closureNature"
-         name="Closure JavaScript Nature"
-         point="org.eclipse.core.resources.natures">
-      <runtime>
-         <run
-               class="net.vtst.ow.eclipse.js.closure.builder.ClosureNature">
-         </run>
-      </runtime>
-      <builder
-            id="net.vtst.ow.eclipse.js.closure.closureBuilder">
-      </builder>
-   </extension>
+
+  <extension 
+    point="org.eclipse.core.resources.builders"
+    id="closureBuilder"
+    name="Closure JavaScript Builder">
+    <builder hasNature="true">
+      <run class="net.vtst.ow.eclipse.js.closure.builder.ClosureBuilder"/>
+    </builder>
+  </extension>
+
+  <extension
+    point="org.eclipse.core.resources.natures"
+    id="closureNature"
+    name="Closure JavaScript Nature">
+    <runtime>
+      <run class="net.vtst.ow.eclipse.js.closure.builder.ClosureNature"/>
+    </runtime>
+    <builder id="net.vtst.ow.eclipse.js.closure.closureBuilder"/>
+  </extension>
+
+  <extension point="org.eclipse.ui.propertyPages">
+    <page
+      class="net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPropertyPage"
+      category="org.eclipse.wst.jsdt.internal.ui.preferences.JavaScriptMainPage"
+      id="net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPropertyPage"
+      name="Closure Support"
+      nameFilter="*">
+      <!-- The property page is enabled for all projects having the jsNature, because
+           it is used to enable or disable the closure nature. -->
+      <enabledWhen>
+        <adapt type="org.eclipse.core.resources.IProject">
+          <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.wst.jsdt.core.jsNature"/>
+        </adapt>
+      </enabledWhen>
+    </page>
+  </extension>
+   
+  <extension point="org.eclipse.wst.jsdt.ui.javaCompletionProposalComputer"
+    id="ClosureCompletionProposalCategory"
+    name="Closure Completion Proposals">
+    <proposalCategory icon="icons/16x16/closure.png"/>
+  </extension>
+   
+  <extension point="org.eclipse.wst.jsdt.ui.javaCompletionProposalComputer"
+    id="ClosureCompletionProposalComputer"
+    name="Closure Completion Proposal Computer">
+    <javaCompletionProposalComputer
+      class="net.vtst.ow.eclipse.js.closure.contentassist.ClosureCompletionProposalComputer"
+      categoryId="net.vtst.ow.eclipse.js.closure.ClosureCompletionProposalCategory">
+      <partition type="__dftl_partition_content_type"/>
+    </javaCompletionProposalComputer>
+  </extension>   
+
+  <!-- Garbage comes below -->
+
    <extension
          point="org.eclipse.ui.popupMenus">
       <objectContribution
@@ -33,7 +64,7 @@
             nameFilter="*"
             objectClass="org.eclipse.core.resources.IProject">
          <action
-               class="net.vtst.ow.eclipse.js.closure.builder.ToggleNatureAction"
+               class="net.vtst.ow.eclipse.js.closure.builder.ToggleClosureNatureAction"
                enablesFor="+"
                id="net.vtst.ow.eclipse.js.closure.addRemoveNatureAction"
                label="Add/Remove Sample Nature"
@@ -61,10 +92,10 @@
       </filter>
          -->
          <action
-               class="net.vtst.ow.eclipse.js.closure.builder.ToggleNatureAction"
+               class="net.vtst.ow.eclipse.js.closure.builder.ToggleClosureNatureAction"
                enablesFor="+"
                id="net.vtst.ow.eclipse.js.closure.addRemoveNatureAction2"
-               label="YOU HAVE THE NATURE"
+               label="YOU HAVE NOT THE NATURE"
                menubarPath="additions">
          </action>
       </objectContribution>
@@ -81,17 +112,59 @@
       </persistent>
    </extension>
    <extension
-         point="org.eclipse.ui.propertyPages">
-      <page
-            class="net.vtst.ow.eclipse.js.closure.properties.ClosurePropertyPage"
-            id="net.vtst.ow.eclipse.js.closure.properties.samplePropertyPage"
-            name="Closure"
-            nameFilter="*">
-         <enabledWhen>
-            <instanceof
-                  value="org.eclipse.core.resources.IProject">
-            </instanceof>
-         </enabledWhen>
-      </page>
+         point="org.eclipse.ui.commands">
+      <category
+            id="net.vtst.ow.eclipse.js.closure.commands.category"
+            name="Sample Category">
+      </category>
+      <command
+            categoryId="net.vtst.ow.eclipse.js.closure.commands.category"
+            id="net.vtst.ow.eclipse.js.closure.commands.sampleCommand"
+            name="Sample Command">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="net.vtst.ow.eclipse.js.closure.dev.SampleHandler"
+            commandId="net.vtst.ow.eclipse.js.closure.commands.sampleCommand">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="net.vtst.ow.eclipse.js.closure.commands.sampleCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+6">
+      </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               id="net.vtst.ow.eclipse.js.closure.menus.sampleMenu"
+               label="Dev Closure"
+               mnemonic="M">
+            <command
+                  commandId="net.vtst.ow.eclipse.js.closure.commands.sampleCommand"
+                  id="net.vtst.ow.eclipse.js.closure.menus.sampleCommand"
+                  mnemonic="S">
+            </command>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="net.vtst.ow.eclipse.js.closure.toolbars.sampleToolbar">
+            <command
+                  commandId="net.vtst.ow.eclipse.js.closure.commands.sampleCommand"
+                  icon="icons/sample.gif"
+                  id="net.vtst.ow.eclipse.js.closure.toolbars.sampleCommand"
+                  tooltip="Say hello world">
+            </command>
+         </toolbar>
+      </menuContribution>
    </extension>
 </plugin>

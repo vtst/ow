@@ -11,6 +11,17 @@ public class DevUtils {
     traversal.traverse(node);
   }
   
+  public static void printNodeAndAncestors(Node node) {
+    StringBuffer buffer = new StringBuffer();
+    Node current = node;
+    while (current != null) {
+      System.out.print(buffer.toString());
+      System.out.println(current);
+      buffer.append("  ");
+      current = current.getParent();
+    }
+  }
+  
   private static class PrintNodeAsTreeCallback implements NodeTraversal.Callback {
 
     private int depth = 0;

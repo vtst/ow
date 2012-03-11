@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Collections;
 
-import net.vtst.ow.closure.compiler.util.Utils;
+import net.vtst.ow.closure.compiler.util.CompilerUtils;
 
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
@@ -33,10 +33,10 @@ public class JSFileStripper {
   }
   
   public void setupCompiler(Writer writer) {
-    compiler = Utils.makeCompiler(errorManager);
-    options = Utils.makeOptions();
+    compiler = CompilerUtils.makeCompiler(errorManager);
+    options = CompilerUtils.makeOptions();
     stripCompilerPass = new StripCompilerPass(compiler, writer);
-    Utils.addCustomCompilerPass(options, stripCompilerPass, CustomPassExecutionTime.BEFORE_OPTIMIZATIONS);
+    CompilerUtils.addCustomCompilerPass(options, stripCompilerPass, CustomPassExecutionTime.BEFORE_OPTIMIZATIONS);
   }
   
   /**
