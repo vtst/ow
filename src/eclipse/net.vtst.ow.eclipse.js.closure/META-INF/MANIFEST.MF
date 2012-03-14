@@ -9,11 +9,15 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources;bundle-version="3.7.100",
  org.eclipse.wst.jsdt.ui;bundle-version="1.1.101",
- org.eclipse.jface.text;bundle-version="3.7.1",
+ org.eclipse.jface.text;bundle-version="3.7.0",
  net.vtst.ow.closure.compiler;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Import-Package: org.eclipse.debug.internal.ui,
+ org.eclipse.jface.internal.text.html,
+ org.eclipse.jface.text,
+ org.eclipse.jface.text.contentassist,
+ org.eclipse.jface.text.link,
  org.eclipse.ui,
  org.eclipse.ui.texteditor,
  org.eclipse.ui.texteditor.link
