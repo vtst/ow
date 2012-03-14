@@ -78,6 +78,10 @@ public class CustomizedSoyLexer extends InternalSoyLexer {
   private final static int MODE_LITERAL = 6;
   /** Within a special single-line command which shall be parsed as a directive */
   private final static int MODE_SPECIAL_SL_COMMENT = 7;
+  /** A special value for modes, used in the transition table only. It indicates
+   * that the previous mode has to be activated.
+   */
+  private final static int MODE_PREVIOUS = -1;
 
   /** The transition table for the modes:  {@code targetMode[currentMode][tokenType]}. */
   private static int[][] targetMode;
@@ -129,7 +133,7 @@ public class CustomizedSoyLexer extends InternalSoyLexer {
           if (tokenNameContainsSubstringAtPosition(tokenName, "{", 2)) return MODE_COMMAND_2;
           else return MODE_COMMAND;
         }
-      } else if (tokenName.equals("'<'")) {
+      } else if (tokenName.startsWith("'<")) {
         return MODE_HTML_TAG;
       } else if (tokenName.equals("'>'")) {
         return MODE_DEFAULT;
@@ -138,14 +142,14 @@ public class CustomizedSoyLexer extends InternalSoyLexer {
     case MODE_COMMAND:
     case MODE_COMMAND_2:
     case MODE_COMMAND_CALL:
-      if (tokenName.endsWith("}'")) return MODE_DEFAULT;  // TODO: or HTML?
+      if (tokenName.endsWith("}'")) return MODE_PREVIOUS;
       return sourceMode;
     case MODE_SOY_DOC:
       return MODE_SOY_DOC;
     case MODE_LITERAL:
-      return MODE_DEFAULT;  // TODO: or HTML?
+      return MODE_PREVIOUS;
     case MODE_SPECIAL_SL_COMMENT:
-      return MODE_DEFAULT;  // TODO: or HTML?
+      return MODE_PREVIOUS;
     default:
         assert false;
     }
@@ -168,6 +172,8 @@ public class CustomizedSoyLexer extends InternalSoyLexer {
 
   /** The current mode. */
   private int mode = MODE_DEFAULT;
+  /** The previous mode. */
+  private int previousMode = MODE_DEFAULT;
 
   /**
    * Switch to the mode after matching a token.
@@ -175,7 +181,14 @@ public class CustomizedSoyLexer extends InternalSoyLexer {
    */
   private void updateModeAfterToken(int tokenType) {
     if (tokenType < 0) return;
-    this.mode = targetMode[this.mode][tokenType];
+    int newMode = targetMode[this.mode][tokenType];
+    if (newMode == this.mode) return;
+    if (newMode == MODE_PREVIOUS) {
+      this.mode = this.previousMode;
+    } else {
+      this.previousMode = this.mode;
+      this.mode = newMode;
+    }
   }
 
   // **************************************************************************
@@ -478,6 +491,15 @@ public class CustomizedSoyLexer extends InternalSoyLexer {
     default:
       super.mTokens();
         switch (state.type) {
+        case RULE_IDENT:
+          switch (mode) {
+          case MODE_HTML_TAG:
+            state.type = RULE_HTML_IDENT;
+            break;
+          default:
+            break;
+          }
+          break;
         case RULE_PRINT_IDENT:
           // This goes back to the '{'.  The ident will be lexed again.
           input.seek(state.tokenStartCharIndex + 1);

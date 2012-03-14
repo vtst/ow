@@ -65,15 +65,15 @@ RawTextItem:
 ;
 
 // This is useful only for syntax coloring
-HtmlTagBegin: ("<" | "</") IDENT;
+HtmlTagBegin: ("<" | "</") HTML_IDENT;
 HtmlTagEnd: ">";
-HtmlAttribute: IDENT '=';
+HtmlAttribute: HTML_IDENT '=';
 
 AnyTerminalWithoutBraceOrAngle:
   IDENT | HEX_INTEGER | FLOAT | DEC_DIGITS_DOT | STRING_SQ | STRING_DQ | DEC_DIGITS | DOLLAR_IJ | DOLLAR_IDENT 
   | "in" | "range(" | ")" | ":" | "?" | "or" | "and" | "not" | "==" | "!=" | "="
   | "<=" | ">=" | "+" | "-" | "*" | "/" | "%" | "(" | "false" | "true" | "null" | "[" | "]" | "," | "." | "|"
-  | UNTERMINATED_NUMBER | ANY_OTHER_CHAR
+  | HTML_IDENT | UNTERMINATED_NUMBER | ANY_OTHER_CHAR
 ;
 
 
@@ -331,6 +331,7 @@ terminal SL_COMMENT : '//';
 terminal FUNCTION_TAG : '*/6';  // Fake terminal used by the CustomizedSoyLexer
 terminal PRINT_DIRECTIVE_TAG : '*/7';  // Fake terminal used by the CustomizedSoyLexer
 terminal CALL_COMMAND_ATTRIBUTE_DQ : '*/8';  // Fake terminal used by the CustomizedSoyLexer
+terminal HTML_IDENT : '*/9';  // Fake terminal used by the CustomizedSoyLexer
 // This is required to properly parse a command like {foo}. It's split by CustomSoyLexer
 terminal PRINT_IDENT : "{" IDENT;
 
