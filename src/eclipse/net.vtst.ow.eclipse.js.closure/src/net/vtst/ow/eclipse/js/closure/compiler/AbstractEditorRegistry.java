@@ -29,6 +29,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
  * A registry that monitors opening and closures of editors in order to:
  * 1. Add a document listener to editors.
  * 2. Provide a mapping from files to editors.
+ * This class is implemented to be thread safe.
  * @author Vincent Simonet
  */
 public abstract class AbstractEditorRegistry {
@@ -95,12 +96,12 @@ public abstract class AbstractEditorRegistry {
   private Map<IDocument, DocumentListener> documentToListener = new HashMap<IDocument, DocumentListener>();
   private Map<IDocument, IFile> documentToFile = new HashMap<IDocument, IFile>();
   
-  private void addPartReference(IWorkbenchPartReference partReference) {
+  private synchronized void addPartReference(IWorkbenchPartReference partReference) {
     ITextEditor textEditor = getTextEditorFromPartReference(partReference);
     if (textEditor != null && filterEditor(textEditor)) addEditor(textEditor);
   }
   
-  private void addEditor(ITextEditor textEditor) {
+  private synchronized void addEditor(ITextEditor textEditor) {
     IEditorInput editorInput = textEditor.getEditorInput();
     if (!(editorInput instanceof IFileEditorInput)) return;
     IFile file = ((IFileEditorInput) editorInput).getFile();
@@ -115,15 +116,14 @@ public abstract class AbstractEditorRegistry {
       document.addDocumentListener(listener);
       documentToFile.put(document, file);
     }
-    // System.out.println("ADD EDITOR: " + editorInput.getName());
   }
 
-  private void removePartReference(IWorkbenchPartReference partReference) {
+  private synchronized void removePartReference(IWorkbenchPartReference partReference) {
     ITextEditor textEditor = getTextEditorFromPartReference(partReference);
     if (textEditor != null && filterEditor(textEditor)) removeEditor(textEditor);
   }
   
-  private void removeEditor(ITextEditor textEditor) {
+  private synchronized void removeEditor(ITextEditor textEditor) {
     IFile file = editorToFile.get(textEditor);
     if (file != null) fileToEditors.remove(file, textEditor);
     IDocument document = editorToDocument.get(textEditor);
@@ -144,21 +144,21 @@ public abstract class AbstractEditorRegistry {
     return (ITextEditor) editorPart;
   }
   
-  public ITextEditor getTextEditor(IFile file) {
+  public synchronized ITextEditor getTextEditor(IFile file) {
     return Utils.getFirstElement(fileToEditors.get(file));
   }
   
-  public IDocument getDocument(IFile file) {
+  public synchronized IDocument getDocument(IFile file) {
     ITextEditor textEditor = Utils.getFirstElement(fileToEditors.get(file));
     if (textEditor == null) return null;
     return textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput());
   }
   
-  public IFile getFile(IDocument document) {
+  public synchronized IFile getFile(IDocument document) {
     return documentToFile.get(document);
   }
   
-  public long getLastModificationTime(IDocument document) {
+  public synchronized long getLastModificationTime(IDocument document) {
     DocumentListener listener = documentToListener.get(document);
     return listener.getLastModificationTime();
   }

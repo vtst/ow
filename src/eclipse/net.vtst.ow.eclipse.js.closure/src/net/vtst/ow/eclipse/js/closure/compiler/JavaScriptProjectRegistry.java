@@ -1,17 +1,14 @@
 package net.vtst.ow.eclipse.js.closure.compiler;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.vtst.ow.closure.compiler.deps.CompilationSet;
 import net.vtst.ow.closure.compiler.deps.CompilationUnit;
-import net.vtst.ow.closure.compiler.deps.Library;
 import net.vtst.ow.closure.compiler.util.CompilerUtils;
 import net.vtst.ow.eclipse.js.closure.builder.ClosureNature;
 import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPersistentPropertyHelper;
@@ -38,12 +35,16 @@ import com.google.javascript.jscomp.JSModule;
 import com.google.javascript.jscomp.JSSourceFile;
 import com.google.javascript.jscomp.PassConfig;
 
+/**
+ * A registry of JavaScript editors, which is updated thanks to listener.
+ * Thread safe implementation.
+ * @author Vincent Simonet
+ */
 public class JavaScriptProjectRegistry {
   
   // Note: the builder is automatically invoked at startup and when the project nature
   // is put on a project.
   
-  // TODO: How to manage the multi-threading?
   // TODO: Manage project references.
   // TODO: Add project libraries.
   // TODO: How to manage errors in the update?
@@ -57,13 +58,14 @@ public class JavaScriptProjectRegistry {
   private final IContentType jsContentType =
       Platform.getContentTypeManager().getContentType(JS_CONTENT_TYPE_ID);
 
+  // Take a concurrent hash map, as it may be accessed in parallel from several threads.
   private Map<IProject, CompilationSet<IFile>> projectToCompilationSet = 
-      new HashMap<IProject, CompilationSet<IFile>>();
+      new ConcurrentHashMap<IProject, CompilationSet<IFile>>();
   
   // This is a weak hash map, because libraries which are no longer used by any project
   // should be collected.
   // TODO: Should the libraries be identified by a pair of files?
-  private WeakHashMap<File, Library> pathToLibrary = new WeakHashMap<File, Library>();
+  // private WeakHashMap<File, Library> pathToLibrary = new WeakHashMap<File, Library>();
 
   public JavaScriptProjectRegistry(IWorkbench workbench) {
     ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceChangeListener);
@@ -88,13 +90,7 @@ public class JavaScriptProjectRegistry {
     project.accept(visitor);
     List<IFile> jsFiles = visitor.getFiles();
     // Build the compilation set
-    CompilationSet<IFile> compilationSet = projectToCompilationSet.get(project);
-    if (compilationSet == null) {
-      compilationSet = new CompilationSet<IFile>();
-      projectToCompilationSet.put(project, compilationSet);
-    } else {
-      compilationSet.clear();
-    }
+    CompilationSet<IFile> compilationSet = new CompilationSet<IFile>();
     // Add the compilation units for the libraries
     ClosureProjectPersistentPropertyHelper helper = new ClosureProjectPersistentPropertyHelper(project);
     for (String libraryPath: helper.getOtherLibraries()) {
@@ -113,6 +109,7 @@ public class JavaScriptProjectRegistry {
           new CompilationUnit(file.getFullPath().toOSString(), 
               new CompilationUnitProviderFromEclipseIFile(file)));
     }
+    projectToCompilationSet.put(project, compilationSet);
   }
   
   /**
@@ -157,7 +154,6 @@ public class JavaScriptProjectRegistry {
   
   // **************************************************************************
   // Access to the registry
-  
   
   /**
    * Get the compilation set for a project.
