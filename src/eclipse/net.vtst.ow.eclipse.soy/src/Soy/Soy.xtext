@@ -336,5 +336,5 @@ terminal HTML_IDENT : '*/9';  // Fake terminal used by the CustomizedSoyLexer
 terminal PRINT_IDENT : "{" IDENT;
 
 // Fallback tokens used for parsing raw text
-terminal UNTERMINATED_NUMBER: "0x" | DEC_DIGITS 'e';  // For HEX_INTEGER and FLOAT
+terminal UNTERMINATED_NUMBER: "0x" | DEC_DIGITS ('.' DEC_DIGITS)? 'e' ('+' | '-')?;  // For HEX_INTEGER and FLOAT
 terminal ANY_OTHER_CHAR : !('{' | '}');
