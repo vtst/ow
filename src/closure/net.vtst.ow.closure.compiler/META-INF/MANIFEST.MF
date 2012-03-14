@@ -14,3 +14,4 @@ Export-Package: com.google.common.base,
  net.vtst.ow.closure.compiler.util
 Bundle-ClassPath: lib/compiler.jar,
  .
+Bundle-Vendor: Vincent Simonet
