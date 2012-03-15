@@ -114,7 +114,7 @@ public class CompilationSet<K> implements ICompilationSet {
       if (compilationUnit.updateDependencies(compiler)) {
         hasChanged = true;
         providedBy.removeAllKeysFor(compilationUnit);
-        for (String name: compilationUnit.getProvidedNames()) {
+        for (String name: compilationUnit.getProvides()) {
           CompilationUnit previousCompilationUnit = providedBy.put(name, compilationUnit);
           if (previousCompilationUnit != null) {
             CompilerUtils.reportError(
@@ -144,7 +144,7 @@ public class CompilationSet<K> implements ICompilationSet {
     while (!toBeVisited.isEmpty()) {
       CompilationUnit compilationUnit = toBeVisited.removeFirst();
       result.addFirst(compilationUnit);
-      for (String name: compilationUnit.getRequiredNames()) {
+      for (String name: compilationUnit.getRequires()) {
         CompilationUnit requiredCompilationUnit = getProvider(name);
         if (requiredCompilationUnit == null) {
           CompilerUtils.reportError(

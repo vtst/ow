@@ -108,6 +108,7 @@ Jan 31, 2012 9:43:02 PM com.google.javascript.jscomp.PhaseOptimizer$NamedPass pr
 INFO: processDefines
 
      */
+    File pathOfClosureBase = new File("/home/vtst/test/in/closure/goog");
     Compiler.setLoggingLevel(Level.OFF);
     Compiler compiler = CompilerUtils.makeCompiler(CompilerUtils.makePrintingErrorManager(System.out));
     CompilerOptions options = CompilerUtils.makeOptions();
@@ -116,7 +117,7 @@ INFO: processDefines
     PassConfig passes = new DefaultPassConfig(options);
     compiler.setPassConfig(passes);
     CompilationSet compilationSet = new CompilationSet();
-    Library libraryGoog = new Library(new File("/home/vtst/test/out/goog"));
+    Library libraryGoog = new Library(pathOfClosureBase);
     libraryGoog.updateDependencies(compiler);
     compilationSet.addCompilationSet(libraryGoog);
     Library librarySoy = new Library(new File("/home/vtst/perso/ow/tgt/closure-templates/javascript"));
@@ -127,8 +128,8 @@ INFO: processDefines
         "album.js", "header.js", "master.js", "splitpane.js", "util.js",
         "browser.js", "keyboard.js", "sepia.js", "templates.js", "viewer.js" 
     }) {
-      String fullname = "/home/vtst/perso/sepia/src/client/js/" + name;
-      CompilationUnit compilationUnit = new CompilationUnit(fullname, new CompilationUnitProvider.FromFile(new File(fullname)));
+      File path = new File("/home/vtst/perso/sepia/src/client/js/" + name);
+      CompilationUnit compilationUnit = new CompilationUnit(path, pathOfClosureBase, new CompilationUnitProvider.FromFile(path));
       compilationSet.addCompilationUnit(compilationUnit);
       compilationUnits.add(compilationUnit);
     }
@@ -214,33 +215,17 @@ INFO: processDefines
     }
   }
   
+  private static void testDeps() {
+    File pathOfClosureBase = new File("/home/vtst/test/in/closure/goog");
+    Library library = new Library(pathOfClosureBase);
+    Compiler compiler = CompilerUtils.makeCompiler(CompilerUtils.makePrintingErrorManager(System.out));
+    compiler.initOptions(CompilerUtils.makeOptions());
+    library.updateDependencies(compiler);
+    System.out.println("FINISHED");
+  }
+  
   public static void main(String[] args) {
-    Visibility visibility;
-    //System.out.println(FileUtils.makeRelative(new File("/x/bar/zop"), new File("/x/y/")));
-    //System.out.println(FileUtils.join(new File("/home/vtst"), new File("array/array.js")));
-    //measureTime();
-    testCompilationSet();
-    //System.out.println(Utils.relativeFile(new File("/home/vtst"), new File("/home/vtst/test")));
-    
-    /*
-    JSFileSet fileSet = new JSFileSet();
-    fileSet.addLibrary(new File("src/"));
-    List<JSFile> deps = fileSet.getFile(new File("src/test.js")).getAllDependenciesAndThis();
-    for (JSFile jsFile: deps) {
-      System.out.println(jsFile.getFile().getAbsolutePath());
-    }
-    */
-    /*
-    try {
-      JSLibraryStripper stripper = new JSLibraryStripper();
-      stripper.strip(new File("/home/vtst/test/out"), new File("/home/vtst/test/out2"));
-      stripper.printSummary();
-    } catch (MagicException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    */
+    testDeps();
   }
 
 }

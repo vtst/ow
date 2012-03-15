@@ -71,6 +71,7 @@ public class GetDependenciesNodeTraversal extends NodeTraversal {
       switch (node.getType()) {
       case Token.BLOCK:
       case Token.SCRIPT:
+      case Token.EXPR_RESULT:
         return true;
       case Token.CALL:
         String callee = node.getFirstChild().getQualifiedName();

@@ -6,14 +6,17 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import net.vtst.ow.closure.compiler.deps.DepsFileTokenizer.Token;
+import net.vtst.ow.closure.compiler.magic.MagicDepsGenerator;
 import net.vtst.ow.closure.compiler.util.CompilerUtils;
 import net.vtst.ow.closure.compiler.util.FileTreeVisitor;
 import net.vtst.ow.closure.compiler.util.FileUtils;
@@ -21,7 +24,10 @@ import net.vtst.ow.closure.compiler.util.StringEscapeUtils;
 
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.DiagnosticType;
+import com.google.javascript.jscomp.ErrorManager;
 import com.google.javascript.jscomp.JSError;
+import com.google.javascript.jscomp.deps.DependencyInfo;
+import com.google.javascript.jscomp.deps.DepsFileParser;
 
 /**
  * A compilation set which represents a frozen JavaScript library.  The set of files and the
@@ -34,7 +40,7 @@ public class Library implements ICompilationSet {
   // TODO: It should be checked whether this works on Microsoft Windows, because the paths
   // in the deps.js file are stored with '/' instead of '\'.
   
-  static final String LEGACY_DEPS_FILE = "deps.js";
+  static final String LEGACY_DEPS_FILE = "deps2.js";
   static final String GENERATED_DEPS_FILE = "deps.ow.js";
   
   static final DiagnosticType OW_DUPLICATED_GOOG_PROVIDE = DiagnosticType.warning(
@@ -51,23 +57,23 @@ public class Library implements ICompilationSet {
 
   private HashMap<String, CompilationUnit> providedBy = new HashMap<String, CompilationUnit>();
   private Collection<CompilationUnit> compilationUnits = new HashSet<CompilationUnit>();
-  private File rootDir;
-  private File referenceDirForDepsFile;
+  private File path;
+  private File pathOfClosureBase;
   private File depsFile;
   private boolean canWriteDepsFile = false;
   private boolean isInitialized = false;
   
   /**
    * Create a new library.
-   * @param rootDir  The root directory for the library.
+   * @param path  The root directory for the library.
    */
-  public Library(File rootDir) {
-    this(rootDir, rootDir);
+  public Library(File path) {
+    this(path, path);
   }
   
-  public Library(File rootDir, File referenceDirForDepsFile) {
-    this.rootDir = rootDir;
-    this.referenceDirForDepsFile = referenceDirForDepsFile;
+  public Library(File path, File pathOfClosureBase) {
+    this.path = path;
+    this.pathOfClosureBase = pathOfClosureBase;
   }
 
   /* (non-Javadoc)
@@ -85,6 +91,7 @@ public class Library implements ICompilationSet {
   public boolean updateDependencies(AbstractCompiler compiler) {
     if (isInitialized) return false;
     if (findDepsFile()) {
+      long t = System.nanoTime();
       readDepsFile(compiler, depsFile);
     } else {
       updateFromFileTree(compiler);
@@ -99,12 +106,12 @@ public class Library implements ICompilationSet {
    */
   private boolean findDepsFile() {
     if (depsFile != null) return depsFile.exists();
-    depsFile = new File(rootDir, LEGACY_DEPS_FILE);
+    depsFile = new File(path, LEGACY_DEPS_FILE);
     if (depsFile.exists()) {
       canWriteDepsFile = false;
       return true;
     } else {
-      depsFile = new File(rootDir, GENERATED_DEPS_FILE);
+      depsFile = new File(path, GENERATED_DEPS_FILE);
       canWriteDepsFile = true;
       return depsFile.exists();
     }
@@ -125,13 +132,14 @@ public class Library implements ICompilationSet {
       public void visitFile(java.io.File file) {
         if (!CompilerUtils.isJavaScriptFile(file)) return;
         CompilationUnit compilationUnit = new CompilationUnit(
-            file.getPath(), 
+            file, 
+            pathOfClosureBase,
             new CompilationUnitProvider.FromFile(file));
         compilationUnit.updateDependencies(compiler);
         addCompilationUnit(compiler, compilationUnit);
       }
     };
-    visitor.visit(rootDir);
+    visitor.visit(path);
     if (canWriteDepsFile) writeDepsFile(compiler, depsFile);
   }
 
@@ -142,7 +150,7 @@ public class Library implements ICompilationSet {
    */
   private void addCompilationUnit(AbstractCompiler compiler, CompilationUnit compilationUnit) {
     compilationUnits.add(compilationUnit);
-    for (String providedName: compilationUnit.getProvidedNames()) {
+    for (String providedName: compilationUnit.getProvides()) {
       CompilationUnit previousCompilationUnit = providedBy.put(providedName, compilationUnit);
       if (previousCompilationUnit != null) {
         CompilerUtils.reportError(
@@ -153,8 +161,24 @@ public class Library implements ICompilationSet {
   }
 
   // **************************************************************************
-  // Parsing of deps.js files
+  // Reading and writing deps.js files
   
+  private void readDepsFile(AbstractCompiler compiler, File depsFile) {
+    try {
+      DepsFileParser depsFileParser = new DepsFileParser(compiler.getErrorManager());
+      for (DependencyInfo info: depsFileParser.parseFile(depsFile.getAbsolutePath())) {
+        File file = FileUtils.join(pathOfClosureBase, new File(info.getName()));
+        CompilationUnit compilationUnit = 
+            new CompilationUnit(file, pathOfClosureBase, new CompilationUnitProvider.FromFile(file));
+        compilationUnit.setDependencies(info.getProvides(), info.getRequires());
+        addCompilationUnit(compiler, compilationUnit);
+      }
+    } catch (IOException exn) {
+      CompilerUtils.reportError(compiler, JSError.make(OW_IO_ERROR, exn.getMessage()));            
+    }
+  }
+  
+  /*
   private Collection<String> parseListUntil(DepsFileTokenizer tokenizer, int close) throws IOException {
     Collection<String> result = new ArrayList<String>();
     while (true) {
@@ -175,8 +199,8 @@ public class Library implements ICompilationSet {
         return;
       }
       if (!tokenizer.expect(DepsFileTokenizer.TOKEN_STRING)) return;
-      File file = FileUtils.join(referenceDirForDepsFile, new File(tokenizer.lastToken().getString()));
-      CompilationUnit compilationUnit = new CompilationUnit(file.getPath(), new CompilationUnitProvider.FromFile(file));
+      File file = FileUtils.join(pathOfClosureBase, new File(tokenizer.lastToken().getString()));
+      CompilationUnit compilationUnit = new CompilationUnit(file, pathOfClosureBase, new CompilationUnitProvider.FromFile(file));
       if (!tokenizer.expect(DepsFileTokenizer.TOKEN_COMA_OPEN_BRACKET)) return;
       Collection<String> providedNames = parseListUntil(tokenizer, DepsFileTokenizer.TOKEN_BRACKET_COMA_BRACKET);
       Collection<String> requiredNames = parseListUntil(tokenizer, DepsFileTokenizer.TOKEN_CLOSE);
@@ -194,10 +218,23 @@ public class Library implements ICompilationSet {
       CompilerUtils.reportError(compiler, JSError.make(OW_IO_ERROR, exn.getMessage()));            
     }
   }
+  */
 
   // **************************************************************************
   // Writing of deps.js files
+  
+  private void writeDepsFile(AbstractCompiler compiler, File file) {
+    try {
+      MagicDepsGenerator depsGenerator = new MagicDepsGenerator();
+      PrintStream out = new PrintStream(file);
+      depsGenerator.writeDepInfos(out, compilationUnits);
+      out.close();
+    } catch (IOException exn) {
+      CompilerUtils.reportError(compiler, JSError.make(OW_IO_ERROR, exn.getMessage()));            
+    }
+  }
 
+  /*
   private static void writeJsString(Writer writer, String string) throws IOException {
     writer.write("\"" + StringEscapeUtils.escapeJavaScript(string) + "\"");
   }
@@ -217,11 +254,11 @@ public class Library implements ICompilationSet {
   public void writeDepsFile(Writer writer) throws IOException {
     for (CompilationUnit compilationUnit: compilationUnits) {
       writer.write("goog.addDependency(");
-      writeJsString(writer, FileUtils.makeRelative(referenceDirForDepsFile, new File(compilationUnit.getName())).getPath());
+      writeJsString(writer, FileUtils.makeRelative(pathOfClosureBase, new File(compilationUnit.getName())).getPath());
       writer.write(", [");
-      writeJsStringList(writer, compilationUnit.getProvidedNames());
+      writeJsStringList(writer, compilationUnit.getProvides());
       writer.write("], [");
-      writeJsStringList(writer, compilationUnit.getRequiredNames());
+      writeJsStringList(writer, compilationUnit.getRequires());
       writer.write("]);\n");
     }
   }
@@ -235,5 +272,6 @@ public class Library implements ICompilationSet {
       CompilerUtils.reportError(compiler, JSError.make(OW_IO_ERROR, exn.getMessage()));            
     }
   }
+  */
 
 }
