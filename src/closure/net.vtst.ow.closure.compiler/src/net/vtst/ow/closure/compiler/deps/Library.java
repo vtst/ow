@@ -1,30 +1,19 @@
 package net.vtst.ow.closure.compiler.deps;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.Reader;
-import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 
-import net.vtst.ow.closure.compiler.deps.DepsFileTokenizer.Token;
 import net.vtst.ow.closure.compiler.magic.MagicDepsGenerator;
 import net.vtst.ow.closure.compiler.util.CompilerUtils;
 import net.vtst.ow.closure.compiler.util.FileTreeVisitor;
 import net.vtst.ow.closure.compiler.util.FileUtils;
-import net.vtst.ow.closure.compiler.util.StringEscapeUtils;
 
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.DiagnosticType;
-import com.google.javascript.jscomp.ErrorManager;
 import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.deps.DependencyInfo;
 import com.google.javascript.jscomp.deps.DepsFileParser;
@@ -178,51 +167,6 @@ public class Library implements ICompilationSet {
     }
   }
   
-  /*
-  private Collection<String> parseListUntil(DepsFileTokenizer tokenizer, int close) throws IOException {
-    Collection<String> result = new ArrayList<String>();
-    while (true) {
-      Token token = tokenizer.nextToken();
-      if (token == null || token.getType() == close) return result;
-      if (token.getType() == DepsFileTokenizer.TOKEN_STRING)
-        result.add(token.getString());
-    }
-  }
-  
-  private void readDepsFile(AbstractCompiler compiler, String filename, Reader reader) throws IOException {
-    DepsFileTokenizer tokenizer = new DepsFileTokenizer(compiler, filename, reader);
-    while (true) {
-      Token token = tokenizer.nextToken();
-      if (token == null) return;
-      if (token.getType() != DepsFileTokenizer.TOKEN_GOOG_DEPENDENCY) {
-        tokenizer.reportError();
-        return;
-      }
-      if (!tokenizer.expect(DepsFileTokenizer.TOKEN_STRING)) return;
-      File file = FileUtils.join(pathOfClosureBase, new File(tokenizer.lastToken().getString()));
-      CompilationUnit compilationUnit = new CompilationUnit(file, pathOfClosureBase, new CompilationUnitProvider.FromFile(file));
-      if (!tokenizer.expect(DepsFileTokenizer.TOKEN_COMA_OPEN_BRACKET)) return;
-      Collection<String> providedNames = parseListUntil(tokenizer, DepsFileTokenizer.TOKEN_BRACKET_COMA_BRACKET);
-      Collection<String> requiredNames = parseListUntil(tokenizer, DepsFileTokenizer.TOKEN_CLOSE);
-      compilationUnit.setDependencies(providedNames, requiredNames);  
-      addCompilationUnit(compiler, compilationUnit);
-    }
-  }
-
-  private void readDepsFile(AbstractCompiler compiler, File file) {
-    try {
-      Reader reader = new BufferedReader(new FileReader(file));
-      readDepsFile(compiler, file.getPath(), reader);
-      reader.close();
-    } catch (IOException exn) {
-      CompilerUtils.reportError(compiler, JSError.make(OW_IO_ERROR, exn.getMessage()));            
-    }
-  }
-  */
-
-  // **************************************************************************
-  // Writing of deps.js files
-  
   private void writeDepsFile(AbstractCompiler compiler, File file) {
     try {
       MagicDepsGenerator depsGenerator = new MagicDepsGenerator();
@@ -233,45 +177,5 @@ public class Library implements ICompilationSet {
       CompilerUtils.reportError(compiler, JSError.make(OW_IO_ERROR, exn.getMessage()));            
     }
   }
-
-  /*
-  private static void writeJsString(Writer writer, String string) throws IOException {
-    writer.write("\"" + StringEscapeUtils.escapeJavaScript(string) + "\"");
-  }
-  
-  private static void writeJsStringList(Writer writer, Iterable<String> strings) throws IOException {
-    boolean first = true;
-    for (String string: strings) {
-      if (first) {
-        first = false;
-      } else {
-        writer.write(", ");
-      }
-      writeJsString(writer, string);
-    }
-  }
-    
-  public void writeDepsFile(Writer writer) throws IOException {
-    for (CompilationUnit compilationUnit: compilationUnits) {
-      writer.write("goog.addDependency(");
-      writeJsString(writer, FileUtils.makeRelative(pathOfClosureBase, new File(compilationUnit.getName())).getPath());
-      writer.write(", [");
-      writeJsStringList(writer, compilationUnit.getProvides());
-      writer.write("], [");
-      writeJsStringList(writer, compilationUnit.getRequires());
-      writer.write("]);\n");
-    }
-  }
-  
-  private void writeDepsFile(AbstractCompiler compiler, File file) {
-    try {
-      Writer writer = new BufferedWriter(new FileWriter(file));
-      writeDepsFile(writer);
-      writer.close();
-    } catch (IOException exn) {
-      CompilerUtils.reportError(compiler, JSError.make(OW_IO_ERROR, exn.getMessage()));            
-    }
-  }
-  */
 
 }
