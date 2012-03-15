@@ -54,17 +54,18 @@ public class AstFactory extends JsAst {
     return super.getAstRoot(compiler);
   }
   
-  public SourceAst getClone() {
+  public JsAst getClone() {
     return new ClonedAst(this);
   }
   
-  private static class ClonedAst implements SourceAst {
+  private static class ClonedAst extends JsAst {
     private static final long serialVersionUID = 1L;
 
     private SourceAst fatherSourceAst;
     private Node root;
 
     public ClonedAst(SourceAst fatherSourceAst) {
+      super(fatherSourceAst.getSourceFile());
       this.fatherSourceAst = fatherSourceAst;
     }
     

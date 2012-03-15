@@ -1,5 +1,6 @@
 package net.vtst.ow.eclipse.js.closure.compiler;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -7,8 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.vtst.ow.closure.compiler.deps.CompilationSet;
-import net.vtst.ow.closure.compiler.deps.CompilationUnit;
+import net.vtst.ow.closure.compiler.compile.CompilableJSUnit;
+import net.vtst.ow.closure.compiler.deps.JSSet;
+import net.vtst.ow.closure.compiler.deps.JSUnit;
 import net.vtst.ow.closure.compiler.util.CompilerUtils;
 import net.vtst.ow.eclipse.js.closure.builder.ClosureNature;
 import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPersistentPropertyHelper;
@@ -31,6 +33,7 @@ import org.eclipse.ui.IWorkbench;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.DefaultPassConfig;
+import com.google.javascript.jscomp.ErrorManager;
 import com.google.javascript.jscomp.JSModule;
 import com.google.javascript.jscomp.JSSourceFile;
 import com.google.javascript.jscomp.PassConfig;
@@ -59,8 +62,8 @@ public class JavaScriptProjectRegistry {
       Platform.getContentTypeManager().getContentType(JS_CONTENT_TYPE_ID);
 
   // Take a concurrent hash map, as it may be accessed in parallel from several threads.
-  private Map<IProject, CompilationSet<IFile>> projectToCompilationSet = 
-      new ConcurrentHashMap<IProject, CompilationSet<IFile>>();
+  private Map<IProject, JSSet<IFile>> projectToCompilationSet = 
+      new ConcurrentHashMap<IProject, JSSet<IFile>>();
   
   // This is a weak hash map, because libraries which are no longer used by any project
   // should be collected.
@@ -90,12 +93,14 @@ public class JavaScriptProjectRegistry {
     project.accept(visitor);
     List<IFile> jsFiles = visitor.getFiles();
     // Build the compilation set
-    CompilationSet<IFile> compilationSet = new CompilationSet<IFile>();
+    JSSet<IFile> compilationSet = new JSSet<IFile>();
     // Add the compilation units for the libraries
     ClosureProjectPersistentPropertyHelper helper = new ClosureProjectPersistentPropertyHelper(project);
     for (String libraryPath: helper.getOtherLibraries()) {
       System.out.println("Library: " + libraryPath);
     }
+    File temporary = new File("/home/vtst/test/in/closure/goog");
+    ErrorManager errorManager = CompilerUtils.makePrintingErrorManager(System.out);  // TODO
     // Add the compilation units for the referenced projects
     // TODO: Be careful to avoid loops!
     for (IProject referencedProject: project.getReferencedProjects()) {
@@ -106,7 +111,9 @@ public class JavaScriptProjectRegistry {
     // Add the files of the current project.
     for (IFile file: jsFiles) {
       compilationSet.addCompilationUnit(file,
-          new CompilationUnit(file.getFullPath().toOSString(), 
+          new CompilableJSUnit(
+              errorManager,
+              compilationSet, file.getFullPath().toFile(), temporary,
               new CompilationUnitProviderFromEclipseIFile(file)));
     }
     projectToCompilationSet.put(project, compilationSet);
@@ -143,7 +150,7 @@ public class JavaScriptProjectRegistry {
    * @return the list of JavaScript files associated with the project.
    */
   private Collection<IFile> getFilesOfProject(IProject project) {
-    CompilationSet<IFile> compilationSet = projectToCompilationSet.get(project);
+    JSSet<IFile> compilationSet = projectToCompilationSet.get(project);
     if (compilationSet == null) return Collections.emptySet();
     return compilationSet.keySet();
   }
@@ -160,14 +167,14 @@ public class JavaScriptProjectRegistry {
    * @param project  The project to look for.
    * @return  The compilation set for that project, or null if the project is not in the registry.
    */
-  public CompilationSet<IFile> getCompilationSet(IProject project) {
+  public JSSet<IFile> getCompilationSet(IProject project) {
     return projectToCompilationSet.get(project);
   }
   
   public void compile(IFile file) {
-    CompilationSet<IFile> compilationSet = projectToCompilationSet.get(file.getProject());
+    JSSet<IFile> compilationSet = projectToCompilationSet.get(file.getProject());
     if (compilationSet == null) return;
-    CompilationUnit compilationUnit = compilationSet.getCompilationUnit(file);
+    JSUnit compilationUnit = compilationSet.getCompilationUnit(file);
     if (compilationUnit == null) return;
     Compiler compiler = CompilerUtils.makeCompiler(CompilerUtils.makePrintingErrorManager(System.out));
     CompilerOptions options = CompilerUtils.makeOptions();

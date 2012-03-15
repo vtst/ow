@@ -2,10 +2,9 @@ package net.vtst.ow.eclipse.js.closure.contentassist;
 
 import java.util.Collections;
 
-import net.vtst.ow.closure.compiler.compile.CompilationJob;
-import net.vtst.ow.closure.compiler.deps.CompilationSet;
-import net.vtst.ow.closure.compiler.deps.CompilationUnit;
-import net.vtst.ow.closure.compiler.util.CompilerUtils;
+import net.vtst.ow.closure.compiler.compile.CompilableJSUnit;
+import net.vtst.ow.closure.compiler.deps.JSSet;
+import net.vtst.ow.closure.compiler.deps.JSUnit;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 
 import org.eclipse.core.resources.IFile;
@@ -171,23 +170,22 @@ public class ClosureContentAssistIncovationContext implements IContentAssistInvo
     return OwJsClosurePlugin.getDefault().getEditorRegistry().getFile(getDocument());
   }
   
-  private CompilationJob compilationJob;
+  private CompilableJSUnit cunit;
   private Node node;
   private boolean compilationJobComputed = false;
   
-  private void computeCompilationJob() {
+  private void compile() {
     if (compilationJobComputed) return;
     compilationJobComputed = true;
     IFile file = getFile();
     if (file == null) return;
-    CompilationSet<IFile> compilationSet = OwJsClosurePlugin.getDefault().getProjectRegistry().getCompilationSet(file.getProject());
+    JSSet<IFile> compilationSet = OwJsClosurePlugin.getDefault().getProjectRegistry().getCompilationSet(file.getProject());
     if (compilationSet == null) return;
-    CompilationUnit compilationUnit = compilationSet.getCompilationUnit(file);
-    if (compilationUnit == null) return;
-    compilationJob = new CompilationJob(CompilerUtils.makePrintingErrorManager(System.out));
-    compilationJob.compile(compilationSet, Collections.singleton(compilationUnit));     
-    System.out.println(compilationJob.getRoot().toStringTree());
-    node = compilationJob.getNode(compilationUnit, getPrefixOffset());
+    JSUnit unit = compilationSet.getCompilationUnit(file);
+    if (!(unit instanceof CompilableJSUnit)) return;
+    cunit = (CompilableJSUnit) unit;
+    cunit.compile();
+    node = cunit.getNode(getPrefixOffset());
   }
   
   /**
@@ -195,9 +193,9 @@ public class ClosureContentAssistIncovationContext implements IContentAssistInvo
    * @return  An iterable over all symbols, empty if the symbols cannot be computed for whatever reason.
    */
   public Iterable<Var> getAllSymbols() {
-    computeCompilationJob();
+    compile();
     if (node == null) return Collections.emptyList();
-    return compilationJob.getAllSymbols(node);
+    return cunit.getAllSymbols(node);
   }
   
   /**
@@ -205,8 +203,8 @@ public class ClosureContentAssistIncovationContext implements IContentAssistInvo
    * @return  The scope, or null if it cannot be retrieved for whatever reason.
    */
   public Scope getScope() {
-    computeCompilationJob();
-    return compilationJob.getScope(node);
+    compile();
+    return cunit.getScope(node);
   }
 
 }

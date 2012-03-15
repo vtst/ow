@@ -135,9 +135,9 @@ public class JSSet<K> implements IJSSet {
    * @param compilationUnits  The compilation units to compile.
    * @return  The list of required compilation units (including those of {@code compilationUnits}.
    */
-  public List<JSUnit> getRequiredCompilationUnits(
+  public List<JSUnit> getRequiredJSUnits(
       AbstractCompiler compiler,
-      Iterable<JSUnit> compilationUnits) {
+      Iterable<? extends JSUnit> compilationUnits) {
     LinkedList<JSUnit> toBeVisited = Lists.newLinkedList(compilationUnits);
     HashSet<JSUnit> visited = Sets.newHashSet(compilationUnits);
     LinkedList<JSUnit> result = new LinkedList<JSUnit>();
@@ -172,7 +172,7 @@ public class JSSet<K> implements IJSSet {
       String moduleName, 
       Iterable<JSUnit> compilationUnits) {
     JSModule module = new JSModule(moduleName);
-    for (JSUnit compilationUnit: getRequiredCompilationUnits(compiler, compilationUnits)) {
+    for (JSUnit compilationUnit: getRequiredJSUnits(compiler, compilationUnits)) {
       module.add(new CompilerInput(compilationUnit.getAst()));
     }
     return module;

@@ -9,7 +9,7 @@ import net.vtst.ow.closure.compiler.util.FileUtils;
 import net.vtst.ow.closure.compiler.util.TimestampKeeper;
 
 import com.google.javascript.jscomp.AbstractCompiler;
-import com.google.javascript.jscomp.SourceAst;
+import com.google.javascript.jscomp.JsAst;
 import com.google.javascript.jscomp.deps.DependencyInfo;
 import com.google.javascript.rhino.Node;
 
@@ -23,6 +23,7 @@ public class JSUnit implements DependencyInfo {
     
   private File path;
   private File pathOfClosureBase;
+  private JSUnitProvider.Interface provider;
   private File pathRelativeToClosureBase;
   private TimestampKeeper timestampKeeperForDependencies;
   private AstFactory astFactory;
@@ -37,6 +38,7 @@ public class JSUnit implements DependencyInfo {
   public JSUnit(File path, File pathOfClosureBase, JSUnitProvider.Interface provider) {
     this.path = path;
     this.pathOfClosureBase = pathOfClosureBase;
+    this.provider = provider;
     this.timestampKeeperForDependencies = new TimestampKeeper(provider);
     this.astFactory = new AstFactory(getName(), provider);
   }
@@ -55,6 +57,10 @@ public class JSUnit implements DependencyInfo {
       pathRelativeToClosureBase = FileUtils.makeRelative(pathOfClosureBase, path);
     }
     return pathRelativeToClosureBase.getPath();
+  }
+  
+  public long lastModified() {
+    return provider.lastModified();
   }
 
 
@@ -120,7 +126,7 @@ public class JSUnit implements DependencyInfo {
    * Get a clone of the AST for the file.
    * @return
    */
-  public SourceAst getAst() {
+  public JsAst getAst() {
     return astFactory.getClone();
   }
 

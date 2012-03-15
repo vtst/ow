@@ -3,7 +3,7 @@ package net.vtst.ow.eclipse.js.closure.compiler;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import net.vtst.ow.closure.compiler.deps.CompilationUnitProvider;
+import net.vtst.ow.closure.compiler.deps.JSUnitProvider;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 
 import org.eclipse.core.resources.IFile;
@@ -11,7 +11,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-public class CompilationUnitProviderFromEclipseIFile implements CompilationUnitProvider.Interface {
+public class CompilationUnitProviderFromEclipseIFile implements JSUnitProvider.Interface {
   
   private IFile file;
   private String code;
