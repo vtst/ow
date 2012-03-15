@@ -24,7 +24,7 @@ import com.google.javascript.jscomp.deps.DepsFileParser;
  * at every loading.
  * @author Vincent Simonet
  */
-public class Library implements ICompilationSet {
+public class JSLibrary implements IJSSet {
   
   // TODO: It should be checked whether this works on Microsoft Windows, because the paths
   // in the deps.js file are stored with '/' instead of '\'.
@@ -44,8 +44,8 @@ public class Library implements ICompilationSet {
       "OW_CANNOT_PARSE_DEPS_LINE",
       "Cannot parse line.");
 
-  private HashMap<String, CompilationUnit> providedBy = new HashMap<String, CompilationUnit>();
-  private Collection<CompilationUnit> compilationUnits = new HashSet<CompilationUnit>();
+  private HashMap<String, JSUnit> providedBy = new HashMap<String, JSUnit>();
+  private Collection<JSUnit> compilationUnits = new HashSet<JSUnit>();
   private File path;
   private File pathOfClosureBase;
   private File depsFile;
@@ -56,11 +56,11 @@ public class Library implements ICompilationSet {
    * Create a new library.
    * @param path  The root directory for the library.
    */
-  public Library(File path) {
+  public JSLibrary(File path) {
     this(path, path);
   }
   
-  public Library(File path, File pathOfClosureBase) {
+  public JSLibrary(File path, File pathOfClosureBase) {
     this.path = path;
     this.pathOfClosureBase = pathOfClosureBase;
   }
@@ -69,7 +69,7 @@ public class Library implements ICompilationSet {
    * @see net.vtst.ow.closure.compiler.compile.ICompilationSet#getProvider(java.lang.String)
    */
   @Override
-  public CompilationUnit getProvider(String name) {
+  public JSUnit getProvider(String name) {
     return providedBy.get(name);
   }
 
@@ -120,10 +120,10 @@ public class Library implements ICompilationSet {
     FileTreeVisitor.Simple<RuntimeException> visitor = new FileTreeVisitor.Simple<RuntimeException>() {
       public void visitFile(java.io.File file) {
         if (!CompilerUtils.isJavaScriptFile(file)) return;
-        CompilationUnit compilationUnit = new CompilationUnit(
+        JSUnit compilationUnit = new JSUnit(
             file, 
             pathOfClosureBase,
-            new CompilationUnitProvider.FromFile(file));
+            new JSUnitProvider.FromFile(file));
         compilationUnit.updateDependencies(compiler);
         addCompilationUnit(compiler, compilationUnit);
       }
@@ -137,10 +137,10 @@ public class Library implements ICompilationSet {
    * @param compiler  The compiler used to report errors.
    * @param compilationUnit  The compilation unit to add.
    */
-  private void addCompilationUnit(AbstractCompiler compiler, CompilationUnit compilationUnit) {
+  private void addCompilationUnit(AbstractCompiler compiler, JSUnit compilationUnit) {
     compilationUnits.add(compilationUnit);
     for (String providedName: compilationUnit.getProvides()) {
-      CompilationUnit previousCompilationUnit = providedBy.put(providedName, compilationUnit);
+      JSUnit previousCompilationUnit = providedBy.put(providedName, compilationUnit);
       if (previousCompilationUnit != null) {
         CompilerUtils.reportError(
             compiler, 
@@ -157,8 +157,8 @@ public class Library implements ICompilationSet {
       DepsFileParser depsFileParser = new DepsFileParser(compiler.getErrorManager());
       for (DependencyInfo info: depsFileParser.parseFile(depsFile.getAbsolutePath())) {
         File file = FileUtils.join(pathOfClosureBase, new File(info.getName()));
-        CompilationUnit compilationUnit = 
-            new CompilationUnit(file, pathOfClosureBase, new CompilationUnitProvider.FromFile(file));
+        JSUnit compilationUnit = 
+            new JSUnit(file, pathOfClosureBase, new JSUnitProvider.FromFile(file));
         compilationUnit.setDependencies(info.getProvides(), info.getRequires());
         addCompilationUnit(compiler, compilationUnit);
       }

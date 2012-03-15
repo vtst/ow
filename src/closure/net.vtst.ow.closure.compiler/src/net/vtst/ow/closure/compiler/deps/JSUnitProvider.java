@@ -15,7 +15,7 @@ import com.google.javascript.jscomp.SourceFile;
  * implementations.
  * @author Vincent Simonet
  */
-public class CompilationUnitProvider {
+public class JSUnitProvider {
 
   /**
    * Generic interface for compilation unit providers.

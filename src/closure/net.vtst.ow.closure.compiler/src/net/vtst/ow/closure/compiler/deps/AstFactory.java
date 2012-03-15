@@ -29,9 +29,9 @@ public class AstFactory extends JsAst {
 
   private TimestampKeeper timestampKeeper;
   private String fileName;
-  private CompilationUnitProvider.Interface provider;
+  private JSUnitProvider.Interface provider;
 
-  public AstFactory(String fileName, CompilationUnitProvider.Interface provider) {
+  public AstFactory(String fileName, JSUnitProvider.Interface provider) {
     super(JSSourceFile.fromGenerator(fileName, provider));
     this.timestampKeeper = new TimestampKeeper(provider);
     this.fileName = fileName;

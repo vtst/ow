@@ -6,8 +6,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.vtst.ow.closure.compiler.deps.CompilationSet;
-import net.vtst.ow.closure.compiler.deps.CompilationUnit;
+import net.vtst.ow.closure.compiler.deps.JSSet;
+import net.vtst.ow.closure.compiler.deps.JSUnit;
 import net.vtst.ow.closure.compiler.magic.MagicScopeCreator;
 import net.vtst.ow.closure.compiler.util.CompilerUtils;
 
@@ -58,7 +58,7 @@ public class CompilationJob {
     compiler.setPassConfig(passes);
   }
   
-  public Result compile(CompilationSet<?> compilationSet, Iterable<CompilationUnit> compilationUnits) {
+  public Result compile(JSSet<?> compilationSet, Iterable<JSUnit> compilationUnits) {
     compilationSet.updateDependencies(compiler);
     JSModule module = compilationSet.makeJSModule(compiler, "test-module", compilationUnits);
     return compiler.compile(new JSSourceFile[]{}, new JSModule[]{module}, options);
@@ -80,7 +80,7 @@ public class CompilationJob {
    * @param offset  The offset.
    * @return  The node, or null if not found.
    */
-  public Node getNode(CompilationUnit compilationUnit, int offset) {
+  public Node getNode(JSUnit compilationUnit, int offset) {
     // It would have been cleaner to use the input id to identify the input file, instead of the name.
     // But much more complicated.
     return FindLocationNodeTraversal.findNode(compiler, compiler.getRoot(), compilationUnit.getName(), offset);

@@ -27,7 +27,7 @@ import com.google.javascript.jscomp.JSModule;
  *
  * @param <K>  Type of keys used to retrieve compilation units.
  */
-public class CompilationSet<K> implements ICompilationSet {
+public class JSSet<K> implements IJSSet {
   
   static final DiagnosticType OW_DUPLICATED_GOOG_PROVIDE = DiagnosticType.warning(
       "OW_DUPLICATED_GOOG_PROVIDE",
@@ -37,18 +37,18 @@ public class CompilationSet<K> implements ICompilationSet {
       "OW_UNDEFINED_PACKAGE",
       "The package \"{0}\" is not provided");
   
-  private Collection<CompilationUnit> compilationUnits = new ArrayList<CompilationUnit>();
-  private Collection<ICompilationSet> compilationSets = new ArrayList<ICompilationSet>();
-  private BidiHashMap<String, CompilationUnit> providedBy = new BidiHashMap<String, CompilationUnit>();
-  private Map<K, CompilationUnit> keyToCompilationUnit = new HashMap<K, CompilationUnit>();
+  private Collection<JSUnit> compilationUnits = new ArrayList<JSUnit>();
+  private Collection<IJSSet> compilationSets = new ArrayList<IJSSet>();
+  private BidiHashMap<String, JSUnit> providedBy = new BidiHashMap<String, JSUnit>();
+  private Map<K, JSUnit> keyToCompilationUnit = new HashMap<K, JSUnit>();
   
   /* (non-Javadoc)
    * @see net.vtst.ow.closure.compiler.compile.ICompilationSet#getProvider(java.lang.String)
    */
-  public CompilationUnit getProvider(String name) {
-    CompilationUnit compilationUnit = providedBy.get(name);
+  public JSUnit getProvider(String name) {
+    JSUnit compilationUnit = providedBy.get(name);
     if (compilationUnit != null) return compilationUnit;
-    for (ICompilationSet compilationSet: compilationSets) {
+    for (IJSSet compilationSet: compilationSets) {
       compilationUnit = compilationSet.getProvider(name);
       if (compilationUnit != null) return compilationUnit;
     }
@@ -59,7 +59,7 @@ public class CompilationSet<K> implements ICompilationSet {
    * Add a compilation unit to the compilation set.  Does not recompute dependencies.
    * @param compilationUnit  The compilation unit to be added.
    */
-  public void addCompilationUnit(CompilationUnit compilationUnit) {
+  public void addCompilationUnit(JSUnit compilationUnit) {
     compilationUnits.add(compilationUnit);
   }
 
@@ -68,7 +68,7 @@ public class CompilationSet<K> implements ICompilationSet {
    * @param key  The key to retrieve the compilation unit.
    * @param compilationUnit  The compilation unit to be added.
    */
-  public void addCompilationUnit(K key, CompilationUnit compilationUnit) {
+  public void addCompilationUnit(K key, JSUnit compilationUnit) {
     keyToCompilationUnit.put(key, compilationUnit);
     addCompilationUnit(compilationUnit);
   }
@@ -78,7 +78,7 @@ public class CompilationSet<K> implements ICompilationSet {
    * @param key
    * @return
    */
-  public CompilationUnit getCompilationUnit(K key) {
+  public JSUnit getCompilationUnit(K key) {
     return keyToCompilationUnit.get(key);
   }
   
@@ -90,7 +90,7 @@ public class CompilationSet<K> implements ICompilationSet {
    * Add a delegated compilation set.  Does not recompute dependencies.
    * @param compilationSet  The delegated compilation set.
    */
-  public void addCompilationSet(ICompilationSet compilationSet) {
+  public void addCompilationSet(IJSSet compilationSet) {
     compilationSets.add(compilationSet);
   }
 
@@ -106,16 +106,16 @@ public class CompilationSet<K> implements ICompilationSet {
    */
   public boolean updateDependencies(AbstractCompiler compiler) {
     boolean hasChanged = false;
-    for (ICompilationSet compilationSet: compilationSets) {
+    for (IJSSet compilationSet: compilationSets) {
       if (compilationSet.updateDependencies(compiler))
         hasChanged = true;
     }
-    for (CompilationUnit compilationUnit: compilationUnits) {
+    for (JSUnit compilationUnit: compilationUnits) {
       if (compilationUnit.updateDependencies(compiler)) {
         hasChanged = true;
         providedBy.removeAllKeysFor(compilationUnit);
         for (String name: compilationUnit.getProvides()) {
-          CompilationUnit previousCompilationUnit = providedBy.put(name, compilationUnit);
+          JSUnit previousCompilationUnit = providedBy.put(name, compilationUnit);
           if (previousCompilationUnit != null) {
             CompilerUtils.reportError(
                 compiler, 
@@ -135,17 +135,17 @@ public class CompilationSet<K> implements ICompilationSet {
    * @param compilationUnits  The compilation units to compile.
    * @return  The list of required compilation units (including those of {@code compilationUnits}.
    */
-  public List<CompilationUnit> getRequiredCompilationUnits(
+  public List<JSUnit> getRequiredCompilationUnits(
       AbstractCompiler compiler,
-      Iterable<CompilationUnit> compilationUnits) {
-    LinkedList<CompilationUnit> toBeVisited = Lists.newLinkedList(compilationUnits);
-    HashSet<CompilationUnit> visited = Sets.newHashSet(compilationUnits);
-    LinkedList<CompilationUnit> result = new LinkedList<CompilationUnit>();
+      Iterable<JSUnit> compilationUnits) {
+    LinkedList<JSUnit> toBeVisited = Lists.newLinkedList(compilationUnits);
+    HashSet<JSUnit> visited = Sets.newHashSet(compilationUnits);
+    LinkedList<JSUnit> result = new LinkedList<JSUnit>();
     while (!toBeVisited.isEmpty()) {
-      CompilationUnit compilationUnit = toBeVisited.removeFirst();
+      JSUnit compilationUnit = toBeVisited.removeFirst();
       result.addFirst(compilationUnit);
       for (String name: compilationUnit.getRequires()) {
-        CompilationUnit requiredCompilationUnit = getProvider(name);
+        JSUnit requiredCompilationUnit = getProvider(name);
         if (requiredCompilationUnit == null) {
           CompilerUtils.reportError(
               compiler, 
@@ -170,9 +170,9 @@ public class CompilationSet<K> implements ICompilationSet {
   public JSModule makeJSModule(
       AbstractCompiler compiler,
       String moduleName, 
-      Iterable<CompilationUnit> compilationUnits) {
+      Iterable<JSUnit> compilationUnits) {
     JSModule module = new JSModule(moduleName);
-    for (CompilationUnit compilationUnit: getRequiredCompilationUnits(compiler, compilationUnits)) {
+    for (JSUnit compilationUnit: getRequiredCompilationUnits(compiler, compilationUnits)) {
       module.add(new CompilerInput(compilationUnit.getAst()));
     }
     return module;

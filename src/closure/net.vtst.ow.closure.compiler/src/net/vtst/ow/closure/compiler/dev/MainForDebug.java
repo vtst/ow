@@ -6,10 +6,10 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 
 import net.vtst.ow.closure.compiler.deps.AstFactory;
-import net.vtst.ow.closure.compiler.deps.CompilationSet;
-import net.vtst.ow.closure.compiler.deps.CompilationUnit;
-import net.vtst.ow.closure.compiler.deps.CompilationUnitProvider;
-import net.vtst.ow.closure.compiler.deps.Library;
+import net.vtst.ow.closure.compiler.deps.JSSet;
+import net.vtst.ow.closure.compiler.deps.JSUnit;
+import net.vtst.ow.closure.compiler.deps.JSUnitProvider;
+import net.vtst.ow.closure.compiler.deps.JSLibrary;
 import net.vtst.ow.closure.compiler.util.CompilerUtils;
 import net.vtst.ow.closure.compiler.util.FileTreeVisitor;
 
@@ -116,20 +116,20 @@ INFO: processDefines
     compiler.initOptions(options);
     PassConfig passes = new DefaultPassConfig(options);
     compiler.setPassConfig(passes);
-    CompilationSet compilationSet = new CompilationSet();
-    Library libraryGoog = new Library(pathOfClosureBase);
+    JSSet compilationSet = new JSSet();
+    JSLibrary libraryGoog = new JSLibrary(pathOfClosureBase);
     libraryGoog.updateDependencies(compiler);
     compilationSet.addCompilationSet(libraryGoog);
-    Library librarySoy = new Library(new File("/home/vtst/perso/ow/tgt/closure-templates/javascript"));
+    JSLibrary librarySoy = new JSLibrary(new File("/home/vtst/perso/ow/tgt/closure-templates/javascript"));
     librarySoy.updateDependencies(compiler);
     compilationSet.addCompilationSet(librarySoy);
-    ArrayList<CompilationUnit> compilationUnits = new ArrayList<CompilationUnit>();
+    ArrayList<JSUnit> compilationUnits = new ArrayList<JSUnit>();
     for (String name: new String[]{
         "album.js", "header.js", "master.js", "splitpane.js", "util.js",
         "browser.js", "keyboard.js", "sepia.js", "templates.js", "viewer.js" 
     }) {
       File path = new File("/home/vtst/perso/sepia/src/client/js/" + name);
-      CompilationUnit compilationUnit = new CompilationUnit(path, pathOfClosureBase, new CompilationUnitProvider.FromFile(path));
+      JSUnit compilationUnit = new JSUnit(path, pathOfClosureBase, new JSUnitProvider.FromFile(path));
       compilationSet.addCompilationUnit(compilationUnit);
       compilationUnits.add(compilationUnit);
     }
@@ -217,7 +217,7 @@ INFO: processDefines
   
   private static void testDeps() {
     File pathOfClosureBase = new File("/home/vtst/test/in/closure/goog");
-    Library library = new Library(pathOfClosureBase);
+    JSLibrary library = new JSLibrary(pathOfClosureBase);
     Compiler compiler = CompilerUtils.makeCompiler(CompilerUtils.makePrintingErrorManager(System.out));
     compiler.initOptions(CompilerUtils.makeOptions());
     library.updateDependencies(compiler);

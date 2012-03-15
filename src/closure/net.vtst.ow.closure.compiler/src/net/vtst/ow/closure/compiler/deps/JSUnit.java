@@ -19,7 +19,7 @@ import com.google.javascript.rhino.Node;
  * objects for the same file!
  * @author Vincent Simonet
  */
-public class CompilationUnit implements DependencyInfo {
+public class JSUnit implements DependencyInfo {
     
   private File path;
   private File pathOfClosureBase;
@@ -34,7 +34,7 @@ public class CompilationUnit implements DependencyInfo {
    * @param fileName  The name for the compilation unit.
    * @param provider  The provider for the compilation unit.
    */
-  public CompilationUnit(File path, File pathOfClosureBase, CompilationUnitProvider.Interface provider) {
+  public JSUnit(File path, File pathOfClosureBase, JSUnitProvider.Interface provider) {
     this.path = path;
     this.pathOfClosureBase = pathOfClosureBase;
     this.timestampKeeperForDependencies = new TimestampKeeper(provider);

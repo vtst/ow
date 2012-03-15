@@ -1,13 +1,13 @@
 package net.vtst.ow.closure.compiler.util;
 
-import net.vtst.ow.closure.compiler.deps.CompilationUnitProvider;
+import net.vtst.ow.closure.compiler.deps.JSUnitProvider;
 
 public class TimestampKeeper {
   
-  private CompilationUnitProvider.Interface provider;
+  private JSUnitProvider.Interface provider;
   private long lastModified = -1;
 
-  public TimestampKeeper(CompilationUnitProvider.Interface provider) {
+  public TimestampKeeper(JSUnitProvider.Interface provider) {
     this.provider = provider;
   }
   
