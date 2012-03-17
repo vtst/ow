@@ -30,7 +30,6 @@ TODO
    - get the scope with a node traversal instead of the magic
    - Catch exceptions from the compiler.  Example: top-level function(x) {};
 2. Auto complete
-   - Fix icon for goog (should be a namespace)
    - Enum and constants in auto complete
    - Standard completion proposals
    - Hover with types

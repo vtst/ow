@@ -45,9 +45,7 @@ public class ClosureCompletionProposalCollector {
     } else {
       try {
         return getProposalsFromScope();
-      } catch (RuntimeException e) {
-        e.printStackTrace();  // TODO To be deleted
-      }
+      } catch (RuntimeException e) {}
     } 
     return Collections.emptyList();
   }
@@ -246,7 +244,34 @@ public class ClosureCompletionProposalCollector {
     if (parent == null) return false;
     if (parent.getBooleanProp(Node.IS_NAMESPACE)) return true;
     Node parent2 = parent.getParent();
-    return (parent2 != null && parent2.getBooleanProp(Node.IS_NAMESPACE));
+    if (parent2 == null) return false;
+    if (parent2.getBooleanProp(Node.IS_NAMESPACE)) return true;
+    return isNamespaceSpecialCase(parent2, parent, var.getNameNode());
+  }
+  
+  // Special case to handle 
+  //   var goog = goog || {};
+  //   var google = {};
+  private static boolean isNamespaceSpecialCase(Node parent2, Node parent, Node node) {
+    if (parent2.getType() != Token.SCRIPT || 
+        parent.getType() != Token.VAR ||
+        node.getType() != Token.NAME) return false;
+    boolean hasValidNode = false;
+    for (Node child: node.children()) {
+      int type = child.getType();
+      if (type == Token.OBJECTLIT && !child.hasChildren()) {
+        hasValidNode = true;
+      } else if (type == Token.OR) {
+        for (Node child2: child.children()) {
+          if (child2.getType() == Token.OBJECTLIT && !child2.hasChildren()) {
+            hasValidNode = true;
+          }
+        }
+      } else {
+        return false;
+      }
+    }
+    return hasValidNode;
   }
   
   /**
