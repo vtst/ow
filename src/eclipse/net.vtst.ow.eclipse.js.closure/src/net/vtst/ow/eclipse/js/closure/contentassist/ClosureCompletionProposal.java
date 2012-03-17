@@ -30,10 +30,12 @@ public class ClosureCompletionProposal extends AbstractCompletionProposal {
     NAMESPACE,
     CLASS,
     INTERFACE,
+    ENUM,
     METHOD,
     FIELD,
     GLOBAL_VARIABLE,
     LOCAL_VARIABLE,
+    CONSTANT,
     UNKNOWN;
   }
 
@@ -93,8 +95,11 @@ public class ClosureCompletionProposal extends AbstractCompletionProposal {
         return Kind.CLASS;
       } else if (docInfo.isInterface()) {
         return Kind.INTERFACE;
+      } else if (docInfo.isConstant()) {
+        return Kind.CONSTANT;
       }
     }
+    if (type.isEnumType()) return Kind.ENUM;
     if (isProperty) {
       if (type.isFunctionType()) return Kind.METHOD;
       else return Kind.FIELD;
@@ -114,11 +119,13 @@ public class ClosureCompletionProposal extends AbstractCompletionProposal {
       return 4;
     case CLASS:
     case INTERFACE:
+    case ENUM:
       return 3;
     case GLOBAL_VARIABLE: 
       return 2;
     case METHOD:
     case FIELD:
+    case CONSTANT:
       return 1;
     }
     return 0;
@@ -127,25 +134,42 @@ public class ClosureCompletionProposal extends AbstractCompletionProposal {
   @Override
   protected String getImageName() {
     switch (kind) {
-    case NAMESPACE: return(OwJsClosureImages.PACKAGE);
-    case CLASS: return(OwJsClosureImages.CLASS);
-    case INTERFACE: return(OwJsClosureImages.INTERFACE);
+    case NAMESPACE: return OwJsClosureImages.PACKAGE;
+    case CLASS: 
+      switch (visibility) {
+      case PRIVATE: return OwJsClosureImages.CLASS_PRIVATE;
+      case PROTECTED: return OwJsClosureImages.CLASS_PROTECTED;
+      case PUBLIC: return OwJsClosureImages.CLASS_PUBLIC;
+      }
+    case INTERFACE:
+      switch (visibility) {
+      case PRIVATE: return OwJsClosureImages.INTERFACE_PRIVATE;
+      case PROTECTED: return OwJsClosureImages.INTERFACE_PROTECTED;
+      case PUBLIC: return OwJsClosureImages.INTERFACE_PUBLIC;
+      }
+    case ENUM: 
+      switch (visibility) {
+      case PRIVATE: return OwJsClosureImages.ENUM_PRIVATE;
+      case PROTECTED: return OwJsClosureImages.ENUM_PROTECTED;
+      case PUBLIC: return OwJsClosureImages.ENUM_PUBLIC;
+      }
     case METHOD:
       switch (visibility) {
-      case PRIVATE: return(OwJsClosureImages.METHOD_PRIVATE);
-      case PROTECTED: return(OwJsClosureImages.METHOD_PROTECTED);
-      case PUBLIC: return(OwJsClosureImages.METHOD_PUBLIC);
+      case PRIVATE: return OwJsClosureImages.METHOD_PRIVATE;
+      case PROTECTED: return OwJsClosureImages.METHOD_PROTECTED;
+      case PUBLIC: return OwJsClosureImages.METHOD_PUBLIC;
       }
       break;
     case FIELD:
       switch (visibility) {
-      case PRIVATE: return(OwJsClosureImages.FIELD_PRIVATE);
-      case PROTECTED: return(OwJsClosureImages.FIELD_PROTECTED);
-      case PUBLIC: return(OwJsClosureImages.FIELD_PUBLIC);
+      case PRIVATE: return OwJsClosureImages.FIELD_PRIVATE;
+      case PROTECTED: return OwJsClosureImages.FIELD_PROTECTED;
+      case PUBLIC: return OwJsClosureImages.FIELD_PUBLIC;
       }
       break;
-    case GLOBAL_VARIABLE: return(OwJsClosureImages.GLOBAL_VARIABLE);
-    case LOCAL_VARIABLE: return(OwJsClosureImages.LOCAL_VARIABLE);
+    case GLOBAL_VARIABLE: return OwJsClosureImages.GLOBAL_VARIABLE;
+    case LOCAL_VARIABLE: return OwJsClosureImages.LOCAL_VARIABLE;
+    case CONSTANT: return OwJsClosureImages.CONSTANT;
     }
     return null;
   }

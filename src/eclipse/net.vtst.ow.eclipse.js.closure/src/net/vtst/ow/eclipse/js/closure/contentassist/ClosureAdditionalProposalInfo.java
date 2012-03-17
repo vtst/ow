@@ -169,7 +169,7 @@ public class ClosureAdditionalProposalInfo implements IAdditionalProposalInfo {
       writeFunctionInfo(Utils.getFunctionNode(node));
     } else if (!type.isUnknownType()
         && !type.isEmptyType() && !type.isVoidType() &&
-        !type.isFunctionPrototypeType()) {
+        !type.isFunctionPrototypeType() && !type.isEnumType()) {
       openSectionAndItem(messages.getString("jsdoc_type"));
       writeType(type);
       closeSectionAndItem();
