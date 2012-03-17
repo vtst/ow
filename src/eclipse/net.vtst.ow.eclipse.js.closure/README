@@ -26,7 +26,6 @@ TODO
 1. Clean code
    - Cache externs
    - Synchronize CompilerRun.incrementalUpdate
-   - Delete logging messages on stdout
    - get the scope with a node traversal instead of the magic
    - Catch exceptions from the compiler.  Example: top-level function(x) {};
 2. Auto complete

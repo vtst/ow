@@ -1,6 +1,7 @@
 package net.vtst.ow.eclipse.js.closure;
 
 import java.net.URL;
+import java.util.logging.Level;
 
 import net.vtst.ow.eclipse.js.closure.compiler.JavaScriptEditorRegistry;
 import net.vtst.ow.eclipse.js.closure.compiler.JavaScriptProjectRegistry;
@@ -12,6 +13,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+
+import com.google.javascript.jscomp.Compiler;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -43,6 +46,7 @@ public class OwJsClosurePlugin extends AbstractUIPlugin {
     editorRegistry = new JavaScriptEditorRegistry(getWorkbench());
     projectRegistry = new JavaScriptProjectRegistry(getWorkbench());
     messages = new OwJsClosureMessages();
+    Compiler.setLoggingLevel(Level.OFF);
 	}
 
 	/*
