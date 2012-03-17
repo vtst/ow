@@ -151,7 +151,7 @@ public class ClosureCompletionProposal extends AbstractCompletionProposal {
   }
 
   @Override
-  protected Iterable<Fragment> makeFragments() {
+  protected List<Fragment> makeFragments() {
     LinkedList<Fragment> list = new LinkedList<Fragment>();
     list.add(new Fragment(getDisplayString()));
     if (type.isFunctionType()) {

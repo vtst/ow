@@ -29,7 +29,7 @@ public class SampleHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 	  IPath path = new Path("test/test.js");
 	  IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
-	  OwJsClosurePlugin.getDefault().getProjectRegistry().compile(file);
+	  //OwJsClosurePlugin.getDefault().getProjectRegistry().compile(file);
 		return null;
 	}
 }

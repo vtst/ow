@@ -22,6 +22,7 @@ public class MagicScopeCreator {
       Magic.getDeclaredMethod(Compiler.class, "getPassConfig");
   
   /**
+   * WARNING! The object has to be created after the compilation!
    * @param passConfig  The passes configuration where to take the scope creator.
    */
   public MagicScopeCreator(PassConfig passConfig) {

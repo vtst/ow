@@ -2,7 +2,6 @@ package net.vtst.ow.closure.compiler.compile;
 
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.NodeTraversal;
-import com.google.javascript.jscomp.Scope;
 import com.google.javascript.rhino.Node;
 
 /**
@@ -27,16 +26,16 @@ public class FindLocationNodeTraversal extends NodeTraversal {
     return callback.bestNode;
   }
 
-  private Scope getBestScope() {
-    return callback.bestScope;
-  }
+//  private Scope getBestScope() {
+//    return callback.bestScope;
+//  }
 
   private static class Callback implements NodeTraversal.Callback {
 
     private String filename;
     private int offset;
     private Node bestNode = null;
-    private Scope bestScope;
+//    private Scope bestScope;
     private int bestLength = Integer.MAX_VALUE;
 
     public Callback(AbstractCompiler compiler, String filename, int offset) {
@@ -55,7 +54,7 @@ public class FindLocationNodeTraversal extends NodeTraversal {
         if (nodeLength < bestLength) {
           bestNode = node;
           bestLength = nodeLength;
-          bestScope = traversal.getScope();
+//          bestScope = traversal.getScope();
         }
         return true;
       }

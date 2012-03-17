@@ -3,6 +3,7 @@ package net.vtst.ow.eclipse.js.closure.contentassist;
 import java.util.Collections;
 
 import net.vtst.ow.closure.compiler.compile.CompilableJSUnit;
+import net.vtst.ow.closure.compiler.compile.CompilerRun;
 import net.vtst.ow.closure.compiler.deps.JSSet;
 import net.vtst.ow.closure.compiler.deps.JSUnit;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
@@ -170,22 +171,21 @@ public class ClosureContentAssistIncovationContext implements IContentAssistInvo
     return OwJsClosurePlugin.getDefault().getEditorRegistry().getFile(getDocument());
   }
   
-  private CompilableJSUnit cunit;
+  private CompilerRun run = null;
   private Node node;
-  private boolean compilationJobComputed = false;
   
-  private void compile() {
-    if (compilationJobComputed) return;
-    compilationJobComputed = true;
+  private void lazyCompile() {
+    if (run != null) return;
     IFile file = getFile();
     if (file == null) return;
     JSSet<IFile> compilationSet = OwJsClosurePlugin.getDefault().getProjectRegistry().getCompilationSet(file.getProject());
     if (compilationSet == null) return;
     JSUnit unit = compilationSet.getCompilationUnit(file);
     if (!(unit instanceof CompilableJSUnit)) return;
-    cunit = (CompilableJSUnit) unit;
-    cunit.compile();
-    node = cunit.getNode(getPrefixOffset());
+    run = ((CompilableJSUnit) unit).getLastAvailableCompilerRun();
+    if (run == null) return;
+    run.incrementalCompile();
+    node = run.getNode(getPrefixOffset());
   }
   
   /**
@@ -193,9 +193,9 @@ public class ClosureContentAssistIncovationContext implements IContentAssistInvo
    * @return  An iterable over all symbols, empty if the symbols cannot be computed for whatever reason.
    */
   public Iterable<Var> getAllSymbols() {
-    compile();
-    if (node == null) return Collections.emptyList();
-    return cunit.getAllSymbols(node);
+    lazyCompile();
+    if (run == null || node == null) return Collections.emptyList();
+    return run.getAllSymbols(node);
   }
   
   /**
@@ -203,8 +203,9 @@ public class ClosureContentAssistIncovationContext implements IContentAssistInvo
    * @return  The scope, or null if it cannot be retrieved for whatever reason.
    */
   public Scope getScope() {
-    compile();
-    return cunit.getScope(node);
+    lazyCompile();
+    if (run == null) return null;
+    return run.getScope(node);
   }
 
 }

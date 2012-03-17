@@ -4,16 +4,22 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.vtst.ow.closure.compiler.compile.CompilableJSUnit;
+import net.vtst.ow.closure.compiler.compile.CompilerRun;
+import net.vtst.ow.closure.compiler.deps.JSLibrary;
 import net.vtst.ow.closure.compiler.deps.JSSet;
 import net.vtst.ow.closure.compiler.deps.JSUnit;
 import net.vtst.ow.closure.compiler.util.CompilerUtils;
 import net.vtst.ow.eclipse.js.closure.builder.ClosureNature;
 import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPersistentPropertyHelper;
+import net.vtst.ow.eclipse.js.closure.util.Pair;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -30,13 +36,8 @@ import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.ui.IWorkbench;
 
-import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
-import com.google.javascript.jscomp.DefaultPassConfig;
 import com.google.javascript.jscomp.ErrorManager;
-import com.google.javascript.jscomp.JSModule;
-import com.google.javascript.jscomp.JSSourceFile;
-import com.google.javascript.jscomp.PassConfig;
 
 /**
  * A registry of JavaScript editors, which is updated thanks to listener.
@@ -66,18 +67,30 @@ public class JavaScriptProjectRegistry {
       new ConcurrentHashMap<IProject, JSSet<IFile>>();
   
   // This is a weak hash map, because libraries which are no longer used by any project
-  // should be collected.
-  // TODO: Should the libraries be identified by a pair of files?
-  // private WeakHashMap<File, Library> pathToLibrary = new WeakHashMap<File, Library>();
+  // should be collected.  Libraries are identified by pairs (closureBasePath, libraryBasePath).
+  private WeakHashMap<Pair<File, File>, JSLibrary> pathToLibrary = new WeakHashMap<Pair<File, File>, JSLibrary>();
 
   public JavaScriptProjectRegistry(IWorkbench workbench) {
     ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceChangeListener);
   }
 
-
   public void dispose() {
     projectToCompilationSet.clear();
     ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceChangeListener);
+  }
+
+  
+  // **************************************************************************
+  // Libraries
+  
+  private synchronized JSLibrary getLibrary(File libraryPath, File pathOfClosureBase, boolean isClosureBase) {
+    Pair<File, File> key = new Pair<File, File>(libraryPath, pathOfClosureBase);
+    JSLibrary library = pathToLibrary.get(key);
+    if (library == null) {
+      library = new JSLibrary(libraryPath, pathOfClosureBase, isClosureBase);
+      pathToLibrary.put(key, library);
+    }
+    return library;
   }
 
   // **************************************************************************
@@ -96,11 +109,11 @@ public class JavaScriptProjectRegistry {
     JSSet<IFile> compilationSet = new JSSet<IFile>();
     // Add the compilation units for the libraries
     ClosureProjectPersistentPropertyHelper helper = new ClosureProjectPersistentPropertyHelper(project);
+    File pathOfClosureBase = new File(helper.getClosureBaseDir());
+    compilationSet.addCompilationSet(getLibrary(pathOfClosureBase, pathOfClosureBase, true));
     for (String libraryPath: helper.getOtherLibraries()) {
-      System.out.println("Library: " + libraryPath);
+      compilationSet.addCompilationSet(getLibrary(new File(libraryPath), pathOfClosureBase, false));
     }
-    File temporary = new File("/home/vtst/test/in/closure/goog");
-    ErrorManager errorManager = CompilerUtils.makePrintingErrorManager(System.out);  // TODO
     // Add the compilation units for the referenced projects
     // TODO: Be careful to avoid loops!
     for (IProject referencedProject: project.getReferencedProjects()) {
@@ -110,11 +123,17 @@ public class JavaScriptProjectRegistry {
     }
     // Add the files of the current project.
     for (IFile file: jsFiles) {
-      compilationSet.addCompilationUnit(file,
-          new CompilableJSUnit(
-              errorManager,
-              compilationSet, file.getFullPath().toFile(), temporary,
-              new CompilationUnitProviderFromEclipseIFile(file)));
+      CompilableJSUnit unit = new CompilableJSUnit(
+          compilationSet, file.getLocation().toFile(), pathOfClosureBase,
+          new CompilationUnitProviderFromEclipseIFile(file));
+      compilationSet.addCompilationUnit(file, unit);
+    }
+    // Compile
+    for (Entry<IFile, JSUnit> entry: compilationSet.entries()) {
+      JSUnit unit = entry.getValue();
+      if (unit instanceof CompilableJSUnit) {
+        compileUnit((CompilableJSUnit) unit, entry.getKey());
+      }
     }
     projectToCompilationSet.put(project, compilationSet);
   }
@@ -125,22 +144,35 @@ public class JavaScriptProjectRegistry {
    * @param delta
    */
   public void incrementalUpdate(IProject project, IResourceDelta delta) throws CoreException {
-    if (!projectToCompilationSet.containsKey(project) ||
-        shallRebuild(project, delta)) fullUpdate(project);
-  }
-  
-  /**
-   * Determine whether an update of a project requires to re-generate the compilation set.
-   * @param project
-   * @param delta
-   * @return  true if the compilation set has to be re-generated.
-   * @throws CoreException
-   */
-  private boolean shallRebuild(IProject project, IResourceDelta delta) throws CoreException {
+    JSSet<IFile> compilationSet = projectToCompilationSet.get(project);
+    if (compilationSet == null) {
+      fullUpdate(project);
+      return;
+    }
     ResourceDeltaVisitorForIncrementalUpdate visitor = 
         new ResourceDeltaVisitorForIncrementalUpdate(getFilesOfProject(project));
     delta.accept(visitor);
-    return visitor.shallRebuild();
+    if (visitor.fullUpdateRequired()) {
+      fullUpdate(project);
+    } else {
+      for (IFile file: visitor.changedFiles()) {
+        JSUnit unit = compilationSet.getCompilationUnit(file);
+        if (unit instanceof CompilableJSUnit) {
+          compileUnit((CompilableJSUnit) unit, file);
+        }
+      }
+    }
+  }
+  
+  private void compileUnit(CompilableJSUnit cunit, IFile file) {
+    CompilerOptions options = CompilerUtils.makeOptions();
+    options = CompilerUtils.makeOptions();  // TODO: Clean up the option generation.  Allow customization.
+    options.checkTypes = true;
+    options.setInferTypes(true);
+    options.closurePass = true;
+    ErrorManager errorManager = new ErrorManagerGeneratingProblemMarkers(cunit, file);
+    CompilerRun run = cunit.compile(options, errorManager);
+    run.setErrorManager(new NullErrorManager());
   }
 
   /**
@@ -171,24 +203,6 @@ public class JavaScriptProjectRegistry {
     return projectToCompilationSet.get(project);
   }
   
-  public void compile(IFile file) {
-    JSSet<IFile> compilationSet = projectToCompilationSet.get(file.getProject());
-    if (compilationSet == null) return;
-    JSUnit compilationUnit = compilationSet.getCompilationUnit(file);
-    if (compilationUnit == null) return;
-    Compiler compiler = CompilerUtils.makeCompiler(CompilerUtils.makePrintingErrorManager(System.out));
-    CompilerOptions options = CompilerUtils.makeOptions();
-    options.checkTypes = true;
-    compiler.initOptions(options);
-    PassConfig passes = new DefaultPassConfig(options);
-    compiler.setPassConfig(passes);
-    compilationSet.updateDependencies(compiler);
-    JSModule module = compilationSet.makeJSModule(compiler, "test-module", Collections.singleton(compilationUnit));
-    compiler.compile(new JSSourceFile[]{}, new JSModule[]{module}, options);
-    System.out.println(compiler.toSource());
-    //System.out.println((System.nanoTime() - t0) * 1e-9);
-  }
-  
   // **************************************************************************
   // ResourceVisitorForFullUpdate
 
@@ -215,8 +229,9 @@ public class JavaScriptProjectRegistry {
 
   class ResourceDeltaVisitorForIncrementalUpdate implements IResourceDeltaVisitor {
     
-    private boolean shallRebuild = false;
+    private boolean fullUpdateRequired = false;
     private Collection<IFile> currentFiles;
+    private List<IFile> changedFiles = new LinkedList<IFile>();
     
     public ResourceDeltaVisitorForIncrementalUpdate(Collection<IFile> currentFiles) {
       this.currentFiles = currentFiles;
@@ -230,19 +245,29 @@ public class JavaScriptProjectRegistry {
         // TODO: Test that the project has the required nature?
         /* CONTENT ENCODING DESCRIPTION OPEN TYPE SYNC MARKERS REPLACED LOCAL_CHANGED */
         if ((flags & (IResourceDelta.DESCRIPTION | IResourceDelta.OPEN)) != 0)
-          shallRebuild = true;
+          fullUpdateRequired = true;
       } else if (resource instanceof IFile) {
         IFile file = (IFile) resource;
-        int kind = delta.getKind();
-        if ((kind == IResourceDelta.ADDED && isJavaScriptFile(file) || 
-            (kind == IResourceDelta.REMOVED && currentFiles.contains(file))))
-          shallRebuild = true;
+        switch (delta.getKind()) {
+        case IResourceDelta.ADDED:
+          if (isJavaScriptFile(file)) fullUpdateRequired = true;
+          break;
+        case IResourceDelta.REMOVED:
+          if (currentFiles.contains(file)) fullUpdateRequired = true;
+          break;
+        case IResourceDelta.CHANGED:
+          if (currentFiles.contains(file)) changedFiles.add(file);
+        }
       }
       return true;
     }
     
-    public boolean shallRebuild() {
-      return shallRebuild;
+    public boolean fullUpdateRequired() {
+      return fullUpdateRequired;
+    }
+    
+    public Iterable<IFile> changedFiles() {
+      return changedFiles;
     }
 
   }

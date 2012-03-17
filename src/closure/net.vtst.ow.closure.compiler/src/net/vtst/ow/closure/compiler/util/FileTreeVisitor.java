@@ -51,7 +51,7 @@ public class FileTreeVisitor {
     public final void visit(java.io.File file, RelativePath path) throws VisitingException {
       if (file.isFile()) {
         visitFile(file, path);
-      } else {
+      } else if (file.isDirectory()) {
         if (!preVisitDirectory(file, path)) return;
         for (java.io.File file1: file.listFiles()) {
           RelativePath path1 = getRelativePathProvider().add(path, file1.getName());

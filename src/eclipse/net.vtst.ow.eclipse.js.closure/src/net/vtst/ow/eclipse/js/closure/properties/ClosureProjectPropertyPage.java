@@ -173,10 +173,12 @@ public class ClosureProjectPropertyPage extends PropertyPage {
 	public boolean performOk() {
     IProject project = (IProject) getElement();
 	  ClosureProjectPersistentPropertyHelper helper = new ClosureProjectPersistentPropertyHelper(project);
+	  
 	  try {
 	    Utils.setProjectNature(project, ClosureNature.NATURE_ID, enableClosureSupport.getSelection());
 	    helper.setClosureBaseDir(closureBaseDir.getText());
 	    helper.setOtherLibraries(otherLibrariesList.getItems());
+	    project.touch(null);
     } catch (CoreException e1) {
       return false;
     }

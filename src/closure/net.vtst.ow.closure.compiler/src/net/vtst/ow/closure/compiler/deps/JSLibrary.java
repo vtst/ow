@@ -29,8 +29,10 @@ public class JSLibrary implements IJSSet {
   // TODO: It should be checked whether this works on Microsoft Windows, because the paths
   // in the deps.js file are stored with '/' instead of '\'.
   
-  static final String LEGACY_DEPS_FILE = "deps2.js";
-  static final String GENERATED_DEPS_FILE = "deps.ow.js";
+  public static final String GOOG = "goog";
+  private static final String BASE_FILE = "base.js";
+  private static final String LEGACY_DEPS_FILE = "deps.js";
+  private static final String GENERATED_DEPS_FILE = "deps.ow.js";
   
   static final DiagnosticType OW_DUPLICATED_GOOG_PROVIDE = DiagnosticType.warning(
       "OW_DUPLICATED_GOOG_PROVIDE",
@@ -51,18 +53,20 @@ public class JSLibrary implements IJSSet {
   private File depsFile;
   private boolean canWriteDepsFile = false;
   private boolean isInitialized = false;
+  private boolean isClosureBase;
   
   /**
    * Create a new library.
    * @param path  The root directory for the library.
    */
   public JSLibrary(File path) {
-    this(path, path);
+    this(path, path, true);
   }
   
-  public JSLibrary(File path, File pathOfClosureBase) {
+  public JSLibrary(File path, File pathOfClosureBase, boolean isClosureBase) {
     this.path = path;
     this.pathOfClosureBase = pathOfClosureBase;
+    this.isClosureBase = isClosureBase;
   }
 
   /* (non-Javadoc)
@@ -80,7 +84,6 @@ public class JSLibrary implements IJSSet {
   public boolean updateDependencies(AbstractCompiler compiler) {
     if (isInitialized) return false;
     if (findDepsFile()) {
-      long t = System.nanoTime();
       readDepsFile(compiler, depsFile);
     } else {
       updateFromFileTree(compiler);
@@ -125,11 +128,31 @@ public class JSLibrary implements IJSSet {
             pathOfClosureBase,
             new JSUnitProvider.FromFile(file));
         compilationUnit.updateDependencies(compiler);
+        addGoogToDependencies(compilationUnit);
         addCompilationUnit(compiler, compilationUnit);
       }
     };
     visitor.visit(path);
     if (canWriteDepsFile) writeDepsFile(compiler, depsFile);
+  }
+  
+  /**
+   * Dependencies to 'goog' (defined in base.js) are not correctly specified in the files of the
+   * Closure Library.  This is to patch this.
+   * @param requires
+   */
+  private void addGoogToDependencies(JSUnit unit) {
+    if (!isClosureBase) return;
+    if (unit.getPathRelativeToClosureBase().equals(BASE_FILE)) {
+      unit.getProvides().add(GOOG);
+    } else {
+      String prefix = GOOG + ".";
+      Collection<String> requires = unit.getRequires();
+      for (String require: requires) {
+        if (require.startsWith(prefix)) return;
+      }
+      requires.add(GOOG);      
+    }
   }
 
   /**
@@ -152,14 +175,20 @@ public class JSLibrary implements IJSSet {
   // **************************************************************************
   // Reading and writing deps.js files
   
+  /**
+   * Reads a deps.js file.
+   * @param compiler  The compiler to use for error reporting.
+   * @param depsFile  The path to the deps.js file.
+   */
   private void readDepsFile(AbstractCompiler compiler, File depsFile) {
     try {
       DepsFileParser depsFileParser = new DepsFileParser(compiler.getErrorManager());
       for (DependencyInfo info: depsFileParser.parseFile(depsFile.getAbsolutePath())) {
-        File file = FileUtils.join(pathOfClosureBase, new File(info.getName()));
+        File file = FileUtils.join(pathOfClosureBase, new File(info.getPathRelativeToClosureBase()));
         JSUnit compilationUnit = 
             new JSUnit(file, pathOfClosureBase, new JSUnitProvider.FromFile(file));
         compilationUnit.setDependencies(info.getProvides(), info.getRequires());
+        addGoogToDependencies(compilationUnit);
         addCompilationUnit(compiler, compilationUnit);
       }
     } catch (IOException exn) {
@@ -167,6 +196,11 @@ public class JSLibrary implements IJSSet {
     }
   }
   
+  /**
+   * Write a deps.js file.
+   * @param compiler  The compiler to use for error reporting.
+   * @param depsFile  The path to the deps.js file.
+   */
   private void writeDepsFile(AbstractCompiler compiler, File file) {
     try {
       MagicDepsGenerator depsGenerator = new MagicDepsGenerator();

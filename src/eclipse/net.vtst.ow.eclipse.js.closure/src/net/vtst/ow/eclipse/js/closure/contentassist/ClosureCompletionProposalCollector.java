@@ -22,13 +22,6 @@ import com.google.javascript.rhino.jstype.UnionType;
  * @author Vincent Simonet
  */
 public class ClosureCompletionProposalCollector {
-  
-  // TODO: Should we get the scope with a node traversal instead of the magic?
-  // TODO: Enums / constants?
-  // TODO: Automatic discarding of non-closure completion proposals
-  //   see: CodeAssistAdvancedPreferencePage
-  // TODO: Standard completion proposals?
-  // TODO: Problem with the dot in the context.
 
   private static String THIS = "this";
 
@@ -50,7 +43,11 @@ public class ClosureCompletionProposalCollector {
         return getProposalsFromType(type);    
       }
     } else {
-      return getProposalsFromScope();
+      try {
+        return getProposalsFromScope();
+      } catch (RuntimeException e) {
+        e.printStackTrace();  // TODO To be deleted
+      }
     } 
     return Collections.emptyList();
   }
@@ -117,7 +114,7 @@ public class ClosureCompletionProposalCollector {
         Var var = scope.getVar(segments[0]);
         if (var != null) type = var.getType();
       }
-      for (int i = 1; i < segments.length - 1; ++i) {
+      for (int i = 1; i < segments.length; ++i) {
         if (type == null) break;
         type = type.findPropertyType(segments[i]);
       }

@@ -23,30 +23,23 @@ Potential threads:
 -------------------------------------------------------------------------------
 TODO
 
-1. Hovers with types
-2. Run compiler in background
-3. /?\ How to manage compilation errors / ensure that the compiler is run only
-   when there is no compilation error. [In particular, missing ;]
-4. Report errors and warning from the compiler.
-5. Catch exceptions from the compiler.  Example: top-level function(x) {};
-6. See TODOs in ClosureCompletionProposalCollector
-
--------------------------------------------------------------------------------
-COMPLETION PROPOSALS
-
-1. Investigate extensions
-2. Clarify how to get the list of completion proposals => See below.
-3. Clarify how to sort completion proposals => Implement IJavaCompletionProposal.
-
-How to get the list of completion proposals.
-1. In a synchronous way:
-   * Get the current position
-   * Get the prefix of the current position
-   * Get the scope at the beginning at this prefix
-   * Take all proposals that begin by this prefix.  If the prefix has no dot, look into global
-     variables.  If the prefix has a dot, look into members.
-2. In an asynchronous way:
-   * Do the same
-   * Check that the last compiled version is still valid, by checking that the text before the prefix
-   is not changed
-   => We need to keep a copy of what has been compiled.
+1. Clean code
+   - Cache externs
+   - Synchronize CompilerRun.incrementalUpdate
+   - Delete logging messages on stdout
+   - get the scope with a node traversal instead of the magic
+   - Catch exceptions from the compiler.  Example: top-level function(x) {};
+2. Auto complete
+   - Fix icon for goog (should be a namespace)
+   - Enum and constants in auto complete
+   - Standard completion proposals
+   - Hover with types
+3. Builder
+   - Implement different levels of error messages
+   - Other libraries
+   - Referenced projects
+   - Having different compiler options for checking errors / auto complete 
+4. Settings
+   - Automatic discarding of non-closure completion proposals
+     see: CodeAssistAdvancedPreferencePage
+   - Compilation options

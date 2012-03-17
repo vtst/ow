@@ -2,23 +2,26 @@ package net.vtst.ow.closure.compiler.deps;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import net.vtst.ow.closure.compiler.util.BidiHashMap;
 import net.vtst.ow.closure.compiler.util.CompilerUtils;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CompilerInput;
 import com.google.javascript.jscomp.DiagnosticType;
 import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.JSModule;
+import com.google.javascript.jscomp.deps.SortedDependencies;
+import com.google.javascript.jscomp.deps.SortedDependencies.CircularDependencyException;
 
 /**
  * Concrete implementation of a compilation set, which may own some compilation unit, and contain
@@ -37,6 +40,10 @@ public class JSSet<K> implements IJSSet {
       "OW_UNDEFINED_PACKAGE",
       "The package \"{0}\" is not provided");
   
+  static final DiagnosticType OW_CIRCULAR_DEPENDENCY = DiagnosticType.error(
+      "OW_CIRCULAR_DEPENDENCY",
+      "Circular dependency: {0}");
+
   private Collection<JSUnit> compilationUnits = new ArrayList<JSUnit>();
   private Collection<IJSSet> compilationSets = new ArrayList<IJSSet>();
   private BidiHashMap<String, JSUnit> providedBy = new BidiHashMap<String, JSUnit>();
@@ -84,6 +91,14 @@ public class JSSet<K> implements IJSSet {
   
   public Set<K> keySet() {
     return keyToCompilationUnit.keySet();
+  }
+  
+  public Collection<JSUnit> compilationUnits() {
+    return compilationUnits;
+  }
+  
+  public Set<Entry<K, JSUnit>> entries() {
+    return keyToCompilationUnit.entrySet();
   }
 
   /**
@@ -135,27 +150,35 @@ public class JSSet<K> implements IJSSet {
    * @param compilationUnits  The compilation units to compile.
    * @return  The list of required compilation units (including those of {@code compilationUnits}.
    */
-  public List<JSUnit> getRequiredJSUnits(
-      AbstractCompiler compiler,
-      Iterable<? extends JSUnit> compilationUnits) {
+  public List<JSUnit> getRequiredJSUnits(AbstractCompiler compiler, Iterable<? extends JSUnit> compilationUnits) {
+    HashSet<JSUnit> requiredUnits = new HashSet<JSUnit>();
+    int numberOfRequiredUnits = 0;
     LinkedList<JSUnit> toBeVisited = Lists.newLinkedList(compilationUnits);
-    HashSet<JSUnit> visited = Sets.newHashSet(compilationUnits);
-    LinkedList<JSUnit> result = new LinkedList<JSUnit>();
     while (!toBeVisited.isEmpty()) {
-      JSUnit compilationUnit = toBeVisited.removeFirst();
-      result.addFirst(compilationUnit);
-      for (String name: compilationUnit.getRequires()) {
-        JSUnit requiredCompilationUnit = getProvider(name);
-        if (requiredCompilationUnit == null) {
-          CompilerUtils.reportError(
-              compiler, 
-              JSError.make(compilationUnit.getName(), 0, 0, OW_UNDEFINED_PACKAGE, name));                      
-        } else {
-          if (visited.add(requiredCompilationUnit)) toBeVisited.add(requiredCompilationUnit);
+      JSUnit unit = toBeVisited.removeFirst();
+      if (requiredUnits.add(unit)) {
+        ++numberOfRequiredUnits;
+        for (String name: unit.getRequires()) {
+          JSUnit requiredCompilationUnit = getProvider(name);
+          if (requiredCompilationUnit == null) {
+            CompilerUtils.reportError(
+                compiler, 
+                JSError.make(unit.getName(), 0, 0, OW_UNDEFINED_PACKAGE, name));                      
+          } else {
+            toBeVisited.add(requiredCompilationUnit);
+          }
         }
       }
     }
-    return result;
+    List<JSUnit> requiredUnitsList = new ArrayList<JSUnit>(numberOfRequiredUnits);
+    requiredUnitsList.addAll(requiredUnits);    
+    try {
+      SortedDependencies<JSUnit> dependencies = new SortedDependencies<JSUnit>(requiredUnitsList);
+      return dependencies.getSortedList();
+    } catch (CircularDependencyException e) {
+      CompilerUtils.reportError(compiler, JSError.make("", 0, 0, OW_CIRCULAR_DEPENDENCY, e.getMessage()));
+      return Collections.emptyList();
+    }
   }
   
   /**

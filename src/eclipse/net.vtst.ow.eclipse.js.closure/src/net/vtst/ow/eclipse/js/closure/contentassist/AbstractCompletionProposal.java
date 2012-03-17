@@ -1,5 +1,7 @@
 package net.vtst.ow.eclipse.js.closure.contentassist;
 
+import java.util.List;
+
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.util.Utils;
 
@@ -165,13 +167,13 @@ public abstract class AbstractCompletionProposal
    * Store the region to select once the completion proposal is selected.  Set by
    * {@code setUpLinkedMode} and read by {@code getSelection}. 
    */
-  private IRegion regionToSelect = null;
+  private Point regionToSelect = null;
   
   /**
    * Get the fragments to be inserted when the selection proposal is selected.
    * @return  The fragments to be inserted.
    */
-  protected abstract Iterable<Fragment> makeFragments();
+  protected abstract List<Fragment> makeFragments();
  
   /**
    * Get the exit characters for the linked mode.
@@ -179,8 +181,8 @@ public abstract class AbstractCompletionProposal
    */
   protected abstract char[] makeExitCharactersForLinkedMode();
   
-  Iterable<Fragment> cachedFragments = null;
-  private Iterable<Fragment> getFragments() {
+  List<Fragment> cachedFragments = null;
+  private List<Fragment> getFragments() {
     if (cachedFragments == null) cachedFragments = makeFragments();
     return cachedFragments;
   }
@@ -189,22 +191,28 @@ public abstract class AbstractCompletionProposal
    * Compute the whole string to be inserted, from the fragments.
    * @return  The string to be inserted.
    */
-  private String getReplacementString() {
+  private String getReplacementString(char trigger) {
     StringBuffer buffer = new StringBuffer();
     for (Fragment fragment: getFragments()) buffer.append(fragment.getText());
+    // This is to insert the trigger character if it is not in the completion proposal itself.
+    if (Utils.contains(this.getTriggerCharacters(), trigger)) {
+      String triggerString = Character.toString(trigger);
+      if (buffer.indexOf(triggerString) < 0) buffer.append(triggerString);
+    }
     return buffer.toString();
   }
   
   @Override
   public void apply(ITextViewer viewer, char trigger, int stateMask, int offset) {
-    Iterable<Fragment> fragments = getFragments();
+    String replacementString = getReplacementString(trigger);
     try {
       IDocument document = viewer.getDocument();
       int replacementOffset = context.getInvocationOffset() - context.getPrefixLength();
       document.replace(
           replacementOffset, context.getPrefixLength() + offset - context.getInvocationOffset(), 
-          getReplacementString());
-      setUpLinkedMode(document, replacementOffset, fragments);
+          replacementString);
+      regionToSelect = new Point(context.getInvocationOffset() + replacementString.length() - context.getPrefixLength(), 0);
+      setUpLinkedMode(document, replacementOffset, getFragments());
     } catch (BadLocationException e) {
       assert false;
     }        
@@ -281,10 +289,6 @@ public abstract class AbstractCompletionProposal
     if (!hasLinkedFragment) return;
   
     model.forceInstall();
-  //  JavaEditor editor= getJavaEditor();
-  //  if (editor != null) {
-  //    model.addLinkingListener(new EditorHighlightingSynchronizer(editor));
-  //  }
   
     LinkedModeUI ui = new EditorLinkedModeUI(model, context.getViewer());
     ui.setExitPosition(context.getViewer(), currentOffset, 0, Integer.MAX_VALUE);
@@ -293,13 +297,13 @@ public abstract class AbstractCompletionProposal
     ui.setCyclingMode(LinkedModeUI.CYCLE_WHEN_NO_PARENT);
     ui.enter();
     
-    regionToSelect = ui.getSelectedRegion();    
+    IRegion region = ui.getSelectedRegion();
+    regionToSelect = new Point(region.getOffset(), region.getLength());    
   }
   
   @Override
   public Point getSelection(IDocument document) {
-    if (regionToSelect != null) return new Point(regionToSelect.getOffset(), regionToSelect.getLength());
-    return new Point(context.getInvocationOffset() + completionString.length() - context.getPrefixLength(), 0);
+    return regionToSelect;
   }
 
   /**
