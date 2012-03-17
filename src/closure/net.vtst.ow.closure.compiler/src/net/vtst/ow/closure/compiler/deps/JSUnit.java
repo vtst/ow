@@ -23,10 +23,10 @@ public class JSUnit implements DependencyInfo {
     
   private File path;
   private File pathOfClosureBase;
-  private JSUnitProvider.Interface provider;
+  private JSUnitProvider.IProvider provider;
   private File pathRelativeToClosureBase;
   private TimestampKeeper timestampKeeperForDependencies;
-  private AstFactory astFactory;
+  private AstFactoryFromModifiable astFactory;
   private Set<String> providedNames = new HashSet<String>();
   private Set<String> requiredNames = new HashSet<String>();
 
@@ -35,12 +35,12 @@ public class JSUnit implements DependencyInfo {
    * @param fileName  The name for the compilation unit.
    * @param provider  The provider for the compilation unit.
    */
-  public JSUnit(File path, File pathOfClosureBase, JSUnitProvider.Interface provider) {
+  public JSUnit(File path, File pathOfClosureBase, JSUnitProvider.IProvider provider) {
     this.path = path;
     this.pathOfClosureBase = pathOfClosureBase;
     this.provider = provider;
     this.timestampKeeperForDependencies = new TimestampKeeper(provider);
-    this.astFactory = new AstFactory(getName(), provider);
+    this.astFactory = new AstFactoryFromModifiable(getName(), provider);
   }
 
   /**

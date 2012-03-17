@@ -88,12 +88,8 @@ public class CompilerRun {
       lastModified.put(unit.getName(), unit.lastModified());
       module.add(new CompilerInput(unit.getAst()));      
     }
-    try {
-      List<SourceFile> externs = CommandLineRunner.getDefaultExterns();  // TODO We should cache them!
-      compiler.compileModules(externs, Lists.newArrayList(module), options);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    compiler.compileModules(
+        Collections.<SourceFile> emptyList(), Lists.newArrayList(DefaultExternsProvider.get(), module), options);
     scopeCreator = new MagicScopeCreator(passes);    
   }
   

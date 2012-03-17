@@ -4,7 +4,7 @@ import java.io.File;
 
 import net.vtst.ow.closure.compiler.deps.JSSet;
 import net.vtst.ow.closure.compiler.deps.JSUnit;
-import net.vtst.ow.closure.compiler.deps.JSUnitProvider.Interface;
+import net.vtst.ow.closure.compiler.deps.JSUnitProvider.IProvider;
 
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.ErrorManager;
@@ -18,7 +18,7 @@ public class CompilableJSUnit extends JSUnit {
 
   private JSSet<?> compilationSet;
 
-  public CompilableJSUnit(JSSet<?> compilationSet, File path, File pathOfClosureBase, Interface provider) {
+  public CompilableJSUnit(JSSet<?> compilationSet, File path, File pathOfClosureBase, IProvider provider) {
     super(path, pathOfClosureBase, provider);
     this.compilationSet = compilationSet;
   }

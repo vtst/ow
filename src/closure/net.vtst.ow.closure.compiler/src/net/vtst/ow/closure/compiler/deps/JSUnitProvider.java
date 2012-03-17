@@ -16,11 +16,11 @@ import com.google.javascript.jscomp.SourceFile;
  * @author Vincent Simonet
  */
 public class JSUnitProvider {
-
+  
   /**
    * Generic interface for compilation unit providers.
    */
-  public static interface Interface extends SourceFile.Generator {
+  public static interface IProvider extends SourceFile.Generator {
     
     /**
      * Return the timestamp of the last modification of the source.
@@ -38,7 +38,7 @@ public class JSUnitProvider {
   /**
    * Compilation unit provider which gets the source code from a file. 
    */
-  public static class FromFile implements Interface {
+  public static class FromFile implements IProvider {
     
     private File file;
     private Charset charset;
@@ -78,7 +78,7 @@ public class JSUnitProvider {
   /**
    * Compilation unit provider which gets the source code from a string. 
    */
-  public static class FromCode implements Interface {
+  public static class FromCode implements IProvider {
     
     private String code;
     

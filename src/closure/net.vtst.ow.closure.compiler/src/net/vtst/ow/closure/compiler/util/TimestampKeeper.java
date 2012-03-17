@@ -4,10 +4,10 @@ import net.vtst.ow.closure.compiler.deps.JSUnitProvider;
 
 public class TimestampKeeper {
   
-  private JSUnitProvider.Interface provider;
+  private JSUnitProvider.IProvider provider;
   private long lastModified = -1;
 
-  public TimestampKeeper(JSUnitProvider.Interface provider) {
+  public TimestampKeeper(JSUnitProvider.IProvider provider) {
     this.provider = provider;
   }
   

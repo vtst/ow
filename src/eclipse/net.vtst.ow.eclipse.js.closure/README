@@ -24,7 +24,6 @@ Potential threads:
 TODO
 
 1. Clean code
-   - Cache externs
    - Synchronize CompilerRun.incrementalUpdate
    - get the scope with a node traversal instead of the magic
    - Catch exceptions from the compiler.  Example: top-level function(x) {};
@@ -32,6 +31,7 @@ TODO
    - Enum and constants in auto complete
    - Standard completion proposals
    - Hover with types
+   - Correct description for namespaces
 3. Builder
    - Implement different levels of error messages
    - Other libraries

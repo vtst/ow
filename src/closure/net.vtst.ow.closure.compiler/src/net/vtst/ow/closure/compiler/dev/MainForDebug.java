@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
-import net.vtst.ow.closure.compiler.deps.AstFactory;
+import net.vtst.ow.closure.compiler.deps.AstFactoryFromModifiable;
 import net.vtst.ow.closure.compiler.deps.JSLibrary;
 import net.vtst.ow.closure.compiler.deps.JSSet;
 import net.vtst.ow.closure.compiler.deps.JSUnit;
@@ -51,7 +51,7 @@ public class MainForDebug {
   public static void measureTime() {
     final ArrayList<File> listFiles = new ArrayList<File>();
     final ArrayList<JSSourceFile> listSourceFiles = new ArrayList<JSSourceFile>();
-    final ArrayList<AstFactory> listAsts = new ArrayList<AstFactory>(); 
+    final ArrayList<AstFactoryFromModifiable> listAsts = new ArrayList<AstFactoryFromModifiable>(); 
     FileTreeVisitor.Simple<RuntimeException> visitor = new FileTreeVisitor.Simple<RuntimeException>() {
       public void visitFile(File file) {
         if (!CompilerUtils.isJavaScriptFile(file)) return;
@@ -68,7 +68,7 @@ public class MainForDebug {
     for (int i = 0; i < 10; ++i) {
       if (i == 1) t1 = System.nanoTime();
       JSModule module = new JSModule("main");
-      for (AstFactory ast: listAsts) {
+      for (AstFactoryFromModifiable ast: listAsts) {
         module.add(new CompilerInput(ast.getClone()));
       }
 //      for (JSSourceFile sourceFile: listSourceFiles) {

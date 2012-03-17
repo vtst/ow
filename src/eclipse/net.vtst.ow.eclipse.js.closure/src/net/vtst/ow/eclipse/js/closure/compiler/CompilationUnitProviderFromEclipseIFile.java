@@ -11,7 +11,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-public class CompilationUnitProviderFromEclipseIFile implements JSUnitProvider.Interface {
+public class CompilationUnitProviderFromEclipseIFile implements JSUnitProvider.IProvider {
   
   private IFile file;
   private String code;
