@@ -25,7 +25,6 @@ public class AstFactory extends JsAst {
     return new AstFactory.ClonedAst(this);
   }
 
-  
   static class ClonedAst extends JsAst {
     private static final long serialVersionUID = 1L;
 
@@ -66,5 +65,4 @@ public class AstFactory extends JsAst {
       throw new UnsupportedOperationException();    
     }
   }
-
 }
