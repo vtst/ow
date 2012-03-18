@@ -129,5 +129,11 @@ public class JSUnit implements DependencyInfo {
   public JsAst getAst() {
     return astFactory.getClone();
   }
+  
+  public String getDescription(AbstractCompiler compiler) {
+    Node node = astFactory.getAstRoot(compiler);
+    System.out.println(node.toStringTree());
+    return "No description";
+  }
 
 }

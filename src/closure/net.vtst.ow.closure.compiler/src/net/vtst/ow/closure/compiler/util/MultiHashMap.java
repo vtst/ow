@@ -1,4 +1,4 @@
-package net.vtst.ow.eclipse.js.closure.util;
+package net.vtst.ow.closure.compiler.util;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -66,7 +66,18 @@ public class MultiHashMap<K, V> {
     values.remove(value);
     return values.isEmpty();
   }
-  
+    
+  /**
+   * Remove all values associated with a given key, and return them.
+   * @param key
+   * @return  The removed values.
+   */
+  public Collection<V> getAndRemoveAll(K key) {
+    HashSet<V> values = map.remove(key);
+    if (values == null) return Collections.emptyList();
+    else return values;    
+  }
+
   /**
    * Remove all values associated with a given key.
    * @param key  The key to look for.

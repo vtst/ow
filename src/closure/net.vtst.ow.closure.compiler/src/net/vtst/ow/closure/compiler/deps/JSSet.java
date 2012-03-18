@@ -62,6 +62,12 @@ public class JSSet<K> implements IJSSet {
     return null;
   }
   
+  public String getNamespaceDescription(AbstractCompiler compiler, String name) {
+    JSUnit unit = getProvider(name);
+    if (unit == null) return null;
+    return unit.getDescription(compiler);
+  }
+  
   /**
    * Add a compilation unit to the compilation set.  Does not recompute dependencies.
    * @param compilationUnit  The compilation unit to be added.

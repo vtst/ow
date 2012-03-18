@@ -25,12 +25,15 @@ TODO
 
 1. Clean code
    - Synchronize CompilerRun.incrementalUpdate
+     (Don't forget the method which gets the description of an unit.)
    - get the scope with a node traversal instead of the magic
    - Catch exceptions from the compiler.  Example: top-level function(x) {};
+   - Is it a performance issue to put externs as inputs?
 2. Auto complete
    - Standard completion proposals
    - Hover with types
    - Correct description for namespaces
+   - Bug if you complete a complete namespace (e.g. goog.dom -> ctrl+whitespace)
 3. Builder
    - Other libraries
    - Referenced projects

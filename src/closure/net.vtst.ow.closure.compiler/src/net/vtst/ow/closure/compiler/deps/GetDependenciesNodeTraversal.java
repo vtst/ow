@@ -17,7 +17,7 @@ import com.google.javascript.rhino.Token;
  */
 public class GetDependenciesNodeTraversal extends NodeTraversal {
 
-  private static final String GOOG_PROVIDE = "goog.provide";
+  public static final String GOOG_PROVIDE = "goog.provide";
   private static final String GOOG_REQUIRE = "goog.require";
   
   static final DiagnosticType WRONG_NUMBER_OF_ARGUMENTS = DiagnosticType.warning(

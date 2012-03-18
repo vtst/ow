@@ -165,8 +165,7 @@ public class JavaScriptProjectRegistry {
   }
   
   private void compileUnit(CompilableJSUnit cunit, IFile file) {
-    CompilerOptions options = CompilerUtils.makeOptions();
-    options = CompilerUtils.makeOptions();  // TODO: Clean up the option generation.  Allow customization.
+    CompilerOptions options = CompilerUtils.makeOptions();  // TODO: Clean up the option generation.  Allow customization.
     options.checkTypes = true;
     options.setInferTypes(true);
     options.closurePass = true;

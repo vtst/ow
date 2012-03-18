@@ -207,5 +207,11 @@ public class ClosureContentAssistIncovationContext implements IContentAssistInvo
     if (run == null) return null;
     return run.getScope(node);
   }
+  
+  public Node getNamespaceProvider(String namespace) {
+    lazyCompile();
+    if (run == null) return null;
+    return run.getNamespaceProvider(namespace);
+  }
 
 }

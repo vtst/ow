@@ -44,18 +44,22 @@ public class CompilerUtils {
     return compiler;
   }  
 
+  private static void setupOptions(CompilerOptions options) {
+    options.ideMode = true;
+    options.setRewriteNewDateGoogNow(false);
+    options.setRemoveAbstractMethods(false);    
+  }
+  
   /**
-   * Createa a new compiler options object, and set the default options we need.
+   * Create a new compiler options object, and set the default options we need.
    * @return  The new compiler options.
    */
   public static CompilerOptions makeOptions() {
     CompilerOptions options = new CompilerOptions();
-    options.ideMode = true;
-    options.setRewriteNewDateGoogNow(false);
-    options.setRemoveAbstractMethods(false);
+    setupOptions(options);
     return options;
   }
-  
+
   /**
    * Add a custom compiler pass to a compiler options.
    * @param options  The compiler options to which the custom pass will be added.

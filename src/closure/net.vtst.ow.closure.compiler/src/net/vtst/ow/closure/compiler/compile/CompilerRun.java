@@ -1,6 +1,5 @@
 package net.vtst.ow.closure.compiler.compile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,17 +15,20 @@ import net.vtst.ow.closure.compiler.magic.MagicScopeCreator;
 import net.vtst.ow.closure.compiler.util.CompilerUtils;
 
 import com.google.common.collect.Lists;
-import com.google.javascript.jscomp.CommandLineRunner;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerInput;
 import com.google.javascript.jscomp.CompilerOptions;
+import com.google.javascript.jscomp.CompilerPass;
+import com.google.javascript.jscomp.CustomPassExecutionTime;
 import com.google.javascript.jscomp.DefaultPassConfig;
 import com.google.javascript.jscomp.ErrorManager;
+import com.google.javascript.jscomp.HotSwapCompilerPass;
 import com.google.javascript.jscomp.JSModule;
+import com.google.javascript.jscomp.JsAst;
 import com.google.javascript.jscomp.PassConfig;
 import com.google.javascript.jscomp.Scope;
-import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.jscomp.Scope.Var;
+import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.rhino.Node;
 
 /**
@@ -40,6 +42,7 @@ public class CompilerRun {
   private PassConfig passes;
   private CompilableJSUnit unit;
   private MagicScopeCreator scopeCreator;
+  private NamespaceProvidersMap namespaceToScriptNode = new NamespaceProvidersMap();
 
   private Map<String, Long> lastModified = new HashMap<String, Long>();
 
@@ -73,6 +76,9 @@ public class CompilerRun {
     compiler = CompilerUtils.makeCompiler(errorManager);
     compiler.initOptions(options);
     passes = new DefaultPassConfig(options);
+    CompilerUtils.addCustomCompilerPass(
+        options, new NamespaceProvidersPass(compiler, namespaceToScriptNode),
+        CustomPassExecutionTime.BEFORE_CHECKS);
     compiler.setPassConfig(passes);
   }
 
@@ -90,7 +96,7 @@ public class CompilerRun {
     }
     compiler.compileModules(
         Collections.<SourceFile> emptyList(), Lists.newArrayList(DefaultExternsProvider.get(), module), options);
-    scopeCreator = new MagicScopeCreator(passes);    
+    scopeCreator = new MagicScopeCreator(passes);
   }
   
   /**
@@ -106,12 +112,27 @@ public class CompilerRun {
       Long previous = lastModified.get(unit.getName());
       if (previous == null) {
         lastModified.put(unit.getName(), current);
-        compiler.addNewScript(unit.getAst());
+        JsAst ast = unit.getAst();
+        processCustomPassesOnNewScript(ast);
+        compiler.addNewScript(ast);
       } else if (current > previous) {
         lastModified.put(unit.getName(), current);
-        compiler.replaceScript(unit.getAst());
+        JsAst ast = unit.getAst();
+        processCustomPassesOnNewScript(ast);
+        compiler.replaceScript(ast);
       }
     }    
+  }
+  
+  public void processCustomPassesOnNewScript(JsAst ast) {
+    if (options.customPasses == null) return;
+    Node scriptRoot = ast.getAstRoot(compiler);
+    Node originalRoot = compiler.getRoot();
+    for (CompilerPass pass: options.customPasses.get(CustomPassExecutionTime.BEFORE_CHECKS)) {
+      if (pass instanceof HotSwapCompilerPass) {
+        ((HotSwapCompilerPass) pass).hotSwapScript(scriptRoot, originalRoot);
+      }
+    }
   }
 
   // **************************************************************************
@@ -175,5 +196,14 @@ public class CompilerRun {
    */
   public Iterable<Var> getAllSymbols(Node node) {
     return getAllSymbolsRecursively(getScope(node));
-  }  
+  }
+  
+  /**
+   * Get the script node which provides a name space.
+   * @param namespace
+   * @return  The script node, or null.
+   */
+  public Node getNamespaceProvider(String namespace) {
+    return namespaceToScriptNode.get(namespace);
+  }
 }

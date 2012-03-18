@@ -3,7 +3,7 @@ package net.vtst.ow.eclipse.js.closure.compiler;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.vtst.ow.eclipse.js.closure.util.MultiHashMap;
+import net.vtst.ow.closure.compiler.util.MultiHashMap;
 import net.vtst.ow.eclipse.js.closure.util.Utils;
 import net.vtst.ow.eclipse.js.closure.util.listeners.NullDocumentListener;
 import net.vtst.ow.eclipse.js.closure.util.listeners.NullPartListener2;
