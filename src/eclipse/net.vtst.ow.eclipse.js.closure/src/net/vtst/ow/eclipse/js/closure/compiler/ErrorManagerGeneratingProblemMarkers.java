@@ -52,12 +52,20 @@ public class ErrorManagerGeneratingProblemMarkers extends BasicErrorManager {
     if (file == null) return;
     try {
       IMarker marker = file.createMarker(PROBLEM);
-      marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+      marker.setAttribute(IMarker.SEVERITY, checkLevelToSeverity(level));
       marker.setAttribute(IMarker.MESSAGE, error.description);
       marker.setAttribute(IMarker.LINE_NUMBER, error.lineNumber);
       // error.getCharno() for the char number in the line
     } catch (CoreException e) {
       e.printStackTrace();
+    }
+  }
+  
+  private int checkLevelToSeverity(CheckLevel level) {
+    switch (level) {
+    case ERROR: return IMarker.SEVERITY_ERROR;
+    case WARNING: return IMarker.SEVERITY_WARNING;
+    case OFF: default: return IMarker.SEVERITY_INFO;
     }
   }
 

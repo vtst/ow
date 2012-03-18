@@ -32,7 +32,6 @@ TODO
    - Hover with types
    - Correct description for namespaces
 3. Builder
-   - Implement different levels of error messages
    - Other libraries
    - Referenced projects
    - Having different compiler options for checking errors / auto complete 
