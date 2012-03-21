@@ -363,6 +363,17 @@ public class CustomizedSoyLexer extends InternalSoyLexer {
   }
   
   /**
+   * Single line comments are allowed only at the beginning of a line or after some
+   * white space.  This function tests these conditions.
+   * @return  true if a single line comment can be parsed here.
+   */
+  private boolean canParseSlComment() {
+    if (lastToken == null) return true;
+    int type = lastToken.getType();
+    return (type == RULE_SL_COMMENT || type == RULE_WS);
+  }
+  
+  /**
    * Lex a single-line comment until its end.
    * @return true if this is a special single-line comment, containing a directive to be parsed.
    */
@@ -464,12 +475,12 @@ public class CustomizedSoyLexer extends InternalSoyLexer {
   // **************************************************************************
   // Lexer main functions
   
-//  public Token nextToken() {
-//    Token token = super.nextToken();
-//    if (token.getType() >= 0)
-//      System.out.println(InternalSoyParser.tokenNames[token.getType()] + ": " + token.getText());
-//    return token;
-//  }
+  private Token lastToken = null;
+  
+  public Token nextToken() {
+    lastToken = super.nextToken();
+    return lastToken;
+  }
   
   public void mTokens() throws RecognitionException {
     switch (mode) {
@@ -520,9 +531,13 @@ public class CustomizedSoyLexer extends InternalSoyLexer {
           }
           break;
         case RULE_SL_COMMENT:
-          if (mSlComment()) {
-            mode = MODE_SPECIAL_SL_COMMENT;
-            return;
+          if (canParseSlComment()) {
+            if (mSlComment()) {
+              mode = MODE_SPECIAL_SL_COMMENT;
+              return;
+            }
+          } else {
+            state.type = RULE_ANY_OTHER_CHAR;
           }
           break;
         default:
