@@ -12,7 +12,6 @@ import com.google.javascript.jscomp.Scope.Var;
 import com.google.javascript.rhino.JSDocInfo;
 import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.Node;
-import com.google.javascript.rhino.Token;
 import com.google.javascript.rhino.jstype.JSType;
 import com.google.javascript.rhino.jstype.ObjectType;
 import com.google.javascript.rhino.jstype.UnionType;
@@ -55,20 +54,6 @@ public class ClosureCompletionProposalCollector {
   
   
   /**
-   * Get the doc info for a namespace, that is the doc info attached to the
-   * SCRIPT node which is an ancestor of the name node.
-   * @param node  The name node of the namespace.
-   * @return  The doc info, or null if not found.
-   */
-  private JSDocInfo getJSDocInfoOfNamespace(Node node) {
-    while (node != null && node.getType() != Token.SCRIPT) {
-      node = node.getParent();
-    }
-    if (node == null) return null;
-    else return node.getJSDocInfo();
-  }
-
-  /**
    * Get the list of completion proposals computed from the scope.  This method is called
    * in the case where the prefix does not contain a dot.
    * @return  The list of completion proposals.
@@ -79,12 +64,10 @@ public class ClosureCompletionProposalCollector {
     for (Var var: context.getAllSymbols()) {
       if (isValidFor(var.getName(), prefix) && isSimpleName(var.getName())) {
         Node node = var.getNameNode();
-        boolean isNamespace = isNamespace(var);
-        JSDocInfo docInfo = isNamespace ? getJSDocInfoOfNamespace(node) : var.getJSDocInfo();
         if (isConcreteNode(node)) {
           list.add(new ClosureCompletionProposal(
-              context, var.getName(), node, var.getType(), docInfo,
-              false, var.isLocal(), isNamespace));
+              context, var.getName(), node, var.getType(), var.getJSDocInfo(),
+              false, var.isLocal()));
         }
       }
     }
@@ -190,15 +173,12 @@ public class ClosureCompletionProposalCollector {
           ClosureCompletionProposal proposal = map.get(propertyName);
           if (proposal == null) {
             Node node = alternateObjectType.getPropertyNode(propertyName);
-            JSDocInfo docInfo = getJSDocInfoOfProperty(alternateObjectType, propertyName);
-            JSType propertyType = alternateObjectType.getPropertyType(propertyName);
-            // TODO: We could share some code with the variable case.
             if (isConcreteNode(node)) {
-              boolean isNamespace = isNamespaceProperty(node);
-              docInfo = isNamespace ? getJSDocInfoOfNamespace(node) : docInfo;
+              JSDocInfo docInfo = getJSDocInfoOfProperty(alternateObjectType, propertyName);
+              JSType propertyType = alternateObjectType.getPropertyType(propertyName);
               proposal = new ClosureCompletionProposal(
                   context, propertyName, node, propertyType, docInfo,
-                  true, false, isNamespace);
+                  true, false);
               map.put(propertyName, proposal);
             }
           }
@@ -209,7 +189,6 @@ public class ClosureCompletionProposalCollector {
       }
     }    
   }
-
   
   // **************************************************************************
   // Predicates 
@@ -234,59 +213,6 @@ public class ClosureCompletionProposalCollector {
   }
 
   /**
-   * Tests whether a variable is a namespace.  It looks into the parent (for main namespaces) and
-   * the grand-parent (for sub-namespaces).
-   * @param var  The variable to test.
-   * @return  true if {@code var} is a namespace.
-   */
-  private static boolean isNamespace(Var var) {
-    Node parent = var.getParentNode();
-    if (parent == null) return false;
-    if (parent.getBooleanProp(Node.IS_NAMESPACE)) return true;
-    Node parent2 = parent.getParent();
-    if (parent2 == null) return false;
-    if (parent2.getBooleanProp(Node.IS_NAMESPACE)) return true;
-    return isNamespaceSpecialCase(parent2, parent, var.getNameNode());
-  }
-  
-  // Special case to handle 
-  //   var goog = goog || {};
-  //   var google = {};
-  private static boolean isNamespaceSpecialCase(Node parent2, Node parent, Node node) {
-    if (parent2.getType() != Token.SCRIPT || 
-        parent.getType() != Token.VAR ||
-        node.getType() != Token.NAME) return false;
-    boolean hasValidNode = false;
-    for (Node child: node.children()) {
-      int type = child.getType();
-      if (type == Token.OBJECTLIT && !child.hasChildren()) {
-        hasValidNode = true;
-      } else if (type == Token.OR) {
-        for (Node child2: child.children()) {
-          if (child2.getType() == Token.OBJECTLIT && !child2.hasChildren()) {
-            hasValidNode = true;
-          }
-        }
-      } else {
-        return false;
-      }
-    }
-    return hasValidNode;
-  }
-  
-  /**
-   * Tests whether a node found from a property is a namespace.
-   * @param node  The node to test.
-   * @return true if {@code node} is the node of a namespace.
-   */
-  private boolean isNamespaceProperty(Node node) {
-    String originalName = (String) node.getProp(Node.ORIGINALNAME_PROP);
-    if (originalName == null) return false;
-    Var var = context.getScope().getVar(originalName);
-    return var != null && isNamespace(var);
-  }
-
-  /**
    * Tests whether a name is valid for a completion proposal.
    * @param name  The name of the completion proposal.
    * @param prefix  The last segment of the context
@@ -295,5 +221,4 @@ public class ClosureCompletionProposalCollector {
   private boolean isValidFor(String name, String prefix) {
     return name.startsWith(prefix);
   }
-  
 }

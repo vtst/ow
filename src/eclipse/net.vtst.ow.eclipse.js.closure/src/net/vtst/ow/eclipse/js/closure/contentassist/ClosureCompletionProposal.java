@@ -41,6 +41,7 @@ public class ClosureCompletionProposal extends AbstractCompletionProposal {
 
   private Kind kind;
   private Visibility visibility = Visibility.PUBLIC;
+  private ClosureContentAssistIncovationContext context;
   private Node node;
   private JSType type;
   private JSDocInfo docInfo;
@@ -61,14 +62,15 @@ public class ClosureCompletionProposal extends AbstractCompletionProposal {
   public ClosureCompletionProposal(
       ClosureContentAssistIncovationContext context, String name, 
       Node node, JSType type, JSDocInfo docInfo,
-      boolean isProperty, boolean isLocalVariable, boolean isNamespace) {
+      boolean isProperty, boolean isLocalVariable) {
     super(context, name);
+    isNamespace = isNamespace(node);
+    this.context = context;
     this.node = node;
     this.type = type;
     this.docInfo = docInfo;
     this.isProperty = isProperty;
     this.isLocalVariable = isLocalVariable;
-    this.isNamespace = isNamespace;
     this.kind = getKind();
   }
 
@@ -233,7 +235,47 @@ public class ClosureCompletionProposal extends AbstractCompletionProposal {
 
   @Override
   protected IAdditionalProposalInfo makeAdditionalProposalInfo() {
+    if (isNamespace) {
+      System.out.println(node.getQualifiedName());
+      Node namespaceNode = context.getNamespaceProvider(node.getQualifiedName());
+      System.out.println(namespaceNode);
+      if (namespaceNode != null) docInfo = namespaceNode.getJSDocInfo();
+    }
     return new ClosureAdditionalProposalInfo(node, docInfo, type);
+  }
+
+  // **************************************************************************
+  // Managing name spaces
+  
+  private boolean isNamespace(Node node) {
+    // First, check whether the node's parent or its grand parent is tagged
+    // as a name space.
+    Node parent = node.getParent();
+    if (parent == null) return false;
+    if (parent.getBooleanProp(Node.IS_NAMESPACE)) return true;
+    Node parent2 = parent.getParent();
+    if (parent2 == null) return false;
+    if (parent2.getBooleanProp(Node.IS_NAMESPACE)) return true;
+    // Special case for name spaces which are defined by var foo = {} or var foo = foo || {}.
+    if (parent2.getType() != Token.SCRIPT || 
+        parent.getType() != Token.VAR ||
+        node.getType() != Token.NAME) return false;
+    boolean hasValidNode = false;
+    for (Node child: node.children()) {
+      int type = child.getType();
+      if (type == Token.OBJECTLIT && !child.hasChildren()) {
+        hasValidNode = true;
+      } else if (type == Token.OR) {
+        for (Node child2: child.children()) {
+          if (child2.getType() == Token.OBJECTLIT && !child2.hasChildren()) {
+            hasValidNode = true;
+          }
+        }
+      } else {
+        return false;
+      }
+    }
+    return hasValidNode;
   }
 
 }
