@@ -32,8 +32,6 @@ TODO
 2. Auto complete
    - Standard completion proposals
    - Hover with types
-   - Correct description for namespaces
-   - Bug if you complete a complete namespace (e.g. goog.dom -> ctrl+whitespace)
 3. Builder
    - Other libraries
    - Referenced projects
