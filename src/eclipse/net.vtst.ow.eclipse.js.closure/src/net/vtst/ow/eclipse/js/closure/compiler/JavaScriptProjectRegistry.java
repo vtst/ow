@@ -109,16 +109,18 @@ public class JavaScriptProjectRegistry {
     JSSet<IFile> compilationSet = new JSSet<IFile>();
     // Add the compilation units for the libraries
     ClosureProjectPersistentPropertyHelper helper = new ClosureProjectPersistentPropertyHelper(project);
-    File pathOfClosureBase = new File(helper.getClosureBaseDir());
-    compilationSet.addCompilationSet(getLibrary(pathOfClosureBase, pathOfClosureBase, true));
+    // TODO Handle the case where closureBaseDir is null
+    String closureBaseDir = helper.getClosureBaseDir();    
+    File pathOfClosureBase = new File(closureBaseDir);
+    compilationSet.addSet(getLibrary(pathOfClosureBase, pathOfClosureBase, true));
     for (String libraryPath: helper.getOtherLibraries()) {
-      compilationSet.addCompilationSet(getLibrary(new File(libraryPath), pathOfClosureBase, false));
+      compilationSet.addSet(getLibrary(new File(libraryPath), pathOfClosureBase, false));
     }
     // Add the compilation units for the referenced projects
     // TODO: Be careful to avoid loops!
     for (IProject referencedProject: project.getReferencedProjects()) {
       if (referencedProject.hasNature(ClosureNature.NATURE_ID)) {
-        System.out.println("Referenced project: " + project.getName());
+        System.out.println("Reference: " + project.getName() + " -> " + referencedProject.getName());
       }
     }
     // Add the files of the current project.
@@ -126,7 +128,7 @@ public class JavaScriptProjectRegistry {
       CompilableJSUnit unit = new CompilableJSUnit(
           compilationSet, file.getLocation().toFile(), pathOfClosureBase,
           new CompilationUnitProviderFromEclipseIFile(file));
-      compilationSet.addCompilationUnit(file, unit);
+      compilationSet.addUnit(file, unit);
     }
     // Compile
     for (Entry<IFile, JSUnit> entry: compilationSet.entries()) {
@@ -156,7 +158,7 @@ public class JavaScriptProjectRegistry {
       fullUpdate(project);
     } else {
       for (IFile file: visitor.changedFiles()) {
-        JSUnit unit = compilationSet.getCompilationUnit(file);
+        JSUnit unit = compilationSet.getUnit(file);
         if (unit instanceof CompilableJSUnit) {
           compileUnit((CompilableJSUnit) unit, file);
         }

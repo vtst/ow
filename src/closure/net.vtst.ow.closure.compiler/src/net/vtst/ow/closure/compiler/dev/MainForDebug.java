@@ -118,10 +118,10 @@ INFO: processDefines
     JSSet compilationSet = new JSSet();
     JSLibrary libraryGoog = new JSLibrary(pathOfClosureBase);
     libraryGoog.updateDependencies(compiler);
-    compilationSet.addCompilationSet(libraryGoog);
+    compilationSet.addSet(libraryGoog);
     JSLibrary librarySoy = new JSLibrary(new File("/home/vtst/perso/ow/tgt/closure-templates/javascript"));
     librarySoy.updateDependencies(compiler);
-    compilationSet.addCompilationSet(librarySoy);
+    compilationSet.addSet(librarySoy);
     ArrayList<JSUnit> compilationUnits = new ArrayList<JSUnit>();
     for (String name: new String[]{
         "album.js", "header.js", "master.js", "splitpane.js", "util.js",
@@ -129,7 +129,7 @@ INFO: processDefines
     }) {
       File path = new File("/home/vtst/perso/sepia/src/client/js/" + name);
       JSUnit compilationUnit = new JSUnit(path, pathOfClosureBase, new JSUnitProvider.FromFile(path));
-      compilationSet.addCompilationUnit(compilationUnit);
+      compilationSet.addUnit(compilationUnit);
       compilationUnits.add(compilationUnit);
     }
     compilationSet.updateDependencies(compiler);

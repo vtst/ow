@@ -180,7 +180,7 @@ public class ClosureContentAssistIncovationContext implements IContentAssistInvo
     if (file == null) return;
     JSSet<IFile> compilationSet = OwJsClosurePlugin.getDefault().getProjectRegistry().getCompilationSet(file.getProject());
     if (compilationSet == null) return;
-    JSUnit unit = compilationSet.getCompilationUnit(file);
+    JSUnit unit = compilationSet.getUnit(file);
     if (!(unit instanceof CompilableJSUnit)) return;
     run = ((CompilableJSUnit) unit).getLastAvailableCompilerRun();
     if (run == null) return;

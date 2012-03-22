@@ -88,7 +88,7 @@ public class CompilerRun {
   private void compile() {
     JSSet<?> compilationSet = unit.getJSSet();
     compilationSet.updateDependencies(compiler);
-    List<JSUnit> units = compilationSet.getRequiredJSUnits(compiler, Collections.singleton(unit));
+    List<JSUnit> units = compilationSet.getRequiredUnits(compiler, Collections.singleton(unit));
     JSModule module = new JSModule(unit.getName());
     for (JSUnit unit: units) {
       lastModified.put(unit.getName(), unit.lastModified());
@@ -106,7 +106,7 @@ public class CompilerRun {
     // TODO This require to be synchronized
     JSSet<?> compilationSet = unit.getJSSet();
     compilationSet.updateDependencies(compiler);
-    List<JSUnit> units = compilationSet.getRequiredJSUnits(compiler, Collections.singleton(unit));
+    List<JSUnit> units = compilationSet.getRequiredUnits(compiler, Collections.singleton(unit));
     for (JSUnit unit: units) {
       long current = unit.lastModified();
       Long previous = lastModified.get(unit.getName());
