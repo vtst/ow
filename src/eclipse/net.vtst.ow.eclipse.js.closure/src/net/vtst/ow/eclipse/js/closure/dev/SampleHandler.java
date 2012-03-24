@@ -1,7 +1,5 @@
 package net.vtst.ow.eclipse.js.closure.dev;
 
-import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
-
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;

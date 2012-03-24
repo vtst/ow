@@ -1,6 +1,5 @@
 package net.vtst.ow.eclipse.js.closure.builder;
 
-import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.util.Utils;
 
 import org.eclipse.core.resources.IProject;
@@ -31,9 +30,8 @@ public class ClosureNature implements IProjectNature {
 	 * @see org.eclipse.core.resources.IProjectNature#deconfigure()
 	 */
 	public void deconfigure() throws CoreException {
-    System.out.println("DECONFIGURE");
     Utils.setProjectBuilder(project, ClosureBuilder.BUILDER_ID, true);
-    OwJsClosurePlugin.getDefault().getProjectRegistry().remove(project);
+    ClosureBuilder.getInstance().clearProject(project);
 	}
 
 	/*

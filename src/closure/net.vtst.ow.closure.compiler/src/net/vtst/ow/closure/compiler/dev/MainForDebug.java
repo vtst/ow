@@ -3,13 +3,8 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.logging.Level;
 
 import net.vtst.ow.closure.compiler.deps.AstFactoryFromModifiable;
-import net.vtst.ow.closure.compiler.deps.JSLibrary;
-import net.vtst.ow.closure.compiler.deps.JSSet;
-import net.vtst.ow.closure.compiler.deps.JSUnit;
-import net.vtst.ow.closure.compiler.deps.JSUnitProvider;
 import net.vtst.ow.closure.compiler.util.CompilerUtils;
 import net.vtst.ow.closure.compiler.util.FileTreeVisitor;
 
@@ -20,7 +15,6 @@ import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.DefaultPassConfig;
 import com.google.javascript.jscomp.JSModule;
 import com.google.javascript.jscomp.JSSourceFile;
-import com.google.javascript.jscomp.PassConfig;
 import com.google.javascript.jscomp.Scope;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.jstype.JSType;
@@ -107,59 +101,6 @@ Jan 31, 2012 9:43:02 PM com.google.javascript.jscomp.PhaseOptimizer$NamedPass pr
 INFO: processDefines
 
      */
-    File pathOfClosureBase = new File("/home/vtst/test/in/closure/goog");
-    Compiler.setLoggingLevel(Level.OFF);
-    Compiler compiler = CompilerUtils.makeCompiler(CompilerUtils.makePrintingErrorManager(System.out));
-    CompilerOptions options = CompilerUtils.makeOptions();
-    options.checkTypes = true;
-    compiler.initOptions(options);
-    PassConfig passes = new DefaultPassConfig(options);
-    compiler.setPassConfig(passes);
-    JSSet compilationSet = new JSSet();
-    JSLibrary libraryGoog = new JSLibrary(pathOfClosureBase);
-    libraryGoog.updateDependencies(compiler);
-    compilationSet.addSet(libraryGoog);
-    JSLibrary librarySoy = new JSLibrary(new File("/home/vtst/perso/ow/tgt/closure-templates/javascript"));
-    librarySoy.updateDependencies(compiler);
-    compilationSet.addSet(librarySoy);
-    ArrayList<JSUnit> compilationUnits = new ArrayList<JSUnit>();
-    for (String name: new String[]{
-        "album.js", "header.js", "master.js", "splitpane.js", "util.js",
-        "browser.js", "keyboard.js", "sepia.js", "templates.js", "viewer.js" 
-    }) {
-      File path = new File("/home/vtst/perso/sepia/src/client/js/" + name);
-      JSUnit compilationUnit = new JSUnit(path, pathOfClosureBase, new JSUnitProvider.FromFile(path));
-      compilationSet.addUnit(compilationUnit);
-      compilationUnits.add(compilationUnit);
-    }
-    compilationSet.updateDependencies(compiler);
-    long t0 = System.nanoTime();
-    for (int i = 0; i < 1; i++) {
-      Compiler compiler2 = CompilerUtils.makeCompiler(CompilerUtils.makePrintingErrorManager(System.out));
-      CompilerOptions options2 = CompilerUtils.makeOptions();
-      options2.checkTypes = true;
-      compiler.initOptions(options2);
-      PassConfig passes2 = new DefaultPassConfig(options2);
-      compiler2.setPassConfig(passes2);
-      JSModule module = compilationSet.makeJSModule(compiler2, "test-module", compilationUnits);
-      compiler2.compile(new JSSourceFile[]{}, new JSModule[]{module}, options2);
-      System.out.println((System.nanoTime() - t0) * 1e-9);
-    }
-    //System.out.println(compiler.toSource());
-    //System.out.println(compiler.getRoot().toStringTree());
-    //DevUtils.printNodeAsTree(compiler, compiler.getRoot());
-    /*
-    System.out.println("YOP1");
-    Node node = FindLocationNodeTraversal.find(compiler, compiler.getRoot(), "test.js", 514);
-    System.out.println("YOP2");
-    Iterable<String> proposals = ContentAssist.getContentProposals(compiler, passes, node, "");
-    System.out.println("YOP3");
-    for (String proposal: proposals) {
-      System.out.println(proposal);
-    }
-    */
-    //compiler.getErrorManager().generateReport();
-    System.out.println("Done.");
   }
   
   public static void compile(JSModule module) {
@@ -215,12 +156,6 @@ INFO: processDefines
   }
   
   private static void testDeps() {
-    File pathOfClosureBase = new File("/home/vtst/test/in/closure/goog");
-    JSLibrary library = new JSLibrary(pathOfClosureBase);
-    Compiler compiler = CompilerUtils.makeCompiler(CompilerUtils.makePrintingErrorManager(System.out));
-    compiler.initOptions(CompilerUtils.makeOptions());
-    library.updateDependencies(compiler);
-    System.out.println("FINISHED");
   }
   
   public static void main(String[] args) {

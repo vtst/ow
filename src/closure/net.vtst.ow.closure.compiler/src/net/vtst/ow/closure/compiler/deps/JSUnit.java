@@ -17,6 +17,10 @@ import com.google.javascript.rhino.Node;
  * A compilation unit stands for a JavaScript file which can be passed to the compiler.
  * Note that the current implementation relies on physical identity: do not create two CompilationUnit
  * objects for the same file!
+ * <br>
+ * <b>Thread safety:</b>  This class maintain the AST and the dependencies for the unit as an internal
+ * state.  In order to ensure safe concurrent accesses, the public methods manipulating them are 
+ * synchronized.
  * @author Vincent Simonet
  */
 public class JSUnit implements DependencyInfo {
@@ -33,6 +37,7 @@ public class JSUnit implements DependencyInfo {
   /**
    * Create a compilation unit from a provider.
    * @param fileName  The name for the compilation unit.
+   * @param pathOfClosureBase  The path of the closure base directory.
    * @param provider  The provider for the compilation unit.
    */
   public JSUnit(File path, File pathOfClosureBase, JSUnitProvider.IProvider provider) {
@@ -41,6 +46,17 @@ public class JSUnit implements DependencyInfo {
     this.provider = provider;
     this.timestampKeeperForDependencies = new TimestampKeeper(provider);
     this.astFactory = new AstFactoryFromModifiable(getName(), provider);
+  }
+  
+  /**
+   * Constructor which is useful when the dependencies are known at creation time,
+   * e.g. when the unit is created from a library which has a deps.js file.
+   */
+  public JSUnit(
+      File path, File pathOfClosureBase, JSUnitProvider.IProvider provider,
+      Collection<String> providedNames, Collection<String> requiredNames) {
+    this(path, pathOfClosureBase, provider);
+    setDependencies(providedNames, requiredNames);
   }
 
   /**
@@ -61,9 +77,8 @@ public class JSUnit implements DependencyInfo {
   
   public long lastModified() {
     return provider.lastModified();
-  }
-
-
+  }  
+  
   // **************************************************************************
   // Dependencies
   
@@ -71,6 +86,7 @@ public class JSUnit implements DependencyInfo {
    * Get the names (namespaces and classes) provided by the compilation unit.
    * @return  The collection of the names.
    */
+  // TODO: Should this be synchronized or made atomic?
   public Collection<String> getProvides() {
     return providedNames;
   }
@@ -79,6 +95,7 @@ public class JSUnit implements DependencyInfo {
    * Get the names (namespaces and classes) required by the compilation unit.
    * @return  The collection of the names.
    */
+  // TODO: Should this be synchronized or made atomic?
   public Collection<String> getRequires() {
     return requiredNames;
   }
@@ -88,7 +105,7 @@ public class JSUnit implements DependencyInfo {
    * @param compiler  The compiler used to report errors.
    * @return  true if the dependencies have changed since the last update.
    */
-  public boolean updateDependencies(AbstractCompiler compiler) {
+  public synchronized boolean updateDependencies(AbstractCompiler compiler) {
     if (!timestampKeeperForDependencies.hasChanged()) return false;
     // There is no need to make a clone, as this pass does not modify the AST.
     Node root = astFactory.getAstRoot(compiler);
@@ -99,26 +116,22 @@ public class JSUnit implements DependencyInfo {
         newRequiredNames.equals(requiredNames)) {
       return false;
     }
-    providedNames = newProvidedNames;
-    requiredNames = newRequiredNames;
+    setDependencies(newProvidedNames, newRequiredNames);
     return true;
   }
-    
+
   /**
-   * Set the dependencies for the compilation unit.  This is useful if they are loaded from a deps.js
-   * file, instead of being computed from the source file.
+   * Internal version of {@code setDependencies}, which does not update the timestamp keeper.
    * @param providedNames
    * @param requiredNames
    */
-  public void setDependencies(Collection<String> providedNames, Collection<String> requiredNames) {
-    this.timestampKeeperForDependencies.sync();
+  private void setDependencies(Collection<String> providedNames, Collection<String> requiredNames) {
     this.providedNames.clear();
     this.providedNames.addAll(providedNames);
     this.requiredNames.clear();
     this.requiredNames.addAll(requiredNames);
   }
 
-  
   // **************************************************************************
   // Source / AST
 
@@ -126,14 +139,16 @@ public class JSUnit implements DependencyInfo {
    * Get a clone of the AST for the file.
    * @return
    */
-  public JsAst getAst() {
+  public synchronized JsAst getAst() {
     return astFactory.getClone();
   }
   
-  public String getDescription(AbstractCompiler compiler) {
-    Node node = astFactory.getAstRoot(compiler);
-    System.out.println(node.toStringTree());
-    return "No description";
-  }
+  // **************************************************************************
+  // Dependency order
 
+  /**
+   * This is a placeholder for the containing project.  It should not be used elsewhere.
+   */
+  public int dependencyIndex;
+  
 }

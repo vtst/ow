@@ -1,8 +1,9 @@
 package net.vtst.ow.closure.compiler.compile;
 
 import java.io.File;
+import java.util.List;
 
-import net.vtst.ow.closure.compiler.deps.JSSet;
+import net.vtst.ow.closure.compiler.deps.JSProject;
 import net.vtst.ow.closure.compiler.deps.JSUnit;
 import net.vtst.ow.closure.compiler.deps.JSUnitProvider.IProvider;
 
@@ -16,26 +17,33 @@ import com.google.javascript.jscomp.ErrorManager;
  */
 public class CompilableJSUnit extends JSUnit {
 
-  private JSSet<?> compilationSet;
 
-  public CompilableJSUnit(JSSet<?> compilationSet, File path, File pathOfClosureBase, IProvider provider) {
+  private JSProject project;
+
+  public CompilableJSUnit(JSProject project, File path, File pathOfClosureBase, IProvider provider) {
     super(path, pathOfClosureBase, provider);
-    this.compilationSet = compilationSet;
+    this.project = project;
   }
   
-  public JSSet<?> getJSSet() {
-    return compilationSet;
-  }
-
   // **************************************************************************
   // Compilation
   
   private CompilerRun run = null;
   
-  public CompilerRun compile(CompilerOptions options, ErrorManager errorManager) {
-    CompilerRun newRun = new CompilerRun(options, errorManager, this);
-    run = newRun;  // This is atomic
-    return newRun;
+  public CompilerRun fullCompile(CompilerOptions options, ErrorManager errorManager) {
+    return fullCompile(options, errorManager, true);
+  }
+  
+  public CompilerRun fullCompile(CompilerOptions options, ErrorManager errorManager, boolean force) {
+    List<JSUnit> units = project.getSortedDependenciesOf(this);
+    units.add(this);
+    if (force || run == null || run.hasChanged(units)) {
+      CompilerRun newRun = new CompilerRun(this.getName(), options, errorManager, units);
+      run = newRun;  // This is atomic
+      return newRun;    
+    } else {
+      return run;
+    }
   }
   
   public CompilerRun getLastAvailableCompilerRun() {

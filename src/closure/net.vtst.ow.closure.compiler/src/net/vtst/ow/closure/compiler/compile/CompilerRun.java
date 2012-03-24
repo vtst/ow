@@ -9,12 +9,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.vtst.ow.closure.compiler.deps.JSSet;
 import net.vtst.ow.closure.compiler.deps.JSUnit;
 import net.vtst.ow.closure.compiler.magic.MagicScopeCreator;
 import net.vtst.ow.closure.compiler.util.CompilerUtils;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerInput;
 import com.google.javascript.jscomp.CompilerOptions;
@@ -33,6 +33,9 @@ import com.google.javascript.rhino.Node;
 
 /**
  * Wrapper class to handle the compilation of a JS unit, and to provide the results.
+ * <br>
+ * <b>Thread safety:</b>  Full compilation can be performed only once in the class life
+ * cycle.  Fast compilation is synchronized.
  * @author Vincent Simonet
  */
 public class CompilerRun {
@@ -40,11 +43,13 @@ public class CompilerRun {
   private Compiler compiler;
   private CompilerOptions options;
   private PassConfig passes;
-  private CompilableJSUnit unit;
   private MagicScopeCreator scopeCreator;
   private NamespaceProvidersMap namespaceToScriptNode = new NamespaceProvidersMap();
 
-  private Map<String, Long> lastModified = new HashMap<String, Long>();
+  private String moduleName;
+  private List<JSUnit> sortedUnits;
+  private Map<JSUnit, Long> lastModifiedMapForFullCompile;
+  private Map<JSUnit, Long> lastModifiedMapForFastCompile;
 
   /**
    * Create a new compiler run.  Note that the call to the constructor triggers the first
@@ -53,9 +58,14 @@ public class CompilerRun {
    * @param errorManager  The error manager used to report errors.
    * @param unit  The unit to compile.
    */
-  public CompilerRun(CompilerOptions options, ErrorManager errorManager, CompilableJSUnit unit) {
+  public CompilerRun(String moduleName, CompilerOptions options, ErrorManager errorManager, List<JSUnit> sortedUnits) {
+    System.out.println("CompilerRun:");
+    for (JSUnit unit: sortedUnits) {
+      System.out.println("  " + unit.getName());
+    }
+    this.moduleName = moduleName;
     this.options = options;
-    this.unit = unit;
+    this.sortedUnits = sortedUnits;
     // Initializes the compiler and do the first compile
     setupCompiler(errorManager);
     compile();
@@ -66,7 +76,23 @@ public class CompilerRun {
   }
 
   // **************************************************************************
-  // Compiling
+  // Full compilation
+
+  private static JSModule buildJSModule(String moduleName, List<JSUnit> sortedUnits) {
+    JSModule module = new JSModule(moduleName);
+    for (JSUnit unit: sortedUnits) {
+      module.add(new CompilerInput(unit.getAst()));
+    }
+    return module;
+  }
+  
+  public Map<JSUnit, Long> buildLastModifiedMap(List<JSUnit> sortedUnits) {
+    Map<JSUnit, Long> map = new HashMap<JSUnit, Long>();
+    for (JSUnit unit: sortedUnits) {
+      map.put(unit, unit.lastModified());
+    }
+    return map;
+  }
 
   /**
    * Initialize the JavaScript compiler
@@ -86,42 +112,42 @@ public class CompilerRun {
    * Run the initial compilation.
    */
   private void compile() {
-    JSSet<?> compilationSet = unit.getJSSet();
-    compilationSet.updateDependencies(compiler);
-    List<JSUnit> units = compilationSet.getRequiredUnits(compiler, Collections.singleton(unit));
-    JSModule module = new JSModule(unit.getName());
-    for (JSUnit unit: units) {
-      lastModified.put(unit.getName(), unit.lastModified());
-      module.add(new CompilerInput(unit.getAst()));      
-    }
+    lastModifiedMapForFullCompile = buildLastModifiedMap(sortedUnits);
+    lastModifiedMapForFastCompile = Maps.newHashMap(lastModifiedMapForFullCompile);
+    JSModule module = buildJSModule(moduleName, sortedUnits);
     compiler.compileModules(
         Collections.<SourceFile> emptyList(), Lists.newArrayList(DefaultExternsProvider.get(), module), options);
     scopeCreator = new MagicScopeCreator(passes);
   }
   
+  public boolean hasChanged(List<JSUnit> newSortedUnits) {
+    if (newSortedUnits.size() != lastModifiedMapForFullCompile.size()) return true;
+    for (JSUnit unit: newSortedUnits) {
+      Long lastModified = lastModifiedMapForFullCompile.get(unit);
+      if (lastModified == null || lastModified.longValue() < unit.lastModified()) return true;
+    }
+    return false;
+  }
+  
+  // **************************************************************************
+  // Fast compilation
+  
   /**
-   * Run an incremental compilation.
+   * Run a fast compilation
    */
-  public synchronized void incrementalCompile() {
-    // TODO This require to be synchronized
-    JSSet<?> compilationSet = unit.getJSSet();
-    compilationSet.updateDependencies(compiler);
-    List<JSUnit> units = compilationSet.getRequiredUnits(compiler, Collections.singleton(unit));
-    for (JSUnit unit: units) {
+  public synchronized void fastCompile() {
+    // TODO: What happens if one of the units has been deleted?
+    for (JSUnit unit: sortedUnits) {
       long current = unit.lastModified();
-      Long previous = lastModified.get(unit.getName());
-      if (previous == null) {
-        lastModified.put(unit.getName(), current);
-        JsAst ast = unit.getAst();
-        processCustomPassesOnNewScript(ast);
-        compiler.addNewScript(ast);
-      } else if (current > previous) {
-        lastModified.put(unit.getName(), current);
+      Long previous = lastModifiedMapForFastCompile.get(unit);
+      assert previous != null;
+      if (current > previous.longValue()) {
+        lastModifiedMapForFastCompile.put(unit, current);
         JsAst ast = unit.getAst();
         processCustomPassesOnNewScript(ast);
         compiler.replaceScript(ast);
       }
-    }    
+    }
   }
   
   public void processCustomPassesOnNewScript(JsAst ast) {
@@ -151,7 +177,7 @@ public class CompilerRun {
    * @param offset  The offset.
    * @return  The node, or null if not found.
    */
-  public Node getNode(int offset) {
+  public Node getNode(JSUnit unit, int offset) {
     // It would have been cleaner to use the input id to identify the input file, instead of the name.
     // But much more complicated.
     return FindLocationNodeTraversal.findNode(compiler, compiler.getRoot(), unit.getName(), offset);

@@ -3,11 +3,11 @@ package net.vtst.ow.eclipse.js.closure.compiler;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.vtst.ow.closure.compiler.deps.JSUnit;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
-
-import net.vtst.ow.closure.compiler.deps.JSUnit;
 
 import com.google.javascript.jscomp.BasicErrorManager;
 import com.google.javascript.jscomp.CheckLevel;

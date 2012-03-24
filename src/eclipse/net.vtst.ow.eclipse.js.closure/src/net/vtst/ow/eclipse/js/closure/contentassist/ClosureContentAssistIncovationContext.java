@@ -4,9 +4,8 @@ import java.util.Collections;
 
 import net.vtst.ow.closure.compiler.compile.CompilableJSUnit;
 import net.vtst.ow.closure.compiler.compile.CompilerRun;
-import net.vtst.ow.closure.compiler.deps.JSSet;
-import net.vtst.ow.closure.compiler.deps.JSUnit;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
+import net.vtst.ow.eclipse.js.closure.builder.ResourceProperties;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.BadLocationException;
@@ -178,14 +177,12 @@ public class ClosureContentAssistIncovationContext implements IContentAssistInvo
     if (run != null) return;
     IFile file = getFile();
     if (file == null) return;
-    JSSet<IFile> compilationSet = OwJsClosurePlugin.getDefault().getProjectRegistry().getCompilationSet(file.getProject());
-    if (compilationSet == null) return;
-    JSUnit unit = compilationSet.getUnit(file);
-    if (!(unit instanceof CompilableJSUnit)) return;
-    run = ((CompilableJSUnit) unit).getLastAvailableCompilerRun();
+    CompilableJSUnit unit = ResourceProperties.getJSUnitOrNullIfCoreException(file);
+    if (unit == null) return;
+    run = unit.getLastAvailableCompilerRun();
     if (run == null) return;
-    run.incrementalCompile();
-    node = run.getNode(getPrefixOffset());
+    run.fastCompile();
+    node = run.getNode(unit, getPrefixOffset());
   }
   
   /**

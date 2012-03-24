@@ -3,9 +3,9 @@ package net.vtst.ow.closure.compiler.deps;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import net.vtst.ow.closure.compiler.magic.MagicDepsGenerator;
 import net.vtst.ow.closure.compiler.util.CompilerUtils;
@@ -17,14 +17,17 @@ import com.google.javascript.jscomp.DiagnosticType;
 import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.deps.DependencyInfo;
 import com.google.javascript.jscomp.deps.DepsFileParser;
+import com.google.javascript.jscomp.deps.SortedDependencies.CircularDependencyException;
 
 /**
  * A compilation set which represents a frozen JavaScript library.  The set of files and the
  * dependencies are stored in a deps.js file, so that it is not necessary to recompute it
  * at every loading.
+ * <br>
+ * <b>Thread safety:</b>  This class is thread safe one initialized.
  * @author Vincent Simonet
  */
-public class JSLibrary implements IJSSet {
+public class JSLibrary extends AbstractJSProject {
   
   // TODO: It should be checked whether this works on Microsoft Windows, because the paths
   // in the deps.js file are stored with '/' instead of '\'.
@@ -46,13 +49,10 @@ public class JSLibrary implements IJSSet {
       "OW_CANNOT_PARSE_DEPS_LINE",
       "Cannot parse line.");
 
-  private HashMap<String, JSUnit> providedBy = new HashMap<String, JSUnit>();
-  private Collection<JSUnit> compilationUnits = new HashSet<JSUnit>();
   private File path;
   private File pathOfClosureBase;
   private File depsFile;
   private boolean canWriteDepsFile = false;
-  private boolean isInitialized = false;
   private boolean isClosureBase;
   
   /**
@@ -64,32 +64,28 @@ public class JSLibrary implements IJSSet {
   }
   
   public JSLibrary(File path, File pathOfClosureBase, boolean isClosureBase) {
+    System.out.println("Creating library for: " + path.getAbsolutePath());
     this.path = path;
     this.pathOfClosureBase = pathOfClosureBase;
     this.isClosureBase = isClosureBase;
   }
-
-  /* (non-Javadoc)
-   * @see net.vtst.ow.closure.compiler.compile.ICompilationSet#getProvider(java.lang.String)
-   */
+  
   @Override
-  public JSUnit getProvider(String name) {
-    return providedBy.get(name);
+  protected List<AbstractJSProject> getReferencedProjects() {
+    return Collections.emptyList();
   }
 
-  /* (non-Javadoc)
-   * @see net.vtst.ow.closure.compiler.compile.ICompilationSet#updateDependencies(com.google.javascript.jscomp.AbstractCompiler)
+  /**
+   * Initialize the set of units of the library, either by reading the deps.js file,
+   * or by browsing the source tree.
+   * @param compiler
    */
-  @Override
-  public boolean updateDependencies(AbstractCompiler compiler) {
-    if (isInitialized) return false;
-    if (findDepsFile()) {
-      readDepsFile(compiler, depsFile);
-    } else {
-      updateFromFileTree(compiler);
+  public void setUnits(AbstractCompiler compiler) {
+    try {
+      setUnits(compiler, getUnits(compiler));
+    } catch (CircularDependencyException e) {
+      reportError(compiler, e);
     }
-    isInitialized = true;
-    return true;
   }
   
   /**
@@ -97,7 +93,6 @@ public class JSLibrary implements IJSSet {
    * @return true if the file has been found, false otherwise.
    */
   private boolean findDepsFile() {
-    if (depsFile != null) return depsFile.exists();
     depsFile = new File(path, LEGACY_DEPS_FILE);
     if (depsFile.exists()) {
       canWriteDepsFile = false;
@@ -109,6 +104,22 @@ public class JSLibrary implements IJSSet {
     }
   }
   
+  /**
+   * Get the units for the library, either by reading the deps.js file, or by visiting the
+   * file tree.
+   * @param compiler  The compiler used to report errors.
+   * @return  The list of units.
+   */
+  private List<JSUnit> getUnits(AbstractCompiler compiler) {
+    if (findDepsFile()) {
+      return readDepsFile(compiler, depsFile);
+    } else {
+      List<JSUnit> units = getUnitsByVisitingFiles(compiler);
+      if (canWriteDepsFile) writeDepsFile(compiler, depsFile, units);
+      return units;
+    }
+  }
+  
   // **************************************************************************
   // Update from file tree
 
@@ -116,24 +127,19 @@ public class JSLibrary implements IJSSet {
    * Update the set of compilation units and the dependencies from the file system.
    * @param compiler  The compiler to use to report errors.
    */
-  public void updateFromFileTree(final AbstractCompiler compiler) {
-    findDepsFile();
-    compilationUnits.clear();
-    providedBy.clear();
+  private List<JSUnit> getUnitsByVisitingFiles(final AbstractCompiler compiler) {
+    final List<JSUnit> units = new ArrayList<JSUnit>();
     FileTreeVisitor.Simple<RuntimeException> visitor = new FileTreeVisitor.Simple<RuntimeException>() {
       public void visitFile(java.io.File file) {
         if (!CompilerUtils.isJavaScriptFile(file)) return;
-        JSUnit compilationUnit = new JSUnit(
-            file, 
-            pathOfClosureBase,
-            new JSUnitProvider.FromFile(file));
-        compilationUnit.updateDependencies(compiler);
-        addGoogToDependencies(compilationUnit);
-        addCompilationUnit(compiler, compilationUnit);
+        JSUnit unit = new JSUnit(file, pathOfClosureBase, new JSUnitProvider.FromFile(file));
+        unit.updateDependencies(compiler);
+        addGoogToDependencies(unit);
+        units.add(unit);
       }
     };
     visitor.visit(path);
-    if (canWriteDepsFile) writeDepsFile(compiler, depsFile);
+    return units;
   }
   
   /**
@@ -146,29 +152,7 @@ public class JSLibrary implements IJSSet {
     if (unit.getPathRelativeToClosureBase().equals(BASE_FILE)) {
       unit.getProvides().add(GOOG);
     } else {
-      String prefix = GOOG + ".";
-      Collection<String> requires = unit.getRequires();
-      for (String require: requires) {
-        if (require.startsWith(prefix)) return;
-      }
-      requires.add(GOOG);      
-    }
-  }
-
-  /**
-   * Add a compilation unit to the library.
-   * @param compiler  The compiler used to report errors.
-   * @param compilationUnit  The compilation unit to add.
-   */
-  private void addCompilationUnit(AbstractCompiler compiler, JSUnit compilationUnit) {
-    compilationUnits.add(compilationUnit);
-    for (String providedName: compilationUnit.getProvides()) {
-      JSUnit previousCompilationUnit = providedBy.put(providedName, compilationUnit);
-      if (previousCompilationUnit != null) {
-        CompilerUtils.reportError(
-            compiler, 
-            JSError.make(previousCompilationUnit.getName(), 0, 0, OW_DUPLICATED_GOOG_PROVIDE, providedName, compilationUnit.getName()));            
-      }
+      unit.getRequires().add(GOOG);     
     }
   }
 
@@ -180,20 +164,21 @@ public class JSLibrary implements IJSSet {
    * @param compiler  The compiler to use for error reporting.
    * @param depsFile  The path to the deps.js file.
    */
-  private void readDepsFile(AbstractCompiler compiler, File depsFile) {
+  private List<JSUnit> readDepsFile(AbstractCompiler compiler, File depsFile) {
+    List<JSUnit> units = new ArrayList<JSUnit>();
     try {
       DepsFileParser depsFileParser = new DepsFileParser(compiler.getErrorManager());
       for (DependencyInfo info: depsFileParser.parseFile(depsFile.getAbsolutePath())) {
         File file = FileUtils.join(pathOfClosureBase, new File(info.getPathRelativeToClosureBase()));
-        JSUnit compilationUnit = 
-            new JSUnit(file, pathOfClosureBase, new JSUnitProvider.FromFile(file));
-        compilationUnit.setDependencies(info.getProvides(), info.getRequires());
-        addGoogToDependencies(compilationUnit);
-        addCompilationUnit(compiler, compilationUnit);
+        JSUnit unit = 
+            new JSUnit(file, pathOfClosureBase, new JSUnitProvider.FromFile(file), info.getProvides(), info.getRequires());
+        addGoogToDependencies(unit);
+        units.add(unit);
       }
     } catch (IOException exn) {
       CompilerUtils.reportError(compiler, JSError.make(OW_IO_ERROR, exn.getMessage()));            
     }
+    return units;
   }
   
   /**
@@ -201,15 +186,14 @@ public class JSLibrary implements IJSSet {
    * @param compiler  The compiler to use for error reporting.
    * @param depsFile  The path to the deps.js file.
    */
-  private void writeDepsFile(AbstractCompiler compiler, File file) {
+  private void writeDepsFile(AbstractCompiler compiler, File file, List<JSUnit> units) {
     try {
       MagicDepsGenerator depsGenerator = new MagicDepsGenerator();
       PrintStream out = new PrintStream(file);
-      depsGenerator.writeDepInfos(out, compilationUnits);
+      depsGenerator.writeDepInfos(out, units);
       out.close();
     } catch (IOException exn) {
       CompilerUtils.reportError(compiler, JSError.make(OW_IO_ERROR, exn.getMessage()));            
     }
   }
-
 }

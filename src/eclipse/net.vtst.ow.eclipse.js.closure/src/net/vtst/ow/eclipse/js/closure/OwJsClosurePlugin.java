@@ -4,7 +4,6 @@ import java.net.URL;
 import java.util.logging.Level;
 
 import net.vtst.ow.eclipse.js.closure.compiler.JavaScriptEditorRegistry;
-import net.vtst.ow.eclipse.js.closure.compiler.JavaScriptProjectRegistry;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
@@ -27,7 +26,6 @@ public class OwJsClosurePlugin extends AbstractUIPlugin {
 	// The shared instance
 	private static OwJsClosurePlugin plugin;
 	private JavaScriptEditorRegistry editorRegistry;
-  private JavaScriptProjectRegistry projectRegistry;
   private OwJsClosureMessages messages;
 	
 	/**
@@ -44,7 +42,6 @@ public class OwJsClosurePlugin extends AbstractUIPlugin {
     super.start(context);
     plugin = this;
     editorRegistry = new JavaScriptEditorRegistry(getWorkbench());
-    projectRegistry = new JavaScriptProjectRegistry(getWorkbench());
     messages = new OwJsClosureMessages();
     Compiler.setLoggingLevel(Level.OFF);
 	}
@@ -56,16 +53,11 @@ public class OwJsClosurePlugin extends AbstractUIPlugin {
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		editorRegistry.dispose();
-		projectRegistry.dispose();
 		super.stop(context);
 	}
 	
 	public JavaScriptEditorRegistry getEditorRegistry() {
 	  return editorRegistry;
-	}
-	
-	public JavaScriptProjectRegistry getProjectRegistry() {
-	  return projectRegistry;
 	}
 	
 	public OwJsClosureMessages getMessages() {

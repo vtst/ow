@@ -1,5 +1,7 @@
 package net.vtst.ow.eclipse.js.closure.properties;
 
+import java.io.File;
+
 import net.vtst.ow.eclipse.js.closure.util.Utils;
 
 import org.eclipse.core.resources.IResource;
@@ -29,6 +31,13 @@ public class ClosureProjectPersistentPropertyHelper {
   public String getClosureBaseDir() throws CoreException {
     return resource.getPersistentProperty(new QualifiedName(QUALIFIER, CLOSURE_BASE_DIR));
   }
+  
+  public File getClosureBaseDirAfFile() throws CoreException {
+    String result = resource.getPersistentProperty(new QualifiedName(QUALIFIER, CLOSURE_BASE_DIR));
+    if (result == null) return null;
+    return new File(result);
+  }
+
   
   public void setOtherLibraries(String[] values) throws CoreException {
     resource.setPersistentProperty(
