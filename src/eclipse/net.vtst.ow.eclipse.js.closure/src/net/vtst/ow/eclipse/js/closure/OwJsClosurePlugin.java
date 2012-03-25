@@ -3,6 +3,7 @@ package net.vtst.ow.eclipse.js.closure;
 import java.net.URL;
 import java.util.logging.Level;
 
+import net.vtst.ow.eclipse.js.closure.builder.JSLibraryManager;
 import net.vtst.ow.eclipse.js.closure.compiler.JavaScriptEditorRegistry;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -27,6 +28,7 @@ public class OwJsClosurePlugin extends AbstractUIPlugin {
 	private static OwJsClosurePlugin plugin;
 	private JavaScriptEditorRegistry editorRegistry;
   private OwJsClosureMessages messages;
+  private JSLibraryManager jsLibraryManager = new JSLibraryManager();
 	
 	/**
 	 * The constructor
@@ -58,6 +60,10 @@ public class OwJsClosurePlugin extends AbstractUIPlugin {
 	
 	public JavaScriptEditorRegistry getEditorRegistry() {
 	  return editorRegistry;
+	}
+	
+	public JSLibraryManager getJSLibraryManager() {
+	  return jsLibraryManager;
 	}
 	
 	public OwJsClosureMessages getMessages() {

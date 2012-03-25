@@ -3,7 +3,6 @@ package net.vtst.ow.eclipse.js.closure.builder;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,7 +12,6 @@ import java.util.Set;
 import net.vtst.ow.closure.compiler.compile.CompilableJSUnit;
 import net.vtst.ow.closure.compiler.compile.CompilerRun;
 import net.vtst.ow.closure.compiler.deps.AbstractJSProject;
-import net.vtst.ow.closure.compiler.deps.JSLibrary;
 import net.vtst.ow.closure.compiler.deps.JSProject;
 import net.vtst.ow.closure.compiler.util.CompilerUtils;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
@@ -21,7 +19,6 @@ import net.vtst.ow.eclipse.js.closure.compiler.CompilationUnitProviderFromEclips
 import net.vtst.ow.eclipse.js.closure.compiler.ErrorManagerGeneratingProblemMarkers;
 import net.vtst.ow.eclipse.js.closure.compiler.NullErrorManager;
 import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPersistentPropertyHelper;
-import net.vtst.ow.eclipse.js.closure.util.Pair;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -38,7 +35,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
 
-import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.ErrorManager;
@@ -55,17 +51,12 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
 
   public static final String BUILDER_ID = "net.vtst.ow.eclipse.js.closure.closureBuilder";
   
-  public static ClosureBuilder instance;
+  private JSLibraryManager jsLibraryManager = OwJsClosurePlugin.getDefault().getJSLibraryManager();
   
   public ClosureBuilder() {
     super();
     System.out.println("Creating builder: " + this.toString());
     System.out.println("  in:" + Thread.currentThread().toString());
-    instance = this;
-  }
-  
-  public static ClosureBuilder getInstance() {
-    return instance;
   }
 
 	protected IProject[] build(int kind, @SuppressWarnings("rawtypes") Map args, IProgressMonitor monitor) throws CoreException {
@@ -85,29 +76,9 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
 		return null;
 	}
 
-  public void clearProject(IProject project) throws CoreException {
+  public static void clearProject(IProject project) throws CoreException {
     ResourceProperties.setJavaScriptFiles(project, null);
     ResourceProperties.setJSProject(project, null);
-  }
-
-  // **************************************************************************
-  // Repository of libraries
-
-  // This is a weak hash map, because libraries which are no longer used by any project
-  // should be collected.  Libraries are identified by pairs (closureBasePath, libraryBasePath).
-  private HashMap<Pair<File, File>, JSLibrary> pathToLibrary = new HashMap<Pair<File, File>, JSLibrary>();
-
-  private JSLibrary getLibrary(AbstractCompiler compiler, File libraryPath, File pathOfClosureBase, boolean isClosureBase) {
-    synchronized (pathToLibrary) {
-      Pair<File, File> key = new Pair<File, File>(libraryPath, pathOfClosureBase);
-      JSLibrary library = pathToLibrary.get(key);
-      if (library == null) {
-        library = new JSLibrary(libraryPath, pathOfClosureBase, isClosureBase);
-        library.setUnits(compiler);
-        pathToLibrary.put(key, library);
-      }
-      return library;
-    }
   }
 
 	// **************************************************************************
@@ -151,10 +122,10 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
     // Set the referenced projects
     List<AbstractJSProject> referencedJsProjects = new ArrayList<AbstractJSProject>();
     if (pathOfClosureBase != null) {
-      referencedJsProjects.add(getLibrary(compiler, pathOfClosureBase, pathOfClosureBase, true));
+      referencedJsProjects.add(jsLibraryManager.get(compiler, pathOfClosureBase, pathOfClosureBase, true));
     }
     for (String libraryPath: helper.getOtherLibraries()) {
-      referencedJsProjects.add(getLibrary(compiler, new File(libraryPath), pathOfClosureBase, false));
+      referencedJsProjects.add(jsLibraryManager.get(compiler, new File(libraryPath), pathOfClosureBase, false));
     }
     for (IProject referencedProject: project.getReferencedProjects()) {
       if (referencedProject.hasNature(ClosureNature.NATURE_ID)) {
