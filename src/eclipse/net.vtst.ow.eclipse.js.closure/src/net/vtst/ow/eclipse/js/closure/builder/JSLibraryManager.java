@@ -4,9 +4,9 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.google.javascript.jscomp.AbstractCompiler;
-
 import net.vtst.ow.closure.compiler.deps.JSLibrary;
+
+import com.google.javascript.jscomp.AbstractCompiler;
 
 /**
  * Registry of JavaScript libraries, which cache created libraries.  The cached libraries
