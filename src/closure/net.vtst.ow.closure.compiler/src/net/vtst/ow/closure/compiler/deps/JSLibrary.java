@@ -132,7 +132,7 @@ public class JSLibrary extends AbstractJSProject {
     FileTreeVisitor.Simple<RuntimeException> visitor = new FileTreeVisitor.Simple<RuntimeException>() {
       public void visitFile(java.io.File file) {
         if (!CompilerUtils.isJavaScriptFile(file)) return;
-        JSUnit unit = new JSUnit(file, pathOfClosureBase, new JSUnitProvider.FromFile(file));
+        JSUnit unit = new JSUnit(file, pathOfClosureBase, new JSUnitProvider.FromFrozenFile(file));
         unit.updateDependencies(compiler);
         addGoogToDependencies(unit);
         units.add(unit);

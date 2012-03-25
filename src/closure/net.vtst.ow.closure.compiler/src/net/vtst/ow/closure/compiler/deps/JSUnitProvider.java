@@ -74,6 +74,23 @@ public class JSUnitProvider {
     }
     
   }
+  
+  public static class FromFrozenFile extends FromFile {
+
+    public FromFrozenFile(File file) {
+      super(file);
+    }
+    
+    public FromFrozenFile(File file, Charset charset) {
+      super(file, charset);
+    }
+    
+    @Override
+    public long lastModified() {
+      return 1;  // not 0, otherwise it will never load.
+    }
+    
+  }
 
   /**
    * Compilation unit provider which gets the source code from a string. 
