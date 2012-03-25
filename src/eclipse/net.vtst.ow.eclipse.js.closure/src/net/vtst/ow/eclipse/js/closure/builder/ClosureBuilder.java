@@ -50,6 +50,8 @@ import com.google.javascript.jscomp.deps.SortedDependencies.CircularDependencyEx
  * @author Vincent Simonet
  */
 public class ClosureBuilder extends IncrementalProjectBuilder {
+  
+  // TODO There might be one instance per thread.  Is JSSet enough thread safe?
 
   public static final String BUILDER_ID = "net.vtst.ow.eclipse.js.closure.closureBuilder";
   
@@ -57,7 +59,8 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
   
   public ClosureBuilder() {
     super();
-    System.out.println("Creating builder");
+    System.out.println("Creating builder: " + this.toString());
+    System.out.println("  in:" + Thread.currentThread().toString());
     instance = this;
   }
   
@@ -67,6 +70,8 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
 
 	protected IProject[] build(int kind, @SuppressWarnings("rawtypes") Map args, IProgressMonitor monitor) throws CoreException {
 	  IProject project = getProject();
+	  System.out.println("Building project: " + project.getName() + " with: " + this.toString());
+    System.out.println("  in:" + Thread.currentThread().toString());
 		if (kind == FULL_BUILD) {
       fullBuild(project);
 		} else {
