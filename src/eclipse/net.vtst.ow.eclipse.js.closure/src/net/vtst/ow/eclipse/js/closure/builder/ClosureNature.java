@@ -31,7 +31,7 @@ public class ClosureNature implements IProjectNature {
 	 */
 	public void deconfigure() throws CoreException {
     Utils.setProjectBuilder(project, ClosureBuilder.BUILDER_ID, true);
-    ClosureBuilder.clearProject(project);
+    ResourceProperties.clearProject(project);
 	}
 
 	/*

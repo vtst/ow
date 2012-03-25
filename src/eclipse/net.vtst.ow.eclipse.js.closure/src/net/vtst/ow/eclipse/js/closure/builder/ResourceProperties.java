@@ -85,4 +85,19 @@ public class ResourceProperties {
       return null;
     }
   }
+  
+  /**
+   * Clear the properties stored in a project (and its files).
+   * @param project
+   * @throws CoreException
+   */
+  public static void clearProject(IProject project) throws CoreException {
+    Iterable<IFile> files = getJavaScriptFiles(project);
+    if (files != null) {
+      for (IFile file: files) setJSUnit(file, null);
+    }
+    setJavaScriptFiles(project, null);
+    setJSProject(project, null);
+  }
+
 }
