@@ -50,8 +50,6 @@ import com.google.javascript.jscomp.deps.SortedDependencies.CircularDependencyEx
  */
 public class ClosureBuilder extends IncrementalProjectBuilder {
   
-  // TODO There might be one instance per thread.  Is JSSet enough thread safe?
-
   public static final String BUILDER_ID = "net.vtst.ow.eclipse.js.closure.closureBuilder";
   
   private JSLibraryManager jsLibraryManager = OwJsClosurePlugin.getDefault().getJSLibraryManager();

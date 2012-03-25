@@ -12,6 +12,7 @@ import net.vtst.ow.closure.compiler.util.CompilerUtils;
 import net.vtst.ow.closure.compiler.util.FileTreeVisitor;
 import net.vtst.ow.closure.compiler.util.FileUtils;
 
+import com.google.common.collect.Sets;
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.DiagnosticType;
 import com.google.javascript.jscomp.JSError;
@@ -150,9 +151,9 @@ public class JSLibrary extends AbstractJSProject {
   private void addGoogToDependencies(JSUnit unit) {
     if (!isClosureBase) return;
     if (unit.getPathRelativeToClosureBase().equals(BASE_FILE)) {
-      unit.getProvides().add(GOOG);
+      unit.addProvide(GOOG);
     } else {
-      unit.getRequires().add(GOOG);     
+      unit.addRequire(GOOG);     
     }
   }
 
@@ -170,8 +171,9 @@ public class JSLibrary extends AbstractJSProject {
       DepsFileParser depsFileParser = new DepsFileParser(compiler.getErrorManager());
       for (DependencyInfo info: depsFileParser.parseFile(depsFile.getAbsolutePath())) {
         File file = FileUtils.join(pathOfClosureBase, new File(info.getPathRelativeToClosureBase()));
-        JSUnit unit = 
-            new JSUnit(file, pathOfClosureBase, new JSUnitProvider.FromFile(file), info.getProvides(), info.getRequires());
+        JSUnit unit = new JSUnit(
+            file, pathOfClosureBase, new JSUnitProvider.FromFile(file), 
+            Sets.newHashSet(info.getProvides()), Sets.newHashSet(info.getRequires()));
         addGoogToDependencies(unit);
         units.add(unit);
       }

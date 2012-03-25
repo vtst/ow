@@ -19,8 +19,9 @@ import com.google.javascript.jscomp.deps.SortedDependencies.MissingProvideExcept
 
 /**
  * A super class for {@code JSLibrary} and {@code JSProject}.
- * @author vtst
- *
+ * <b>Thread safety:</b>  Thread safety is ensured for {@code setUnits} and {@code sortUnitsByDependencies}.
+ * Other methods do not really need to be synchronized.
+ * @author Vincent Simonet
  */
 public abstract class AbstractJSProject {
   
@@ -31,7 +32,7 @@ public abstract class AbstractJSProject {
    * @param units  The new list of units.
    * @throws CircularDependencyException  If there is a circular dependency in the passed list.
    */
-  public <T extends JSUnit> void setUnits(AbstractCompiler compiler, List<T> units) throws CircularDependencyException {
+  public synchronized <T extends JSUnit> void setUnits(AbstractCompiler compiler, List<T> units) throws CircularDependencyException {
     dependencies = new SortedDependencies<T>(units);
     int index = 0;
     for (JSUnit unit: dependencies.getSortedList()) {
@@ -39,12 +40,21 @@ public abstract class AbstractJSProject {
       ++index;
     }
   }
-
+  
+  private static Comparator<JSUnit> jsUnitComparator = new Comparator<JSUnit>() {
+    @Override
+    public int compare(JSUnit unit1, JSUnit unit2) {
+      return (unit1.dependencyIndex - unit2.dependencyIndex);
+    }
+  };
+  
   /**
-   * @return  The list of unit, sorted according to their dependencies.
+   * Sort a list of compilation units (which should belong to the current project), according
+   * to their dependency order.
+   * @param units
    */
-  protected List<? extends JSUnit> getSortedUnits() {
-    return dependencies.getSortedList();
+  protected synchronized void sortUnitsByDependencies(List<JSUnit> units) {
+    Collections.sort(units, jsUnitComparator);
   }
 
   /**
@@ -62,10 +72,16 @@ public abstract class AbstractJSProject {
   }
 
   /**
-   * @return  The list of referenced projects.
+   * @return  The list of referenced projects.  The project must be ordered according to their
+   * dependencies, in decreasing order: if A comes before B, A may depend on B, but B cannot 
+   * depend on A.  Note there is no recursion: the referenced projects of referenced projects
+   * must be included in the list if needed.
    */
   protected abstract List<AbstractJSProject> getReferencedProjects();
 
+  /**
+   * Helper class for {@code getSortedDependenciesOf}.
+   */
   private class DependencyBuilder {
     private ArrayList<ArrayList<JSUnit>> results;
     private LinkedList<String> namesToVisit;
@@ -98,7 +114,7 @@ public abstract class AbstractJSProject {
         }
       }
       namesToVisit = remainingNames;
-      Collections.sort(unitsInThisProject, new JSUnitComparator());
+      project.sortUnitsByDependencies(unitsInThisProject);
       results.add(unitsInThisProject);
     }
     
@@ -121,16 +137,6 @@ public abstract class AbstractJSProject {
   public List<JSUnit> getSortedDependenciesOf(JSUnit unit) {
     DependencyBuilder builder = new DependencyBuilder(this, unit);
     return builder.get();
-  }
-  
-  /**
-   * Comparator for {@code JSUnit}, according to the dependency order in the project.
-   */
-  private static class JSUnitComparator implements Comparator<JSUnit> {
-    @Override
-    public int compare(JSUnit unit1, JSUnit unit2) {
-      return (unit1.dependencyIndex - unit2.dependencyIndex);
-    }
   }
 
   // **************************************************************************

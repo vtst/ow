@@ -2,6 +2,7 @@ package net.vtst.ow.closure.compiler.deps;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,7 +21,7 @@ import com.google.javascript.rhino.Node;
  * <br>
  * <b>Thread safety:</b>  This class maintain the AST and the dependencies for the unit as an internal
  * state.  In order to ensure safe concurrent accesses, the public methods manipulating them are 
- * synchronized.
+ * synchronized.  The provides/requires are thread safe as they are immutable collections.
  * @author Vincent Simonet
  */
 public class JSUnit implements DependencyInfo {
@@ -31,8 +32,8 @@ public class JSUnit implements DependencyInfo {
   private File pathRelativeToClosureBase;
   private TimestampKeeper timestampKeeperForDependencies;
   private AstFactoryFromModifiable astFactory;
-  private Set<String> providedNames = new HashSet<String>();
-  private Set<String> requiredNames = new HashSet<String>();
+  private Collection<String> providedNames;
+  private Collection<String> requiredNames;
 
   /**
    * Create a compilation unit from a provider.
@@ -54,7 +55,7 @@ public class JSUnit implements DependencyInfo {
    */
   public JSUnit(
       File path, File pathOfClosureBase, JSUnitProvider.IProvider provider,
-      Collection<String> providedNames, Collection<String> requiredNames) {
+      Set<String> providedNames, Set<String> requiredNames) {
     this(path, pathOfClosureBase, provider);
     setDependencies(providedNames, requiredNames);
   }
@@ -86,20 +87,36 @@ public class JSUnit implements DependencyInfo {
    * Get the names (namespaces and classes) provided by the compilation unit.
    * @return  The collection of the names.
    */
-  // TODO: Should this be synchronized or made atomic?
   public Collection<String> getProvides() {
     return providedNames;
+  }
+  
+  /**
+   * Add a provided name.  This method is <b>not</b> thread safe.  It should not be called if the
+   * object can be accessed from several threads.
+   * @param name
+   */
+  void addProvide(String name) {
+    providedNames.add(name);
   }
   
   /**
    * Get the names (namespaces and classes) required by the compilation unit.
    * @return  The collection of the names.
    */
-  // TODO: Should this be synchronized or made atomic?
   public Collection<String> getRequires() {
     return requiredNames;
   }
-  
+
+  /**
+   * Add a required name.  This method is <b>not</b> thread safe.  It should not be called if the
+   * object can be accessed from several threads.
+   * @param name
+   */
+  void addRequire(String name) {
+    requiredNames.add(name);
+  }
+
   /**
    * Update the sets of provided and required names from the current code.
    * @param compiler  The compiler used to report errors.
@@ -125,11 +142,9 @@ public class JSUnit implements DependencyInfo {
    * @param providedNames
    * @param requiredNames
    */
-  private void setDependencies(Collection<String> providedNames, Collection<String> requiredNames) {
-    this.providedNames.clear();
-    this.providedNames.addAll(providedNames);
-    this.requiredNames.clear();
-    this.requiredNames.addAll(requiredNames);
+  private void setDependencies(Set<String> providedNames, Set<String> requiredNames) {
+    this.providedNames = Collections.unmodifiableCollection(providedNames);  // Atomic set
+    this.requiredNames = Collections.unmodifiableCollection(requiredNames);  // Atomic set
   }
 
   // **************************************************************************
@@ -147,8 +162,8 @@ public class JSUnit implements DependencyInfo {
   // Dependency order
 
   /**
-   * This is a placeholder for the containing project.  It should not be used elsewhere.
+   * This is a placeholder for the containing project.  It should not be used 
+   * elsewhere.
    */
   public int dependencyIndex;
-  
 }
