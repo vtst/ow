@@ -4,8 +4,10 @@ import java.net.URL;
 import java.util.logging.Level;
 
 import net.vtst.ow.eclipse.js.closure.builder.JSLibraryManager;
+import net.vtst.ow.eclipse.js.closure.builder.ProjectOrderManager;
 import net.vtst.ow.eclipse.js.closure.compiler.JavaScriptEditorRegistry;
 
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -28,7 +30,8 @@ public class OwJsClosurePlugin extends AbstractUIPlugin {
 	private static OwJsClosurePlugin plugin;
 	private JavaScriptEditorRegistry editorRegistry;
   private OwJsClosureMessages messages;
-  private JSLibraryManager jsLibraryManager = new JSLibraryManager();
+  private JSLibraryManager jsLibraryManager;
+  private ProjectOrderManager projectOrderManager;
 	
 	/**
 	 * The constructor
@@ -45,6 +48,9 @@ public class OwJsClosurePlugin extends AbstractUIPlugin {
     plugin = this;
     editorRegistry = new JavaScriptEditorRegistry(getWorkbench());
     messages = new OwJsClosureMessages();
+    jsLibraryManager = new JSLibraryManager();
+    projectOrderManager = new ProjectOrderManager();
+    ResourcesPlugin.getWorkspace().addResourceChangeListener(projectOrderManager);  // TODO: Add int arg?
     Compiler.setLoggingLevel(Level.OFF);
 	}
 
@@ -55,6 +61,7 @@ public class OwJsClosurePlugin extends AbstractUIPlugin {
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		editorRegistry.dispose();
+    ResourcesPlugin.getWorkspace().removeResourceChangeListener(projectOrderManager);
 		super.stop(context);
 	}
 	
@@ -64,6 +71,10 @@ public class OwJsClosurePlugin extends AbstractUIPlugin {
 	
 	public JSLibraryManager getJSLibraryManager() {
 	  return jsLibraryManager;
+	}
+	
+	public ProjectOrderManager getProjectOrderManager() {
+	  return projectOrderManager;
 	}
 	
 	public OwJsClosureMessages getMessages() {

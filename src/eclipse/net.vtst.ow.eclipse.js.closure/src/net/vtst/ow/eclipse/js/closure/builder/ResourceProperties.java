@@ -22,6 +22,8 @@ public class ResourceProperties {
   private static final QualifiedName JS_PROJECT = new QualifiedName(OwJsClosurePlugin.PLUGIN_ID, "JSProject");
   private static final QualifiedName JS_FILES = new QualifiedName(OwJsClosurePlugin.PLUGIN_ID, "Files");
   private static final QualifiedName JS_UNIT = new QualifiedName(OwJsClosurePlugin.PLUGIN_ID, "JSUnit");
+  private static final QualifiedName REFERENCED_PROJECTS = new QualifiedName(OwJsClosurePlugin.PLUGIN_ID, "ReferencedProjects");
+  
   
   /**
    * Set the {@code JSProject} associated with a resource project.
@@ -37,6 +39,24 @@ public class ResourceProperties {
     Object obj = project.getSessionProperty(JS_PROJECT);
     if (obj instanceof JSProject) return (JSProject) obj;
     return null;
+  }
+  
+  /**
+   * Get the {@code JSProject} associated with a resource project, or create it if it does not exist.
+   * Synchronized.
+   */
+  public static JSProject getOrCreateJSProject(IProject project) throws CoreException {
+    JSProject jsProject = getJSProject(project);
+    if (jsProject == null) {
+      synchronized (project) {
+        jsProject = getJSProject(project);
+        if (jsProject == null) {
+          jsProject = new JSProject();
+          setJSProject(project, jsProject);
+        }
+      }
+    }
+    return jsProject;
   }
   
   /**
@@ -56,6 +76,22 @@ public class ResourceProperties {
     Object obj = project.getSessionProperty(JS_PROJECT);
     if (obj instanceof Collection<?>) return (Collection<IFile>) obj;
     return null;    
+  }
+  
+  /**
+   * Get the projects which are transitively referenced from the current project.
+   */
+  public static void setTransitivelyReferencedProjects(IProject project, IProject[] projects) throws CoreException {
+    project.setSessionProperty(REFERENCED_PROJECTS, projects);
+  }
+  
+  /**
+   * Set the projects which are transitively referenced from the current project.
+   */
+  public static IProject[] getTransitivelyReferencedProjects(IProject project) throws CoreException {
+    Object obj = project.getSessionProperty(REFERENCED_PROJECTS);
+    if (obj instanceof IProject[]) return (IProject[]) obj;
+    return new IProject[0];    
   }
   
   /**

@@ -88,7 +88,7 @@ public class JSUnit implements DependencyInfo {
    * @return  The collection of the names.
    */
   public Collection<String> getProvides() {
-    return providedNames;
+    return Collections.unmodifiableCollection(providedNames);
   }
   
   /**
@@ -105,7 +105,7 @@ public class JSUnit implements DependencyInfo {
    * @return  The collection of the names.
    */
   public Collection<String> getRequires() {
-    return requiredNames;
+    return Collections.unmodifiableCollection(requiredNames);
   }
 
   /**
@@ -143,8 +143,8 @@ public class JSUnit implements DependencyInfo {
    * @param requiredNames
    */
   private void setDependencies(Set<String> providedNames, Set<String> requiredNames) {
-    this.providedNames = Collections.unmodifiableCollection(providedNames);  // Atomic set
-    this.requiredNames = Collections.unmodifiableCollection(requiredNames);  // Atomic set
+    this.providedNames = providedNames;  // Atomic set
+    this.requiredNames = requiredNames;  // Atomic set
   }
 
   // **************************************************************************

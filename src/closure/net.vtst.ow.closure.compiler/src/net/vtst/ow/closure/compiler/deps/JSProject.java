@@ -25,6 +25,7 @@ public class JSProject extends AbstractJSProject {
   // **************************************************************************
   // Referenced projects
 
+  private long referencedProjectsModificationStamp = 0;
   private List<AbstractJSProject> referencedProjects;
   
   /**
@@ -32,7 +33,24 @@ public class JSProject extends AbstractJSProject {
    * @param compilationSet  The referenced projects.
    */
   public void setReferencedProjects(List<AbstractJSProject> referencedProjects) {
+    setReferencedProjects(referencedProjects, 0);
+  }
+  
+  /**
+   * Set the projects referenced by a project.
+   * @param referencedProjects  The referenced projects.
+   * @param modificationStamp  The associated modification stamp.
+   */
+  public void setReferencedProjects(List<AbstractJSProject> referencedProjects, long modificationStamp) {
     this.referencedProjects = referencedProjects;
+    this.referencedProjectsModificationStamp = modificationStamp;
+  }
+  
+  /**
+   * @return  The modification stamp for the referenced projects.
+   */
+  public long getReferencedProjectsModificationStamp() {
+    return referencedProjectsModificationStamp;
   }
   
   /* (non-Javadoc)

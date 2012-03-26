@@ -59,10 +59,6 @@ public class CompilerRun {
    * @param unit  The unit to compile.
    */
   public CompilerRun(String moduleName, CompilerOptions options, ErrorManager errorManager, List<JSUnit> sortedUnits) {
-    System.out.println("CompilerRun:");
-    for (JSUnit unit: sortedUnits) {
-      System.out.println("  " + unit.getName());
-    }
     this.moduleName = moduleName;
     this.options = options;
     this.sortedUnits = sortedUnits;
