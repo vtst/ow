@@ -68,6 +68,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
 	protected IProject[] build(
 	    int kind, Map<String, String> args, IProgressMonitor monitor) throws CoreException {
 	  IProject project = getProject();
+    OwJsDev.log("Start build: %s", project.getName());
 	  monitor.beginTask(messages.format("build_closure", project.getName()), 2);
 		if (kind == FULL_BUILD) {
       fullBuild(monitor, project);
@@ -80,6 +81,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
 			}
 		}
     monitor.done();
+    OwJsDev.log("End build: %s", project.getName());
 		return ResourceProperties.getTransitivelyReferencedProjects(project);
 	}
 
