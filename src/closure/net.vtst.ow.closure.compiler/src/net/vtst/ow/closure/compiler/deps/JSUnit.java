@@ -30,7 +30,8 @@ public class JSUnit implements DependencyInfo {
   private File pathOfClosureBase;
   private JSUnitProvider.IProvider provider;
   private File pathRelativeToClosureBase;
-  private TimestampKeeper timestampKeeperForDependencies;
+  private TimestampKeeper timestampKeeperForDependencies;  // Timestamp for the source modification
+  private long dependenciesModificationStamp = -1;  // Timestamp for the last modification of the dependencies
   private AstFactoryFromModifiable astFactory;
   private Collection<String> providedNames;
   private Collection<String> requiredNames;
@@ -57,7 +58,7 @@ public class JSUnit implements DependencyInfo {
       File path, File pathOfClosureBase, JSUnitProvider.IProvider provider,
       Set<String> providedNames, Set<String> requiredNames) {
     this(path, pathOfClosureBase, provider);
-    setDependencies(providedNames, requiredNames);
+    setDependencies(providedNames, requiredNames, -1);
   }
 
   /**
@@ -124,6 +125,7 @@ public class JSUnit implements DependencyInfo {
    */
   public synchronized boolean updateDependencies(AbstractCompiler compiler) {
     if (!timestampKeeperForDependencies.hasChanged()) return false;
+    long modificationStamp = timestampKeeperForDependencies.getModificationStamp();
     // There is no need to make a clone, as this pass does not modify the AST.
     Node root = astFactory.getAstRoot(compiler);
     Set<String> newProvidedNames = new HashSet<String>();
@@ -133,7 +135,7 @@ public class JSUnit implements DependencyInfo {
         newRequiredNames.equals(requiredNames)) {
       return false;
     }
-    setDependencies(newProvidedNames, newRequiredNames);
+    setDependencies(newProvidedNames, newRequiredNames, modificationStamp);
     return true;
   }
 
@@ -141,8 +143,11 @@ public class JSUnit implements DependencyInfo {
    * Internal version of {@code setDependencies}, which does not update the timestamp keeper.
    * @param providedNames
    * @param requiredNames
+   * @param modificationStamp  The modification stamp for the dependencies, i.e. the last modification
+   *   date of the file at the time the dependencies were computed.
    */
-  private void setDependencies(Set<String> providedNames, Set<String> requiredNames) {
+  private void setDependencies(Set<String> providedNames, Set<String> requiredNames, long modificationStamp) {
+    this.dependenciesModificationStamp = modificationStamp;
     this.providedNames = providedNames;  // Atomic set
     this.requiredNames = requiredNames;  // Atomic set
   }

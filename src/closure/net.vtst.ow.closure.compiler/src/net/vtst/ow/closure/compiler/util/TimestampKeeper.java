@@ -32,4 +32,8 @@ public class TimestampKeeper {
     if (newLastModified > lastModified) lastModified = newLastModified;    
   }
 
+  public long getModificationStamp() {
+    return lastModified;
+  }
+
 }
