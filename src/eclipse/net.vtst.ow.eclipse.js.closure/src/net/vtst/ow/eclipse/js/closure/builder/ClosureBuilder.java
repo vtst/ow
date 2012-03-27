@@ -31,6 +31,7 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -60,6 +61,14 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
   
   public ClosureBuilder() {
     super();
+  }
+  
+  protected void startupOnInitialize() {
+    super.startupOnInitialize();
+    OwJsDev.log("Initializing builder for: " + getProject().getName());
+    // This is to force re-build on startup, because the persistent cache does not keep
+    // enough information.
+    this.forgetLastBuiltState();
   }
 
 	/* (non-Javadoc)
