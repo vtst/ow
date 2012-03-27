@@ -1,6 +1,7 @@
 package net.vtst.ow.closure.compiler.compile;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 
 import net.vtst.ow.closure.compiler.deps.JSProject;
@@ -13,6 +14,10 @@ import com.google.javascript.jscomp.ErrorManager;
 /**
  * This class extends {@code JSUnit} with methods to perform complete and incremental
  * compilations.
+ * <br>
+ * <b>Thread safety:</b>  {@code fullCompile} is not thread safe, it shall be called from
+ * a single thread.  {@code getLastAvailableCompilerRun} is thread safe because it returns
+ * a member which is atomically updated.
  * @author Vincent Simonet
  */
 public class CompilableJSUnit extends JSUnit {
@@ -29,14 +34,35 @@ public class CompilableJSUnit extends JSUnit {
   // Compilation
   
   private CompilerRun run = null;
+  private List<JSUnit> orderedUnits = Collections.emptyList();
+  private long allDependenciesModificationStamp = -2;
+  
+  private long getMaxDependenciesModificationStamp() {
+    long result = -1;
+    for (JSUnit unit: orderedUnits) {
+      if (unit.getDependenciesModificationStamp() > result)
+        result = unit.getDependenciesModificationStamp();
+    }
+    return result;
+  }
+  
+  private List<JSUnit> updateAndGetOrderedUnits() {
+    long maxDependenciesModificationStamp = getMaxDependenciesModificationStamp();
+    if (allDependenciesModificationStamp < maxDependenciesModificationStamp) {
+      allDependenciesModificationStamp = maxDependenciesModificationStamp;
+      List<JSUnit> units = project.getSortedDependenciesOf(this);
+      units.add(this);
+      orderedUnits = units;
+    }
+    return orderedUnits;
+  }  
   
   public CompilerRun fullCompile(CompilerOptions options, ErrorManager errorManager) {
     return fullCompile(options, errorManager, true);
   }
   
   public CompilerRun fullCompile(CompilerOptions options, ErrorManager errorManager, boolean force) {
-    List<JSUnit> units = project.getSortedDependenciesOf(this);
-    units.add(this);
+    List<JSUnit> units = updateAndGetOrderedUnits();
     if (force || run == null || run.hasChanged(units)) {
       CompilerRun newRun = new CompilerRun(this.getName(), options, errorManager, units);
       run = newRun;  // This is atomic

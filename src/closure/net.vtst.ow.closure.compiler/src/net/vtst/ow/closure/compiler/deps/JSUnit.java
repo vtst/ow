@@ -151,6 +151,10 @@ public class JSUnit implements DependencyInfo {
     this.providedNames = providedNames;  // Atomic set
     this.requiredNames = requiredNames;  // Atomic set
   }
+  
+  public long getDependenciesModificationStamp() {
+    return dependenciesModificationStamp;
+  }
 
   // **************************************************************************
   // Source / AST

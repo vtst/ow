@@ -64,6 +64,7 @@ public abstract class AbstractJSProject {
    * @return  The providing unit, or {@code null}.
    */
   protected JSUnit getUnitProviding(String name) {
+    if (dependencies == null) return null;
     try {
       return dependencies.getInputProviding(name);
     } catch (MissingProvideException e) {
