@@ -362,7 +362,6 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
    */
   private Collection<AbstractJSProject> getJSLibraries(
       IProgressMonitor monitor, Compiler compiler, ArrayList<IProject> projects) throws CoreException {
-    // TODO: Clarify the order of libraries.
     ListWithoutDuplicates<AbstractJSProject> result = new ListWithoutDuplicates<AbstractJSProject>();
     for (int i = projects.size() - 1; i >= 0; --i) {
       ClosureProjectPersistentPropertyHelper helper = new ClosureProjectPersistentPropertyHelper(projects.get(i));
