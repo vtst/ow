@@ -249,7 +249,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
    * @throws CoreException
    */
   private void compileJavaScriptFiles(IProgressMonitor monitor, Collection<IFile> files, boolean force) throws CoreException {
-    SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 0);  // TODO: is ticks==0 correct?
+    SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 1);
     subMonitor.beginTask("build_compile", files.size());
     for (IFile file: files) {
       checkCancel(subMonitor, false);
@@ -258,7 +258,6 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
       subMonitor.worked(1);
     }
     subMonitor.done();
-    monitor.worked(1);
   }
   
   /**
