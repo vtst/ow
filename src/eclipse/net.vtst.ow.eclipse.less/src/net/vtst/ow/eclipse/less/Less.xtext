@@ -110,13 +110,31 @@ BlockSemicolon:
 // @ statements
 
 ImportStatement:
-  '@import' OPT_SPACE uri=(STRING | Uri) OPT_SPACE medias=MediaList? ';' OPT_SPACE
+  '@import' OPT_SPACE uri=(STRING | Uri) OPT_SPACE media_queries=MediaQueryList ';' OPT_SPACE
 ;
 
 MediaStatement:
-  '@media' OPT_SPACE medias=MediaList block=Block
+  '@media' OPT_SPACE media_queries=MediaQueryList block=Block
 ;
 
+MediaQueryList:
+  {MediaQueryList} (media_query+=MediaQuery (',' OPT_SPACE media_query+=MediaQuery)*)? 
+;
+
+MediaQuery:
+  (keyword=('only' | 'not') OPT_SPACE)? media_type=IDENT OPT_SPACE ('and' OPT_SPACE expr+=MediaExpression)*
+  | expr+=MediaExpression ('and' OPT_SPACE expr+=MediaExpression)*
+;
+
+MediaExpression:
+  '(' OPT_SPACE media_feature=MediaFeature OPT_SPACE (':' OPT_SPACE expr=Expr)? ')' OPT_SPACE
+;
+
+MediaFeature:
+  IDENT
+;
+
+// TODO: Delete!
 MediaList:
   media+=IDENT OPT_SPACE (',' OPT_SPACE media+=IDENT OPT_SPACE)*
 ;
@@ -248,8 +266,14 @@ Attrib:
 // This rule does not end with OPT_SPACE, because of combinators
 Pseudo:
   {PseudoClassIdent} ':' ident=IDENT
-  | {PseudoClassFunction} ':' function=IDENT '(' OPT_SPACE (arg=(IDENT | NUMBER) OPT_SPACE)? ')'
+  | {PseudoClassFunction} ':' function=IDENT '(' OPT_SPACE (arg=PseudoClassFunctionArgument OPT_SPACE)? ')'
   | {PseudoElement} '::' ident=IDENT
+;
+
+PseudoClassFunctionArgument:
+  ident=IDENT
+  | number=NUMBER
+  //| selector=SimpleSelector
 ;
 
 // Declarations

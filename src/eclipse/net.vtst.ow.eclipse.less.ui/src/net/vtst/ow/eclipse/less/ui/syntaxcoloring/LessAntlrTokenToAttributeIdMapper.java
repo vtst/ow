@@ -27,5 +27,8 @@ public class LessAntlrTokenToAttributeIdMapper extends EasyAntlrTokenToAttribute
     bindKeyword("@page", highlightingConfig.AT_KEYWORD);
     bindKeyword("@font-face", highlightingConfig.AT_KEYWORD);
     bindKeyword("@charset", highlightingConfig.AT_KEYWORD);
+    bindKeyword("and", highlightingConfig.MEDIA_QUERY_KEYWORD);
+    bindKeyword("not", highlightingConfig.PROPERTY);
+    bindKeyword("only", highlightingConfig.MEDIA_QUERY_KEYWORD);
   }
 }

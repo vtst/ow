@@ -8,6 +8,7 @@ import net.vtst.ow.eclipse.less.less.FontFaceStatement;
 import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.less.InnerRuleSet;
 import net.vtst.ow.eclipse.less.less.InnerSelector;
+import net.vtst.ow.eclipse.less.less.MediaQuery;
 import net.vtst.ow.eclipse.less.less.MediaStatement;
 import net.vtst.ow.eclipse.less.less.MixinDefinition;
 import net.vtst.ow.eclipse.less.less.PageStatement;
@@ -160,12 +161,17 @@ public class LessLabelProvider extends DefaultEObjectLabelProvider {
 	
   StyledString text(MediaStatement obj) {
     StyledString ss = new StyledString("@media", atKeywordStyler);
-    EList<String> medias = obj.getMedias().getMedia();
+    EList<MediaQuery> medias = obj.getMedia_queries().getMedia_query();
     boolean first = true;
-    for (String s: medias) {
+    for (MediaQuery mediaQuery: medias) {
       if (first) first = false;
       else ss.append(",");
-      ss.append(" " + s);
+      if (mediaQuery.getKeyword() != null) {
+        ss.append(" ");
+        ss.append(mediaQuery.getKeyword());
+      }
+      ss.append(" ");
+      ss.append(mediaQuery.getMedia_type());
     }
     return ss;
   }

@@ -19,5 +19,6 @@ public class LessHighlightingConfiguration extends EasyHighlightingConfiguration
   public EasyTextAttribute SELECTOR = new EasyTextAttribute(0, 0, 192, SWT.BOLD);
   public EasyTextAttribute STRING = new EasyTextAttribute(127, 159, 191);
   public EasyTextAttribute VARIABLE_DEFINITION = new EasyTextAttribute(0, 0, 192, SWT.BOLD);
-  
+  public EasyTextAttribute MEDIA_QUERY_KEYWORD = new EasyTextAttribute(127, 0, 85, SWT.BOLD + SWT.ITALIC);
+  public EasyTextAttribute MEDIA_FEATURE = new EasyTextAttribute(127, 0, 85, SWT.BOLD);
 }
