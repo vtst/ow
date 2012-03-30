@@ -266,7 +266,7 @@ Attrib:
 // This rule does not end with OPT_SPACE, because of combinators
 Pseudo:
   {PseudoClassIdent} ':' ident=IDENT
-  | {PseudoClassFunction} ':' function=IDENT '(' OPT_SPACE (arg=PseudoClassFunctionArgument OPT_SPACE)? ')'
+  | {PseudoClassFunction} ':' function=(IDENT | 'not') '(' OPT_SPACE (arg=PseudoClassFunctionArgument OPT_SPACE)? ')'
   | {PseudoElement} '::' ident=IDENT
 ;
 
