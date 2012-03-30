@@ -33,10 +33,7 @@ TODO
    - Standard completion proposals
    - Hover with types
 3. Builder
-   - Other libraries
-   - Referenced projects
    - Having different compiler options for checking errors / auto complete 
-   - Cancelling the builder
 4. Settings
    - Automatic discarding of non-closure completion proposals
      see: CodeAssistAdvancedPreferencePage
