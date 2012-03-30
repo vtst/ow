@@ -201,12 +201,14 @@ InnerSelector:
 Combinator:
   {ChildCombinator} OPT_SPACE '>' OPT_SPACE
   | {AdjacentSiblingCombinator} OPT_SPACE '+' OPT_SPACE
+  | {GeneralSiblingCombinator} OPT_SPACE '~' OPT_SPACE
   | {DescendantSelector} SPACE
 ;
 
 RootCombinator returns Combinator:
   {ChildCombinator} '>' OPT_SPACE
   | {AdjacentSiblingCombinator} '+' OPT_SPACE
+  | {GeneralSiblingCombinator} '~' OPT_SPACE
   | {DescendantSelector}
 ;
 
@@ -240,13 +242,14 @@ CLASS_IDENT returns ecore::EString: '.' IDENT;
 // This rule does not end with OPT_SPACE, because of combinators
 Attrib:
   '[' OPT_SPACE attribute=IDENT OPT_SPACE 
-  (operator=('=' | '~=' | '|=') OPT_SPACE ((value=IDENT | value=STRING) OPT_SPACE)?)? ']'
+  (operator=('=' | '~=' | '^=' | '$=' | '|=') OPT_SPACE ((value=IDENT | value=STRING) OPT_SPACE)?)? ']'
 ;
 
 // This rule does not end with OPT_SPACE, because of combinators
 Pseudo:
-  {PseudoIdent} ':' ident=IDENT
-  | {PseudoFunction} ':' function=IDENT '(' OPT_SPACE (arg=IDENT OPT_SPACE)? ')'
+  {PseudoClassIdent} ':' ident=IDENT
+  | {PseudoClassFunction} ':' function=IDENT '(' OPT_SPACE (arg=(IDENT | NUMBER) OPT_SPACE)? ')'
+  | {PseudoElement} '::' ident=IDENT
 ;
 
 // Declarations
