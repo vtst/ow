@@ -177,7 +177,7 @@ MixinDefinition:
 MixinDefinitionParameter: 
   {MixinDefinitionVariable} variable=VariableDefinitionIdent OPT_SPACE
     (':' OPT_SPACE default_value+=Term (SPACE default_value+=Term)* OPT_SPACE)?
-  | {MixinDefinitionPattern} ident=IDENT OPT_SPACE
+  | {MixinDefinitionPattern} ident=IDENT_OR_KEYWORD OPT_SPACE
   | {MixinDefinitionPattern} string=STRING OPT_SPACE
   | {MixinDefinitionPattern} number=NumericLiteral OPT_SPACE
 ;
@@ -237,13 +237,20 @@ MixinCallCombinator returns Combinator:
 
 // This rule does not end with OPT_SPACE, because of combinators
 SimpleSelector:
-  {SimpleSelectorWithRoot} root=(IDENT | '*' | AMPERSAND_IDENT)
+  {SimpleSelectorWithRoot} root=(IDENT_OR_KEYWORD | '*' | AMPERSAND_IDENT)
   (criteria+=HashOrClass | criteria+=Attrib | criteria+=Pseudo)*
   | {SimpleSelectorWithoutRoot} (
       criteria+=HashOrClass | criteria+=Attrib | criteria+=Pseudo
     )+
 ;
-AMPERSAND_IDENT returns ecore::EString: '&' IDENT?;
+SimpleSelectorInNot:
+  {SimpleSelectorInNotWithRoot} root=(IDENT_OR_KEYWORD | '*' | AMPERSAND_IDENT)
+  (criteria+=HashOrClass | criteria+=Attrib | criteria+=PseudoWithoutNot)*
+  | {SimpleSelectorInNotWithoutRoot} (
+      criteria+=HashOrClass | criteria+=Attrib | criteria+=PseudoWithoutNot
+    )+
+;
+AMPERSAND_IDENT returns ecore::EString: '&' IDENT_OR_KEYWORD?;
 
 HashOrClass: Hash | Class;
 HashOrClassCrossReference: ident=[HashOrClass|HASH_OR_CLASS_IDENT];
@@ -255,20 +262,25 @@ HASH_IDENT returns ecore::EString: HASH_COLOR | HASH_OTHER;
 
 // This rule does not end with OPT_SPACE, because of combinators
 Class: ident=CLASS_IDENT;
-CLASS_IDENT returns ecore::EString: '.' IDENT;
+CLASS_IDENT returns ecore::EString: '.' IDENT_OR_KEYWORD;
+IDENT_OR_KEYWORD returns ecore::EString: IDENT | 'and' | 'even' | 'n' | 'not' | 'odd' | 'only';
 
 // This rule does not end with OPT_SPACE, because of combinators
 Attrib:
-  '[' OPT_SPACE attribute=IDENT OPT_SPACE 
-  (operator=('=' | '~=' | '^=' | '$=' | '|=') OPT_SPACE ((value=IDENT | value=STRING) OPT_SPACE)?)? ']'
+  '[' OPT_SPACE attribute=IDENT_OR_KEYWORD OPT_SPACE 
+  (operator=('=' | '~=' | '^=' | '$=' | '|=') OPT_SPACE ((value=IDENT_OR_KEYWORD | value=STRING) OPT_SPACE)?)? ']'
 ;
 
 // This rule does not end with OPT_SPACE, because of combinators
 Pseudo:
+  PseudoWithoutNot
+  | {PseudoClassNot} ':' 'not' '(' OPT_SPACE selector=SimpleSelectorInNot OPT_SPACE ')'
+;
+
+PseudoWithoutNot:
   {PseudoClassIdent} ':' ident=IDENT
   | {PseudoClassFunction} ':' function=IDENT '(' OPT_SPACE (arg=PseudoClassFunctionArgument OPT_SPACE)? ')'
-  | {PseudoClassNot} ':' 'not' '(' OPT_SPACE selector=SimpleSelector OPT_SPACE ')'
-  | {PseudoElement} '::' ident=IDENT
+  | {PseudoElement} '::' ident=IDENT  
 ;
 
 PseudoClassFunctionArgument:
@@ -292,23 +304,6 @@ PseudoClassNthSpecialCaseString returns ecore::EString:
   | '+' IDENT  // +n-1
 ;
 
-/*
- * li:nth-child(-n+1) {}  // IDENT + 1
-li:nth-child(n-1) {}
-li:nth-child(1n-1) {}  // NUMBER IDENT
-li:nth-child(+1n-1) {}  // + 1 IDENT
-li:nth-child(-1n-1) {}  // - NUMBER IDENT
-li:nth-child(+n-1) {}  // + IDENT
-li:nth-child(-n-1) {}  // IDENT
- 
- */
-/*
- * nth
-  : S* [ ['-'|'+']? INTEGER? {N} [ S* ['-'|'+'] S* INTEGER ]? |
-         ['-'|'+']? INTEGER | {O}{D}{D} | {E}{V}{E}{N} ] S*
-  ;
- */
-
 // Declarations
 
 Declaration:
@@ -316,7 +311,7 @@ Declaration:
   ('!' OPT_SPACE important?='important' OPT_SPACE)?
 ;
 
-Property: IDENT;
+Property: IDENT_OR_KEYWORD;
 
 // There is a trailing OPT_SPACE in this rule, because there is no in SimpleSelector
 // '/' disabled, as it is not properly handled by LESS.
@@ -331,7 +326,7 @@ Operator:
 
 // This rule does not end with OPT_SPACE, because of operators in Expr
 Term:
-  {IdentTerm} ident=IDENT
+  {IdentTerm} ident=IDENT_OR_KEYWORD
   | {StringTerm} string=STRING
   | {UriTerm} uri=Uri
   | {EscapedStringTerm} '~' string=STRING
@@ -378,8 +373,8 @@ SimpleTerm:
 
 // This rule does not end with OPT_SPACE, because of operators in Expr
 FunctionTerm:
-  function=(IDENT | PERCENT) 
-  '(' OPT_SPACE (arg=IDENT OPT_SPACE '=' OPT_SPACE)? (expr=Expr)? ')'
+  function=(IDENT_OR_KEYWORD | PERCENT) 
+  '(' OPT_SPACE (arg=IDENT_OR_KEYWORD OPT_SPACE '=' OPT_SPACE)? (expr=Expr)? ')'
 ;
 
 // This rule does not end with OPT_SPACE, because of operators in Expr
