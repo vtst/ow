@@ -266,14 +266,14 @@ Attrib:
 // This rule does not end with OPT_SPACE, because of combinators
 Pseudo:
   {PseudoClassIdent} ':' ident=IDENT
-  | {PseudoClassFunction} ':' function=(IDENT | 'not') '(' OPT_SPACE (arg=PseudoClassFunctionArgument OPT_SPACE)? ')'
+  | {PseudoClassFunction} ':' function=IDENT '(' OPT_SPACE (arg=PseudoClassFunctionArgument OPT_SPACE)? ')'
+  | {PseudoClassNot} ':' 'not' '(' OPT_SPACE selector=SimpleSelector OPT_SPACE ')'
   | {PseudoElement} '::' ident=IDENT
 ;
 
 PseudoClassFunctionArgument:
   ident=IDENT
   | number=NUMBER
-  //| selector=SimpleSelector
 ;
 
 // Declarations
