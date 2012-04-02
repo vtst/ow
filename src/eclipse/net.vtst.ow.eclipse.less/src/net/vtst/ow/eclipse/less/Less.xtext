@@ -273,8 +273,41 @@ Pseudo:
 
 PseudoClassFunctionArgument:
   ident=IDENT
-  | number=NUMBER
+  | nth=PseudoClassNth  //  This includes NUMBER
 ;
+
+/* TODO: odd, even and n as keywords */
+PseudoClassNth:
+  {PseudoClassNth} ('+' | '-')? NUMBER? 'n' (OPT_SPACE ('+' | '-') OPT_SPACE NUMBER)?
+  | {PseudoClassNth} ('+' | '-')? NUMBER
+  | {PseudoClassNth} ('odd' | 'even')
+  | {PseudoClassNthSpecialCase} special=PseudoClassNthSpecialCaseString
+;
+
+PseudoClassNthSpecialCaseString returns ecore::EString:
+  IDENT '+' NUMBER  // -n+1
+  | NUMBER IDENT  // 1n-1
+  | '+' NUMBER IDENT  // +1n-1
+  | '-' NUMBER IDENT // -1n-1
+  | '+' IDENT  // +n-1
+;
+
+/*
+ * li:nth-child(-n+1) {}  // IDENT + 1
+li:nth-child(n-1) {}
+li:nth-child(1n-1) {}  // NUMBER IDENT
+li:nth-child(+1n-1) {}  // + 1 IDENT
+li:nth-child(-1n-1) {}  // - NUMBER IDENT
+li:nth-child(+n-1) {}  // + IDENT
+li:nth-child(-n-1) {}  // IDENT
+ 
+ */
+/*
+ * nth
+  : S* [ ['-'|'+']? INTEGER? {N} [ S* ['-'|'+'] S* INTEGER ]? |
+         ['-'|'+']? INTEGER | {O}{D}{D} | {E}{V}{E}{N} ] S*
+  ;
+ */
 
 // Declarations
 

@@ -19,6 +19,7 @@ import net.vtst.ow.eclipse.less.less.MixinCall;
 import net.vtst.ow.eclipse.less.less.MixinDefinition;
 import net.vtst.ow.eclipse.less.less.MixinDefinitionParameter;
 import net.vtst.ow.eclipse.less.less.MixinDefinitionVariable;
+import net.vtst.ow.eclipse.less.less.PseudoClassNthSpecialCase;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
 import net.vtst.ow.eclipse.less.less.VariableDefinition;
 import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver;
@@ -192,4 +193,34 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   public void checkIncompleteToplevelStatement(IncompleteToplevelStatement statement) {
     error(messages.getString("incomplete_toplevel_statement"), statement, null, 0);
   }
+  
+  
+  @Check
+  public void checkPseudoClassNthSpecialCase(PseudoClassNthSpecialCase pseudo) {
+    if (!doCheckPseudoClassNthSpecialCase(pseudo.getSpecial())) {
+      error(messages.getString("illegal_pseudo_class_argument"), pseudo, null, 0);
+    }
+  }
+  
+  public boolean doCheckPseudoClassNthSpecialCase(String special) {
+    int i = 0;
+    int n = special.length();
+    char c = special.charAt(i);
+    if (c == '+' || c == '-') {
+      ++i; if (i == n) return false; else c = special.charAt(i);
+    }
+    while (c >= '0' && c <= '9') {
+      ++i; if (i == n) return false; else c = special.charAt(i);
+    }
+    if (c != 'n') return false;
+    ++i; if (i == n) return false; else c = special.charAt(i);
+    if (c != '+' && c != '-') return false;
+    ++i; if (i == n) return false; else c = special.charAt(i);
+    if (c < '0' && c > '9') return false;
+    while (c >= '0' && c <= '9' && i < n) {
+      ++i; if (i == n) return true; else c = special.charAt(i);
+    }
+    return false;
+  }
+
 }
