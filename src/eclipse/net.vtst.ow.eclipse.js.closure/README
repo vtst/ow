@@ -38,3 +38,4 @@ TODO
    - Automatic discarding of non-closure completion proposals
      see: CodeAssistAdvancedPreferencePage
    - Compilation options
+   - How to generate the pruned library?
