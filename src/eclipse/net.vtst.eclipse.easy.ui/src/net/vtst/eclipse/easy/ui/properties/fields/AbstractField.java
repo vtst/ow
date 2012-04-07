@@ -6,6 +6,7 @@ import net.vtst.eclipse.easy.ui.properties.stores.IReadOnlyStore;
 import net.vtst.eclipse.easy.ui.properties.stores.IStore;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.swt.widgets.Composite;
 
 /**
  * Base class for fields.
@@ -47,14 +48,14 @@ public abstract class AbstractField<T> implements IField<T> {
    * @param container  The container for the newly created editor.
    * @return  The newly created editor.
    */
-  abstract public AbstractFieldEditor<T> createEditor(IEditorContainer container);
+  abstract public AbstractFieldEditor<T> createEditor(IEditorContainer container, Composite parent);
   
   /**
    * Create an editor for the current field, into the container.
    * @param container
    */
   public void bindEditor(IEditorContainer container) {
-    editor = createEditor(container);
+    editor = createEditor(container, container.getComposite());
   }
   
   /**

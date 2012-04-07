@@ -40,8 +40,8 @@ public class StringOptionsField extends AbstractField<String> {
   }
 
   @Override
-  public AbstractFieldEditor<String> createEditor(IEditorContainer container) {
-    return new Editor(container, this);
+  public AbstractFieldEditor<String> createEditor(IEditorContainer container, Composite parent) {
+    return new Editor(container, parent, this);
   }
   
   protected static class Editor extends AbstractFieldEditor<String> {
@@ -50,11 +50,10 @@ public class StringOptionsField extends AbstractField<String> {
     private Button[] buttons;
     private StringOptionsField field;
 
-    public Editor(IEditorContainer container, StringOptionsField field) {
+    public Editor(IEditorContainer container, Composite parent, StringOptionsField field) {
       super(container, field);
       this.field = field;
-      int hspan = container.getColumnCount();
-      Composite parent = container.getComposite();
+      int hspan = getColumnCount(parent);
       if (hspan < 2) return;
       buttons = new Button[field.values.length];
       label = SWTFactory.createLabel(parent, getMessage(), 1);

@@ -67,8 +67,5 @@ public abstract class AbstractCompoundEditor extends AbstractEditor implements I
   }
 
   @Override
-  public abstract int getColumnCount();
-
-  @Override
   public abstract Composite getComposite();
 }

@@ -1,11 +1,16 @@
 package net.vtst.eclipse.easy.ui.properties.editors;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.vtst.eclipse.easy.ui.util.SWTFactory;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Widget;
 
 /**
  * Default field set editor, which disposes its widgets on a grid.
@@ -13,8 +18,8 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class DefaultCompoundEditor extends AbstractCompoundEditor {
 
-  private int numColumns;
   private Composite composite;
+  private List<Control> controls = new ArrayList<Control>();
   
   public DefaultCompoundEditor(IEditorContainer container, int numColumns) {
     this(container, container.getComposite(), numColumns);
@@ -22,13 +27,7 @@ public class DefaultCompoundEditor extends AbstractCompoundEditor {
 
   public DefaultCompoundEditor(IEditorContainer container, Composite parent, int numColumns) {
     super(container);
-    this.numColumns = numColumns;
     composite = SWTFactory.createComposite(parent, numColumns, 1, GridData.FILL_BOTH);
-  }
-
-  @Override
-  public int getColumnCount() {
-    return numColumns;
   }
 
   @Override
@@ -43,6 +42,11 @@ public class DefaultCompoundEditor extends AbstractCompoundEditor {
 
   public void setEnabled(boolean enabled) {
     for (IEditor editor: editors) editor.setEnabled(enabled);
+    for (Control control: controls) control.setEnabled(enabled);
+  }
+  
+  public void addControl(Control control) {
+    controls.add(control);
   }
 
 }

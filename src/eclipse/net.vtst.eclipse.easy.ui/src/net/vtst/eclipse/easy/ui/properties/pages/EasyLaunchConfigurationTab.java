@@ -63,9 +63,4 @@ public abstract class EasyLaunchConfigurationTab extends AbstractLaunchConfigura
     return parent;
   }
 
-  @Override
-  public int getColumnCount() {
-    return 0;
-  }
-
 }

@@ -8,6 +8,7 @@ import net.vtst.eclipse.easy.ui.util.SWTFactory;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
 
 /**
  * A field whose values are booleans, and which is edited by a check-box.
@@ -30,19 +31,19 @@ public class BooleanField extends AbstractField<Boolean> {
   }
 
   @Override
-  public AbstractFieldEditor<Boolean> createEditor(IEditorContainer container) {
-    return new Editor(container, this);
+  public AbstractFieldEditor<Boolean> createEditor(IEditorContainer container, Composite parent) {
+    return new Editor(container, parent, this);
   }
 
   public class Editor extends AbstractFieldEditor<Boolean> {
     
     Button checkbox;
 
-    public Editor(IEditorContainer container, IField<Boolean> field) {
+    public Editor(IEditorContainer container, Composite parent, IField<Boolean> field) {
       super(container, field);
       checkbox = SWTFactory.createCheckButton(
-          container.getComposite(), getMessage(), null, false, 
-          container.getColumnCount());
+          parent, getMessage(), null, false, 
+          getColumnCount(parent));
       checkbox.addSelectionListener(this);
     }
 

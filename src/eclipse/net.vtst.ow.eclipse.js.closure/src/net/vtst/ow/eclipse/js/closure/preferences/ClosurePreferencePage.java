@@ -1,6 +1,7 @@
 package net.vtst.ow.eclipse.js.closure.preferences;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Control;
 
 import net.vtst.eclipse.easy.ui.properties.editors.ICompositeEditor;
 import net.vtst.eclipse.easy.ui.properties.pages.EasyPreferencePage;
