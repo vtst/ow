@@ -55,8 +55,17 @@ public abstract class AbstractField<T> implements IField<T> {
    * @param container
    */
   public void bindEditor(IEditorContainer container) {
-    editor = createEditor(container, container.getComposite());
+    bindEditor(container, container.getComposite());
   }
+  
+  /**
+   * @param container  The containing editor.
+   * @param parent  The containing composite.
+   */
+  public void bindEditor(IEditorContainer container, Composite parent) {
+    editor = createEditor(container, parent);
+  }
+
   
   /**
    * @return  The last created editor for the current field.

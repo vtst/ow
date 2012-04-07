@@ -27,6 +27,7 @@ public class ClosureProjectPropertyPage extends EasyProjectPropertyPage {
     Composite composite = SWTFactory.createComposite(parent, 1, 1, GridData.FILL_BOTH);
     enableClosureSupport = SWTFactory.createCheckButton(
         composite, getMessage("enableClosureSupport"), null, false, 1);
+    enableClosureSupport.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
     enableClosureSupport.addSelectionListener(new NullSwtSelectionListener() {
       @Override
       public void widgetSelected(SelectionEvent event) {

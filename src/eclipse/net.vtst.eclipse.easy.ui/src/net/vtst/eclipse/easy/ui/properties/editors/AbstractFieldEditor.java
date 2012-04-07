@@ -116,7 +116,7 @@ public abstract class AbstractFieldEditor<T>
     if (layout instanceof GridLayout) {
       return ((GridLayout) layout).numColumns;
     } else {
-      return 0;
+      return 3;
     }
   }
 }
