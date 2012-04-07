@@ -39,20 +39,30 @@ public class ProjectPropertyStore implements IStore {
       throws CoreException {
     String value = getPersistentProperty(name);
     if (value == null) return defaultValue;
-    return Boolean.parseBoolean(value);  // TODO: How are parse errors handled?
+    return Boolean.parseBoolean(value);
   }
 
   @Override
   public int get(String name, int defaultValue) throws CoreException {
-    // TODO Auto-generated method stub
-    return 0;
+    String value = getPersistentProperty(name);
+    if (value == null) return defaultValue;
+    try {
+      return Integer.parseInt(value);
+    } catch (NumberFormatException e) {
+      return defaultValue;
+    }
   }
 
   @Override
   public double get(String name, double defaultValue)
       throws CoreException {
-    // TODO Auto-generated method stub
-    return 0;
+    String value = getPersistentProperty(name);
+    if (value == null) return defaultValue;
+    try {
+      return Double.parseDouble(value);
+    } catch (NumberFormatException e) {
+      return defaultValue;
+    }
   }
 
   @Override
