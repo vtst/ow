@@ -37,16 +37,34 @@
       </enabledWhen>
     </page>
   </extension>
+  
+  <extension point="org.eclipse.ui.preferencePages">
+    <page
+      name="%closure_preference_page"
+      class="net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferencePage"
+      id="net.vtst.ow.eclipse.js.closure.ClosurePreferencePage"
+      category="org.eclipse.wst.jsdt.ui.preferences.JavaBasePreferencePage">
+      <keywordReference id="org.eclipse.wst.jsdt.ui.general"/>
+    </page>
+  </extension>
+  
+  <extension point="org.eclipse.ui.keywords">
+    <keyword
+      label="%closure_preference_keyword"
+      id="org.eclipse.wst.jsdt.ui.general"/>
+  </extension>
+  
+  
    
   <extension point="org.eclipse.wst.jsdt.ui.javaCompletionProposalComputer"
     id="ClosureCompletionProposalCategory"
-    name="Closure Completion Proposals">
+    name="%closure_completion_proposal_category">
     <proposalCategory icon="icons/16x16/closure.png"/>
   </extension>
    
   <extension point="org.eclipse.wst.jsdt.ui.javaCompletionProposalComputer"
     id="ClosureCompletionProposalComputer"
-    name="Closure Completion Proposal Computer">
+    name="%closure_completion_proposal_computer">
     <javaCompletionProposalComputer
       class="net.vtst.ow.eclipse.js.closure.contentassist.ClosureCompletionProposalComputer"
       categoryId="net.vtst.ow.eclipse.js.closure.ClosureCompletionProposalCategory">
