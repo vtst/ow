@@ -56,7 +56,7 @@ public class ClosureProjectPropertyPage extends EasyProjectPropertyPage {
 
   @Override
   protected String getPropertyQualifier() {
-    return "Closure";
+    return OwJsClosurePlugin.PLUGIN_ID;
   }
   
   private boolean hasNature() {

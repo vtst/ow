@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.vtst.eclipse.easy.ui.properties.stores.IStore;
+import net.vtst.eclipse.easy.ui.properties.stores.PluginPreferenceStore;
+import net.vtst.eclipse.easy.ui.properties.stores.ProjectPropertyStore;
 import net.vtst.ow.closure.compiler.compile.CompilableJSUnit;
 import net.vtst.ow.closure.compiler.compile.CompilerRun;
 import net.vtst.ow.closure.compiler.deps.AbstractJSProject;
@@ -21,7 +24,9 @@ import net.vtst.ow.eclipse.js.closure.compiler.CompilationUnitProviderFromEclips
 import net.vtst.ow.eclipse.js.closure.compiler.ErrorManagerGeneratingProblemMarkers;
 import net.vtst.ow.eclipse.js.closure.compiler.NullErrorManager;
 import net.vtst.ow.eclipse.js.closure.dev.OwJsDev;
-import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPersistentPropertyHelper;
+import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
+import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPropertyRecord;
+import net.vtst.ow.eclipse.js.closure.properties.ClosurePropertyEditor;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -129,8 +134,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
     monitor.subTask("build_prepare");
     Compiler compiler = CompilerUtils.makeCompiler(new NullErrorManager());  // TODO!
     compiler.initOptions(CompilerUtils.makeOptions());
-    ClosureProjectPersistentPropertyHelper helper = new ClosureProjectPersistentPropertyHelper(project);
-    File pathOfClosureBase = helper.getClosureBaseDirAfFile();
+    File pathOfClosureBase = getPathOfClosureBase(project);
 
     // Create or get the project
     JSProject jsProject = ResourceProperties.getOrCreateJSProject(project);
@@ -158,6 +162,17 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
     }
     monitor.worked(1);
     compileJavaScriptFiles(monitor, files, false);
+  }
+  
+  private File getPathOfClosureBase(IProject project) throws CoreException {
+    IStore ps = new ProjectPropertyStore(project, OwJsClosurePlugin.PLUGIN_ID);
+    ClosureProjectPropertyRecord pr = ClosureProjectPropertyRecord.getInstance();
+    if (pr.useDefaultClosureBasePath.get(ps)) {
+      IStore prefs = new PluginPreferenceStore(OwJsClosurePlugin.getDefault().getPreferenceStore());
+      return ClosurePreferenceRecord.getInstance().closureBasePath.get(prefs);
+    } else {
+      return pr.closureBasePath.get(ps);
+    }
   }
 
   // **************************************************************************
@@ -372,15 +387,14 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
   private Collection<AbstractJSProject> getJSLibraries(
       IProgressMonitor monitor, Compiler compiler, ArrayList<IProject> projects) throws CoreException {
     ListWithoutDuplicates<AbstractJSProject> result = new ListWithoutDuplicates<AbstractJSProject>();
-    for (int i = projects.size() - 1; i >= 0; --i) {
-      ClosureProjectPersistentPropertyHelper helper = new ClosureProjectPersistentPropertyHelper(projects.get(i));
-      File pathOfClosureBase = helper.getClosureBaseDirAfFile();
+    for (int i = projects.size() - 1; i >= 0; --i) {      
+      File pathOfClosureBase = getPathOfClosureBase(projects.get(i));
       if (pathOfClosureBase != null) {
         result.add(jsLibraryManager.get(compiler, pathOfClosureBase, pathOfClosureBase, true));
       }
-      for (String libraryPath: helper.getOtherLibraries()) {
+      for (File libraryPath: ClosureProjectPropertyRecord.getInstance().otherLibraries.get(new ProjectPropertyStore(projects.get(i), OwJsClosurePlugin.PLUGIN_ID))) {
         checkCancel(monitor, true);
-        result.add(jsLibraryManager.get(compiler, new File(libraryPath), pathOfClosureBase, false));
+        result.add(jsLibraryManager.get(compiler, libraryPath, pathOfClosureBase, false));
       }
     }
     return result.asList();
