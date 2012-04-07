@@ -90,6 +90,20 @@ public abstract class EasyProjectPropertyPage extends PropertyPage implements IE
   }
   
   private IStore getStore() {
-    return new ProjectPropertyStore((IProject) getElement(), getPropertyQualifier());
+    return new ProjectPropertyStore(getProject(), getPropertyQualifier());
+  }
+  
+  /**
+   * @return  The editor contained by this page.
+   */
+  protected IEditor getEditor() {
+    return editor;
+  }
+  
+  /**
+   * @return  The project resource edited by this page.
+   */
+  protected IProject getProject() {
+    return (IProject) getElement();
   }
 }
