@@ -15,14 +15,15 @@ import net.vtst.eclipse.easy.ui.properties.stores.ProjectPropertyStore;
 import net.vtst.ow.closure.compiler.compile.CompilableJSUnit;
 import net.vtst.ow.closure.compiler.compile.CompilerRun;
 import net.vtst.ow.closure.compiler.deps.AbstractJSProject;
+import net.vtst.ow.closure.compiler.deps.JSLibrary;
 import net.vtst.ow.closure.compiler.deps.JSProject;
 import net.vtst.ow.closure.compiler.util.CompilerUtils;
 import net.vtst.ow.closure.compiler.util.ListWithoutDuplicates;
+import net.vtst.ow.closure.compiler.util.NullErrorManager;
 import net.vtst.ow.eclipse.js.closure.OwJsClosureMessages;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.compiler.CompilationUnitProviderFromEclipseIFile;
 import net.vtst.ow.eclipse.js.closure.compiler.ErrorManagerGeneratingProblemMarkers;
-import net.vtst.ow.eclipse.js.closure.compiler.NullErrorManager;
 import net.vtst.ow.eclipse.js.closure.dev.OwJsDev;
 import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
 import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPropertyRecord;
@@ -174,7 +175,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
       return pr.closureBasePath.get(ps);
     }
   }
-
+  
   // **************************************************************************
   // Incremental build
   
