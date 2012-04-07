@@ -13,17 +13,17 @@ public class ClosurePreferencePage extends EasyPreferencePage {
   private OwJsClosureMessages messages = OwJsClosurePlugin.getDefault().getMessages();;
 
   @Override
-  public String getMessage(String key) {
-    return messages.getString(key);
-  }
-
-  @Override
   protected ICompositeEditor createEditor() {
     return new ClosurePreferenceEditor(this);
   }
   
   public IPreferenceStore getPreferenceStore() {
     return OwJsClosurePlugin.getDefault().getPreferenceStore();
+  }
+
+  @Override
+  public String getMessage(String key) {
+    return messages.getStringOrNull("ClosurePreferencePage_" + key);
   }
 
 }
