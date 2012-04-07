@@ -21,4 +21,5 @@ Export-Package: net.vtst.eclipse.easy.ui.listeners,
  net.vtst.eclipse.easy.ui.properties.editors,
  net.vtst.eclipse.easy.ui.properties.fields,
  net.vtst.eclipse.easy.ui.properties.pages,
- net.vtst.eclipse.easy.ui.properties.stores
+ net.vtst.eclipse.easy.ui.properties.stores,
+ net.vtst.eclipse.easy.ui.util
