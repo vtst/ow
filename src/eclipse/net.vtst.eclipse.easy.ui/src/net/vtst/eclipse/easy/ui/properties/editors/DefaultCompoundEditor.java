@@ -1,6 +1,9 @@
 package net.vtst.eclipse.easy.ui.properties.editors;
 
+import net.vtst.eclipse.easy.ui.util.SWTFactory;
+
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
@@ -20,9 +23,7 @@ public class DefaultCompoundEditor extends AbstractCompoundEditor {
   public DefaultCompoundEditor(IEditorContainer container, Composite parent, int numColumns) {
     super(container);
     this.numColumns = numColumns;
-    composite = new Composite(parent, SWT.NONE);
-    GridLayout layout = new GridLayout(numColumns, false);
-    composite.setLayout(layout);
+    composite = SWTFactory.createComposite(parent, numColumns, 1, GridData.FILL_BOTH);
   }
 
   @Override
