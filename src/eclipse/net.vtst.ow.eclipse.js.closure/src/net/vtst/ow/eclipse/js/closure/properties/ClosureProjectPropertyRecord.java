@@ -12,12 +12,14 @@ public class ClosureProjectPropertyRecord extends Record {
   public ClosureProjectPropertyRecord() {
     super.initializeByReflection();
   }
-  
+
+  public FileField closureBasePath = new FileField("", FileField.Type.DIRECTORY);
+
   // Includes
   
-  public FileField closureBasePath = new FileField("", FileField.Type.DIRECTORY);
   public FileListField otherLibraries = new FileListField(FileListField.Type.DIRECTORY);
-  public FileListField externs = new FileListField(FileListField.Type.DIRECTORY);
+  public FileListField externs = new FileListField(FileListField.Type.FILE, 
+      new String[]{"*.js", "*"}, new String[]{"js", "all"});
   public BooleanField useOnlyCustomExterns = new BooleanField(false);
   
   // Compilation (checks)
