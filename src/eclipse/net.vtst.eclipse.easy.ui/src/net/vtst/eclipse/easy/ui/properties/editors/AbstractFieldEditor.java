@@ -10,6 +10,9 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Layout;
 
 /**
  * Base class for implementing field editors.
@@ -106,5 +109,14 @@ public abstract class AbstractFieldEditor<T>
       if (message == null) message = "!" + key + "!"; 
     }
     return message;
+  }
+  
+  protected static int getColumnCount(Composite parent) {
+    Layout layout = parent.getLayout();
+    if (layout instanceof GridLayout) {
+      return ((GridLayout) layout).numColumns;
+    } else {
+      return 3;
+    }
   }
 }

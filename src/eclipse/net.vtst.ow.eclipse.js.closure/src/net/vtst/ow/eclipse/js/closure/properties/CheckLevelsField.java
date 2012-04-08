@@ -59,8 +59,8 @@ public class CheckLevelsField extends AbstractField<Map<String, CheckLevel>> {
   }
 
   @Override
-  public AbstractFieldEditor<Map<String, CheckLevel>> createEditor(IEditorContainer container) {
-    return new Editor(container, this);
+  public AbstractFieldEditor<Map<String, CheckLevel>> createEditor(IEditorContainer container, Composite parent) {
+    return new Editor(container, parent, this);
   }
   
   private String checkLevelToString(CheckLevel level) {
@@ -79,9 +79,8 @@ public class CheckLevelsField extends AbstractField<Map<String, CheckLevel>> {
   
   private static class Editor extends AbstractFieldEditor<Map<String, CheckLevel>> {
 
-    public Editor(IEditorContainer container, IField<Map<String, CheckLevel>> field) {
+    public Editor(IEditorContainer container, Composite parent, IField<Map<String, CheckLevel>> field) {
       super(container, field);
-      Composite parent = container.getComposite();
       Table table = new Table(parent, SWT.NONE);
       TableColumn column1 = new TableColumn(table, SWT.NONE);
       column1.setText("Check");

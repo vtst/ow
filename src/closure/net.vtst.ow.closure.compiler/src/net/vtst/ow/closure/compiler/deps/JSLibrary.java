@@ -30,6 +30,12 @@ import com.google.javascript.jscomp.deps.SortedDependencies.CircularDependencyEx
  */
 public class JSLibrary extends AbstractJSProject {
   
+  public enum StripMode {
+    DISABLED,
+    READ_ONLY,
+    READ_AND_WRITE
+  }
+  
   // TODO: It should be checked whether this works on Microsoft Windows, because the paths
   // in the deps.js file are stored with '/' instead of '\'.
   
@@ -55,6 +61,7 @@ public class JSLibrary extends AbstractJSProject {
   private File depsFile;
   private boolean canWriteDepsFile = false;
   private boolean isClosureBase;
+  private StripMode stripMode = StripMode.DISABLED;
   
   /**
    * Create a new library.
@@ -70,6 +77,12 @@ public class JSLibrary extends AbstractJSProject {
     this.pathOfClosureBase = pathOfClosureBase;
     this.isClosureBase = isClosureBase;
   }
+  
+  public JSLibrary(File path, File pathOfClosureBase, boolean isClosureBase, StripMode stripMode) {
+    this(path, pathOfClosureBase, isClosureBase);
+    this.stripMode = stripMode;
+  }
+
   
   @Override
   protected List<AbstractJSProject> getReferencedProjects() {
@@ -133,7 +146,7 @@ public class JSLibrary extends AbstractJSProject {
     FileTreeVisitor.Simple<RuntimeException> visitor = new FileTreeVisitor.Simple<RuntimeException>() {
       public void visitFile(java.io.File file) {
         if (!CompilerUtils.isJavaScriptFile(file)) return;
-        JSUnit unit = new JSUnit(file, pathOfClosureBase, new JSUnitProvider.FromFrozenFile(file));
+        JSUnit unit = new JSUnit(file, pathOfClosureBase, new JSUnitProvider.FromLibraryFile(file, stripMode));
         unit.updateDependencies(compiler);
         addGoogToDependencies(unit);
         units.add(unit);
@@ -172,7 +185,7 @@ public class JSLibrary extends AbstractJSProject {
       for (DependencyInfo info: depsFileParser.parseFile(depsFile.getAbsolutePath())) {
         File file = FileUtils.join(pathOfClosureBase, new File(info.getPathRelativeToClosureBase()));
         JSUnit unit = new JSUnit(
-            file, pathOfClosureBase, new JSUnitProvider.FromFile(file), 
+            file, pathOfClosureBase, new JSUnitProvider.FromLibraryFile(file, stripMode), 
             Sets.newHashSet(info.getProvides()), Sets.newHashSet(info.getRequires()));
         addGoogToDependencies(unit);
         units.add(unit);

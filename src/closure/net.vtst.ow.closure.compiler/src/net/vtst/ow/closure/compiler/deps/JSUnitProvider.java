@@ -5,6 +5,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
+import net.vtst.ow.closure.compiler.deps.JSLibrary.StripMode;
+import net.vtst.ow.closure.compiler.strip.JSFileStripper;
+import net.vtst.ow.closure.compiler.util.NullErrorManager;
+
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.javascript.jscomp.SourceFile;
@@ -52,11 +56,15 @@ public class JSUnitProvider {
       this.file = file;
       this.charset = charset;
     }
+    
+    protected File getFile() {
+      return file;
+    }
 
     @Override
     public void prepareToGetCode() throws IOException {
       try {
-        code = Files.toString(file, charset);
+        code = Files.toString(getFile(), charset);
       } catch (IOException exn) {
         code = "";
         throw exn;
@@ -75,14 +83,54 @@ public class JSUnitProvider {
     
   }
   
-  public static class FromFrozenFile extends FromFile {
+  public static class FromLibraryFile extends FromFile {
+    
+    private File strippedFile;
+    private JSLibrary.StripMode stripMode;
 
-    public FromFrozenFile(File file) {
+    public FromLibraryFile(File file, JSLibrary.StripMode stripMode) {
       super(file);
+      this.stripMode = stripMode;
+      strippedFile = new File(file.getPath() + ".stripped");
     }
     
-    public FromFrozenFile(File file, Charset charset) {
+    public FromLibraryFile(File file, Charset charset) {
       super(file, charset);
+    }
+    
+    private boolean strip() {
+      JSFileStripper stripper = new JSFileStripper(new NullErrorManager());
+      try {
+        stripper.strip(super.getFile(), strippedFile);
+        return true;
+      } catch (IOException e) {
+        return false;
+      }
+    }
+    
+    protected File getFile() {
+      File originalFile = super.getFile();
+      if (stripMode == StripMode.DISABLED) return originalFile;
+      if (strippedFile.exists()) {
+        if (strippedFile.lastModified() >= originalFile.lastModified()) {
+          return strippedFile;
+        }
+        else if (stripMode == StripMode.READ_AND_WRITE && strippedFile.canWrite() && strip()) {
+          return strippedFile;
+        } else {
+          return originalFile;
+        }
+      } else {
+        try {
+          if (stripMode == StripMode.READ_AND_WRITE && strippedFile.createNewFile() && strip()) {
+            return strippedFile;
+          } else {
+            return originalFile;
+          }
+        } catch (IOException e) {
+          return originalFile;
+        }
+      }
     }
     
     @Override

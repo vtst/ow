@@ -1,4 +1,4 @@
-package net.vtst.ow.eclipse.js.closure.compiler;
+package net.vtst.ow.closure.compiler.util;
 
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.ErrorManager;

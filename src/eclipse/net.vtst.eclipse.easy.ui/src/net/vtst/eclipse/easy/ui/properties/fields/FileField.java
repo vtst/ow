@@ -43,8 +43,8 @@ public class FileField extends AbstractField<File> {
   }
 
   @Override
-  public AbstractFieldEditor<File> createEditor(IEditorContainer container) {
-    return new Editor(container, this);
+  public AbstractFieldEditor<File> createEditor(IEditorContainer container, Composite parent) {
+    return new Editor(container, parent, this);
   }
   
   public static class Editor extends AbstractFieldEditor<File> {
@@ -53,10 +53,9 @@ public class FileField extends AbstractField<File> {
     private Text text;
     private Button buttonBrowse;
 
-    public Editor(IEditorContainer container, IField<File> field) {
+    public Editor(IEditorContainer container, Composite parent, IField<File> field) {
       super(container, field);
-      int hspan = container.getColumnCount();
-      Composite parent = container.getComposite();
+      int hspan = getColumnCount(parent);
       if (hspan < 3) return;  // TODO
       label = SWTFactory.createLabel(parent, getMessage(), 1);
       text = SWTFactory.createSingleText(parent, hspan - 2);

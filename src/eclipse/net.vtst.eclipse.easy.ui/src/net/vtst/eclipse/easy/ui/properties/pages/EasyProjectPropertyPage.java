@@ -61,11 +61,6 @@ public abstract class EasyProjectPropertyPage extends PropertyPage implements IE
   public Composite getComposite() {
     return parent;
   }
-
-  @Override
-  public int getColumnCount() {
-    return 0;
-  }
   
   @Override
   public boolean isValid() {

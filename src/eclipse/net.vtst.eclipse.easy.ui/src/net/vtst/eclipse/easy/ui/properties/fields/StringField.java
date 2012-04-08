@@ -29,8 +29,8 @@ public class StringField extends AbstractField<String> {
   }
 
   @Override
-  public AbstractFieldEditor<String> createEditor(IEditorContainer container) {
-    return new Editor(container, this);
+  public AbstractFieldEditor<String> createEditor(IEditorContainer container, Composite parent) {
+    return new Editor(container, parent, this);
   }
   
   protected static class Editor extends AbstractFieldEditor<String> {
@@ -38,10 +38,9 @@ public class StringField extends AbstractField<String> {
     private Label label;
     private Text text;
 
-    public Editor(IEditorContainer container, IField<String> field) {
+    public Editor(IEditorContainer container, Composite parent, IField<String> field) {
       super(container, field);
-      int hspan = container.getColumnCount();
-      Composite parent = container.getComposite();
+      int hspan = getColumnCount(parent);
       if (hspan < 2) return;
       label = SWTFactory.createLabel(parent, getMessage(), 1);
       text = SWTFactory.createSingleText(parent, hspan - 1);

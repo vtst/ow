@@ -4,7 +4,13 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.eclipse.core.runtime.CoreException;
+
+import net.vtst.eclipse.easy.ui.properties.stores.IStore;
+import net.vtst.eclipse.easy.ui.properties.stores.PluginPreferenceStore;
 import net.vtst.ow.closure.compiler.deps.JSLibrary;
+import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
+import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
 
 import com.google.javascript.jscomp.AbstractCompiler;
 
@@ -69,10 +75,29 @@ public class JSLibraryManager {
     LibraryKey key = new LibraryKey(libraryPath, pathOfClosureBase, isClosureBase);
     JSLibrary library = get(key);
     if (library == null) {
-      library = new JSLibrary(libraryPath, pathOfClosureBase, isClosureBase);
+      library = new JSLibrary(libraryPath, pathOfClosureBase, isClosureBase, getStripMode());
       library.setUnits(compiler);
       cache.put(key, new WeakReference<JSLibrary>(library));
     }
     return library;
   }
+  
+  private JSLibrary.StripMode getStripMode() {
+    ClosurePreferenceRecord r = ClosurePreferenceRecord.getInstance();
+    IStore prefs = new PluginPreferenceStore(OwJsClosurePlugin.getDefault().getPreferenceStore());
+    try {
+      if (r.readStrippedLibraryFiles.get(prefs)) {
+        if (r.writeStrippedLibraryFiles.get(prefs)) {
+          return JSLibrary.StripMode.READ_AND_WRITE;
+        } else {
+          return JSLibrary.StripMode.READ_ONLY;
+        }
+      } else {
+        return JSLibrary.StripMode.DISABLED;
+      }
+    } catch (CoreException e) {
+      return JSLibrary.StripMode.DISABLED;
+   }
+  }
+
 }

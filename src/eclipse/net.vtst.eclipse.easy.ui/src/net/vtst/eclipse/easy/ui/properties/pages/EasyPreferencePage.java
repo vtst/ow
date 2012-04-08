@@ -73,9 +73,4 @@ public abstract class EasyPreferencePage extends PreferencePage implements IWork
   public Composite getComposite() {
     return parent;
   }
-
-  @Override
-  public int getColumnCount() {
-    return 0;
-  }
 }

@@ -1,6 +1,7 @@
 package net.vtst.eclipse.easy.ui.properties.editors;
 
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 
 /**
  * Interface for objects containing editors.
@@ -26,12 +27,7 @@ public interface IEditorContainer {
    * @return  The composite to which the contained editor may add their widgets.
    */
   public Composite getComposite();
-  
-  /**
-   * @return  The number of columns of the composite, or 0 if it does not have a grid layout.
-   */
-  public int getColumnCount();
-  
+    
   /**
    * Get a message string for user display.
    * @param key  The key of the message string.

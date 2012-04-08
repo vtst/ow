@@ -64,8 +64,8 @@ public class FileListField extends AbstractField<List<File>> {
   }
 
   @Override
-  public AbstractFieldEditor<List<File>> createEditor(IEditorContainer container) {
-    return new Editor(container, this);
+  public AbstractFieldEditor<List<File>> createEditor(IEditorContainer container, Composite parent) {
+    return new Editor(container, parent, this);
   }
   
   public static class Editor extends AbstractFieldEditor<List<File>> {
@@ -76,11 +76,10 @@ public class FileListField extends AbstractField<List<File>> {
     private Button removeButton;
     private Button addOtherLibrary;
 
-    public Editor(IEditorContainer container, FileListField field) {
+    public Editor(IEditorContainer container, Composite parent, FileListField field) {
       super(container, field);
       this.field = field;
-      int hspan = container.getColumnCount();
-      Composite parent = container.getComposite();
+      int hspan = getColumnCount(parent);
       if (hspan < 3) return;  // TODO
       label = SWTFactory.createLabel(parent, getMessage(), 1);
       GridData gd = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);

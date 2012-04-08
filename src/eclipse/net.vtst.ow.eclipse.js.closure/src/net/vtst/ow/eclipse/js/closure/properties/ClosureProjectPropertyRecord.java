@@ -13,6 +13,7 @@ public class ClosureProjectPropertyRecord extends Record {
     super.initializeByReflection();
   }
 
+  public BooleanField useDefaultClosureBasePath = new BooleanField(true);
   public FileField closureBasePath = new FileField("", FileField.Type.DIRECTORY);
 
   // Includes
