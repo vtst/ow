@@ -1,6 +1,8 @@
 package net.vtst.eclipse.easy.ui.properties.fields;
 
 import java.io.File;
+import java.io.ObjectInputStream.GetField;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -8,6 +10,7 @@ import java.util.List;
 import net.vtst.eclipse.easy.ui.listeners.NullSwtSelectionListener;
 import net.vtst.eclipse.easy.ui.properties.editors.AbstractFieldEditor;
 import net.vtst.eclipse.easy.ui.properties.editors.IEditorContainer;
+import net.vtst.eclipse.easy.ui.properties.fields.FileListField.Type;
 import net.vtst.eclipse.easy.ui.properties.stores.IReadOnlyStore;
 import net.vtst.eclipse.easy.ui.properties.stores.IStore;
 import net.vtst.eclipse.easy.ui.util.SWTFactory;
@@ -19,6 +22,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 
 /**
@@ -27,11 +31,21 @@ import org.eclipse.swt.widgets.Label;
  */
 public class FileListField extends AbstractField<List<File>> {
   
-  public enum Type { DIRECTORY }
+  public enum Type { DIRECTORY, FILE }
+
+  private Type type;
+  private String[] filterExtensions;
+  private String[] filterNames;
 
   public FileListField(Type type) {
+    this(type, new String[0], new String[0]);
+  }
+  
+  public FileListField(Type type, String[] filterExtensions, String[] filterNames) {
     super(Collections.<File>emptyList());
-    // this.type = type;
+    this.type = type;
+    this.filterExtensions = filterExtensions;
+    this.filterNames = filterNames;
   }
   
   @Override
@@ -56,13 +70,15 @@ public class FileListField extends AbstractField<List<File>> {
   
   public static class Editor extends AbstractFieldEditor<List<File>> {
     
+    private FileListField field;
     private Label label;
     private org.eclipse.swt.widgets.List list;
     private Button removeButton;
     private Button addOtherLibrary;
 
-    public Editor(IEditorContainer container, IField<List<File>> field) {
+    public Editor(IEditorContainer container, FileListField field) {
       super(container, field);
+      this.field = field;
       int hspan = container.getColumnCount();
       Composite parent = container.getComposite();
       if (hspan < 3) return;  // TODO
@@ -89,6 +105,7 @@ public class FileListField extends AbstractField<List<File>> {
           removeFile();
         }
       });
+      SWTFactory.createLabel(parent, "", 1);
     }
     
     @Override
@@ -115,12 +132,27 @@ public class FileListField extends AbstractField<List<File>> {
     }
     
     private void addFile() {
-      DirectoryDialog dialog = new DirectoryDialog(removeButton.getShell());
-      dialog.setText(getMessage("add_title", "FileListField_add_title"));
-      dialog.setMessage(getMessage("add_message", "FileListField_add_message"));
-      String newDir = dialog.open();
-      if (newDir == null) return;
-      addFile(newDir);
+      switch (field.type) {
+      case DIRECTORY:
+        DirectoryDialog directoryDialog = new DirectoryDialog(removeButton.getShell());
+        directoryDialog.setText(getMessage("add_title", "FileListField_add_title"));
+        directoryDialog.setMessage(getMessage("add_message", "FileListField_add_message"));
+        String newDir = directoryDialog.open();
+        if (newDir != null) addFile(newDir);
+        break;
+      case FILE:
+        FileDialog fileDialog = new FileDialog(removeButton.getShell());
+        fileDialog.setText(getMessage("add_title", "FileListField_add_title"));
+        fileDialog.setFilterExtensions(field.filterExtensions);
+        String[] filterNamesMessages = new String[field.filterNames.length];
+        for (int i = 0; i < filterNamesMessages.length; ++i) {
+          filterNamesMessages[i] = getMessage("filter_" + field.filterNames[i]);
+        }
+        fileDialog.setFilterNames(filterNamesMessages);
+        String newFile = fileDialog.open();
+        if (newFile != null) addFile(newFile);
+        break;
+      } 
     }
 
     private void addFile(String path) {
