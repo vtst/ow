@@ -17,9 +17,8 @@ import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.builder.ClosureNature;
 import net.vtst.ow.eclipse.js.closure.util.Utils;
 
-public class ClosureProjectPropertyPage extends EasyProjectPropertyPage {
+public class ClosureMainConfigurationPropertyPage extends ClosureAsbtractPropertyPage {
 
-  private OwJsClosureMessages messages = OwJsClosurePlugin.getDefault().getMessages();;
   private Button enableClosureSupport;
   
   @Override
@@ -44,18 +43,7 @@ public class ClosureProjectPropertyPage extends EasyProjectPropertyPage {
   
   @Override
   protected ICompositeEditor createEditor() {
-    messages = OwJsClosurePlugin.getDefault().getMessages();
-    return new ClosurePropertyEditor(this);
-  }
-
-  @Override
-  public String getMessage(String key) {
-    return messages.getStringOrNull("ClosureProjectPropertyPage_" + key);
-  }
-
-  @Override
-  protected String getPropertyQualifier() {
-    return "Closure";
+    return new ClosureMainConfigurationEditor(this);
   }
   
   private boolean hasNature() {

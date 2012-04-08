@@ -8,11 +8,11 @@ import net.vtst.eclipse.easy.ui.properties.editors.IEditorContainer;
 import net.vtst.eclipse.easy.ui.properties.stores.IReadOnlyStore;
 import net.vtst.eclipse.easy.ui.util.SWTFactory;
 
-public class ClosurePropertyEditor extends DefaultCompoundEditor {
+public class ClosureMainConfigurationEditor extends DefaultCompoundEditor {
   
-  ClosureProjectPropertyRecord record = new ClosureProjectPropertyRecord();
+  private ClosureProjectPropertyRecord record = new ClosureProjectPropertyRecord();
   
-  public ClosurePropertyEditor(IEditorContainer container) {
+  public ClosureMainConfigurationEditor(IEditorContainer container) {
     super(container, 3);
     record.closureBasePath.bindEditor(this);
     record.otherLibraries.bindEditor(this);
