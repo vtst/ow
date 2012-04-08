@@ -135,6 +135,10 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
     Compiler compiler = CompilerUtils.makeCompiler(new NullErrorManager());  // TODO!
     compiler.initOptions(CompilerUtils.makeOptions());
     File pathOfClosureBase = getPathOfClosureBase(project);
+    if (pathOfClosureBase == null) {
+      monitor.worked(1);
+      return;
+    }
 
     // Create or get the project
     JSProject jsProject = ResourceProperties.getOrCreateJSProject(project);

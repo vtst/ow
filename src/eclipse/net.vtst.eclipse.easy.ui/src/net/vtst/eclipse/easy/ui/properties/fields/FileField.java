@@ -26,7 +26,7 @@ public class FileField extends AbstractField<File> {
   public enum Type { DIRECTORY }
 
   public FileField(String defaultValue, Type type) {
-    super(new File(defaultValue));
+    super(defaultValue == null ? null : new File(defaultValue));
     // this.type = type;
   }
   
@@ -34,12 +34,13 @@ public class FileField extends AbstractField<File> {
   public File get(IReadOnlyStore store) throws CoreException {
     String value = store.get(name, (String) null);
     if (value == null) return defaultValue;
+    if (value.length() == 0) return null;
     return new File(value);
   }
 
   @Override
   public void set(IStore store, File value) throws CoreException {
-    store.set(name, value.getAbsolutePath());
+    store.set(name, value == null ? "" : value.getAbsolutePath());
   }
 
   @Override
@@ -79,12 +80,14 @@ public class FileField extends AbstractField<File> {
 
     @Override
     public File getCurrentValue() {
+      if (text.getText().length() == 0) return null;
       return new File(text.getText());
     }
 
     @Override
     public void setCurrentValue(File value) {
-      text.setText(value.getAbsolutePath());
+      if (value == null) text.setText("");
+      else text.setText(value.getAbsolutePath());
     }
 
     @Override

@@ -11,7 +11,7 @@ public class ClosurePreferenceRecord extends Record {
     super.initializeByReflection();
   }
   
-  public FileField closureBasePath = new FileField("", FileField.Type.DIRECTORY);
+  public FileField closureBasePath = new FileField(null, FileField.Type.DIRECTORY);
   public BooleanField readStrippedLibraryFiles = new BooleanField(true);
   public BooleanField writeStrippedLibraryFiles = new BooleanField(false);
 

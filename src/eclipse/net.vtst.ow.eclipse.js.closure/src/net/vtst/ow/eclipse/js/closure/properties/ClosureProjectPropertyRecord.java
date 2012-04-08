@@ -14,7 +14,7 @@ public class ClosureProjectPropertyRecord extends Record {
   }
 
   public BooleanField useDefaultClosureBasePath = new BooleanField(true);
-  public FileField closureBasePath = new FileField("", FileField.Type.DIRECTORY);
+  public FileField closureBasePath = new FileField(null, FileField.Type.DIRECTORY);
 
   // Includes
   
