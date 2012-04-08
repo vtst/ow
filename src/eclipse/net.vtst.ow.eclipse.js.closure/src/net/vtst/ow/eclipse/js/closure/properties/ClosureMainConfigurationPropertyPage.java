@@ -46,13 +46,10 @@ public class ClosureMainConfigurationPropertyPage extends ClosureAsbtractPropert
     return new ClosureMainConfigurationEditor(this);
   }
   
-  private boolean hasNature() {
-    try {
-      return ((IProject) getElement()).hasNature(ClosureNature.NATURE_ID);
-    } catch (CoreException e) {
-      return false;
-    }
+  protected boolean enableEditor() {
+    return true;
   }
+
   
   public boolean performOk() {
     try {
