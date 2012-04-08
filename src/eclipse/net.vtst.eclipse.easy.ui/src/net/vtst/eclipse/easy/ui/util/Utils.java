@@ -1,6 +1,7 @@
 package net.vtst.eclipse.easy.ui.util;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Utils {
@@ -28,6 +29,7 @@ public class Utils {
   
   public static List<String> stringToStringList(String value, List<String> defaultValue) {
     if (value == null) return defaultValue;
+    if (value.length() == 0) return Collections.emptyList();
     return Arrays.asList(value.split(SEPARATOR));
   }
 
