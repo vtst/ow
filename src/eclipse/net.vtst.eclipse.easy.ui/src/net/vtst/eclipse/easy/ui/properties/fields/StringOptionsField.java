@@ -19,6 +19,10 @@ public class StringOptionsField extends AbstractField<String> {
   
   private String[] values;
   private Map<String, Integer> valueMap;
+  
+  public StringOptionsField(String[] values) {
+    this(values[0], values);
+  }
 
   public StringOptionsField(String defaultValue, String[] values) {
     super(defaultValue);
