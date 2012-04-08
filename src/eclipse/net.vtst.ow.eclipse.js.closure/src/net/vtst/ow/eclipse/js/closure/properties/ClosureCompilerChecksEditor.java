@@ -11,6 +11,7 @@ public class ClosureCompilerChecksEditor extends DefaultCompoundEditor {
     super(container, 3);
     // TODO First group
     record.warningLevel.bindEditor(this);
+    record.checkLevels.bindEditor(this);
     // TODO Second group
     record.thirdParty.bindEditor(this);
     record.processClosurePrimitives.bindEditor(this);

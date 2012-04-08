@@ -31,7 +31,7 @@ public class ClosureProjectPropertyRecord extends Record {
   public BooleanField processJQueryPrimitives = new BooleanField(false);
   public BooleanField acceptConstKeyword = new BooleanField(false);
   public StringOptionsField languageIn = new StringOptionsField("ECMASCRIPT3", "ECMASCRIPT5", "ECMASCRIPT5_STRICT");
-  // TODO: jscomp_off/warning/error
+  public CheckLevelsField checkLevels = new CheckLevelsField();
   
   // Compilation (output)
   
