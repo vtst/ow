@@ -99,5 +99,9 @@ public class JSLibraryManager {
       return JSLibrary.StripMode.DISABLED;
    }
   }
+  
+  public void clear() {
+    cache.clear();
+  }
 
 }
