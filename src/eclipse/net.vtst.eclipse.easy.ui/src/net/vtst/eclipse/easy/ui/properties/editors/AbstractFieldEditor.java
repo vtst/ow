@@ -54,7 +54,7 @@ public abstract class AbstractFieldEditor<T>
   
   @Override
   public boolean hasChanged(IReadOnlyStore store) throws CoreException {
-    return field.valueEqual(getCurrentValue(), field.get(store));
+    return !field.valueEqual(getCurrentValue(), field.get(store));
   }
   
   @Override
