@@ -48,6 +48,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
@@ -411,7 +412,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
     return result.asList();
   }
   
-  public static void buildAll() throws CoreException {
+  public static void buildAll() {
     // Get the list of projects having the Closure nature
     IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
     final ArrayList<IBuildConfiguration> configs = new ArrayList<IBuildConfiguration>(projects.length);
@@ -425,19 +426,17 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
       }
     }
     // Build
-    try {
-      PlatformUI.getWorkbench().getProgressService().run(false, true, new IRunnableWithProgress() {
-         public void run(IProgressMonitor monitor) throws InvocationTargetException {
-           try {
-            ResourcesPlugin.getWorkspace().build(configs.toArray(new IBuildConfiguration[0]), IncrementalProjectBuilder.FULL_BUILD, false, monitor);
-          } catch (CoreException e) {
-            throw new InvocationTargetException(e);
-          }
-         }
-      });
-    } catch (InterruptedException e) {
-    } catch (InvocationTargetException e) {
-      if (e.getCause() instanceof CoreException) throw (CoreException) e.getCause();
-    }
+    Job buildAll = new Job(OwJsClosurePlugin.getDefault().getMessages().getString("build_all")) {
+      @Override
+      protected IStatus run(IProgressMonitor monitor) {
+        try {
+          ResourcesPlugin.getWorkspace().build(configs.toArray(new IBuildConfiguration[0]), IncrementalProjectBuilder.FULL_BUILD, false, monitor);
+          return Status.OK_STATUS;
+        } catch (CoreException e) {
+          return e.getStatus();
+        }
+      }
+    };
+    buildAll.schedule();
   }
 }
