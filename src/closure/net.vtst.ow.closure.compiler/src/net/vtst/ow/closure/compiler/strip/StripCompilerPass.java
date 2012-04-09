@@ -106,7 +106,10 @@ public class StripCompilerPass implements CompilerPass {
             child.removeChildren();
           }
         }
-        return false;          
+        return false;
+      default:
+        JSDocInfo info = node.getJSDocInfo();
+        if (info != null && info.isConstructor()) return false;
       }
       return true;
     }
