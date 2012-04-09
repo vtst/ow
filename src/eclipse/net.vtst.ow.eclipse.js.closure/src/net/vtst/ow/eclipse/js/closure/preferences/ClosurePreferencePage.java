@@ -1,14 +1,13 @@
 package net.vtst.ow.eclipse.js.closure.preferences;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.widgets.Control;
-
 import net.vtst.eclipse.easy.ui.properties.editors.ICompositeEditor;
 import net.vtst.eclipse.easy.ui.properties.pages.EasyPreferencePage;
 import net.vtst.ow.eclipse.js.closure.OwJsClosureMessages;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.builder.ClosureBuilder;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.preference.IPreferenceStore;
 
 public class ClosurePreferencePage extends EasyPreferencePage {
 

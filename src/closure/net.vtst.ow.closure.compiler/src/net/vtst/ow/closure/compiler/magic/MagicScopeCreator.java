@@ -1,11 +1,9 @@
 package net.vtst.ow.closure.compiler.magic;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import com.google.javascript.jscomp.Compiler;
-import com.google.javascript.jscomp.PassConfig;
 import com.google.javascript.jscomp.Scope;
 import com.google.javascript.rhino.Node;
 

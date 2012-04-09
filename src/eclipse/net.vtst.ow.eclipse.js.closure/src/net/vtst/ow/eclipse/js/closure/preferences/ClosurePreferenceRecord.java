@@ -3,7 +3,6 @@ package net.vtst.ow.eclipse.js.closure.preferences;
 import net.vtst.eclipse.easy.ui.properties.Record;
 import net.vtst.eclipse.easy.ui.properties.fields.BooleanField;
 import net.vtst.eclipse.easy.ui.properties.fields.FileField;
-import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPropertyRecord;
 
 public class ClosurePreferenceRecord extends Record {
 
