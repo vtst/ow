@@ -47,14 +47,22 @@ public abstract class AbstractFieldEditor<T>
    */
   public abstract void setCurrentValue(T value);
   
+  @Override
   public void readValuesFrom(IReadOnlyStore store) throws CoreException {
     setCurrentValue(field.get(store));
   }
   
+  @Override
+  public boolean hasChanged(IReadOnlyStore store) throws CoreException {
+    return field.valueEqual(getCurrentValue(), field.get(store));
+  }
+  
+  @Override
   public void setValuesToDefault() {
     setCurrentValue(field.getDefault());
   }
   
+  @Override
   public void writeValuesTo(IStore store) throws CoreException {
     field.set(store, getCurrentValue());
   }

@@ -43,6 +43,12 @@ public abstract class AbstractField<T> implements IField<T> {
     return defaultValue;
   }
   
+  @Override
+  public boolean valueEqual(T value1, T value2) {
+    if (value1 == null) return (value2 == null);
+    else return value1.equals(value2);
+  }
+  
   /**
    * Create an editor for the current field.
    * @param container  The container for the newly created editor.
