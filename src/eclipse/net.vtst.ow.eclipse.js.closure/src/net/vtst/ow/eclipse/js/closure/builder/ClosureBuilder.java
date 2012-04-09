@@ -1,6 +1,7 @@
 package net.vtst.ow.eclipse.js.closure.builder;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -28,6 +29,7 @@ import net.vtst.ow.eclipse.js.closure.dev.OwJsDev;
 import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
 import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPropertyRecord;
 
+import org.eclipse.core.resources.IBuildConfiguration;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -35,6 +37,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -45,6 +48,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.IProgressService;
 
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
@@ -402,5 +409,35 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
       }
     }
     return result.asList();
+  }
+  
+  public static void buildAll() throws CoreException {
+    // Get the list of projects having the Closure nature
+    IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+    final ArrayList<IBuildConfiguration> configs = new ArrayList<IBuildConfiguration>(projects.length);
+    for (IProject project: projects) {
+      try {
+        if (project.hasNature(ClosureNature.NATURE_ID)) {
+          configs.add(project.getActiveBuildConfig());
+        }
+      } catch (CoreException e) {
+        // This happens if the project is not open
+      }
+    }
+    // Build
+    try {
+      PlatformUI.getWorkbench().getProgressService().run(false, true, new IRunnableWithProgress() {
+         public void run(IProgressMonitor monitor) throws InvocationTargetException {
+           try {
+            ResourcesPlugin.getWorkspace().build(configs.toArray(new IBuildConfiguration[0]), IncrementalProjectBuilder.FULL_BUILD, false, monitor);
+          } catch (CoreException e) {
+            throw new InvocationTargetException(e);
+          }
+         }
+      });
+    } catch (InterruptedException e) {
+    } catch (InvocationTargetException e) {
+      if (e.getCause() instanceof CoreException) throw (CoreException) e.getCause();
+    }
   }
 }
