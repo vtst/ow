@@ -9,6 +9,9 @@ import java.util.List;
  * @author Vincent Simonet
  */
 public class FileUtils {
+  
+  // This regex is used in split(...).
+  private static String fileSeparatorRegex = (File.separatorChar == '\\' ? "\\\\" : File.separator);
 
   /**
    * Check whether a path is absolute. 
@@ -33,7 +36,7 @@ public class FileUtils {
   }
   
   private static String[] split(File file) {
-    return file.getPath().split(File.separator);
+    return file.getPath().split(fileSeparatorRegex);
   }
   
   private static void addSegments(List<String> addTo, String[] segments) {
@@ -66,7 +69,7 @@ public class FileUtils {
     boolean first = true;
     for (String segment: segments) {
       if (first) first = false;
-      else buf.append('/');
+      else buf.append(File.separatorChar);
       buf.append(segment);
     }
     return buf.toString();
