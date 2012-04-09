@@ -50,7 +50,7 @@ public abstract class EasyPreferencePage extends PreferencePage implements IWork
     super.performDefaults();
   }
   
-  private IStore getStore() {
+  protected IStore getStore() {
     return new PluginPreferenceStore(getPreferenceStore());
   }
 
