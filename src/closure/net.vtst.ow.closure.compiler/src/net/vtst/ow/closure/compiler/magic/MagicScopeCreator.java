@@ -18,48 +18,23 @@ public class MagicScopeCreator {
 
   private Object memoizedScopeCreator = null;
   private Method memoizedScopeCreator_getScopeIfMemoized = null;
-  private static Method compiler_getPassConfig = 
-      Magic.getDeclaredMethod(Compiler.class, "getPassConfig");
   
   /**
    * WARNING! The object has to be created after the compilation!
-   * @param passConfig  The passes configuration where to take the scope creator.
-   */
-  public MagicScopeCreator(PassConfig passConfig) {
-    setPassConfig(passConfig);
-  }
-  
-  /**
    * @param compiler  The compiler where to take the passes configuration.
    */
   public MagicScopeCreator(Compiler compiler) {
-    try {
-      Object object = compiler_getPassConfig.invoke(compiler);
-      if (!(object instanceof PassConfig)) throw new MagicException();
-      setPassConfig((PassConfig) object);
-    } catch (IllegalArgumentException e) {
-      throw new MagicException(e);
-    } catch (IllegalAccessException e) {
-      throw new MagicException(e);
-    } catch (InvocationTargetException e) {
-      throw new MagicException(e);
-    }
+    setMemoizedScopeCreator(compiler.getTypedScopeCreator());
   }
   
-  private void setPassConfig(PassConfig passConfig) {
+  private void setMemoizedScopeCreator(Object object) {
+    if (object == null) return;
+    memoizedScopeCreator = object;
     try {
-      Field field = PassConfig.class.getDeclaredField("typedScopeCreator");
-      field.setAccessible(true);
-      memoizedScopeCreator = field.get(passConfig);
-      if (memoizedScopeCreator == null) return;
       memoizedScopeCreator_getScopeIfMemoized = 
           memoizedScopeCreator.getClass().getDeclaredMethod("getScopeIfMemoized", Node.class);
       memoizedScopeCreator_getScopeIfMemoized.setAccessible(true);
     } catch (SecurityException e) {
-      throw new MagicException(e);
-    } catch (NoSuchFieldException e) {
-      throw new MagicException(e);
-    } catch (IllegalAccessException e) {
       throw new MagicException(e);
     } catch (NoSuchMethodException e) {
       throw new MagicException(e);

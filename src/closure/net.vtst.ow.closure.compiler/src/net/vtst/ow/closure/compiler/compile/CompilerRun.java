@@ -113,7 +113,7 @@ public class CompilerRun {
     JSModule module = buildJSModule(moduleName, sortedUnits);
     compiler.compileModules(
         Collections.<SourceFile> emptyList(), Lists.newArrayList(DefaultExternsProvider.get(), module), options);
-    scopeCreator = new MagicScopeCreator(passes);
+    scopeCreator = new MagicScopeCreator(compiler);
   }
   
   public boolean hasChanged(List<JSUnit> newSortedUnits) {
