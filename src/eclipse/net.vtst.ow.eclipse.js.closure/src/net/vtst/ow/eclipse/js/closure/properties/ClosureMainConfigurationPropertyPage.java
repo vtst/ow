@@ -1,5 +1,11 @@
 package net.vtst.ow.eclipse.js.closure.properties;
 
+import net.vtst.eclipse.easy.ui.listeners.NullSwtSelectionListener;
+import net.vtst.eclipse.easy.ui.properties.editors.ICompositeEditor;
+import net.vtst.eclipse.easy.ui.util.SWTFactory;
+import net.vtst.ow.eclipse.js.closure.builder.ClosureNature;
+import net.vtst.ow.eclipse.js.closure.util.Utils;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.events.SelectionEvent;
@@ -7,15 +13,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-
-import net.vtst.eclipse.easy.ui.listeners.NullSwtSelectionListener;
-import net.vtst.eclipse.easy.ui.properties.editors.ICompositeEditor;
-import net.vtst.eclipse.easy.ui.properties.pages.EasyProjectPropertyPage;
-import net.vtst.eclipse.easy.ui.util.SWTFactory;
-import net.vtst.ow.eclipse.js.closure.OwJsClosureMessages;
-import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
-import net.vtst.ow.eclipse.js.closure.builder.ClosureNature;
-import net.vtst.ow.eclipse.js.closure.util.Utils;
 
 public class ClosureMainConfigurationPropertyPage extends ClosureAsbtractPropertyPage {
 

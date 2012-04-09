@@ -38,4 +38,12 @@ public interface IField<T> {
    * @return  The default value for the field.
    */
   public T getDefault();
+  
+  /**
+   * Test whether two values for the field are equal.
+   * @param value1
+   * @param value2
+   * @return  true iif value1 == value2.
+   */
+  public boolean valueEqual(T value1, T value2);
 }

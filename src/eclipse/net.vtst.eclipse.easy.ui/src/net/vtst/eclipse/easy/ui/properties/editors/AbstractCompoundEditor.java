@@ -28,6 +28,15 @@ public abstract class AbstractCompoundEditor extends AbstractEditor implements I
   }
   
   @Override
+  public boolean hasChanged(IReadOnlyStore store) throws CoreException {
+    for (IEditor editor: editors) {
+      if (editor.hasChanged(store)) return true;
+    }
+    return false;
+  }
+
+  
+  @Override
   public void setValuesToDefault() {
     for (IEditor editor: editors) editor.setValuesToDefault();    
     editorChanged(new AllEditorChangeEvent());

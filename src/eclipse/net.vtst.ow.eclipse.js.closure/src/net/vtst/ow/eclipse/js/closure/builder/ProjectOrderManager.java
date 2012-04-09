@@ -84,6 +84,10 @@ public class ProjectOrderManager implements IResourceChangeListener {
     return localState;
   }
   
+  public synchronized void clear() {
+    state = null;
+  }
+  
   public State get() throws CoreException {
     State state = this.state;
     if (state == null || state.dirty) return update();

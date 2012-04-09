@@ -4,13 +4,13 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.eclipse.core.runtime.CoreException;
-
 import net.vtst.eclipse.easy.ui.properties.stores.IStore;
 import net.vtst.eclipse.easy.ui.properties.stores.PluginPreferenceStore;
 import net.vtst.ow.closure.compiler.deps.JSLibrary;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
+
+import org.eclipse.core.runtime.CoreException;
 
 import com.google.javascript.jscomp.AbstractCompiler;
 
@@ -98,6 +98,10 @@ public class JSLibraryManager {
     } catch (CoreException e) {
       return JSLibrary.StripMode.DISABLED;
    }
+  }
+  
+  public void clear() {
+    cache.clear();
   }
 
 }

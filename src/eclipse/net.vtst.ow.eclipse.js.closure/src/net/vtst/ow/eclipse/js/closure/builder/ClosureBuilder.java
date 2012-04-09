@@ -15,7 +15,6 @@ import net.vtst.eclipse.easy.ui.properties.stores.ProjectPropertyStore;
 import net.vtst.ow.closure.compiler.compile.CompilableJSUnit;
 import net.vtst.ow.closure.compiler.compile.CompilerRun;
 import net.vtst.ow.closure.compiler.deps.AbstractJSProject;
-import net.vtst.ow.closure.compiler.deps.JSLibrary;
 import net.vtst.ow.closure.compiler.deps.JSProject;
 import net.vtst.ow.closure.compiler.util.CompilerUtils;
 import net.vtst.ow.closure.compiler.util.ListWithoutDuplicates;
@@ -28,6 +27,7 @@ import net.vtst.ow.eclipse.js.closure.dev.OwJsDev;
 import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
 import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPropertyRecord;
 
+import org.eclipse.core.resources.IBuildConfiguration;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -35,8 +35,8 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -45,6 +45,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.core.runtime.jobs.Job;
 
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
@@ -402,5 +403,33 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
       }
     }
     return result.asList();
+  }
+  
+  public static void buildAll() {
+    // Get the list of projects having the Closure nature
+    IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+    final ArrayList<IBuildConfiguration> configs = new ArrayList<IBuildConfiguration>(projects.length);
+    for (IProject project: projects) {
+      try {
+        if (project.hasNature(ClosureNature.NATURE_ID)) {
+          configs.add(project.getActiveBuildConfig());
+        }
+      } catch (CoreException e) {
+        // This happens if the project is not open
+      }
+    }
+    // Build
+    Job buildAll = new Job(OwJsClosurePlugin.getDefault().getMessages().getString("build_all")) {
+      @Override
+      protected IStatus run(IProgressMonitor monitor) {
+        try {
+          ResourcesPlugin.getWorkspace().build(configs.toArray(new IBuildConfiguration[0]), IncrementalProjectBuilder.FULL_BUILD, false, monitor);
+          return Status.OK_STATUS;
+        } catch (CoreException e) {
+          return e.getStatus();
+        }
+      }
+    };
+    buildAll.schedule();
   }
 }

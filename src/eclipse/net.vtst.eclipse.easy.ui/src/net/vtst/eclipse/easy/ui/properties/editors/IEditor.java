@@ -19,6 +19,16 @@ public interface IEditor {
   public void readValuesFrom(IReadOnlyStore store) throws CoreException;
   
   /**
+   * Tests whether the current values of the editor have changed compared to those
+   * from the store
+   * @param store
+   * @return true iff at least one value in the editor is different from that of the
+   * store.
+   * @throws CoreException
+   */
+  public boolean hasChanged(IReadOnlyStore store) throws CoreException;
+  
+  /**
    * Set the current values of the editor UI to the default values.
    */
   public void setValuesToDefault();

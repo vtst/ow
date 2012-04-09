@@ -12,13 +12,12 @@ import net.vtst.eclipse.easy.ui.properties.fields.IField;
 import net.vtst.eclipse.easy.ui.properties.stores.IReadOnlyStore;
 import net.vtst.eclipse.easy.ui.properties.stores.IStore;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-
-import org.eclipse.core.runtime.CoreException;
 
 import com.google.javascript.jscomp.CheckLevel;
 

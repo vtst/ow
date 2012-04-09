@@ -11,7 +11,7 @@ public class ClosureIncludesEditor extends DefaultCompoundEditor {
   public ClosureIncludesEditor(IEditorContainer container) {
     super(container, 3);
     record.otherLibraries.bindEditor(this);
-    SWTFactory.createLabel(container.getComposite(), getMessage("help"), 3);
+    SWTFactory.createLabel(container.getComposite(), getMessage("otherLibrariesHelp"), 3);
     record.externs.bindEditor(this);
     record.useOnlyCustomExterns.bindEditor(this);
   }
