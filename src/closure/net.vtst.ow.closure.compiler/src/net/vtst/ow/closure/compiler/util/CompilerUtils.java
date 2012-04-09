@@ -55,6 +55,7 @@ public class CompilerUtils {
    * @return  The new compiler options.
    */
   public static CompilerOptions makeOptions() {
+    // These options should remain minimal, because they are used by the stripper.
     CompilerOptions options = new CompilerOptions();
     setupOptions(options);
     return options;
