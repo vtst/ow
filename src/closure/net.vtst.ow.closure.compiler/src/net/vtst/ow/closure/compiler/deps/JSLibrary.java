@@ -30,7 +30,7 @@ import com.google.javascript.jscomp.deps.SortedDependencies.CircularDependencyEx
  */
 public class JSLibrary extends AbstractJSProject {
   
-  public enum StripMode {
+  public enum CacheMode {
     DISABLED,
     READ_ONLY,
     READ_AND_WRITE
@@ -61,7 +61,7 @@ public class JSLibrary extends AbstractJSProject {
   private File depsFile;
   private boolean canWriteDepsFile = false;
   private boolean isClosureBase;
-  private StripMode stripMode = StripMode.DISABLED;
+  private CacheMode stripMode = CacheMode.DISABLED;
   
   /**
    * Create a new library.
@@ -78,7 +78,7 @@ public class JSLibrary extends AbstractJSProject {
     this.isClosureBase = isClosureBase;
   }
   
-  public JSLibrary(File path, File pathOfClosureBase, boolean isClosureBase, StripMode stripMode) {
+  public JSLibrary(File path, File pathOfClosureBase, boolean isClosureBase, CacheMode stripMode) {
     this(path, pathOfClosureBase, isClosureBase);
     this.stripMode = stripMode;
   }

@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import net.vtst.ow.closure.compiler.deps.JSLibrary.StripMode;
+import net.vtst.ow.closure.compiler.deps.JSLibrary.CacheMode;
 import net.vtst.ow.closure.compiler.strip.JSFileStripper;
 import net.vtst.ow.closure.compiler.util.NullErrorManager;
 
@@ -86,9 +86,9 @@ public class JSUnitProvider {
   public static class FromLibraryFile extends FromFile {
     
     private File strippedFile;
-    private JSLibrary.StripMode stripMode;
+    private JSLibrary.CacheMode stripMode;
 
-    public FromLibraryFile(File file, JSLibrary.StripMode stripMode) {
+    public FromLibraryFile(File file, JSLibrary.CacheMode stripMode) {
       super(file);
       this.stripMode = stripMode;
       strippedFile = new File(file.getPath() + ".stripped");
@@ -110,19 +110,19 @@ public class JSUnitProvider {
     
     protected File getFile() {
       File originalFile = super.getFile();
-      if (stripMode == StripMode.DISABLED) return originalFile;
+      if (stripMode == CacheMode.DISABLED) return originalFile;
       if (strippedFile.exists()) {
         if (strippedFile.lastModified() >= originalFile.lastModified()) {
           return strippedFile;
         }
-        else if (stripMode == StripMode.READ_AND_WRITE && strippedFile.canWrite() && strip()) {
+        else if (stripMode == CacheMode.READ_AND_WRITE && strippedFile.canWrite() && strip()) {
           return strippedFile;
         } else {
           return originalFile;
         }
       } else {
         try {
-          if (stripMode == StripMode.READ_AND_WRITE && strippedFile.createNewFile() && strip()) {
+          if (stripMode == CacheMode.READ_AND_WRITE && strippedFile.createNewFile() && strip()) {
             return strippedFile;
           } else {
             return originalFile;
