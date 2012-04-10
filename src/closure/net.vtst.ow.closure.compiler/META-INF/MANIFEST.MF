@@ -12,6 +12,7 @@ Export-Package: com.google.common.base,
  com.google.javascript.rhino.jstype,
  net.vtst.ow.closure.compiler.compile,
  net.vtst.ow.closure.compiler.deps,
+ net.vtst.ow.closure.compiler.magic,
  net.vtst.ow.closure.compiler.util
 Bundle-ClassPath: lib/compiler.jar,
  .

@@ -19,11 +19,6 @@ public class ClosureMainConfigurationEditor extends DefaultCompoundEditor {
     addControl(group1);
     record.useDefaultClosureBasePath.bindEditor(this, group1);
     record.closureBasePath.bindEditor(this, group1);
-    Group group2 = SWTFactory.createGroup(
-        getComposite(), ("otherLibrariesGroup"), 3, 1, GridData.FILL_BOTH);
-    addControl(group2);
-    record.otherLibraries.bindEditor(this, group2);
-    addControl(SWTFactory.createLabel(group2, getMessage("otherLibrariesHelp"), 1));
   }
   
   public void editorChanged(IEditorChangeEvent event) {

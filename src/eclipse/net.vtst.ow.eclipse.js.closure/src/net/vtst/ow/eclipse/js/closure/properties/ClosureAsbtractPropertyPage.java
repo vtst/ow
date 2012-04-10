@@ -40,7 +40,10 @@ public abstract class ClosureAsbtractPropertyPage extends EasyProjectPropertyPag
   }
   
   protected boolean enableEditor() {
-    return hasNature();
+    // We enable everything even if the nature is not selected, because it seems difficult
+    // to do otherwise as we have several pages.
+    // return hasNature();
+    return true;
   }
 
   protected boolean hasNature() {

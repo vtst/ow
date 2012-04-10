@@ -1,8 +1,9 @@
 package net.vtst.ow.eclipse.js.closure.preferences;
 
 import net.vtst.eclipse.easy.ui.properties.Record;
-import net.vtst.eclipse.easy.ui.properties.fields.BooleanField;
+import net.vtst.eclipse.easy.ui.properties.fields.EnumOptionsField;
 import net.vtst.eclipse.easy.ui.properties.fields.FileField;
+import net.vtst.ow.closure.compiler.deps.JSLibrary.CacheMode;
 
 public class ClosurePreferenceRecord extends Record {
 
@@ -11,8 +12,10 @@ public class ClosurePreferenceRecord extends Record {
   }
   
   public FileField closureBasePath = new FileField(null, FileField.Type.DIRECTORY);
-  public BooleanField readStrippedLibraryFiles = new BooleanField(true);
-  public BooleanField writeStrippedLibraryFiles = new BooleanField(false);
+  public EnumOptionsField<CacheMode> cacheLibraryStrippedFiles = 
+      new EnumOptionsField<CacheMode>(CacheMode.class, CacheMode.READ_AND_WRITE);
+  public EnumOptionsField<CacheMode> cacheLibraryDepsFiles = 
+      new EnumOptionsField<CacheMode>(CacheMode.class, CacheMode.READ_AND_WRITE);
 
   private static ClosurePreferenceRecord instance;
   public static ClosurePreferenceRecord getInstance() {
