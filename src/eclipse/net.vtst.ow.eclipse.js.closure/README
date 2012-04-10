@@ -12,12 +12,14 @@ CONFIGURATION TAB
 -------------------------------------------------------------------------------
 TODO
 
+URGENT:
+- Option for auto-generation of deps.js files
+- Harmonize file extensions for deps.ow.js and .stripped
+
 Priority 1:
 - Clone externs as inputs
 - Option for stripping project files
 - Check re-compile after property change
-- Option for auto-generation of deps.js files
-- Harmonize file extensions for deps.ow.js and .stripped
 
 Priority 2:
 - Option for doing partial compilation in incremental build
