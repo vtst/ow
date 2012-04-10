@@ -10,32 +10,26 @@ CONFIGURATION TAB
 2. Variables?
 
 -------------------------------------------------------------------------------
-THREADING
-
-Potential threads:
-1. Project builder
-2. Document listener
-3. Resource listener (for deletion of projects)
-4. Window and Part listener
-5. The project nature
-6. Caller of the compiler
-
--------------------------------------------------------------------------------
 TODO
 
-1. Clean code
-   - Synchronize CompilerRun.incrementalUpdate
-     (Don't forget the method which gets the description of an unit.)
-   - get the scope with a node traversal instead of the magic
-   - Catch exceptions from the compiler.  Example: top-level function(x) {};
-   - Is it a performance issue to put externs as inputs?
-2. Auto complete
-   - Standard completion proposals
-   - Hover with types
-3. Builder
-   - Having different compiler options for checking errors / auto complete 
-4. Settings
-   - Automatic discarding of non-closure completion proposals
-     see: CodeAssistAdvancedPreferencePage
-   - Compilation options
-   - How to generate the pruned library?
+Priority 1:
+- Clone externs as inputs
+- Option for stripping project files
+- Check re-compile after property change
+- Option for auto-generation of deps.js files
+- Harmonize file extensions for deps.ow.js and .stripped
+
+Priority 2:
+- Option for doing partial compilation in incremental build
+- Project properties -> compilation options [can we re-use CompilerOptions?]
+
+Priority 3 features:
+- Hover with types
+- Launch configuration
+
+Others:
+- Get the scope with a node traversal instead of the magic
+- Catch exceptions from the compiler.  Example: top-level function(x) {};
+- Standard completion proposals
+- Automatic discarding of non-closure completion proposals
+  see: CodeAssistAdvancedPreferencePage
