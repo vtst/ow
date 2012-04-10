@@ -36,13 +36,18 @@ public class JSLibrary extends AbstractJSProject {
     READ_AND_WRITE
   }
   
+  public static class CacheSettings {
+    public CacheMode cacheDepsFiles = CacheMode.DISABLED;
+    public CacheMode cacheStrippedFiles = CacheMode.DISABLED;
+  }
+  
   // TODO: It should be checked whether this works on Microsoft Windows, because the paths
   // in the deps.js file are stored with '/' instead of '\'.
   
   public static final String GOOG = "goog";
   private static final String BASE_FILE = "base.js";
   private static final String LEGACY_DEPS_FILE = "deps.js";
-  private static final String GENERATED_DEPS_FILE = "deps.ow.js";
+  private static final String GENERATED_DEPS_FILE = "deps.js.ow";
   
   static final DiagnosticType OW_DUPLICATED_GOOG_PROVIDE = DiagnosticType.warning(
       "OW_DUPLICATED_GOOG_PROVIDE",
@@ -59,9 +64,9 @@ public class JSLibrary extends AbstractJSProject {
   private File path;
   private File pathOfClosureBase;
   private File depsFile;
-  private boolean canWriteDepsFile = false;
+  private boolean shouldWriteDepsFile = false;
   private boolean isClosureBase;
-  private CacheMode stripMode = CacheMode.DISABLED;
+  private CacheSettings cacheSettings;
   
   /**
    * Create a new library.
@@ -72,15 +77,15 @@ public class JSLibrary extends AbstractJSProject {
   }
   
   public JSLibrary(File path, File pathOfClosureBase, boolean isClosureBase) {
+    this(path, pathOfClosureBase, isClosureBase, new CacheSettings());
+  }
+  
+  public JSLibrary(File path, File pathOfClosureBase, boolean isClosureBase, CacheSettings cacheSettings) {
     System.out.println("Creating library for: " + path.getAbsolutePath());
     this.path = path;
     this.pathOfClosureBase = pathOfClosureBase;
     this.isClosureBase = isClosureBase;
-  }
-  
-  public JSLibrary(File path, File pathOfClosureBase, boolean isClosureBase, CacheMode stripMode) {
-    this(path, pathOfClosureBase, isClosureBase);
-    this.stripMode = stripMode;
+    this.cacheSettings = cacheSettings;
   }
 
   
@@ -109,12 +114,14 @@ public class JSLibrary extends AbstractJSProject {
   private boolean findDepsFile() {
     depsFile = new File(path, LEGACY_DEPS_FILE);
     if (depsFile.exists()) {
-      canWriteDepsFile = false;
+      shouldWriteDepsFile = false;
       return true;
-    } else {
+    } else if (cacheSettings.cacheDepsFiles != CacheMode.DISABLED){
       depsFile = new File(path, GENERATED_DEPS_FILE);
-      canWriteDepsFile = true;
+      shouldWriteDepsFile = true;
       return depsFile.exists();
+    } else {
+      return false;
     }
   }
   
@@ -129,7 +136,8 @@ public class JSLibrary extends AbstractJSProject {
       return readDepsFile(compiler, depsFile);
     } else {
       List<JSUnit> units = getUnitsByVisitingFiles(compiler);
-      if (canWriteDepsFile) writeDepsFile(compiler, depsFile, units);
+      if (shouldWriteDepsFile && cacheSettings.cacheDepsFiles == CacheMode.READ_AND_WRITE)
+        writeDepsFile(compiler, depsFile, units);
       return units;
     }
   }
@@ -146,7 +154,7 @@ public class JSLibrary extends AbstractJSProject {
     FileTreeVisitor.Simple<RuntimeException> visitor = new FileTreeVisitor.Simple<RuntimeException>() {
       public void visitFile(java.io.File file) {
         if (!CompilerUtils.isJavaScriptFile(file)) return;
-        JSUnit unit = new JSUnit(file, pathOfClosureBase, new JSUnitProvider.FromLibraryFile(file, stripMode));
+        JSUnit unit = new JSUnit(file, pathOfClosureBase, new JSUnitProvider.FromLibraryFile(file, cacheSettings.cacheStrippedFiles));
         unit.updateDependencies(compiler);
         addGoogToDependencies(unit);
         units.add(unit);
@@ -185,7 +193,7 @@ public class JSLibrary extends AbstractJSProject {
       for (DependencyInfo info: depsFileParser.parseFile(depsFile.getAbsolutePath())) {
         File file = FileUtils.join(pathOfClosureBase, new File(info.getPathRelativeToClosureBase()));
         JSUnit unit = new JSUnit(
-            file, pathOfClosureBase, new JSUnitProvider.FromLibraryFile(file, stripMode), 
+            file, pathOfClosureBase, new JSUnitProvider.FromLibraryFile(file, cacheSettings.cacheStrippedFiles), 
             Sets.newHashSet(info.getProvides()), Sets.newHashSet(info.getRequires()));
         addGoogToDependencies(unit);
         units.add(unit);

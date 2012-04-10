@@ -85,13 +85,15 @@ public class JSUnitProvider {
   
   public static class FromLibraryFile extends FromFile {
     
+    private static final String EXTENSION_FOR_STRIPPED_FILES = ".ow";
+    
     private File strippedFile;
     private JSLibrary.CacheMode stripMode;
 
     public FromLibraryFile(File file, JSLibrary.CacheMode stripMode) {
       super(file);
       this.stripMode = stripMode;
-      strippedFile = new File(file.getPath() + ".stripped");
+      strippedFile = new File(file.getPath() + EXTENSION_FOR_STRIPPED_FILES);
     }
     
     public FromLibraryFile(File file, Charset charset) {

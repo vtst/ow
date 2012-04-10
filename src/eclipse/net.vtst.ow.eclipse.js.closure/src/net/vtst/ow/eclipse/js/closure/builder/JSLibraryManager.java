@@ -76,21 +76,28 @@ public class JSLibraryManager {
     LibraryKey key = new LibraryKey(libraryPath, pathOfClosureBase, isClosureBase);
     JSLibrary library = get(key);
     if (library == null) {
-      library = new JSLibrary(libraryPath, pathOfClosureBase, isClosureBase, getStripMode());
+      library = new JSLibrary(libraryPath, pathOfClosureBase, isClosureBase, getCacheSettings());
       library.setUnits(compiler);
       cache.put(key, new WeakReference<JSLibrary>(library));
     }
     return library;
   }
   
-  private JSLibrary.CacheMode getStripMode() {
+  private JSLibrary.CacheSettings getCacheSettings() {
     ClosurePreferenceRecord r = ClosurePreferenceRecord.getInstance();
+    JSLibrary.CacheSettings result = new JSLibrary.CacheSettings();
     IStore prefs = new PluginPreferenceStore(OwJsClosurePlugin.getDefault().getPreferenceStore());
     try {
-      return r.cacheLibraryStrippedFiles.get(prefs);
+      result.cacheDepsFiles = r.cacheLibraryDepsFiles.get(prefs);
     } catch (CoreException e) {
-      return r.cacheLibraryStrippedFiles.getDefault();
+      result.cacheDepsFiles = r.cacheLibraryDepsFiles.getDefault();
     }
+    try {
+      result.cacheStrippedFiles = r.cacheLibraryStrippedFiles.get(prefs);
+    } catch (CoreException e) {
+      result.cacheStrippedFiles = r.cacheLibraryStrippedFiles.getDefault();
+    }
+    return result;
   }
   
   public void clear() {
