@@ -16,11 +16,26 @@ public class DefaultExternsProvider {
   
   private static List<AstFactory> astFactories;
 
-  public static JSModule get() {
+  /**
+   * Get the externs as a {@code JSModule}.  Note that the included compiler inputs are <b>not</b> marked
+   * as externs.
+   * @return  The module containing the externs.
+   */
+  public static JSModule getAsModule() {
     if (astFactories == null) initialize();
     JSModule module = new JSModule("externs");
     for (AstFactory astFactory: astFactories) module.add(new CompilerInput(astFactory.getClone()));
     return module;
+  }
+  
+  /**
+   * @return  the externs as a list of {@code CompilerInput}.
+   */
+  public static List<CompilerInput> getAsCompilerInputs() {
+    if (astFactories == null) initialize();
+    List<CompilerInput> result = new ArrayList<CompilerInput>(astFactories.size());
+    for (AstFactory astFactory: astFactories) result.add(new CompilerInput(astFactory.getClone(), true));
+    return result;    
   }
   
   private static synchronized void initialize() {

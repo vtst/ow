@@ -3,6 +3,7 @@ package net.vtst.ow.closure.compiler.magic;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.List;
 
 import com.google.common.base.Preconditions;
@@ -29,6 +30,9 @@ public class MagicCompiler {
     this.compiler_externs = Magic.getDeclaredField(Compiler.class, "externs");
     this.compiler_modules = Magic.getDeclaredField(Compiler.class, "modules");
   }
+  
+  // **************************************************************************
+  // This is the pure adaptation of the methods of the Compiler class
   
   private <T extends SourceFile> List<CompilerInput> makeCompilerInput(
       List<T> files, boolean isExtern) {
@@ -108,6 +112,44 @@ public class MagicCompiler {
     } catch (InvocationTargetException e) {
       throw new MagicException(e);
     }
+  }
+
+  // **************************************************************************
+  // These are the new methods.
+
+  private void init(List<CompilerInput> externs, JSModule module, CompilerOptions options) {
+    compiler.initOptions(options);
+    try {
+      compiler_externs.set(compiler, externs);
+      compiler_modules.set(compiler, Lists.newArrayList(module));
+      compiler.rebuildInputsFromModules();
+    } catch (IllegalArgumentException e) {
+      throw new MagicException(e);
+    } catch (IllegalAccessException e) {
+      throw new MagicException(e);      
+    }    
+  }
+  
+  public Result compile(List<CompilerInput> externs, JSModule module, CompilerOptions options) {
+    // The compile method should only be called once.
+    Preconditions.checkState(compiler.getRoot() == null);
+    // TODO: This could be delted once we are sure we did it.
+    for (CompilerInput input: externs) Preconditions.checkArgument(input.isExtern());
+
+    try {
+      init(externs, module, options);
+      if (compiler.hasErrors()) {
+        return compiler.getResult();
+      }
+      return compile();
+    } finally {
+      compiler.getErrorManager().generateReport();
+    }
+  }
+
+  public static Result compile(Compiler compiler, List<CompilerInput> externs, JSModule module, CompilerOptions options) {
+    MagicCompiler magicCompiler = new MagicCompiler(compiler);
+    return magicCompiler.compile(externs, module, options);
   }
   
 }

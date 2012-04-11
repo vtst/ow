@@ -22,6 +22,7 @@ import net.vtst.ow.closure.compiler.util.NullErrorManager;
 import net.vtst.ow.eclipse.js.closure.OwJsClosureMessages;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.compiler.CompilationUnitProviderFromEclipseIFile;
+import net.vtst.ow.eclipse.js.closure.compiler.CompilerOptionsFactory;
 import net.vtst.ow.eclipse.js.closure.compiler.ErrorManagerGeneratingProblemMarkers;
 import net.vtst.ow.eclipse.js.closure.dev.OwJsDev;
 import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
@@ -298,10 +299,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
   private void compileJavaScriptFile(IFile file, boolean force) throws CoreException {
     CompilableJSUnit unit = ResourceProperties.getJSUnit(file);
     if (unit == null) return;
-    CompilerOptions options = CompilerUtils.makeOptions();  // TODO: Clean up the option generation.  Allow customization.
-    options.checkTypes = true;
-    options.setInferTypes(true);
-    options.closurePass = true;
+    CompilerOptions options = CompilerOptionsFactory.makeForBackgroundCompilation(file.getProject());
     ErrorManager errorManager = new ErrorManagerGeneratingProblemMarkers(unit, file);
     CompilerRun run = unit.fullCompile(options, errorManager, force);
     run.setErrorManager(new NullErrorManager());
