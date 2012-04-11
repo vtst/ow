@@ -12,15 +12,16 @@ CONFIGURATION TAB
 -------------------------------------------------------------------------------
 TODO
 
+- Check that my understanding of compiler options is correct.
+- Can we clone compiler options?
+
 Priority 1:
-- Clone externs as inputs
 - Option for stripping project files
 - Check re-compile after property change
 - Order of completion proposals
 
 Priority 2:
 - Option for doing partial compilation in incremental build
-- Project properties -> compilation options [can we re-use CompilerOptions?]
 
 Priority 3 features:
 - Hover with types
