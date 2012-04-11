@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.vtst.ow.closure.compiler.deps.JSUnit;
+import net.vtst.ow.closure.compiler.magic.MagicCompiler;
 import net.vtst.ow.closure.compiler.magic.MagicScopeCreator;
 import net.vtst.ow.closure.compiler.util.CompilerUtils;
 
@@ -111,8 +112,11 @@ public class CompilerRun {
     lastModifiedMapForFullCompile = buildLastModifiedMap(sortedUnits);
     lastModifiedMapForFastCompile = Maps.newHashMap(lastModifiedMapForFullCompile);
     JSModule module = buildJSModule(moduleName, sortedUnits);
-    compiler.compileModules(
-        Collections.<SourceFile> emptyList(), Lists.newArrayList(DefaultExternsProvider.get(), module), options);
+    // For avoiding the magic, we could do:
+    // compiler.compileModules(
+    //   Collections.<SourceFile> emptyList(), Lists.newArrayList(DefaultExternsProvider.getAsModule(), module), options);
+    // but this would be less efficient.
+    MagicCompiler.compile(compiler, DefaultExternsProvider.getAsCompilerInputs(), module, options);
     scopeCreator = new MagicScopeCreator(compiler);
   }
   

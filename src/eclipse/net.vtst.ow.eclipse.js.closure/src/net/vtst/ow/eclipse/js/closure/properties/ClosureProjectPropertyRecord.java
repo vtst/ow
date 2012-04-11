@@ -1,7 +1,12 @@
 package net.vtst.ow.eclipse.js.closure.properties;
 
+import com.google.javascript.jscomp.CompilerOptions;
+import com.google.javascript.jscomp.WarningLevel;
+import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
+
 import net.vtst.eclipse.easy.ui.properties.Record;
 import net.vtst.eclipse.easy.ui.properties.fields.BooleanField;
+import net.vtst.eclipse.easy.ui.properties.fields.EnumOptionsField;
 import net.vtst.eclipse.easy.ui.properties.fields.FileField;
 import net.vtst.eclipse.easy.ui.properties.fields.FileListField;
 import net.vtst.eclipse.easy.ui.properties.fields.StringField;
@@ -25,13 +30,13 @@ public class ClosureProjectPropertyRecord extends Record {
   
   // Compilation (checks)
   
-  public StringOptionsField warningLevel = new StringOptionsField("QUIET", "DEFAULT", "VERBOSE");
+  public EnumOptionsField<WarningLevel> warningLevel = new EnumOptionsField<WarningLevel>(WarningLevel.class, WarningLevel.DEFAULT);
   public BooleanField thirdParty = new BooleanField(false);
   public BooleanField processClosurePrimitives = new BooleanField(true);
   public StringField closureEntryPoints = new StringField("");
   public BooleanField processJQueryPrimitives = new BooleanField(false);
   public BooleanField acceptConstKeyword = new BooleanField(false);
-  public StringOptionsField languageIn = new StringOptionsField("ECMASCRIPT3", "ECMASCRIPT5", "ECMASCRIPT5_STRICT");
+  public EnumOptionsField<LanguageMode> languageIn = new EnumOptionsField<LanguageMode>(CompilerOptions.LanguageMode.class, LanguageMode.ECMASCRIPT3);
   public CheckLevelsField checkLevels = new CheckLevelsField();
   
   // Compilation (output)
