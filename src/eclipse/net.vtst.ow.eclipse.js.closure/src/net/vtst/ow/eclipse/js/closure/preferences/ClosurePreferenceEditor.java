@@ -21,6 +21,8 @@ public class ClosurePreferenceEditor extends DefaultCompoundEditor {
     SWTFactory.createLabel(group1, getMessage("libraryCacheGroup_help"), 3);
     record.cacheLibraryDepsFiles.bindEditor(this, group1);
     record.cacheLibraryStrippedFiles.bindEditor(this, group1);
+    Group group2 = SWTFactory.createGroup(getComposite(), getMessage("otherOptionsGroup"), 3, 1, GridData.FILL_HORIZONTAL);
+    record.stripProjectFiles.bindEditor(this, group2);
   }
   
 }
