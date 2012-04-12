@@ -18,7 +18,6 @@ TODO
 Priority 1:
 - Option for stripping project files
 - Check re-compile after property change
-- Order of completion proposals
 
 Priority 2:
 - Option for doing partial compilation in incremental build
