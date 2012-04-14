@@ -37,14 +37,7 @@ public class ClosureProjectPropertyRecord extends Record {
   public BooleanField processJQueryPrimitives = new BooleanField(false);
   public BooleanField acceptConstKeyword = new BooleanField(false);
   public EnumOptionsField<LanguageMode> languageIn = new EnumOptionsField<LanguageMode>(CompilerOptions.LanguageMode.class, LanguageMode.ECMASCRIPT3);
-  public CheckLevelsField checkLevels = new CheckLevelsField();
-  
-  // Compilation (output)
-  
-  public StringOptionsField compilationLevel = new StringOptionsField("WHITESPACE_ONLY", "SIMPLE_OPTIMIZATIONS", "ADVANCED_OPTIMIZATIONS");
-  public BooleanField formattingPrettyPrint = new BooleanField(false);
-  public BooleanField formattingPrintInputDelimiter = new BooleanField(false);
-  
+  public CheckLevelsField checkLevels = new CheckLevelsField();  
 
   private static ClosureProjectPropertyRecord instance;
   public static ClosureProjectPropertyRecord getInstance() {

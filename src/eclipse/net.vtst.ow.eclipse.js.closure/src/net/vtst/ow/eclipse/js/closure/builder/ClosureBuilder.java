@@ -15,6 +15,7 @@ import net.vtst.eclipse.easy.ui.properties.stores.ProjectPropertyStore;
 import net.vtst.ow.closure.compiler.compile.CompilableJSUnit;
 import net.vtst.ow.closure.compiler.compile.CompilerRun;
 import net.vtst.ow.closure.compiler.deps.AbstractJSProject;
+import net.vtst.ow.closure.compiler.deps.JSLibrary;
 import net.vtst.ow.closure.compiler.deps.JSProject;
 import net.vtst.ow.closure.compiler.util.CompilerUtils;
 import net.vtst.ow.closure.compiler.util.ListWithoutDuplicates;
@@ -299,9 +300,12 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
   private void compileJavaScriptFile(IFile file, boolean force) throws CoreException {
     CompilableJSUnit unit = ResourceProperties.getJSUnit(file);
     if (unit == null) return;
+    // TODO: We should try to clone the options.
     CompilerOptions options = CompilerOptionsFactory.makeForBackgroundCompilation(file.getProject());
+    // TODO: We should avoid calling this for every file.
+    boolean stripIncludedFiles = getStripIncludedFiles();
     ErrorManager errorManager = new ErrorManagerGeneratingProblemMarkers(unit, file);
-    CompilerRun run = unit.fullCompile(options, errorManager, force);
+    CompilerRun run = unit.fullCompile(options, errorManager, stripIncludedFiles, force);
     run.setErrorManager(new NullErrorManager());
   }
 
@@ -322,6 +326,15 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
     if (contentDescription == null) return false;
     IContentType contentType = contentDescription.getContentType();
     return contentType.isKindOf(jsContentType);
+  }
+  
+  private boolean getStripIncludedFiles() {
+    IStore store = new PluginPreferenceStore(OwJsClosurePlugin.getDefault().getPreferenceStore());
+    try {
+      return ClosurePreferenceRecord.getInstance().stripProjectFiles.get(store);
+    } catch (CoreException e) {
+      return ClosurePreferenceRecord.getInstance().stripProjectFiles.getDefault();
+    }
   }
 
   // **************************************************************************

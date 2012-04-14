@@ -16,7 +16,7 @@ TODO
 - Can we clone compiler options?
 
 Priority 1:
-- Option for stripping project files
+- Try to put closure library as externs
 - Check re-compile after property change
 
 Priority 2:
