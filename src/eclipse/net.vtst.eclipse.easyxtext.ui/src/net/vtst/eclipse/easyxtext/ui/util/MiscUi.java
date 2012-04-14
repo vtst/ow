@@ -14,6 +14,7 @@ import org.eclipse.ui.PlatformUI;
  */
 public class MiscUi {
   
+  // TODO: This is duplicated in EasyUI. Should we keep?
   /**
    * Returns the currently active workbench window shell or <code>null</code>
    * if none.
@@ -33,6 +34,7 @@ public class MiscUi {
     return null;
   }
   
+  // TODO: This is duplicated in EasyUI. Should we keep?
   /**
    * Render a command line given as a string array into a single string with proper escaping
    * @param commandLine
