@@ -13,7 +13,9 @@ import net.vtst.eclipse.easy.ui.properties.stores.IReadOnlyStore;
 import net.vtst.eclipse.easy.ui.properties.stores.IStore;
 import net.vtst.eclipse.easy.ui.util.SWTFactory;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -41,33 +43,113 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
  */
 public class ResourceListField<T extends IResource> extends AbstractField<List<T>> {
 
-  public static interface IFilter<T> {
-    public boolean select(T resource);
+  public static interface IFilter<T extends IResource> {
+    public boolean show(T resource) throws CoreException;
+    public boolean select(T resource) throws CoreException;
   }
   
-  public static class TrueFilter<T> implements IFilter<T> {
-    public boolean select(T resource) { return true; }
+  public static class TrueFilter<T extends IResource> implements IFilter<T> {
+    public boolean show(T resource) throws CoreException { return true; }
+    public boolean select(T resource) throws CoreException { return show(resource); }
   }
   
-  public static abstract class OperatorFilter<T> implements IFilter<T> {
+  public static abstract class OperatorFilter<T extends IResource> implements IFilter<T> {
     protected IFilter<T>[] filters;
     public OperatorFilter(IFilter<T> filter0, IFilter<T> filter1) {
       this(new IFilter[]{filter0, filter1});
+    }
+    public OperatorFilter(IFilter<T> filter0, IFilter<T> filter1, IFilter<T> filter2) {
+      this(new IFilter[]{filter0, filter1, filter2});
     }
     public OperatorFilter(IFilter<T>[] filters) {
       this.filters = filters;
     }
   }
   
-  public static class Orfilter<T> extends OperatorFilter<T> {
-    public Orfilter(IFilter<T> filter0, IFilter<T> filter1) {
+  public static class Or<T extends IResource> extends OperatorFilter<T> {
+    public Or(IFilter<T> filter0, IFilter<T> filter1) {
       super(filter0, filter1);
     }
-    public boolean select(T resource) {
+    public Or(IFilter<T> filter0, IFilter<T> filter1, IFilter<T> filter2) {
+      super(filter0, filter1, filter2);
+    }
+    public boolean show(T resource) throws CoreException {
+      for (IFilter<T> filter: filters) {
+        if (filter.show(resource)) return true;
+      }
+      return false;
+    }
+    public boolean select(T resource) throws CoreException {
       for (IFilter<T> filter: filters) {
         if (filter.select(resource)) return true;
       }
       return false;
+    }
+  }
+
+  public static class And<T extends IResource> extends OperatorFilter<T> {
+    public And(IFilter<T> filter0, IFilter<T> filter1) {
+      super(filter0, filter1);
+    }
+    public boolean show(T resource) throws CoreException {
+      for (IFilter<T> filter: filters) {
+        if (filter.show(resource)) return true;
+      }
+      return false;
+    }
+    public boolean select(T resource) throws CoreException {
+      for (IFilter<T> filter: filters) {
+        if (filter.select(resource)) return true;
+      }
+      return false;
+    }
+  }
+  
+  public static class FileType<T extends IResource> extends TrueFilter<T> {
+    private Pattern pattern;
+    private IContentType contentType;
+
+    public FileType(Pattern pattern, IContentType contentType) {
+      this.pattern = pattern;
+      this.contentType = contentType;
+    }
+    
+    @Override
+    public boolean show(T resource) {
+      if (resource instanceof IFile) {
+        IFile file = (IFile) resource;
+        if (pattern != null && pattern.matcher(file.getName()).matches()) return true;
+        try { if (contentType != null && file.getContentDescription().getContentType().isKindOf(contentType)) return true; }
+        catch (CoreException e) {}
+        return false;
+      } else {
+        return false;
+      }
+    }    
+  }
+
+  public static class ProjectNature<T extends IResource> extends TrueFilter<T> {
+    private String nature;
+    public ProjectNature(String nature) {
+      this.nature = nature;
+    }
+    public boolean show(T resource) throws CoreException {
+      if (resource instanceof IProject) {
+        IProject project = (IProject) resource;
+        return project.hasNature(nature);
+      } else {
+        return false;
+      }
+    }
+  }
+  
+  public static class ResourceType<T extends IResource> extends TrueFilter<T> {
+    private Class<? extends T> cls;
+    public ResourceType(Class<? extends T> cls) {
+      this.cls = cls;
+    }
+    public boolean show(T resource) throws CoreException {
+      return cls.isInstance(resource);
     }
   }
   
@@ -176,10 +258,6 @@ public class ResourceListField<T extends IResource> extends AbstractField<List<T
       return null;
     }
     
-    private Pattern pattern = null;
-    private IContentType contentType = null;
-    
-    @SuppressWarnings("unchecked")
     private void addResource() {
       ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(
           null,
@@ -193,7 +271,11 @@ public class ResourceListField<T extends IResource> extends AbstractField<List<T
         public boolean select(Viewer viewer, Object parent, Object element) {
           T resource = field.castResource(element);
           if (resource == null) return false;
-          return field.filter.select(resource);
+          try {
+            return field.filter.show(resource);
+          } catch (CoreException e) {
+            return false;
+          }
         }});
       try {
         dialog.setInitialSelection(ResourcesPlugin.getWorkspace().getRoot());
@@ -211,10 +293,14 @@ public class ResourceListField<T extends IResource> extends AbstractField<List<T
     }
     
     private T getSelectedResource(Object[] result) {
-      if (result.length != 1) return null;
+      if (result == null || result.length != 1) return null;
       T resource = field.castResource(result[0]);
-      if (resource == null || !field.filter.select(resource)) return null;
-      return resource;
+      try {
+        if (resource == null || !field.filter.select(resource)) return null;
+        return resource;
+      } catch (CoreException e) {
+        return null;
+      }
     }
 
     private void addResource(T resource) {
