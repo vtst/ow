@@ -27,7 +27,6 @@ public abstract class EasyLaunchConfigurationTab extends AbstractLaunchConfigura
   
   @Override
   public void createControl(Composite parent) {
-    System.out.println("CREATE CONTROL");
     this.parent = parent;
     editor = createEditor();
     setControl(editor.getComposite());
@@ -37,7 +36,6 @@ public abstract class EasyLaunchConfigurationTab extends AbstractLaunchConfigura
   public void initializeFrom(ILaunchConfiguration config) {
     try {
       editor.readValuesFrom(new LaunchConfigurationReadOnlyStore(config));
-      editorChanged(new AllEditorChangeEvent());
     } catch (CoreException e) {}
   }
 
@@ -50,19 +48,27 @@ public abstract class EasyLaunchConfigurationTab extends AbstractLaunchConfigura
 
   @Override
   public void setDefaults(ILaunchConfigurationWorkingCopy config) {
-    System.out.println("SET DEFAULTS");
-    // TODO: Is it suitable?
     if (editor != null) {
       editor.setValuesToDefault();
-      editorChanged(new AllEditorChangeEvent());
     }
   }
+  
+  /* (non-Javadoc)
+   * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
+   */
+  @Override
+  public boolean isValid(ILaunchConfiguration config) {
+    return true;
+  }
+
 
   @Override
   public void addEditor(IEditor editor) {}
 
   @Override
-  public void editorChanged(IEditorChangeEvent event) {}
+  public void editorChanged(IEditorChangeEvent event) {
+    updateLaunchConfigurationDialog();    
+  }
 
   @Override
   public Composite getComposite() {
