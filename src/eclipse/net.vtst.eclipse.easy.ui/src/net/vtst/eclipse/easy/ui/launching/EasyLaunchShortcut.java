@@ -165,7 +165,7 @@ public abstract class EasyLaunchShortcut<Selection> implements ILaunchShortcut {
    */
   protected ILaunchConfiguration chooseConfiguration(List<ILaunchConfiguration> configs) {
     IDebugModelPresentation labelProvider = DebugUITools.newDebugModelPresentation();
-    ElementListSelectionDialog dialog= new ElementListSelectionDialog(Utils.getShell(), labelProvider);
+    ElementListSelectionDialog dialog = new ElementListSelectionDialog(Utils.getShell(), labelProvider);
     dialog.setElements(configs.toArray());
     dialog.setTitle(messages.getString("choose_configuration_title"));  
     dialog.setMessage(messages.getString("choose_configuration_message"));
