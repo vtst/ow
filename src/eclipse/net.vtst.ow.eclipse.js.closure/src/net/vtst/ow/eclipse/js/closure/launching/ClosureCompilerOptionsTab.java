@@ -11,7 +11,7 @@ public class ClosureCompilerOptionsTab extends EasyLaunchConfigurationTab {
   
   @Override
   public String getMessage(String key) {
-    return messages.getString("ClosureCompilerOptionsTab_" + key);
+    return messages.getStringOrNull("ClosureCompilerOptionsTab_" + key);
   }
 
   @Override
