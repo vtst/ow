@@ -40,25 +40,66 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
  * @author Vincent Simonet
  */
 public class ResourceListField<T extends IResource> extends AbstractField<List<T>> {
-  
-  private Class<T> cls;
 
-  public ResourceListField(Class<T> cls) {
-    super(Collections.<T>emptyList());
-    this.cls = cls;
+  public static interface IFilter<T> {
+    public boolean select(T resource);
   }
   
-  @SuppressWarnings("unchecked")
+  public static class TrueFilter<T> implements IFilter<T> {
+    public boolean select(T resource) { return true; }
+  }
+  
+  public static abstract class OperatorFilter<T> implements IFilter<T> {
+    protected IFilter<T>[] filters;
+    public OperatorFilter(IFilter<T> filter0, IFilter<T> filter1) {
+      this(new IFilter[]{filter0, filter1});
+    }
+    public OperatorFilter(IFilter<T>[] filters) {
+      this.filters = filters;
+    }
+  }
+  
+  public static class Orfilter<T> extends OperatorFilter<T> {
+    public Orfilter(IFilter<T> filter0, IFilter<T> filter1) {
+      super(filter0, filter1);
+    }
+    public boolean select(T resource) {
+      for (IFilter<T> filter: filters) {
+        if (filter.select(resource)) return true;
+      }
+      return false;
+    }
+  }
+  
+  private Class<T> cls;
+  private IFilter<T> filter;
+
+  public ResourceListField(Class<T> cls, IFilter<T> filter) {
+    super(Collections.<T>emptyList());
+    this.cls = cls;
+    this.filter = filter;
+  }
+  
+  public ResourceListField(Class<T> cls) {
+    this(cls, new TrueFilter<T>());
+  }
+  
   @Override
   public List<T> get(IReadOnlyStore store) throws CoreException {
     IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
     List<String> list = store.get(name, Collections.<String>emptyList());
     ArrayList<T> result = new ArrayList<T>(list.size());
     for (String s: list) {
-      IResource r = root.findMember(new Path(s));
-      if (cls.isInstance(r)) result.add((T) r);
+      T resource = castResource(root.findMember(new Path(s)));
+      if (resource != null) result.add(resource);
     }
     return result;
+  }
+  
+  @SuppressWarnings("unchecked")
+  private T castResource(Object resource) {
+    if (cls.isInstance(resource)) return (T) resource;
+    return null;
   }
   
   @Override
@@ -70,7 +111,7 @@ public class ResourceListField<T extends IResource> extends AbstractField<List<T
 
   @Override
   public AbstractFieldEditor<List<T>> createEditor(IEditorContainer container, Composite parent) {
-    return new Editor(container, parent, this);
+    return new Editor<T>(container, parent, this);
   }
   
   public static class Editor<T extends IResource> extends AbstractFieldEditor<List<T>> {
@@ -150,35 +191,30 @@ public class ResourceListField<T extends IResource> extends AbstractField<List<T
       dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
       dialog.addFilter(new ViewerFilter() {
         public boolean select(Viewer viewer, Object parent, Object element) {
-          // TODO!
-          if (element instanceof IFile) {
-            IFile file = (IFile) element;
-            if (pattern != null && pattern.matcher(file.getName()).matches()) return true;
-            try { if (contentType != null && file.getContentDescription().getContentType().isKindOf(contentType)) return true; }
-            catch (CoreException e) {}
-            return false;
-          } else {
-            return true;
-          }
+          T resource = field.castResource(element);
+          if (resource == null) return false;
+          return field.filter.select(resource);
         }});
       try {
         dialog.setInitialSelection(ResourcesPlugin.getWorkspace().getRoot());
       } catch (IllegalArgumentException exn) {}  // Raised by new Path(...)
       dialog.setValidator(new ISelectionStatusValidator() {
         public IStatus validate(Object[] result) {
-          if (result.length != 1 ||
-              !(result[0] instanceof IFile)) {
-            return new Status(IStatus.ERROR, EasyUiPlugin.PLUGIN_ID, getMessage("_error"));
-          }
-          return new Status(IStatus.OK, EasyUiPlugin.PLUGIN_ID, "");
+          if (getSelectedResource(result) == null)
+            return new Status(IStatus.ERROR, EasyUiPlugin.PLUGIN_ID, getMessage("error"));
+          else
+            return new Status(IStatus.OK, EasyUiPlugin.PLUGIN_ID, "");
         }});
       dialog.open();
-      Object[] result = dialog.getResult();
-      // TODO!
-      if (result == null || result.length != 1) return;
-      // TODO!
-      if (!(result[0] instanceof IResource)) return;
-      addResource((T) result[0]);
+      T resource = getSelectedResource(dialog.getResult());
+      if (resource != null) addResource((T) resource);
+    }
+    
+    private T getSelectedResource(Object[] result) {
+      if (result.length != 1) return null;
+      T resource = field.castResource(result[0]);
+      if (resource == null || !field.filter.select(resource)) return null;
+      return resource;
     }
 
     private void addResource(T resource) {
@@ -219,5 +255,4 @@ public class ResourceListField<T extends IResource> extends AbstractField<List<T
     }
     
   }
-
 }
