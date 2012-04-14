@@ -139,13 +139,13 @@ public class ResourceListField<T extends IResource> extends AbstractField<List<T
       gd.verticalSpan = 3;
       list.setLayoutData(gd);
       
-      addOtherLibrary = SWTFactory.createPushButton(parent, getMessage("add", "FileListField_add"), null);
+      addOtherLibrary = SWTFactory.createPushButton(parent, getMessage("add", "ResourceListField_add"), null);
       addOtherLibrary.addSelectionListener(new NullSwtSelectionListener() {
         @Override public void widgetSelected(SelectionEvent event) {
           addResource();
         }
       });
-      removeButton = SWTFactory.createPushButton(parent, getMessage("remove", "FileListField_remove"), null);
+      removeButton = SWTFactory.createPushButton(parent, getMessage("remove", "ResourceListField_remove"), null);
       removeButton.addSelectionListener(new NullSwtSelectionListener() {
         @Override public void widgetSelected(SelectionEvent event) {
           removeResource();
@@ -186,8 +186,8 @@ public class ResourceListField<T extends IResource> extends AbstractField<List<T
           new WorkbenchLabelProvider(),
           new BaseWorkbenchContentProvider());
       dialog.setAllowMultiple(false);
-      dialog.setTitle(getMessage("_title"));
-      dialog.setMessage(getMessage("_message"));
+      dialog.setTitle(getMessage("title", "ResourceListField_title"));
+      dialog.setMessage(getMessage("message", "ResourceListField_message"));
       dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
       dialog.addFilter(new ViewerFilter() {
         public boolean select(Viewer viewer, Object parent, Object element) {
@@ -201,7 +201,7 @@ public class ResourceListField<T extends IResource> extends AbstractField<List<T
       dialog.setValidator(new ISelectionStatusValidator() {
         public IStatus validate(Object[] result) {
           if (getSelectedResource(result) == null)
-            return new Status(IStatus.ERROR, EasyUiPlugin.PLUGIN_ID, getMessage("error"));
+            return new Status(IStatus.ERROR, EasyUiPlugin.PLUGIN_ID, getMessage("error", "ResourceListField_error"));
           else
             return new Status(IStatus.OK, EasyUiPlugin.PLUGIN_ID, "");
         }});
