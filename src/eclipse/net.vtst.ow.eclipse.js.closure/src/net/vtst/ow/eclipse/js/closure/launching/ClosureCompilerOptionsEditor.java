@@ -16,9 +16,10 @@ public class ClosureCompilerOptionsEditor extends DefaultCompoundEditor {
     record.compilationLevel.bindEditor(this);
     record.generateExports.bindEditor(this);
     Group group1 = SWTFactory.createGroup(
-        getComposite(), getMessage("formatting"), 3, 1, GridData.FILL_HORIZONTAL);
+        getComposite(), getMessage("formatting"), 3, 3, GridData.FILL_HORIZONTAL);
     record.formattingPrettyPrint.bindEditor(this, group1);
     record.formattingPrintInputDelimiter.bindEditor(this, group1);
+    record.inputResources.bindEditor(this);
   }
 
 }
