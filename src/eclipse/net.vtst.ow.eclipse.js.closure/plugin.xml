@@ -2,6 +2,9 @@
 <?eclipse version="3.4"?>
 <plugin>
 
+  <!-- ******************************************************************** -->
+  <!-- Builder                                                              -->
+
   <extension 
     point="org.eclipse.core.resources.builders"
     id="closureBuilder"
@@ -20,6 +23,86 @@
     </runtime>
     <builder id="net.vtst.ow.eclipse.js.closure.closureBuilder"/>
   </extension>
+
+  <!-- ******************************************************************** -->
+  <!-- Completion proposal computer                                         -->
+   
+  <extension point="org.eclipse.wst.jsdt.ui.javaCompletionProposalComputer"
+    id="ClosureCompletionProposalCategory"
+    name="%closure_completion_proposal_category">
+    <proposalCategory icon="icons/16x16/closure.png"/>
+  </extension>
+   
+  <extension point="org.eclipse.wst.jsdt.ui.javaCompletionProposalComputer"
+    id="ClosureCompletionProposalComputer"
+    name="%closure_completion_proposal_computer">
+    <javaCompletionProposalComputer
+      class="net.vtst.ow.eclipse.js.closure.contentassist.ClosureCompletionProposalComputer"
+      categoryId="net.vtst.ow.eclipse.js.closure.ClosureCompletionProposalCategory">
+      <partition type="__dftl_partition_content_type"/>
+    </javaCompletionProposalComputer>
+  </extension>
+  
+  <extension id="compiler-error" point="org.eclipse.core.resources.markers">
+    <super type="org.eclipse.core.resources.problemmarker"/>
+    <persistent value="true"/>
+  </extension>  
+  
+  <!-- ******************************************************************** -->
+  <!-- Launch configuration for Closure compiler                            -->
+  
+  <extension point="org.eclipse.debug.core.launchConfigurationTypes">
+    <launchConfigurationType
+        name="%closure_compiler_launch_configuration"
+        delegate="net.vtst.ow.eclipse.js.closure.launching.ClosureCompilerLaunchConfigurationDelegate"
+        modes="run, debug"               
+        id="net.vtst.ow.eclipse.js.closure.launching.compiler">        
+    </launchConfigurationType>
+  </extension>
+  
+  <extension point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+    <!-- If you change the icon, change it in the shortcut too! -->
+    <!-- Image to be changed -->
+    <launchConfigurationTypeImage
+        icon="icons/16x16/stylesheet.gif"
+        configTypeID="net.vtst.ow.eclipse.js.closure.launching.compiler"
+        id="net.vtst.ow.eclipse.js.closure.launching.compiler.image">
+    </launchConfigurationTypeImage>
+  </extension>
+  
+  <extension point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+    <launchConfigurationTabGroup
+        type="net.vtst.ow.eclipse.js.closure.launching.compiler"
+        class="net.vtst.ow.eclipse.js.closure.launching.ClosureCompilerTabGroup"
+        id="net.vtst.ow.eclipse.js.closure.launching.compiler.tabgroup">
+    </launchConfigurationTabGroup>
+  </extension>
+  
+  <extension point="org.eclipse.debug.ui.launchShortcuts">
+    <shortcut
+        id="net.vtst.ow.eclipse.js.closure.launching.compiler.shortcut"
+        class="net.vtst.ow.eclipse.js.closure.launching.ClosureCompilerLaunchShortcut"
+        label="%closure_compiler_launch_configuration"
+        icon="icons/16x16/stylesheet.gif"
+        modes="run, debug">
+         <contextualLaunch>
+           <enablement>
+             <with variable="selection">
+               <count value="1"/>
+               <iterate>
+                 <or>
+                   <test property="org.eclipse.debug.ui.matchesPattern" value="%js_file_pattern"/>
+                   <test property="org.eclipse.debug.ui.matchesContentType" value="org.eclipse.wst.jsdt.core.jsSource"/>
+                </or>
+               </iterate>
+             </with>
+           </enablement>
+       </contextualLaunch>
+     </shortcut>
+  </extension>
+
+  <!-- ******************************************************************** -->
+  <!-- Project properties                                                   -->
 
   <extension point="org.eclipse.ui.propertyPages">
     <page
@@ -66,6 +149,9 @@
     </page>
   </extension>
   
+  <!-- ******************************************************************** -->
+  <!-- Preferences                                                          -->
+  
   <extension point="org.eclipse.ui.preferencePages">
     <page
       name="%closure_preference_page"
@@ -83,27 +169,7 @@
   </extension>
   
   
-   
-  <extension point="org.eclipse.wst.jsdt.ui.javaCompletionProposalComputer"
-    id="ClosureCompletionProposalCategory"
-    name="%closure_completion_proposal_category">
-    <proposalCategory icon="icons/16x16/closure.png"/>
-  </extension>
-   
-  <extension point="org.eclipse.wst.jsdt.ui.javaCompletionProposalComputer"
-    id="ClosureCompletionProposalComputer"
-    name="%closure_completion_proposal_computer">
-    <javaCompletionProposalComputer
-      class="net.vtst.ow.eclipse.js.closure.contentassist.ClosureCompletionProposalComputer"
-      categoryId="net.vtst.ow.eclipse.js.closure.ClosureCompletionProposalCategory">
-      <partition type="__dftl_partition_content_type"/>
-    </javaCompletionProposalComputer>
-  </extension>
   
-  <extension id="compiler-error" point="org.eclipse.core.resources.markers">
-    <super type="org.eclipse.core.resources.problemmarker"/>
-    <persistent value="true"/>
-  </extension>  
 
   <!-- Garbage comes below -->
 
