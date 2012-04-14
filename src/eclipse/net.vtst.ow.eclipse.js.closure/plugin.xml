@@ -64,7 +64,7 @@
     <!-- If you change the icon, change it in the shortcut too! -->
     <!-- Image to be changed -->
     <launchConfigurationTypeImage
-        icon="icons/16x16/stylesheet.gif"
+        icon="icons/16x16/closure.png"
         configTypeID="net.vtst.ow.eclipse.js.closure.launching.compiler"
         id="net.vtst.ow.eclipse.js.closure.launching.compiler.image">
     </launchConfigurationTypeImage>
@@ -83,7 +83,7 @@
         id="net.vtst.ow.eclipse.js.closure.launching.compiler.shortcut"
         class="net.vtst.ow.eclipse.js.closure.launching.ClosureCompilerLaunchShortcut"
         label="%closure_compiler_launch_configuration"
-        icon="icons/16x16/stylesheet.gif"
+        icon="icons/16x16/closure.png"
         modes="run, debug">
          <contextualLaunch>
            <enablement>
