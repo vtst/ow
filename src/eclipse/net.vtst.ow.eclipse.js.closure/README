@@ -17,7 +17,6 @@ TODO
 
 Priority 1:
 - Try to put closure library as externs
-- Check re-compile after property change
 
 Priority 2:
 - Option for doing partial compilation in incremental build
