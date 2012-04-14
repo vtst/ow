@@ -4,7 +4,6 @@ import net.vtst.ow.closure.compiler.strip.StrippableJsAst;
 
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.JsAst;
-import com.google.javascript.jscomp.SourceAst;
 import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.rhino.InputId;
 import com.google.javascript.rhino.Node;

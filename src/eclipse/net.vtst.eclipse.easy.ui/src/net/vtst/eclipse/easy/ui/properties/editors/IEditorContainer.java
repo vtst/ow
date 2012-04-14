@@ -1,7 +1,6 @@
 package net.vtst.eclipse.easy.ui.properties.editors;
 
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 
 /**
  * Interface for objects containing editors.

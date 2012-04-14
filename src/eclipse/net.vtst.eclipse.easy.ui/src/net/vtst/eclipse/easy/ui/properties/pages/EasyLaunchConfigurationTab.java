@@ -1,6 +1,5 @@
 package net.vtst.eclipse.easy.ui.properties.pages;
 
-import net.vtst.eclipse.easy.ui.properties.editors.AllEditorChangeEvent;
 import net.vtst.eclipse.easy.ui.properties.editors.ICompositeEditor;
 import net.vtst.eclipse.easy.ui.properties.editors.IEditor;
 import net.vtst.eclipse.easy.ui.properties.editors.IEditorChangeEvent;

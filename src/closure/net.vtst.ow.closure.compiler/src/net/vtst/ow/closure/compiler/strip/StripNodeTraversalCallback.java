@@ -2,9 +2,9 @@ package net.vtst.ow.closure.compiler.strip;
 
 import com.google.javascript.jscomp.NodeTraversal;
 import com.google.javascript.rhino.JSDocInfo;
+import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
-import com.google.javascript.rhino.JSDocInfo.Visibility;
 
 public class StripNodeTraversalCallback implements NodeTraversal.Callback {
 

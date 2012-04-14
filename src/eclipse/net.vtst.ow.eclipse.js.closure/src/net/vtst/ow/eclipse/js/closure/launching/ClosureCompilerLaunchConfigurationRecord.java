@@ -2,20 +2,20 @@ package net.vtst.ow.eclipse.js.closure.launching;
 
 import java.util.regex.Pattern;
 
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.Platform;
-
 import net.vtst.eclipse.easy.ui.properties.Record;
 import net.vtst.eclipse.easy.ui.properties.fields.BooleanField;
 import net.vtst.eclipse.easy.ui.properties.fields.ResourceListField;
+import net.vtst.eclipse.easy.ui.properties.fields.ResourceListField.FileType;
 import net.vtst.eclipse.easy.ui.properties.fields.ResourceListField.Or;
 import net.vtst.eclipse.easy.ui.properties.fields.ResourceListField.ProjectNature;
-import net.vtst.eclipse.easy.ui.properties.fields.ResourceListField.FileType;
 import net.vtst.eclipse.easy.ui.properties.fields.ResourceListField.ResourceType;
 import net.vtst.eclipse.easy.ui.properties.fields.StringOptionsField;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.builder.ClosureNature;
+
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Platform;
 
 public class ClosureCompilerLaunchConfigurationRecord extends Record {
   

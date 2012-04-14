@@ -5,7 +5,6 @@ import net.vtst.eclipse.easy.ui.properties.fields.BooleanField;
 import net.vtst.eclipse.easy.ui.properties.fields.EnumOptionsField;
 import net.vtst.eclipse.easy.ui.properties.fields.FileField;
 import net.vtst.ow.closure.compiler.deps.JSLibrary.CacheMode;
-import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPropertyRecord;
 
 public class ClosurePreferenceRecord extends Record {
 
