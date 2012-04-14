@@ -27,8 +27,10 @@ public abstract class EasyLaunchConfigurationTab extends AbstractLaunchConfigura
   
   @Override
   public void createControl(Composite parent) {
+    System.out.println("CREATE CONTROL");
     this.parent = parent;
     editor = createEditor();
+    setControl(editor.getComposite());
   }
 
   @Override
@@ -48,8 +50,12 @@ public abstract class EasyLaunchConfigurationTab extends AbstractLaunchConfigura
 
   @Override
   public void setDefaults(ILaunchConfigurationWorkingCopy config) {
-    editor.setValuesToDefault();
-    editorChanged(new AllEditorChangeEvent());
+    System.out.println("SET DEFAULTS");
+    // TODO: Is it suitable?
+    if (editor != null) {
+      editor.setValuesToDefault();
+      editorChanged(new AllEditorChangeEvent());
+    }
   }
 
   @Override

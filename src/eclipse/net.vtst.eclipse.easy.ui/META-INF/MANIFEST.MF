@@ -10,12 +10,18 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface;bundle-version="3.7.0",
  org.eclipse.debug.core;bundle-version="3.7.0",
  org.eclipse.ui;bundle-version="3.7.0",
- org.eclipse.debug.ui;bundle-version="3.7.0"
+ org.eclipse.debug.ui;bundle-version="3.7.0",
+ org.eclipse.ui.console;bundle-version="3.5.100"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Import-Package: org.eclipse.debug.core,
+ org.eclipse.jdt.core,
+ org.eclipse.jdt.launching,
+ org.eclipse.jface.text,
+ org.eclipse.ui.console,
  org.eclipse.ui.forms.widgets
-Export-Package: net.vtst.eclipse.easy.ui.listeners,
+Export-Package: net.vtst.eclipse.easy.ui.launching,
+ net.vtst.eclipse.easy.ui.listeners,
  net.vtst.eclipse.easy.ui.messages,
  net.vtst.eclipse.easy.ui.properties,
  net.vtst.eclipse.easy.ui.properties.editors,

@@ -2,3 +2,4 @@ Things to improve:
 1. Access to records
 2. Enable/disable controls
 3. get, returning the default value in case of error
+4. Keys for messages
