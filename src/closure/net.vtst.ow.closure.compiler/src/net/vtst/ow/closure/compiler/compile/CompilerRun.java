@@ -49,6 +49,8 @@ public class CompilerRun {
 
   private String moduleName;
   private List<JSUnit> sortedUnits;
+  private Collection<JSUnit> entryPoints;
+  private boolean stripIncludedFiles;
   private Map<JSUnit, Long> lastModifiedMapForFullCompile;
   private Map<JSUnit, Long> lastModifiedMapForFastCompile;
 
@@ -57,12 +59,17 @@ public class CompilerRun {
    * compilation.
    * @param options  The compilation options
    * @param errorManager  The error manager used to report errors.
-   * @param unit  The unit to compile.
+   * @param sortedUnits  The unit to compile.
+   * @param entryPoints  A subset of {@code sortedUnits}, these units will not be stripped.
    */
-  public CompilerRun(String moduleName, CompilerOptions options, ErrorManager errorManager, List<JSUnit> sortedUnits) {
+  public CompilerRun(
+      String moduleName, CompilerOptions options, ErrorManager errorManager, 
+      List<JSUnit> sortedUnits, Collection<JSUnit> entryPoints, boolean stripIncludedFiles) {
     this.moduleName = moduleName;
     this.options = options;
     this.sortedUnits = sortedUnits;
+    this.entryPoints = entryPoints;
+    this.stripIncludedFiles = stripIncludedFiles; 
     // Initializes the compiler and do the first compile
     setupCompiler(errorManager);
     compile();
@@ -71,14 +78,18 @@ public class CompilerRun {
   public void setErrorManager(ErrorManager errorManager) {
     this.compiler.setErrorManager(errorManager);
   }
+  
+  private boolean shouldStrip(JSUnit unit) {
+    return stripIncludedFiles && !entryPoints.contains(unit);
+  }
 
   // **************************************************************************
   // Full compilation
 
-  private static JSModule buildJSModule(String moduleName, List<JSUnit> sortedUnits) {
+  private JSModule buildJSModule() {
     JSModule module = new JSModule(moduleName);
     for (JSUnit unit: sortedUnits) {
-      module.add(new CompilerInput(unit.getAst()));
+      module.add(new CompilerInput(unit.getAst(shouldStrip(unit))));
     }
     return module;
   }
@@ -111,7 +122,7 @@ public class CompilerRun {
   private void compile() {
     lastModifiedMapForFullCompile = buildLastModifiedMap(sortedUnits);
     lastModifiedMapForFastCompile = Maps.newHashMap(lastModifiedMapForFullCompile);
-    JSModule module = buildJSModule(moduleName, sortedUnits);
+    JSModule module = buildJSModule();
     // For avoiding the magic, we could do:
     // compiler.compileModules(
     //   Collections.<SourceFile> emptyList(), Lists.newArrayList(DefaultExternsProvider.getAsModule(), module), options);
@@ -143,7 +154,7 @@ public class CompilerRun {
       assert previous != null;
       if (current > previous.longValue()) {
         lastModifiedMapForFastCompile.put(unit, current);
-        JsAst ast = unit.getAst();
+        JsAst ast = unit.getAst(shouldStrip(unit));
         processCustomPassesOnNewScript(ast);
         compiler.replaceScript(ast);
       }

@@ -65,7 +65,7 @@ public class StripCompilerPass implements CompilerPass {
   /**
    * The node traversal used by the compiler pass.
    */
-  private NodeTraversal traversal = new NodeTraversal(compiler, new NodeTraversal.Callback() {
+  private NodeTraversal traversal = new NodeTraversal(compiler, new StripNodeTraversalCallback() {
     
     /**
      * Get the original JSDoc comment string for a node representing a top-level statement in
@@ -82,36 +82,6 @@ public class StripCompilerPass implements CompilerPass {
         if (infoChild != null) return infoChild.getOriginalCommentString();
       }
       return null;
-    }
-
-    @Override
-    public boolean shouldTraverse(NodeTraversal traversal, Node node, Node parent) {
-      // In the descending phase, we delete private top-level definitions and the
-      // contents of functions.
-      switch (node.getType()) {
-      case Token.EXPR_RESULT:
-        // Delete private top-level definitions.
-        if (node.getFirstChild() != null &&
-            node.getFirstChild().getType() == Token.ASSIGN &&
-            node.getFirstChild().getJSDocInfo() != null &&
-            node.getFirstChild().getJSDocInfo().getVisibility() == Visibility.PRIVATE) {
-          node.detachFromParent();
-          return false; 
-        }
-        break;
-      case Token.FUNCTION:
-        // Strip the contents of functions
-        for (Node child: node.children()) {
-          if (child.getType() == Token.BLOCK) {
-            child.removeChildren();
-          }
-        }
-        return false;
-      default:
-        JSDocInfo info = node.getJSDocInfo();
-        if (info != null && info.isConstructor()) return false;
-      }
-      return true;
     }
 
     @Override

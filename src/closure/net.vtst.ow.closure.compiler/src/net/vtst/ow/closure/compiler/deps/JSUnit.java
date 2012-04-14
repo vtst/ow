@@ -163,8 +163,8 @@ public class JSUnit implements DependencyInfo {
    * Get a clone of the AST for the file.
    * @return
    */
-  public synchronized JsAst getAst() {
-    return astFactory.getClone();
+  public synchronized JsAst getAst(boolean stripped) {
+    return astFactory.getClone(stripped);
   }
   
   // **************************************************************************
