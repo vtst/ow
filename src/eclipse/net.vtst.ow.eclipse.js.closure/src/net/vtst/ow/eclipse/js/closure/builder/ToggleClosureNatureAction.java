@@ -22,7 +22,6 @@ public class ToggleClosureNatureAction implements IObjectActionDelegate {
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
 	public void run(IAction action) {
-    System.out.println("RUN");
 		if (selection instanceof IStructuredSelection) {
 			for (Iterator it = ((IStructuredSelection) selection).iterator(); it
 					.hasNext();) {
@@ -71,7 +70,6 @@ public class ToggleClosureNatureAction implements IObjectActionDelegate {
 			IProjectDescription description = project.getDescription();
 			String[] natures = description.getNatureIds();
 			for (String nature: natures) {
-			  System.out.println("NATURE: " + nature);
 			}
 
 			for (int i = 0; i < natures.length; ++i) {

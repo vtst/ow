@@ -297,7 +297,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
    * @throws CoreException
    */
   private void compileJavaScriptFile(IFile file, boolean force) throws CoreException {
-    System.out.println("Compiling " + file.getFullPath().toOSString());
+    OwJsDev.log("Compiling %s", file.getFullPath().toOSString());
     CompilableJSUnit unit = ResourceProperties.getJSUnit(file);
     if (unit == null) return;
     // TODO: We should try to clone the options.

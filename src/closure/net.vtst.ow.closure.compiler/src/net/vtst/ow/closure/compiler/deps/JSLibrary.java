@@ -81,7 +81,6 @@ public class JSLibrary extends AbstractJSProject {
   }
   
   public JSLibrary(File path, File pathOfClosureBase, boolean isClosureBase, CacheSettings cacheSettings) {
-    System.out.println("Creating library for: " + path.getAbsolutePath());
     this.path = path;
     this.pathOfClosureBase = pathOfClosureBase;
     this.isClosureBase = isClosureBase;

@@ -56,14 +56,10 @@ public class CompilationUnitProviderFromEclipseIFile implements JSUnitProvider.I
       code = "";
       throw new IOException(e);
     }    
-    // System.out.println("GET FROM FILE: " + file.getName());
-    // System.out.println(code);
   }
   
   private void prepareToGetCodeFromEditor(ITextEditor textEditor) {
     code = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput()).get();
-    // System.out.println("GET FROM EDITOR: " + file.getName());
-    // System.out.println(code);
   }
 
   @Override

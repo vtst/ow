@@ -134,7 +134,6 @@ public abstract class AbstractEditorRegistry {
         documentToFile.remove(document);
       }
     }
-    // System.out.println("REMOVE EDITOR: " + textEditor.getEditorInput().getName());
   }
   
   public static ITextEditor getTextEditorFromPartReference(IWorkbenchPartReference partReference) {
