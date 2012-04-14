@@ -20,7 +20,7 @@ public class LaunchConfigurationReadOnlyStore implements IReadOnlyStore {
   @Override
   public boolean get(String name, boolean defaultValue)
       throws CoreException {
-    return config.getAttribute(name, defaultValue ? -1 : 0) == -1;
+    return config.getAttribute(name, defaultValue);
   }
 
   @Override
