@@ -48,7 +48,6 @@ public class LessImportStatementResolver {
    */
   public Iterable<ToplevelStatement> getAllStatements(final ImportStatement importStatement) {
     return cache.get(Tuples.pair(LessImportStatementResolver.class, importStatement), importStatement.eResource(), new Provider<Iterable<ToplevelStatement>>() {
-      @Override
       public Iterable<ToplevelStatement> get() {
         LinkedList<ToplevelStatement> statements = new LinkedList<ToplevelStatement>();
         getAllStatementsRec(importStatement, statements, new HashSet<URI>());

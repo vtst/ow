@@ -21,7 +21,6 @@ public class LessResourceDescriptionStrategy implements IDefaultResourceDescript
   
   private static final String STYLESHEET_NAME = "<stylesheet>";
 
-  @Override
   public boolean createEObjectDescriptions(EObject eObject, IAcceptor<IEObjectDescription> acceptor) {
     if (eObject instanceof StyleSheet) {
       acceptor.accept(EObjectDescription.create(STYLESHEET_NAME, eObject));
@@ -29,7 +28,6 @@ public class LessResourceDescriptionStrategy implements IDefaultResourceDescript
     return false;
   }
 
-  @Override
   public boolean createReferenceDescriptions(EObject eObject, URI exportedContainerURI, IAcceptor<IReferenceDescription> acceptor) {
     return false;
   }
