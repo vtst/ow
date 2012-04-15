@@ -288,7 +288,10 @@ public class ResourceListField<T extends IResource> extends AbstractField<List<T
         }});
       dialog.open();
       T resource = getSelectedResource(dialog.getResult());
-      if (resource != null) addResource((T) resource);
+      if (resource != null) {
+        addResource((T) resource);
+        triggerChangeEvent();
+      }
     }
     
     private T getSelectedResource(Object[] result) {
@@ -324,6 +327,7 @@ public class ResourceListField<T extends IResource> extends AbstractField<List<T
       int numberOfRemainingElements = list.getItemCount();
       if (numberOfRemainingElements == 0) updateRemoveButton();
       else select(Math.min(index, numberOfRemainingElements - 1));
+      triggerChangeEvent();
     }
 
     private void updateRemoveButton() {
