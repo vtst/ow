@@ -134,7 +134,7 @@ public class ProjectOrderManager implements IResourceChangeListener {
   @Override
   public void resourceChanged(IResourceChangeEvent event) {
     State localState = state;
-    if (localState.dirty) return;
+    if (localState == null || localState.dirty) return;
     ResourceDeltaVisitor visitor = new ResourceDeltaVisitor(localState);
     try {
       event.getDelta().accept(visitor);

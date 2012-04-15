@@ -32,8 +32,8 @@ public class AstFactoryFromModifiable extends AstFactory {
     this.fileName = fileName;
     this.provider = provider;    
   }
-
-  public Node getAstRoot(AbstractCompiler compiler) {
+  
+  private void refreshIfChanged(AbstractCompiler compiler) {
     if (timestampKeeper.hasChanged()) {
       try {
         provider.prepareToGetCode();
@@ -45,7 +45,11 @@ public class AstFactoryFromModifiable extends AstFactory {
       // is called by clearAst(), because it does not reset the private fields of SourceFile.
       // To work around this, we create a new fresh source file object.
       super.setSourceFile(JSSourceFile.fromGenerator(fileName, provider));
-    }
+    }    
+  }
+
+  public Node getAstRoot(AbstractCompiler compiler) {
+    refreshIfChanged(compiler);
     return super.getAstRoot(compiler);
   }
  

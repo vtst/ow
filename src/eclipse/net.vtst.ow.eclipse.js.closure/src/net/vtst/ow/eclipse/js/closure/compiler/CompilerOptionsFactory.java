@@ -1,12 +1,15 @@
 package net.vtst.ow.eclipse.js.closure.compiler;
 
-import net.vtst.eclipse.easy.ui.properties.stores.IStore;
+import net.vtst.eclipse.easy.ui.properties.stores.IReadOnlyStore;
+import net.vtst.eclipse.easy.ui.properties.stores.LaunchConfigurationReadOnlyStore;
 import net.vtst.eclipse.easy.ui.properties.stores.ProjectPropertyStore;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
+import net.vtst.ow.eclipse.js.closure.launching.ClosureCompilerLaunchConfigurationRecord;
 import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPropertyRecord;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.ILaunchConfiguration;
 
 import com.google.javascript.jscomp.ClosureCodingConvention;
 import com.google.javascript.jscomp.CompilationLevel;
@@ -17,29 +20,35 @@ import com.google.javascript.jscomp.WarningLevel;
 public class CompilerOptionsFactory {
   
   // This is based on CommandLineRunner.createOptions() and AbstractCommandLineRunner.setRunOptions()
-  public static CompilerOptions makeForBackgroundCompilation(IProject project) throws CoreException {
+  private static CompilerOptions makeInternal(IProject project, IReadOnlyStore launchStore, boolean ideMode) throws CoreException {
+    ClosureProjectPropertyRecord projectRecord = ClosureProjectPropertyRecord.getInstance();
+    ClosureCompilerLaunchConfigurationRecord launchRecord = ClosureCompilerLaunchConfigurationRecord.getInstance();
+
     // From CommandLineRunner.createOptions()
     CompilerOptions options = new CompilerOptions();
-    ClosureProjectPropertyRecord record = new ClosureProjectPropertyRecord();
-    IStore store = new ProjectPropertyStore(project, OwJsClosurePlugin.PLUGIN_ID);
+    IReadOnlyStore projectStore = new ProjectPropertyStore(project, OwJsClosurePlugin.PLUGIN_ID);
     options.setCodingConvention(new ClosureCodingConvention());
     CompilationLevel level = CompilationLevel.WHITESPACE_ONLY;
-    // level.setOptionsForCompilationLevel(options);
-    // if (flags.generate_exports) {
-    //   options.setGenerateExports(flags.generate_exports);
-    // }
+    if (!ideMode) {
+       level.setOptionsForCompilationLevel(options);
+       if (launchRecord.generateExports.get(launchStore)) {
+         options.setGenerateExports(true);
+       }
+    }
 
-    WarningLevel wLevel = record.warningLevel.get(store);
+    WarningLevel wLevel = projectRecord.warningLevel.get(projectStore);
     wLevel.setOptionsForWarningLevel(options);
-    // if (record.formattingPrettyPrint.get(store)) options.prettyPrint = true;
-    // if (record.formattingPrintInputDelimiter.get(store)) options.printInputDelimiter = true;
+    if (!ideMode) {
+      if (launchRecord.formattingPrettyPrint.get(launchStore)) options.prettyPrint = true;
+      if (launchRecord.formattingPrintInputDelimiter.get(launchStore)) options.printInputDelimiter = true;
+    }
 
-    options.closurePass = record.processClosurePrimitives.get(store);
+    options.closurePass = projectRecord.processClosurePrimitives.get(projectStore);
 
-    options.jqueryPass = record.processJQueryPrimitives.get(store) &&
+    options.jqueryPass = projectRecord.processJQueryPrimitives.get(projectStore) &&
         CompilationLevel.ADVANCED_OPTIMIZATIONS == level;
 
-    if (record.processJQueryPrimitives.get(store)) {
+    if (projectRecord.processJQueryPrimitives.get(projectStore)) {
       options.setCodingConvention(new JqueryCodingConvention());
     }
 
@@ -80,7 +89,7 @@ public class CompilerOptionsFactory {
     //   options.setManageClosureDependencies(config.closureEntryPoints);
     // }
 
-    options.ideMode = true;
+    options.ideMode = ideMode;
     // options.setCodingConvention(config.codingConvention);
     // options.setSummaryDetailLevel(config.summaryDetailLevel);
 
@@ -103,7 +112,7 @@ public class CompilerOptionsFactory {
     //   options.inputPropertyMapSerialized =
     //       VariableMap.load(config.propertyMapInputFile).toBytes();
     // }
-    options.setLanguageIn(record.languageIn.get(store));
+    options.setLanguageIn(projectRecord.languageIn.get(projectStore));
 
     // if (!config.outputManifests.isEmpty()) {
     //   Set<String> uniqueNames = Sets.newHashSet();
@@ -125,7 +134,7 @@ public class CompilerOptionsFactory {
     //   }
     // }
 
-    options.setAcceptConstKeyword(record.acceptConstKeyword.get(store));
+    options.setAcceptConstKeyword(projectRecord.acceptConstKeyword.get(projectStore));
     // options.transformAMDToCJSModules = config.transformAMDToCJSModules;
     // options.processCommonJSModules = config.processCommonJSModules;
     // options.commonJSModulePathPrefix = config.commonJSModulePathPrefix;
@@ -137,6 +146,14 @@ public class CompilerOptionsFactory {
     options.closurePass = true;
 
     return options;
+  }
+
+  public static CompilerOptions makeForBackgroundCompilation(IProject project) throws CoreException {
+    return makeInternal(project, null, true);
+  }
+  
+  public static CompilerOptions makeForFullCompilation(IProject project, ILaunchConfiguration config) throws CoreException {
+    return makeInternal(project, new LaunchConfigurationReadOnlyStore(config), false);
   }
 
 }

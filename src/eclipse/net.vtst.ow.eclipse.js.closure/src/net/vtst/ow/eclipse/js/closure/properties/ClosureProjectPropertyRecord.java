@@ -1,16 +1,15 @@
 package net.vtst.ow.eclipse.js.closure.properties;
 
-import com.google.javascript.jscomp.CompilerOptions;
-import com.google.javascript.jscomp.WarningLevel;
-import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
-
 import net.vtst.eclipse.easy.ui.properties.Record;
 import net.vtst.eclipse.easy.ui.properties.fields.BooleanField;
 import net.vtst.eclipse.easy.ui.properties.fields.EnumOptionsField;
 import net.vtst.eclipse.easy.ui.properties.fields.FileField;
 import net.vtst.eclipse.easy.ui.properties.fields.FileListField;
 import net.vtst.eclipse.easy.ui.properties.fields.StringField;
-import net.vtst.eclipse.easy.ui.properties.fields.StringOptionsField;
+
+import com.google.javascript.jscomp.CompilerOptions;
+import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
+import com.google.javascript.jscomp.WarningLevel;
 
 public class ClosureProjectPropertyRecord extends Record {
   
@@ -37,14 +36,7 @@ public class ClosureProjectPropertyRecord extends Record {
   public BooleanField processJQueryPrimitives = new BooleanField(false);
   public BooleanField acceptConstKeyword = new BooleanField(false);
   public EnumOptionsField<LanguageMode> languageIn = new EnumOptionsField<LanguageMode>(CompilerOptions.LanguageMode.class, LanguageMode.ECMASCRIPT3);
-  public CheckLevelsField checkLevels = new CheckLevelsField();
-  
-  // Compilation (output)
-  
-  public StringOptionsField compilationLevel = new StringOptionsField("WHITESPACE_ONLY", "SIMPLE_OPTIMIZATIONS", "ADVANCED_OPTIMIZATIONS");
-  public BooleanField formattingPrettyPrint = new BooleanField(false);
-  public BooleanField formattingPrintInputDelimiter = new BooleanField(false);
-  
+  public CheckLevelsField checkLevels = new CheckLevelsField();  
 
   private static ClosureProjectPropertyRecord instance;
   public static ClosureProjectPropertyRecord getInstance() {

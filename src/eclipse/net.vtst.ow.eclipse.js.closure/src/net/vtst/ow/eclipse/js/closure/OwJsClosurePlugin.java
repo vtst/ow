@@ -25,6 +25,7 @@ public class OwJsClosurePlugin extends AbstractUIPlugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "net.vtst.ow.eclipse.js.closure"; //$NON-NLS-1$
+	public static final String JS_CONTENT_TYPE_ID = "org.eclipse.wst.jsdt.core.jsSource";
 
 	// The shared instance
 	private static OwJsClosurePlugin plugin;

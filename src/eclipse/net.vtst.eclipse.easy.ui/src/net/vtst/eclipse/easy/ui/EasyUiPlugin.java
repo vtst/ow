@@ -1,13 +1,13 @@
 package net.vtst.eclipse.easy.ui;
 
-import net.vtst.eclipse.easy.ui.messages.EasyBundleMessages;
-
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 public class EasyUiPlugin extends AbstractUIPlugin implements BundleActivator {
+  
+  public static final String PLUGIN_ID = "net.vtst.eclipse.easy.ui";
 
 	private static BundleContext context;
 	private static EasyUiPlugin instance;
@@ -34,7 +34,7 @@ public class EasyUiPlugin extends AbstractUIPlugin implements BundleActivator {
 		EasyUiPlugin.context = null;
 	}
 	
-	public EasyBundleMessages getMessages() {
+	public EasyUiMessages getMessages() {
 	  return messages;
 	}
 	

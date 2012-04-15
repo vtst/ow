@@ -1,8 +1,9 @@
 package net.vtst.ow.closure.compiler.deps;
 
+import net.vtst.ow.closure.compiler.strip.StrippableJsAst;
+
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.JsAst;
-import com.google.javascript.jscomp.SourceAst;
 import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.rhino.InputId;
 import com.google.javascript.rhino.Node;
@@ -14,26 +15,34 @@ import com.google.javascript.rhino.Node;
  * 
  * @author Vincent Simonet
  */
-public class AstFactory extends JsAst {
+public class AstFactory extends StrippableJsAst {
   private static final long serialVersionUID = 1L;
+  private Node strippedRoot;
   
   public AstFactory(SourceFile sourceFile) {
     super(sourceFile);
   }
+  
+  public void clearAst() {
+    super.clearAst();
+    this.strippedRoot = null;
+  }
 
-  public JsAst getClone() {
-    return new AstFactory.ClonedAst(this);
+  public JsAst getClone(boolean stripped) {
+    return new AstFactory.ClonedAst(this, stripped);
   }
 
   static class ClonedAst extends JsAst {
     private static final long serialVersionUID = 1L;
 
-    private SourceAst fatherSourceAst;
+    private StrippableJsAst fatherSourceAst;
     private Node root;
+    private boolean stripped;
 
-    public ClonedAst(SourceAst fatherSourceAst) {
+    public ClonedAst(StrippableJsAst fatherSourceAst, boolean stripped) {
       super(fatherSourceAst.getSourceFile());
       this.fatherSourceAst = fatherSourceAst;
+      this.stripped = stripped;
     }
     
     @Override
@@ -44,7 +53,7 @@ public class AstFactory extends JsAst {
     @Override
     public Node getAstRoot(AbstractCompiler compiler) {
       if (root == null) {
-        Node fatherRoot = fatherSourceAst.getAstRoot(compiler);
+        Node fatherRoot = stripped ? fatherSourceAst.getStrippedAstRoot(compiler) : fatherSourceAst.getAstRoot(compiler);
         root = fatherRoot.cloneTree();
       }
       return root;

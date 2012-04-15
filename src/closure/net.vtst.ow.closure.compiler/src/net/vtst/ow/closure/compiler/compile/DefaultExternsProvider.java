@@ -24,7 +24,7 @@ public class DefaultExternsProvider {
   public static JSModule getAsModule() {
     if (astFactories == null) initialize();
     JSModule module = new JSModule("externs");
-    for (AstFactory astFactory: astFactories) module.add(new CompilerInput(astFactory.getClone()));
+    for (AstFactory astFactory: astFactories) module.add(new CompilerInput(astFactory.getClone(false)));
     return module;
   }
   
@@ -34,8 +34,12 @@ public class DefaultExternsProvider {
   public static List<CompilerInput> getAsCompilerInputs() {
     if (astFactories == null) initialize();
     List<CompilerInput> result = new ArrayList<CompilerInput>(astFactories.size());
-    for (AstFactory astFactory: astFactories) result.add(new CompilerInput(astFactory.getClone(), true));
+    for (AstFactory astFactory: astFactories) result.add(new CompilerInput(astFactory.getClone(false), true));
     return result;    
+  }
+  
+  public static List<SourceFile> getAsSourceFiles() throws IOException {
+    return CommandLineRunner.getDefaultExterns();
   }
   
   private static synchronized void initialize() {
@@ -48,7 +52,7 @@ public class DefaultExternsProvider {
   }
   
   private static List<AstFactory> loadExterns() throws IOException {
-    List<SourceFile> externs = CommandLineRunner.getDefaultExterns();
+    List<SourceFile> externs = getAsSourceFiles();
     ArrayList<AstFactory> astFactories = new ArrayList<AstFactory>(externs.size());
     for (SourceFile extern: externs) astFactories.add(new AstFactory(extern));
     return astFactories;

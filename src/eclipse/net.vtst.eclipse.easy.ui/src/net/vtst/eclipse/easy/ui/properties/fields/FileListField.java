@@ -1,8 +1,6 @@
 package net.vtst.eclipse.easy.ui.properties.fields;
 
 import java.io.File;
-import java.io.ObjectInputStream.GetField;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -10,7 +8,6 @@ import java.util.List;
 import net.vtst.eclipse.easy.ui.listeners.NullSwtSelectionListener;
 import net.vtst.eclipse.easy.ui.properties.editors.AbstractFieldEditor;
 import net.vtst.eclipse.easy.ui.properties.editors.IEditorContainer;
-import net.vtst.eclipse.easy.ui.properties.fields.FileListField.Type;
 import net.vtst.eclipse.easy.ui.properties.stores.IReadOnlyStore;
 import net.vtst.eclipse.easy.ui.properties.stores.IStore;
 import net.vtst.eclipse.easy.ui.util.SWTFactory;
@@ -137,7 +134,10 @@ public class FileListField extends AbstractField<List<File>> {
         directoryDialog.setText(getMessage("add_title", "FileListField_add_title"));
         directoryDialog.setMessage(getMessage("add_message", "FileListField_add_message"));
         String newDir = directoryDialog.open();
-        if (newDir != null) addFile(newDir);
+        if (newDir != null) {
+          addFile(newDir);
+          triggerChangeEvent();
+        }
         break;
       case FILE:
         FileDialog fileDialog = new FileDialog(removeButton.getShell());
@@ -149,7 +149,10 @@ public class FileListField extends AbstractField<List<File>> {
         }
         fileDialog.setFilterNames(filterNamesMessages);
         String newFile = fileDialog.open();
-        if (newFile != null) addFile(newFile);
+        if (newFile != null) {
+          addFile(newFile);
+          triggerChangeEvent();
+        }
         break;
       } 
     }
@@ -180,6 +183,7 @@ public class FileListField extends AbstractField<List<File>> {
       int numberOfRemainingElements = list.getItemCount();
       if (numberOfRemainingElements == 0) updateRemoveButton();
       else select(Math.min(index, numberOfRemainingElements - 1));
+      triggerChangeEvent();
     }
 
     private void updateRemoveButton() {

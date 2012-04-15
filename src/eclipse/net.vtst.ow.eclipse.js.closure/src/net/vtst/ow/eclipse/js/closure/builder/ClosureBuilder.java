@@ -21,6 +21,7 @@ import net.vtst.ow.closure.compiler.util.ListWithoutDuplicates;
 import net.vtst.ow.closure.compiler.util.NullErrorManager;
 import net.vtst.ow.eclipse.js.closure.OwJsClosureMessages;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
+import net.vtst.ow.eclipse.js.closure.compiler.ClosureUtils;
 import net.vtst.ow.eclipse.js.closure.compiler.CompilationUnitProviderFromEclipseIFile;
 import net.vtst.ow.eclipse.js.closure.compiler.CompilerOptionsFactory;
 import net.vtst.ow.eclipse.js.closure.compiler.ErrorManagerGeneratingProblemMarkers;
@@ -117,7 +118,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
       public boolean visit(IResource resource) throws CoreException {
         if (resource instanceof IFile) {
           IFile file = (IFile) resource;
-          if (isJavaScriptFile(file)) files.add(file);
+          if (ClosureUtils.isJavaScriptFile(file)) files.add(file);
         }
         return true;
       }
@@ -133,7 +134,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
    * @throws CoreException
    */
   private void fullBuild(IProgressMonitor monitor, IProject project) throws CoreException {
-    monitor.subTask("build_prepare");
+    monitor.subTask(messages.format("build_prepare"));
     Compiler compiler = CompilerUtils.makeCompiler(new NullErrorManager());  // TODO!
     compiler.initOptions(CompilerUtils.makeOptions());
     File pathOfClosureBase = getPathOfClosureBase(project);
@@ -208,7 +209,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
         IFile file = (IFile) resource;
         switch (delta.getKind()) {
         case IResourceDelta.ADDED:
-          if (isJavaScriptFile(file)) fullBuildRequired = true;
+          if (ClosureUtils.isJavaScriptFile(file)) fullBuildRequired = true;
           return false;
         case IResourceDelta.REMOVED:
           if (currentFiles.contains(file)) fullBuildRequired = true;
@@ -297,31 +298,25 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
    * @throws CoreException
    */
   private void compileJavaScriptFile(IFile file, boolean force) throws CoreException {
+    OwJsDev.log("Compiling %s", file.getFullPath().toOSString());
     CompilableJSUnit unit = ResourceProperties.getJSUnit(file);
     if (unit == null) return;
+    // TODO: We should try to clone the options.
     CompilerOptions options = CompilerOptionsFactory.makeForBackgroundCompilation(file.getProject());
+    // TODO: We should avoid calling this for every file.
+    boolean stripIncludedFiles = getStripIncludedFiles();
     ErrorManager errorManager = new ErrorManagerGeneratingProblemMarkers(unit, file);
-    CompilerRun run = unit.fullCompile(options, errorManager, force);
+    CompilerRun run = unit.fullCompile(options, errorManager, stripIncludedFiles, force);
     run.setErrorManager(new NullErrorManager());
   }
 
-  private static final String JS_CONTENT_TYPE_ID =
-      "org.eclipse.wst.jsdt.core.jsSource";
-
-  private final IContentType jsContentType =
-      Platform.getContentTypeManager().getContentType(JS_CONTENT_TYPE_ID);
-
-  /**
-   * Test whether a file is a JavaScript file (by looking at its content type).
-   * @param file  The file to test.
-   * @return  true iif the given file is a JavaScript file.
-   * @throws CoreException
-   */
-  private boolean isJavaScriptFile(IFile file) throws CoreException {
-    IContentDescription contentDescription = file.getContentDescription();
-    if (contentDescription == null) return false;
-    IContentType contentType = contentDescription.getContentType();
-    return contentType.isKindOf(jsContentType);
+  private boolean getStripIncludedFiles() {
+    IStore store = new PluginPreferenceStore(OwJsClosurePlugin.getDefault().getPreferenceStore());
+    try {
+      return ClosurePreferenceRecord.getInstance().stripProjectFiles.get(store);
+    } catch (CoreException e) {
+      return ClosurePreferenceRecord.getInstance().stripProjectFiles.getDefault();
+    }
   }
 
   // **************************************************************************

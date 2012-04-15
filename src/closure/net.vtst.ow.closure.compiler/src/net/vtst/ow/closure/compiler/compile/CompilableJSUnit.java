@@ -57,14 +57,16 @@ public class CompilableJSUnit extends JSUnit {
     return orderedUnits;
   }  
   
-  public CompilerRun fullCompile(CompilerOptions options, ErrorManager errorManager) {
-    return fullCompile(options, errorManager, true);
+  public CompilerRun fullCompile(CompilerOptions options, ErrorManager errorManager, boolean stripIncludedFiles) {
+    return fullCompile(options, errorManager, stripIncludedFiles, true);
   }
   
-  public CompilerRun fullCompile(CompilerOptions options, ErrorManager errorManager, boolean force) {
-    List<JSUnit> units = updateAndGetOrderedUnits();
-    if (force || run == null || run.hasChanged(units)) {
-      CompilerRun newRun = new CompilerRun(this.getName(), options, errorManager, units);
+  public CompilerRun fullCompile(CompilerOptions options, ErrorManager errorManager, boolean stripIncludedFiles, boolean force) {
+    List<JSUnit> orderedUnits = updateAndGetOrderedUnits();
+    if (force || run == null || run.hasChanged(orderedUnits)) {
+      CompilerRun newRun = new CompilerRun(
+          this.getName(), options, errorManager, 
+          orderedUnits, Collections.<JSUnit>singleton(this), stripIncludedFiles);
       run = newRun;  // This is atomic
       return newRun;    
     } else {

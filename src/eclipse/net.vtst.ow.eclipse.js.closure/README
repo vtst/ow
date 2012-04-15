@@ -16,9 +16,7 @@ TODO
 - Can we clone compiler options?
 
 Priority 1:
-- Option for stripping project files
-- Check re-compile after property change
-- Order of completion proposals
+- Try to put closure library as externs
 
 Priority 2:
 - Option for doing partial compilation in incremental build

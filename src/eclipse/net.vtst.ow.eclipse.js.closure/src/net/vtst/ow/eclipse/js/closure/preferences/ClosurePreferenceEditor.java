@@ -1,11 +1,11 @@
 package net.vtst.ow.eclipse.js.closure.preferences;
 
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Group;
-
 import net.vtst.eclipse.easy.ui.properties.editors.DefaultCompoundEditor;
 import net.vtst.eclipse.easy.ui.properties.editors.IEditorContainer;
 import net.vtst.eclipse.easy.ui.util.SWTFactory;
+
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Group;
 
 public class ClosurePreferenceEditor extends DefaultCompoundEditor {
 
@@ -21,6 +21,8 @@ public class ClosurePreferenceEditor extends DefaultCompoundEditor {
     SWTFactory.createLabel(group1, getMessage("libraryCacheGroup_help"), 3);
     record.cacheLibraryDepsFiles.bindEditor(this, group1);
     record.cacheLibraryStrippedFiles.bindEditor(this, group1);
+    Group group2 = SWTFactory.createGroup(getComposite(), getMessage("otherOptionsGroup"), 3, 1, GridData.FILL_HORIZONTAL);
+    record.stripProjectFiles.bindEditor(this, group2);
   }
   
 }

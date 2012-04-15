@@ -1,6 +1,5 @@
 package net.vtst.eclipse.easy.ui.properties.pages;
 
-import net.vtst.eclipse.easy.ui.properties.editors.AllEditorChangeEvent;
 import net.vtst.eclipse.easy.ui.properties.editors.ICompositeEditor;
 import net.vtst.eclipse.easy.ui.properties.editors.IEditor;
 import net.vtst.eclipse.easy.ui.properties.editors.IEditorChangeEvent;
@@ -29,13 +28,13 @@ public abstract class EasyLaunchConfigurationTab extends AbstractLaunchConfigura
   public void createControl(Composite parent) {
     this.parent = parent;
     editor = createEditor();
+    setControl(editor.getComposite());
   }
 
   @Override
   public void initializeFrom(ILaunchConfiguration config) {
     try {
       editor.readValuesFrom(new LaunchConfigurationReadOnlyStore(config));
-      editorChanged(new AllEditorChangeEvent());
     } catch (CoreException e) {}
   }
 
@@ -48,15 +47,27 @@ public abstract class EasyLaunchConfigurationTab extends AbstractLaunchConfigura
 
   @Override
   public void setDefaults(ILaunchConfigurationWorkingCopy config) {
-    editor.setValuesToDefault();
-    editorChanged(new AllEditorChangeEvent());
+    if (editor != null) {
+      editor.setValuesToDefault();
+    }
   }
+  
+  /* (non-Javadoc)
+   * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
+   */
+  @Override
+  public boolean isValid(ILaunchConfiguration config) {
+    return true;
+  }
+
 
   @Override
   public void addEditor(IEditor editor) {}
 
   @Override
-  public void editorChanged(IEditorChangeEvent event) {}
+  public void editorChanged(IEditorChangeEvent event) {
+    updateLaunchConfigurationDialog();    
+  }
 
   @Override
   public Composite getComposite() {

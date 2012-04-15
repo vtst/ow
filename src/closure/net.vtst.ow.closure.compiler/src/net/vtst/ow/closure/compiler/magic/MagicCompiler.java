@@ -3,7 +3,6 @@ package net.vtst.ow.closure.compiler.magic;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.List;
 
 import com.google.common.base.Preconditions;
@@ -11,9 +10,7 @@ import com.google.common.collect.Lists;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerInput;
 import com.google.javascript.jscomp.CompilerOptions;
-import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.JSModule;
-import com.google.javascript.jscomp.JSModuleGraph;
 import com.google.javascript.jscomp.Result;
 import com.google.javascript.jscomp.SourceFile;
 

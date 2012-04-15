@@ -75,7 +75,10 @@ public class FileField extends AbstractField<File> {
       dialog.setMessage(getMessage("browse_message", "FileField_browse_message"));
       dialog.setFilterPath(text.getText());
       String newDir = dialog.open();
-      if (newDir != null) text.setText(newDir);
+      if (newDir != null) {
+        text.setText(newDir);
+        triggerChangeEvent();
+      }
     }
 
     @Override
@@ -106,7 +109,5 @@ public class FileField extends AbstractField<File> {
       text.setEnabled(enabled);
       buttonBrowse.setEnabled(enabled);
     }
-    
   }
-
 }

@@ -63,7 +63,7 @@ public class MainForDebug {
       if (i == 1) t1 = System.nanoTime();
       JSModule module = new JSModule("main");
       for (AstFactoryFromModifiable ast: listAsts) {
-        module.add(new CompilerInput(ast.getClone()));
+        module.add(new CompilerInput(ast.getClone(false)));
       }
 //      for (JSSourceFile sourceFile: listSourceFiles) {
 //        module.add(new CompilerInput(sourceFile));

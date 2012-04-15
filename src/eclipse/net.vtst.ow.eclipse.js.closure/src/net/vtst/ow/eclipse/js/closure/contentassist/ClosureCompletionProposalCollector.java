@@ -64,9 +64,10 @@ public class ClosureCompletionProposalCollector {
     for (Var var: context.getAllSymbols()) {
       if (isValidFor(var.getName(), prefix) && isSimpleName(var.getName())) {
         Node node = var.getNameNode();
-        if (isConcreteNode(node)) {
+        String name = var.getName();
+        if (isConcreteNode(node) && isVisibleName(name)) {
           list.add(new ClosureCompletionProposal(
-              context, var.getName(), node, var.getType(), var.getJSDocInfo(),
+              context, name, node, var.getType(), var.getJSDocInfo(),
               false, var.isLocal()));
         }
       }
@@ -173,7 +174,7 @@ public class ClosureCompletionProposalCollector {
           ClosureCompletionProposal proposal = map.get(propertyName);
           if (proposal == null) {
             Node node = alternateObjectType.getPropertyNode(propertyName);
-            if (isConcreteNode(node)) {
+            if (isConcreteNode(node) && isVisibleName(propertyName)) {
               JSDocInfo docInfo = getJSDocInfoOfProperty(alternateObjectType, propertyName);
               JSType propertyType = alternateObjectType.getPropertyType(propertyName);
               proposal = new ClosureCompletionProposal(
@@ -210,6 +211,13 @@ public class ClosureCompletionProposalCollector {
    */
   private boolean isConcreteNode(Node node) {
     return node != null && !node.isSyntheticBlock() && node.getLineno() >= 0;
+  }
+  
+  private boolean isVisibleName(String name) {
+    int n = name.length();
+    if (n < 4) return true;
+    return name.charAt(0) != '_' || name.charAt(1) != '_' || 
+        name.charAt(n - 1) != '_' || name.charAt(n - 2) != '_';
   }
 
   /**

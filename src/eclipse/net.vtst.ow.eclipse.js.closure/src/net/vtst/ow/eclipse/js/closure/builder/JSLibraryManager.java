@@ -7,7 +7,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.vtst.eclipse.easy.ui.properties.stores.IStore;
 import net.vtst.eclipse.easy.ui.properties.stores.PluginPreferenceStore;
 import net.vtst.ow.closure.compiler.deps.JSLibrary;
-import net.vtst.ow.closure.compiler.deps.JSLibrary.CacheMode;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
 
