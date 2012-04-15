@@ -231,6 +231,4 @@ public abstract class AbstractEditorRegistry {
       return lastModificationTime;
     }
   }
-
-
 }
