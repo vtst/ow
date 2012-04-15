@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: net.vtst.eclipse.easy.ui
-Bundle-SymbolicName: net.vtst.eclipse.easy.ui
+Bundle-SymbolicName: net.vtst.eclipse.easy.ui;singleton:=true
 Bundle-Version: 0.1.0
 Bundle-Activator: net.vtst.eclipse.easy.ui.EasyUiPlugin
 Bundle-Vendor: Vincent Simonet
