@@ -38,6 +38,10 @@ public class DefaultExternsProvider {
     return result;    
   }
   
+  public static List<SourceFile> getAsSourceFiles() throws IOException {
+    return CommandLineRunner.getDefaultExterns();
+  }
+  
   private static synchronized void initialize() {
     if (astFactories != null) return;
     try {
@@ -48,7 +52,7 @@ public class DefaultExternsProvider {
   }
   
   private static List<AstFactory> loadExterns() throws IOException {
-    List<SourceFile> externs = CommandLineRunner.getDefaultExterns();
+    List<SourceFile> externs = getAsSourceFiles();
     ArrayList<AstFactory> astFactories = new ArrayList<AstFactory>(externs.size());
     for (SourceFile extern: externs) astFactories.add(new AstFactory(extern));
     return astFactories;
