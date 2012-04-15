@@ -13,6 +13,7 @@ public class ClosureCompilerOptionsEditor extends DefaultCompoundEditor {
 
   public ClosureCompilerOptionsEditor(IEditorContainer container) {
     super(container, 3);
+    SWTFactory.createLabel(getComposite(), "THE LAUNCH CONFIGURATION IS NOT YET COMPLETELY IMPLEMENTED. PLEASE WAIT FOR A NEXT VERSION OF THE PLUGIN!", 3);
     record.compilationLevel.bindEditor(this);
     record.generateExports.bindEditor(this);
     Group group1 = SWTFactory.createGroup(
