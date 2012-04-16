@@ -31,17 +31,14 @@ public class JSLibraryProviderWithCache implements IJSLibraryProvider {
   private static class LibraryKey {
     private File libraryPath;
     private File pathOfClosureBase;
-    private boolean isClosureBase;
-    LibraryKey(File libraryPath, File pathOfClosureBase, boolean isClosureBase) {
+    LibraryKey(File libraryPath, File pathOfClosureBase) {
       this.libraryPath = libraryPath;
       this.pathOfClosureBase = pathOfClosureBase;
-      this.isClosureBase = isClosureBase;
     }
     public boolean equals(Object obj) {
       if (obj instanceof LibraryKey) {
         LibraryKey key = (LibraryKey) obj;
         return (
-            key.isClosureBase == isClosureBase &&
             key.libraryPath.equals(libraryPath) && 
             key.pathOfClosureBase.equals(pathOfClosureBase));
       }
@@ -50,7 +47,7 @@ public class JSLibraryProviderWithCache implements IJSLibraryProvider {
     public int hashCode() {
       int h1 = libraryPath.hashCode();
       int h2 = pathOfClosureBase.hashCode();
-      return h1 * h2 + h1 + h2 + (isClosureBase ? 0 : 1013);
+      return h1 * h2 + h1 + h2;
     }
   }
   
@@ -72,11 +69,11 @@ public class JSLibraryProviderWithCache implements IJSLibraryProvider {
    * @param isClosureBase
    * @return
    */
-  public JSLibrary get(AbstractCompiler compiler, File libraryPath, File pathOfClosureBase, boolean isClosureBase) {
-    LibraryKey key = new LibraryKey(libraryPath, pathOfClosureBase, isClosureBase);
+  public JSLibrary get(AbstractCompiler compiler, File libraryPath, File pathOfClosureBase) {
+    LibraryKey key = new LibraryKey(libraryPath, pathOfClosureBase);
     JSLibrary library = get(key);
     if (library == null) {
-      library = new JSLibrary(libraryPath, pathOfClosureBase, isClosureBase, getCacheSettings());
+      library = new JSLibrary(libraryPath, pathOfClosureBase, getCacheSettings());
       library.setUnits(compiler);
       cache.put(key, new WeakReference<JSLibrary>(library));
     }

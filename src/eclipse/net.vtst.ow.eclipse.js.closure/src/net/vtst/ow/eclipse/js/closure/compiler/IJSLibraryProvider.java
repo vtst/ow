@@ -21,7 +21,7 @@ public interface IJSLibraryProvider {
    * @param isClosureBase  Whether this library is the closure base library.
    * @return  The library.
    */
-  public JSLibrary get(AbstractCompiler compiler, File libraryPath, File pathOfClosureBase, boolean isClosureBase);
+  public JSLibrary get(AbstractCompiler compiler, File libraryPath, File pathOfClosureBase);
 
   /**
    * Clear any cached data of the provider.

@@ -387,11 +387,11 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
     for (int i = projects.size() - 1; i >= 0; --i) {      
       File pathOfClosureBase = getPathOfClosureBase(projects.get(i));
       if (pathOfClosureBase != null) {
-        result.add(jsLibraryManager.get(compiler, pathOfClosureBase, pathOfClosureBase, true));
+        result.add(jsLibraryManager.get(compiler, pathOfClosureBase, pathOfClosureBase));
       }
       for (File libraryPath: ClosureProjectPropertyRecord.getInstance().otherLibraries.get(new ProjectPropertyStore(projects.get(i), OwJsClosurePlugin.PLUGIN_ID))) {
         checkCancel(monitor, true);
-        result.add(jsLibraryManager.get(compiler, libraryPath, pathOfClosureBase, false));
+        result.add(jsLibraryManager.get(compiler, libraryPath, pathOfClosureBase));
       }
     }
     return result.asList();

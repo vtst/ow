@@ -163,7 +163,7 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
   }
   
   private JSLibrary getLibrary(AbstractCompiler compiler, File path, File pathOfClosureBase, boolean isClosureBase, CacheSettings cacheSettings) {
-    JSLibrary library = new JSLibrary(path, pathOfClosureBase, isClosureBase, cacheSettings);
+    JSLibrary library = new JSLibrary(path, pathOfClosureBase, cacheSettings);
     library.setUnits(compiler);
     return library;
   }

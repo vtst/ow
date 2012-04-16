@@ -73,17 +73,17 @@ public class JSLibrary extends AbstractJSProject {
    * @param path  The root directory for the library.
    */
   public JSLibrary(File path) {
-    this(path, path, true);
+    this(path, path);
   }
   
-  public JSLibrary(File path, File pathOfClosureBase, boolean isClosureBase) {
-    this(path, pathOfClosureBase, isClosureBase, new CacheSettings());
+  public JSLibrary(File path, File pathOfClosureBase) {
+    this(path, pathOfClosureBase, new CacheSettings());
   }
   
-  public JSLibrary(File path, File pathOfClosureBase, boolean isClosureBase, CacheSettings cacheSettings) {
+  public JSLibrary(File path, File pathOfClosureBase, CacheSettings cacheSettings) {
     this.path = path;
     this.pathOfClosureBase = pathOfClosureBase;
-    this.isClosureBase = isClosureBase;
+    this.isClosureBase = path.equals(pathOfClosureBase);
     this.cacheSettings = cacheSettings;
   }
 
