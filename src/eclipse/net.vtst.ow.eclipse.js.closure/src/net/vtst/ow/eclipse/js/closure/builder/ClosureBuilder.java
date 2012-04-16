@@ -3,6 +3,7 @@ package net.vtst.ow.eclipse.js.closure.builder;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -63,7 +64,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
   
   public static final String BUILDER_ID = "net.vtst.ow.eclipse.js.closure.closureBuilder";
   
-  private IJSLibraryProvider jsLibraryManager = OwJsClosurePlugin.getDefault().getJSLibraryProviderForClosureBuilder();
+  private IJSLibraryProvider jsLibraryProvider = OwJsClosurePlugin.getDefault().getJSLibraryProviderForClosureBuilder();
   private OwJsClosureMessages messages = OwJsClosurePlugin.getDefault().getMessages();
   private ProjectOrderManager projectOrderManager = OwJsClosurePlugin.getDefault().getProjectOrderManager();
   
@@ -106,28 +107,6 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
 	// Full build
   
   /**
-   * Gets the list of JavaScript files in a project.
-   * @param project  The project to visit.
-   * @return  The list of JavaScript file.  May be empty, but never null.
-   * @throws CoreException 
-   */
-  private Set<IFile> getJavaScriptFiles(IProject project) throws CoreException {
-    final Set<IFile> files = new HashSet<IFile>();
-    IResourceVisitor visitor = new IResourceVisitor() {
-      @Override
-      public boolean visit(IResource resource) throws CoreException {
-        if (resource instanceof IFile) {
-          IFile file = (IFile) resource;
-          if (ClosureCompiler.isJavaScriptFile(file)) files.add(file);
-        }
-        return true;
-      }
-    };
-    project.accept(visitor);
-    return files;
-  }
-
-  /**
    * Perform a full build of a project.
    * @param monitor  The project monitor.  This methods reports two units of work.
    * @param project  The project to build.
@@ -137,7 +116,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
     monitor.subTask(messages.format("build_prepare"));
     Compiler compiler = CompilerUtils.makeCompiler(new NullErrorManager());  // TODO!
     compiler.initOptions(CompilerUtils.makeOptions());
-    File pathOfClosureBase = getPathOfClosureBase(project);
+    File pathOfClosureBase = ClosureCompiler.getPathOfClosureBase(project);
     if (pathOfClosureBase == null) {
       monitor.worked(1);
       return;
@@ -148,7 +127,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
     updateReferencedProjectsIfNeeded(monitor, compiler, project, jsProject);
     
     // Set the compilation units
-    Set<IFile> files = getJavaScriptFiles(project);
+    Set<IFile> files = ClosureCompiler.getJavaScriptFiles(project);
     ResourceProperties.setJavaScriptFiles(project, files);
     List<CompilableJSUnit> units = new ArrayList<CompilableJSUnit>(files.size());
     for (IFile file: files) {
@@ -169,17 +148,6 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
     }
     monitor.worked(1);
     compileJavaScriptFiles(monitor, files, false);
-  }
-  
-  private File getPathOfClosureBase(IProject project) throws CoreException {
-    IStore ps = new ProjectPropertyStore(project, OwJsClosurePlugin.PLUGIN_ID);
-    ClosureProjectPropertyRecord pr = ClosureProjectPropertyRecord.getInstance();
-    if (pr.useDefaultClosureBasePath.get(ps)) {
-      IStore prefs = new PluginPreferenceStore(OwJsClosurePlugin.getDefault().getPreferenceStore());
-      return ClosurePreferenceRecord.getInstance().closureBasePath.get(prefs);
-    } else {
-      return pr.closureBasePath.get(ps);
-    }
   }
   
   // **************************************************************************
@@ -335,68 +303,16 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
     ProjectOrderManager.State projectOrderState = projectOrderManager.get();
     if (projectOrderState.getModificationStamp() <= jsProject.getReferencedProjectsModificationStamp()) return;
     OwJsDev.log("Updating referenced projects of: %s", project.getName());
-    ArrayList<IProject> projects = getReferencedJavaScriptProjectsRecursively(projectOrderState, project);
-    Collection<AbstractJSProject> libraries = getJSLibraries(monitor, compiler, projects);
+    ArrayList<IProject> projects = ClosureCompiler.getReferencedJavaScriptProjectsRecursively(
+        Collections.singleton(project), projectOrderState.reverseOrderComparator());
+    Collection<AbstractJSProject> libraries = ClosureCompiler.getJSLibraries(jsLibraryProvider, compiler, monitor, projects);
     ArrayList<AbstractJSProject> referencedProjects = new ArrayList<AbstractJSProject>(projects.size() + libraries.size());
     for (IProject referencedProject: projects) referencedProjects.add(ResourceProperties.getOrCreateJSProject(referencedProject));
     referencedProjects.addAll(libraries);
     ResourceProperties.setTransitivelyReferencedProjects(project, projects.toArray(new IProject[0]));
     jsProject.setReferencedProjects(referencedProjects, projectOrderState.getModificationStamp());
   }
-
-  /**
-   * Get the list of projects which are transitively referenced from a root project,
-   * including the root.
-   * @param project  The root project.
-   * @return  The list of referenced projects, ordered in reverse order of the
-   *   dependencies.
-   * @throws CoreException
-   */
-  private ArrayList<IProject> getReferencedJavaScriptProjectsRecursively(
-      ProjectOrderManager.State projectOrderState, IProject project) throws CoreException {
-    // Compute the transitive set of referenced projects.
-    ListWithoutDuplicates<IProject> projects = new ListWithoutDuplicates<IProject>();
-    LinkedList<IProject> projectsToVisit = new LinkedList<IProject>();
-    projectsToVisit.add(project);
-    projects.add(project);
-    while (!projectsToVisit.isEmpty()) {
-      IProject visitedProject = projectsToVisit.remove();
-      for (IProject referencedProject: visitedProject.getReferencedProjects()) {
-        if (referencedProject.hasNature(ClosureNature.NATURE_ID)) {
-          if (projects.add(referencedProject)) projectsToVisit.add(referencedProject);
-        }
-      }
-    }
-    // Sort the set of referenced projects by dependency order.
-    projects.sortList(projectOrderState.reverseOrderComparator());
-    return projects.asList();
-  }
-  
-  /**
-   * Returns an iterable over the libraries which are imported from a given list of projects.
-   * @param monitor  A progress monitor, which is checked for cancellation.
-   * @param compiler  The compiler to which errors are reported.
-   * @param projects  The projects to scan.
-   * @return  The list of libraries, in the order of the projects which require them.  If the
-   *   same library is required by several projects, the last wins.
-   * @throws CoreException
-   */
-  private Collection<AbstractJSProject> getJSLibraries(
-      IProgressMonitor monitor, Compiler compiler, ArrayList<IProject> projects) throws CoreException {
-    ListWithoutDuplicates<AbstractJSProject> result = new ListWithoutDuplicates<AbstractJSProject>();
-    for (int i = projects.size() - 1; i >= 0; --i) {      
-      File pathOfClosureBase = getPathOfClosureBase(projects.get(i));
-      if (pathOfClosureBase != null) {
-        result.add(jsLibraryManager.get(compiler, pathOfClosureBase, pathOfClosureBase));
-      }
-      for (File libraryPath: ClosureProjectPropertyRecord.getInstance().otherLibraries.get(new ProjectPropertyStore(projects.get(i), OwJsClosurePlugin.PLUGIN_ID))) {
-        checkCancel(monitor, true);
-        result.add(jsLibraryManager.get(compiler, libraryPath, pathOfClosureBase));
-      }
-    }
-    return result.asList();
-  }
-  
+    
   public static void buildAll() {
     // Get the list of projects having the Closure nature
     IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();

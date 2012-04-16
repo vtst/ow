@@ -27,6 +27,10 @@ public class ListWithoutDuplicates<T> {
     else return false;
   }
   
+  public void addAll(Iterable<T> elements) {
+    for (T element: elements) add(element);
+  }
+  
   public ArrayList<T> asList() {
     return list;
   }
