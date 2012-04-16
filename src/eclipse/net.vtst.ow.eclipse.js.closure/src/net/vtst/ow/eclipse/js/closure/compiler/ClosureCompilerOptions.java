@@ -4,7 +4,7 @@ import net.vtst.eclipse.easy.ui.properties.stores.IReadOnlyStore;
 import net.vtst.eclipse.easy.ui.properties.stores.LaunchConfigurationReadOnlyStore;
 import net.vtst.eclipse.easy.ui.properties.stores.ProjectPropertyStore;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
-import net.vtst.ow.eclipse.js.closure.launching.ClosureCompilerLaunchConfigurationRecord;
+import net.vtst.ow.eclipse.js.closure.launching.compiler.ClosureCompilerLaunchConfigurationRecord;
 import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPropertyRecord;
 
 import org.eclipse.core.resources.IProject;

@@ -1,4 +1,4 @@
-package net.vtst.ow.eclipse.js.closure.launching;
+package net.vtst.ow.eclipse.js.closure.launching.compiler;
 
 import java.util.List;
 

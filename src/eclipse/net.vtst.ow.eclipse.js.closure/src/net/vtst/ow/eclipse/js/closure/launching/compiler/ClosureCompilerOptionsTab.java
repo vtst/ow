@@ -1,4 +1,4 @@
-package net.vtst.ow.eclipse.js.closure.launching;
+package net.vtst.ow.eclipse.js.closure.launching.compiler;
 
 import net.vtst.eclipse.easy.ui.properties.editors.ICompositeEditor;
 import net.vtst.eclipse.easy.ui.properties.pages.EasyLaunchConfigurationTab;

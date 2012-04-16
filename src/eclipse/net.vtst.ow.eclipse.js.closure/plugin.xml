@@ -54,9 +54,9 @@
   <extension point="org.eclipse.debug.core.launchConfigurationTypes">
     <launchConfigurationType
         name="%closure_compiler_launch_configuration"
-        delegate="net.vtst.ow.eclipse.js.closure.launching.ClosureCompilerLaunchConfigurationDelegate"
+        delegate="net.vtst.ow.eclipse.js.closure.launching.compiler.ClosureCompilerLaunchConfigurationDelegate"
         modes="run, debug"               
-        id="net.vtst.ow.eclipse.js.closure.launching.compiler">        
+        id="net.vtst.ow.eclipse.js.closure.launching.compiler.compiler">        
     </launchConfigurationType>
   </extension>
   
@@ -65,23 +65,23 @@
     <!-- Image to be changed -->
     <launchConfigurationTypeImage
         icon="icons/16x16/closure.png"
-        configTypeID="net.vtst.ow.eclipse.js.closure.launching.compiler"
-        id="net.vtst.ow.eclipse.js.closure.launching.compiler.image">
+        configTypeID="net.vtst.ow.eclipse.js.closure.launching.compiler.compiler"
+        id="net.vtst.ow.eclipse.js.closure.launching.compiler.compiler.image">
     </launchConfigurationTypeImage>
   </extension>
   
   <extension point="org.eclipse.debug.ui.launchConfigurationTabGroups">
     <launchConfigurationTabGroup
-        type="net.vtst.ow.eclipse.js.closure.launching.compiler"
-        class="net.vtst.ow.eclipse.js.closure.launching.ClosureCompilerTabGroup"
-        id="net.vtst.ow.eclipse.js.closure.launching.compiler.tabgroup">
+        type="net.vtst.ow.eclipse.js.closure.launching.compiler.compiler"
+        class="net.vtst.ow.eclipse.js.closure.launching.compiler.ClosureCompilerTabGroup"
+        id="net.vtst.ow.eclipse.js.closure.launching.compiler.compiler.tabgroup">
     </launchConfigurationTabGroup>
   </extension>
   
   <extension point="org.eclipse.debug.ui.launchShortcuts">
     <shortcut
-        id="net.vtst.ow.eclipse.js.closure.launching.compiler.shortcut"
-        class="net.vtst.ow.eclipse.js.closure.launching.ClosureCompilerLaunchShortcut"
+        id="net.vtst.ow.eclipse.js.closure.launching.compiler.compiler.shortcut"
+        class="net.vtst.ow.eclipse.js.closure.launching.compiler.ClosureCompilerLaunchShortcut"
         label="%closure_compiler_launch_configuration"
         icon="icons/16x16/closure.png"
         modes="run, debug">

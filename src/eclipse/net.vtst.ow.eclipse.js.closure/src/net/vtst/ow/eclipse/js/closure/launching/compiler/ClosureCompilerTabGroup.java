@@ -1,4 +1,4 @@
-package net.vtst.ow.eclipse.js.closure.launching;
+package net.vtst.ow.eclipse.js.closure.launching.compiler;
 
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
 import org.eclipse.debug.ui.CommonTab;
