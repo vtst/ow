@@ -233,7 +233,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
   }
 
   // **************************************************************************
-  // Helper functions
+  // Compilation of JavaScript files
 
   /**
    * Compile a collection of JavaScript files.
