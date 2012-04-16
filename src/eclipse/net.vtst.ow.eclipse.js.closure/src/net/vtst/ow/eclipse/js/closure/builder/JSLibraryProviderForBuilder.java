@@ -23,7 +23,7 @@ import com.google.javascript.jscomp.AbstractCompiler;
  * <b>Thread safety:</b> This class is thread safe, as it uses a concurrent hash map.
  * @author Vincent Simonet
  */
-public class JSLibraryProviderWithCache implements IJSLibraryProvider {
+public class JSLibraryProviderForBuilder implements IJSLibraryProvider {
   
   /**
    * The key identifying a library in the cache.
@@ -100,5 +100,4 @@ public class JSLibraryProviderWithCache implements IJSLibraryProvider {
   public void clear() {
     cache.clear();
   }
-
 }

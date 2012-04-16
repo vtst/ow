@@ -3,7 +3,7 @@ package net.vtst.ow.eclipse.js.closure;
 import java.net.URL;
 import java.util.logging.Level;
 
-import net.vtst.ow.eclipse.js.closure.builder.JSLibraryProviderWithCache;
+import net.vtst.ow.eclipse.js.closure.builder.JSLibraryProviderForBuilder;
 import net.vtst.ow.eclipse.js.closure.builder.JavaScriptEditorRegistry;
 import net.vtst.ow.eclipse.js.closure.builder.ProjectOrderManager;
 import net.vtst.ow.eclipse.js.closure.compiler.IJSLibraryProvider;
@@ -32,7 +32,7 @@ public class OwJsClosurePlugin extends AbstractUIPlugin {
 	private static OwJsClosurePlugin plugin;
 	private JavaScriptEditorRegistry editorRegistry;
   private OwJsClosureMessages messages;
-  private JSLibraryProviderWithCache jsLibraryProviderForClosureBuilder;
+  private JSLibraryProviderForBuilder jsLibraryProviderForClosureBuilder;
   private ProjectOrderManager projectOrderManager;
 	
 	/**
@@ -50,7 +50,7 @@ public class OwJsClosurePlugin extends AbstractUIPlugin {
     plugin = this;
     editorRegistry = new JavaScriptEditorRegistry(getWorkbench());
     messages = new OwJsClosureMessages();
-    jsLibraryProviderForClosureBuilder = new JSLibraryProviderWithCache();
+    jsLibraryProviderForClosureBuilder = new JSLibraryProviderForBuilder();
     projectOrderManager = new ProjectOrderManager();
     ResourcesPlugin.getWorkspace().addResourceChangeListener(projectOrderManager);  // TODO: Add int arg?
     Compiler.setLoggingLevel(Level.OFF);
