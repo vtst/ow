@@ -1,4 +1,4 @@
-package net.vtst.ow.eclipse.js.closure.compiler;
+package net.vtst.ow.eclipse.js.closure.builder;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

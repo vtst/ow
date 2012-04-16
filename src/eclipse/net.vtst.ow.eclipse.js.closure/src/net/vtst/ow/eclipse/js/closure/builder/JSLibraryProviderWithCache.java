@@ -8,6 +8,7 @@ import net.vtst.eclipse.easy.ui.properties.stores.IStore;
 import net.vtst.eclipse.easy.ui.properties.stores.PluginPreferenceStore;
 import net.vtst.ow.closure.compiler.deps.JSLibrary;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
+import net.vtst.ow.eclipse.js.closure.compiler.IJSLibraryProvider;
 import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
 
 import org.eclipse.core.runtime.CoreException;
@@ -22,7 +23,7 @@ import com.google.javascript.jscomp.AbstractCompiler;
  * <b>Thread safety:</b> This class is thread safe, as it uses a concurrent hash map.
  * @author Vincent Simonet
  */
-public class JSLibraryManager {
+public class JSLibraryProviderWithCache implements IJSLibraryProvider {
   
   /**
    * The key identifying a library in the cache.

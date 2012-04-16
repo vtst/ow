@@ -36,7 +36,7 @@ public class ClosurePreferencePage extends EasyPreferencePage {
       boolean hasChanged = editor.hasChanged(getStore());
       boolean ok = super.performOk();
       if (hasChanged && ok) {
-        OwJsClosurePlugin.getDefault().getJSLibraryManager().clear();
+        OwJsClosurePlugin.getDefault().getJSLibraryProviderForClosureBuilder().clear();
         OwJsClosurePlugin.getDefault().getProjectOrderManager().clear();
         ClosureBuilder.buildAll();
       }

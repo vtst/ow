@@ -1,4 +1,4 @@
-package net.vtst.ow.eclipse.js.closure.compiler;
+package net.vtst.ow.eclipse.js.closure.builder;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.IWorkbench;
