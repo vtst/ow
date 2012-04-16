@@ -262,6 +262,9 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
     subMonitor.done();
   }
 
+  /**
+   * @return  The status of the workspace preference stripProjectFiles.
+   */
   private boolean getStripIncludedFiles() {
     IStore store = new PluginPreferenceStore(OwJsClosurePlugin.getDefault().getPreferenceStore());
     try {
@@ -271,6 +274,9 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
     }
   }
   
+  /**
+   * Clone a {@code CompilerOptions} object.  If the cloning fails, generate a fresh one.
+   */
   private CompilerOptions cloneCompilerOptions(IProject project, CompilerOptions options) throws CoreException {
     try {
       return (CompilerOptions) options.clone();
@@ -319,6 +325,9 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
     jsProject.setReferencedProjects(referencedProjects, projectOrderState.getModificationStamp());
   }
     
+  /**
+   * Force a build of all JavaScript projects in the workspace.
+   */
   public static void buildAll() {
     // Get the list of projects having the Closure nature
     IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
