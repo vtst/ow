@@ -25,6 +25,9 @@ import com.google.javascript.jscomp.AbstractCompiler;
  */
 public class JSLibraryProviderForBuilder implements IJSLibraryProvider {
   
+  // **************************************************************************
+  // Cache of libraries
+  
   /**
    * The key identifying a library in the cache.
    */
@@ -51,14 +54,17 @@ public class JSLibraryProviderForBuilder implements IJSLibraryProvider {
     }
   }
   
-  private ConcurrentHashMap<LibraryKey, WeakReference<JSLibrary>> cache = 
+  private ConcurrentHashMap<LibraryKey, WeakReference<JSLibrary>> libraries = 
       new ConcurrentHashMap<LibraryKey, WeakReference<JSLibrary>>();
 
   private JSLibrary get(LibraryKey key) {
-    WeakReference<JSLibrary> ref = cache.get(key);
+    WeakReference<JSLibrary> ref = libraries.get(key);
     if (ref == null) return null;
     else return ref.get();
   }
+
+  // **************************************************************************
+  // Implementation of IJSLibraryProvider
   
   /**
    * Get a library from the cache, or create it and add it to the cache if it is not in
@@ -75,29 +81,42 @@ public class JSLibraryProviderForBuilder implements IJSLibraryProvider {
     if (library == null) {
       library = new JSLibrary(libraryPath, pathOfClosureBase, getCacheSettings());
       library.setUnits(compiler);
-      cache.put(key, new WeakReference<JSLibrary>(library));
+      libraries.put(key, new WeakReference<JSLibrary>(library));
     }
     return library;
   }
-  
-  private JSLibrary.CacheSettings getCacheSettings() {
-    ClosurePreferenceRecord r = ClosurePreferenceRecord.getInstance();
-    JSLibrary.CacheSettings result = new JSLibrary.CacheSettings();
-    IStore prefs = new PluginPreferenceStore(OwJsClosurePlugin.getDefault().getPreferenceStore());
-    try {
-      result.cacheDepsFiles = r.cacheLibraryDepsFiles.get(prefs);
-    } catch (CoreException e) {
-      result.cacheDepsFiles = r.cacheLibraryDepsFiles.getDefault();
-    }
-    try {
-      result.cacheStrippedFiles = r.cacheLibraryStrippedFiles.get(prefs);
-    } catch (CoreException e) {
-      result.cacheStrippedFiles = r.cacheLibraryStrippedFiles.getDefault();
-    }
-    return result;
+    
+  public void clear() {
+    libraries.clear();
+    cacheSettings = null;
   }
   
-  public void clear() {
-    cache.clear();
+  // **************************************************************************
+  // Preferences
+  
+  private JSLibrary.CacheSettings cacheSettings;
+  
+  private JSLibrary.CacheSettings getCacheSettings() {
+    if (cacheSettings == null) {
+      cacheSettings = getCacheSettingsFromPreferences();
+    }
+    return cacheSettings;
+  }
+  
+  private JSLibrary.CacheSettings getCacheSettingsFromPreferences() {
+    ClosurePreferenceRecord record = ClosurePreferenceRecord.getInstance();
+    JSLibrary.CacheSettings result = new JSLibrary.CacheSettings();
+    IStore store = new PluginPreferenceStore(OwJsClosurePlugin.getDefault().getPreferenceStore());
+    try {
+      result.cacheDepsFiles = record.cacheLibraryDepsFiles.get(store);
+    } catch (CoreException e) {
+      result.cacheDepsFiles = record.cacheLibraryDepsFiles.getDefault();
+    }
+    try {
+      result.cacheStrippedFiles = record.cacheLibraryStrippedFiles.get(store);
+    } catch (CoreException e) {
+      result.cacheStrippedFiles = record.cacheLibraryStrippedFiles.getDefault();
+    }
+    return result;
   }
 }
