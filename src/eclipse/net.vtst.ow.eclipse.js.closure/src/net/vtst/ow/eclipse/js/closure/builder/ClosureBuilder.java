@@ -323,7 +323,6 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
   // Referenced projects
   
   /**
-   * 
    * @param monitor  Progress monitor checked for cancellation.
    * @param compiler  Compiler used to parse libraries.
    * @param project  Project for which references shall be updated.
