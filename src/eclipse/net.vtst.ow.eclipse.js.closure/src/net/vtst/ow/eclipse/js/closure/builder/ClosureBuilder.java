@@ -266,7 +266,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
     CompilableJSUnit unit = ResourceProperties.getJSUnit(file);
     if (unit == null) return;
     // TODO: We should try to clone the options.
-    CompilerOptions options = ClosureCompilerOptions.makeForBackgroundCompilation(file.getProject());
+    CompilerOptions options = ClosureCompilerOptions.makeForBuilder(file.getProject());
     // TODO: We should avoid calling this for every file.
     boolean stripIncludedFiles = getStripIncludedFiles();
     ErrorManager errorManager = new ErrorManagerGeneratingProblemMarkers(unit, file);

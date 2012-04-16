@@ -74,7 +74,7 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
     File closureBasePath = projectRecord.closureBasePath.get(projectStore);
     
     Compiler compiler = CompilerUtils.makeCompiler(CompilerUtils.makePrintingErrorManager(System.out));
-    CompilerOptions options = ClosureCompilerOptions.makeForFullCompilation(project, config);
+    CompilerOptions options = ClosureCompilerOptions.makeForLaunch(project, config);
     compiler.initOptions(options);
     Iterable<IProject> projects = getClosureProjects(resources);
     List<AbstractJSProject> libraries = getLibraries(compiler, projects);

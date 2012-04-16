@@ -17,6 +17,10 @@ import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.JqueryCodingConvention;
 import com.google.javascript.jscomp.WarningLevel;
 
+/**
+ * This class provides static methods for creating {@code CompilerOptions}.
+ * @author Vincent Simonet
+ */
 public class ClosureCompilerOptions {
   
   // This is based on CommandLineRunner.createOptions() and AbstractCommandLineRunner.setRunOptions()
@@ -148,11 +152,11 @@ public class ClosureCompilerOptions {
     return options;
   }
 
-  public static CompilerOptions makeForBackgroundCompilation(IProject project) throws CoreException {
+  public static CompilerOptions makeForBuilder(IProject project) throws CoreException {
     return makeInternal(project, null, true);
   }
   
-  public static CompilerOptions makeForFullCompilation(IProject project, ILaunchConfiguration config) throws CoreException {
+  public static CompilerOptions makeForLaunch(IProject project, ILaunchConfiguration config) throws CoreException {
     return makeInternal(project, new LaunchConfigurationReadOnlyStore(config), false);
   }
 
