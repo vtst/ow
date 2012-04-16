@@ -27,8 +27,6 @@ public class ClosureCompilerChecksEditor extends DefaultCompoundEditor {
     record.processClosurePrimitives.bindEditor(this, group2);
     record.processJQueryPrimitives.bindEditor(this, group2);
     record.acceptConstKeyword.bindEditor(this, group2);
-    // TODO Remove
-    // record.closureEntryPoints.bindEditor(this);
   }
 
 }

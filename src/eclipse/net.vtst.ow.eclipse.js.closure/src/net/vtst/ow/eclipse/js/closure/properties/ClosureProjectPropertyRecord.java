@@ -5,7 +5,6 @@ import net.vtst.eclipse.easy.ui.properties.fields.BooleanField;
 import net.vtst.eclipse.easy.ui.properties.fields.EnumOptionsField;
 import net.vtst.eclipse.easy.ui.properties.fields.FileField;
 import net.vtst.eclipse.easy.ui.properties.fields.FileListField;
-import net.vtst.eclipse.easy.ui.properties.fields.StringField;
 
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
@@ -32,7 +31,6 @@ public class ClosureProjectPropertyRecord extends Record {
   public EnumOptionsField<WarningLevel> warningLevel = new EnumOptionsField<WarningLevel>(WarningLevel.class, WarningLevel.DEFAULT);
   public BooleanField thirdParty = new BooleanField(false);
   public BooleanField processClosurePrimitives = new BooleanField(true);
-  public StringField closureEntryPoints = new StringField("");
   public BooleanField processJQueryPrimitives = new BooleanField(false);
   public BooleanField acceptConstKeyword = new BooleanField(false);
   public EnumOptionsField<LanguageMode> languageIn = new EnumOptionsField<LanguageMode>(CompilerOptions.LanguageMode.class, LanguageMode.ECMASCRIPT3);
@@ -43,5 +41,4 @@ public class ClosureProjectPropertyRecord extends Record {
     if (instance == null) instance = new ClosureProjectPropertyRecord();
     return instance;
   }
-  
 }

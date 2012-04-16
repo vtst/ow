@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 import net.vtst.eclipse.easy.ui.properties.Record;
 import net.vtst.eclipse.easy.ui.properties.fields.BooleanField;
 import net.vtst.eclipse.easy.ui.properties.fields.ResourceListField;
+import net.vtst.eclipse.easy.ui.properties.fields.StringField;
 import net.vtst.eclipse.easy.ui.properties.fields.ResourceListField.FileType;
 import net.vtst.eclipse.easy.ui.properties.fields.ResourceListField.Or;
 import net.vtst.eclipse.easy.ui.properties.fields.ResourceListField.ProjectNature;
@@ -33,6 +34,7 @@ public class ClosureCompilerLaunchConfigurationRecord extends Record {
           new ResourceType<IResource>(IFolder.class),
           new FileType<IResource>(Pattern.compile(".*\\.js"), Platform.getContentTypeManager().getContentType(OwJsClosurePlugin.JS_CONTENT_TYPE_ID))
           ));
+  public StringField closureEntryPoints = new StringField("");
 
   private static ClosureCompilerLaunchConfigurationRecord instance;
   public static ClosureCompilerLaunchConfigurationRecord getInstance() {
