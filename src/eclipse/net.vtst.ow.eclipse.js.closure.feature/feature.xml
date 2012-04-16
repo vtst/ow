@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="net.vtst.ow.eclipse.js.closure.feature"
+      label="Ow JavaScript"
+      version="0.1.0"
+      provider-name="Vincent Simonet">
+
+   <description url="http://www.normalesup.org/~simonet/soft/ow/eclipse-javascript.en.html">
+      Extension of JSDT to support Closure Compiler and Closure Library.
+   </description>
+
+   <copyright url="http://www.normalesup.org/~simonet/soft/ow/eclipse-javascript.en.html">
+      (c) Vincent Simonet, 2012.
+   </copyright>
+
+   <license url="http://eclipse.org/legal/epl-v10.html">
+      This software is distributed under the terms of the Eclipse Public License, version 1.0.
+   </license>
+
+   <plugin
+         id="net.vtst.eclipse.easy.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.vtst.ow.closure.compiler"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.vtst.ow.eclipse.js.closure"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
