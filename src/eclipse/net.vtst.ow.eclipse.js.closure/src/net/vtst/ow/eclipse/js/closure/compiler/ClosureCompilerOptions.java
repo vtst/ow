@@ -17,7 +17,7 @@ import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.JqueryCodingConvention;
 import com.google.javascript.jscomp.WarningLevel;
 
-public class CompilerOptionsFactory {
+public class ClosureCompilerOptions {
   
   // This is based on CommandLineRunner.createOptions() and AbstractCommandLineRunner.setRunOptions()
   private static CompilerOptions makeInternal(IProject project, IReadOnlyStore launchStore, boolean ideMode) throws CoreException {

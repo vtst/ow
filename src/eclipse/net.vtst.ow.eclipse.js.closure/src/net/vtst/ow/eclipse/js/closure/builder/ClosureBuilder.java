@@ -21,8 +21,8 @@ import net.vtst.ow.closure.compiler.util.ListWithoutDuplicates;
 import net.vtst.ow.closure.compiler.util.NullErrorManager;
 import net.vtst.ow.eclipse.js.closure.OwJsClosureMessages;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
-import net.vtst.ow.eclipse.js.closure.compiler.ClosureUtils;
-import net.vtst.ow.eclipse.js.closure.compiler.CompilerOptionsFactory;
+import net.vtst.ow.eclipse.js.closure.compiler.ClosureCompiler;
+import net.vtst.ow.eclipse.js.closure.compiler.ClosureCompilerOptions;
 import net.vtst.ow.eclipse.js.closure.compiler.ErrorManagerGeneratingProblemMarkers;
 import net.vtst.ow.eclipse.js.closure.compiler.IJSLibraryProvider;
 import net.vtst.ow.eclipse.js.closure.dev.OwJsDev;
@@ -118,7 +118,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
       public boolean visit(IResource resource) throws CoreException {
         if (resource instanceof IFile) {
           IFile file = (IFile) resource;
-          if (ClosureUtils.isJavaScriptFile(file)) files.add(file);
+          if (ClosureCompiler.isJavaScriptFile(file)) files.add(file);
         }
         return true;
       }
@@ -209,7 +209,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
         IFile file = (IFile) resource;
         switch (delta.getKind()) {
         case IResourceDelta.ADDED:
-          if (ClosureUtils.isJavaScriptFile(file)) fullBuildRequired = true;
+          if (ClosureCompiler.isJavaScriptFile(file)) fullBuildRequired = true;
           return false;
         case IResourceDelta.REMOVED:
           if (currentFiles.contains(file)) fullBuildRequired = true;
@@ -302,7 +302,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
     CompilableJSUnit unit = ResourceProperties.getJSUnit(file);
     if (unit == null) return;
     // TODO: We should try to clone the options.
-    CompilerOptions options = CompilerOptionsFactory.makeForBackgroundCompilation(file.getProject());
+    CompilerOptions options = ClosureCompilerOptions.makeForBackgroundCompilation(file.getProject());
     // TODO: We should avoid calling this for every file.
     boolean stripIncludedFiles = getStripIncludedFiles();
     ErrorManager errorManager = new ErrorManagerGeneratingProblemMarkers(unit, file);

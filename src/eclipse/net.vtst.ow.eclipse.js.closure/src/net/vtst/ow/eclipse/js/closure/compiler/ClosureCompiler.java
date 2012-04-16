@@ -1,17 +1,12 @@
 package net.vtst.ow.eclipse.js.closure.compiler;
 
-import net.vtst.eclipse.easy.ui.properties.stores.IStore;
-import net.vtst.eclipse.easy.ui.properties.stores.PluginPreferenceStore;
-import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
-import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
 
-public class ClosureUtils {
+public class ClosureCompiler {
 
   private static final String JS_CONTENT_TYPE_ID =
       "org.eclipse.wst.jsdt.core.jsSource";

@@ -28,8 +28,8 @@ import net.vtst.ow.closure.compiler.deps.JSUnitProvider;
 import net.vtst.ow.closure.compiler.util.CompilerUtils;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.builder.ClosureNature;
-import net.vtst.ow.eclipse.js.closure.compiler.ClosureUtils;
-import net.vtst.ow.eclipse.js.closure.compiler.CompilerOptionsFactory;
+import net.vtst.ow.eclipse.js.closure.compiler.ClosureCompiler;
+import net.vtst.ow.eclipse.js.closure.compiler.ClosureCompilerOptions;
 import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
 import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPropertyRecord;
 
@@ -74,7 +74,7 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
     File closureBasePath = projectRecord.closureBasePath.get(projectStore);
     
     Compiler compiler = CompilerUtils.makeCompiler(CompilerUtils.makePrintingErrorManager(System.out));
-    CompilerOptions options = CompilerOptionsFactory.makeForFullCompilation(project, config);
+    CompilerOptions options = ClosureCompilerOptions.makeForFullCompilation(project, config);
     compiler.initOptions(options);
     Iterable<IProject> projects = getClosureProjects(resources);
     List<AbstractJSProject> libraries = getLibraries(compiler, projects);
@@ -135,7 +135,7 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
       public boolean visit(IResource resource) throws CoreException {
         if (resource instanceof IFile) {
           IFile file = (IFile) resource;
-          if (ClosureUtils.isJavaScriptFile(file)) files.add(file);
+          if (ClosureCompiler.isJavaScriptFile(file)) files.add(file);
         }
         return true;
       }};
