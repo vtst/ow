@@ -2,4 +2,7 @@ Things to improve:
 1. Access to records
 2. Enable/disable controls
 3. get, returning the default value in case of error
-4. Keys for messages
+4. Keys for messages when the same editor is used from several places
+5. Passage d'un sous-editeur à la construction (utile pour embed).
+   En d'autres termes, veut-on gérer les constructeurs top/down ou bottom/up
+   
