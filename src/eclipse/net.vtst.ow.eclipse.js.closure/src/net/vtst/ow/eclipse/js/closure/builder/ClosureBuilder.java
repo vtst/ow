@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -12,13 +11,11 @@ import java.util.Set;
 
 import net.vtst.eclipse.easy.ui.properties.stores.IStore;
 import net.vtst.eclipse.easy.ui.properties.stores.PluginPreferenceStore;
-import net.vtst.eclipse.easy.ui.properties.stores.ProjectPropertyStore;
 import net.vtst.ow.closure.compiler.compile.CompilableJSUnit;
 import net.vtst.ow.closure.compiler.compile.CompilerRun;
 import net.vtst.ow.closure.compiler.deps.AbstractJSProject;
 import net.vtst.ow.closure.compiler.deps.JSProject;
 import net.vtst.ow.closure.compiler.util.CompilerUtils;
-import net.vtst.ow.closure.compiler.util.ListWithoutDuplicates;
 import net.vtst.ow.closure.compiler.util.NullErrorManager;
 import net.vtst.ow.eclipse.js.closure.OwJsClosureMessages;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
@@ -28,7 +25,6 @@ import net.vtst.ow.eclipse.js.closure.compiler.ErrorManagerGeneratingProblemMark
 import net.vtst.ow.eclipse.js.closure.compiler.IJSLibraryProvider;
 import net.vtst.ow.eclipse.js.closure.dev.OwJsDev;
 import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
-import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPropertyRecord;
 import net.vtst.ow.eclipse.js.closure.util.Utils;
 
 import org.eclipse.core.resources.IBuildConfiguration;
@@ -37,18 +33,14 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
-import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.core.runtime.content.IContentDescription;
-import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.jobs.Job;
 
 import com.google.javascript.jscomp.Compiler;

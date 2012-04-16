@@ -17,7 +17,6 @@ import net.vtst.ow.closure.compiler.deps.AbstractJSProject;
 import net.vtst.ow.closure.compiler.util.ListWithoutDuplicates;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.builder.ClosureNature;
-import net.vtst.ow.eclipse.js.closure.builder.ProjectOrderManager;
 import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
 import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPropertyRecord;
 import net.vtst.ow.eclipse.js.closure.util.Utils;
@@ -33,7 +32,6 @@ import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
 
 import com.google.javascript.jscomp.AbstractCompiler;
-import com.google.javascript.jscomp.Compiler;
 
 /**
  * This class implements static methods which are useful for using the Closure Compiler.

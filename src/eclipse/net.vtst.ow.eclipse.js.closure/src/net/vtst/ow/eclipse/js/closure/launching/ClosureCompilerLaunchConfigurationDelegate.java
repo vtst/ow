@@ -15,7 +15,6 @@ import java.util.Set;
 import net.vtst.eclipse.easy.ui.properties.stores.IReadOnlyStore;
 import net.vtst.eclipse.easy.ui.properties.stores.IStore;
 import net.vtst.eclipse.easy.ui.properties.stores.LaunchConfigurationReadOnlyStore;
-import net.vtst.eclipse.easy.ui.properties.stores.LaunchConfigurationStore;
 import net.vtst.eclipse.easy.ui.properties.stores.PluginPreferenceStore;
 import net.vtst.eclipse.easy.ui.properties.stores.ProjectPropertyStore;
 import net.vtst.ow.closure.compiler.compile.DefaultExternsProvider;
@@ -33,7 +32,6 @@ import net.vtst.ow.eclipse.js.closure.compiler.ClosureCompilerOptions;
 import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
 import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPropertyRecord;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
