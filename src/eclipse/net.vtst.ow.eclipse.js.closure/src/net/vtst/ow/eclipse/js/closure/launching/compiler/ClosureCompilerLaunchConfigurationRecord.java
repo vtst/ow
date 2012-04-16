@@ -24,21 +24,32 @@ public class ClosureCompilerLaunchConfigurationRecord extends Record {
     super.initializeByReflection();
   }
   
-  public BooleanField useProjectPropertiesForIncludes = new BooleanField(true);
-  public BooleanField useProjectPropertiesForChecks = new BooleanField(true);
-  
-  public StringOptionsField compilationLevel = new StringOptionsField("WHITESPACE_ONLY", "SIMPLE_OPTIMIZATIONS", "ADVANCED_OPTIMIZATIONS");
-  public BooleanField formattingPrettyPrint = new BooleanField(false);
-  public BooleanField formattingPrintInputDelimiter = new BooleanField(false);
-  public BooleanField generateExports = new BooleanField(false);
+  // Inputs and output
+
   public ResourceListField<IResource> inputResources = 
       new ResourceListField<IResource>(IResource.class, new Or<IResource>(
           new ProjectNature<IResource>(ClosureNature.NATURE_ID),
           new ResourceType<IResource>(IFolder.class),
           new FileType<IResource>(Pattern.compile(".*\\.js"), Platform.getContentTypeManager().getContentType(OwJsClosurePlugin.JS_CONTENT_TYPE_ID))
           ));
+  public BooleanField manageClosureDependencies = new BooleanField(true);
+  public StringField outputFile = new StringField("");
+  public BooleanField useDefaultOutputFile = new BooleanField(true);
+  public BooleanField useAsDefault = new BooleanField(true);
+
+  // Compilation options
+
+  public StringOptionsField compilationLevel = new StringOptionsField("WHITESPACE_ONLY", "SIMPLE_OPTIMIZATIONS", "ADVANCED_OPTIMIZATIONS");
+  public BooleanField formattingPrettyPrint = new BooleanField(false);
+  public BooleanField formattingPrintInputDelimiter = new BooleanField(false);
+  public BooleanField generateExports = new BooleanField(false);
   public StringField closureEntryPoints = new StringField("");
 
+  // Project properties
+  
+  public BooleanField useProjectPropertiesForIncludes = new BooleanField(true);
+  public BooleanField useProjectPropertiesForChecks = new BooleanField(true);
+  
   private static ClosureCompilerLaunchConfigurationRecord instance;
   public static ClosureCompilerLaunchConfigurationRecord getInstance() {
     if (instance == null) instance = new ClosureCompilerLaunchConfigurationRecord();

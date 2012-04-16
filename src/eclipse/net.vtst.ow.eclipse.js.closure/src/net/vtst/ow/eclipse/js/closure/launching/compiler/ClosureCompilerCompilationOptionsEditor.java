@@ -17,6 +17,7 @@ public class ClosureCompilerCompilationOptionsEditor extends DefaultCompoundEdit
     record.generateExports.bindEditor(this);
     Group group1 = SWTFactory.createGroup(
         getComposite(), getMessage("formatting"), 3, 3, GridData.FILL_HORIZONTAL);
+    addControl(group1);
     record.formattingPrettyPrint.bindEditor(this, group1);
     record.formattingPrintInputDelimiter.bindEditor(this, group1);
   }
