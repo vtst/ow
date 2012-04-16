@@ -22,7 +22,6 @@ import com.google.javascript.jscomp.ErrorManager;
  */
 public class CompilableJSUnit extends JSUnit {
 
-
   private JSProject project;
 
   public CompilableJSUnit(JSProject project, File path, File pathOfClosureBase, IProvider provider) {
