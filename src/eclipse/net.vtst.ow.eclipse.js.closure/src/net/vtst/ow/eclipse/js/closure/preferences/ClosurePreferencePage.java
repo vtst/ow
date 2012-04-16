@@ -30,7 +30,7 @@ public class ClosurePreferencePage extends EasyPreferencePage {
   }
   
   public boolean performOk() {
-    // This is not implemented as a change listener, because a change listener would be modified
+    // This is not implemented as a change listener, because a change listener would be notified
     // of property changes individually.
     try {
       boolean hasChanged = editor.hasChanged(getStore());
