@@ -152,7 +152,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
       }
       monitor.worked(1);
       forgetIfCanceled = false;
-      compileJavaScriptFiles(monitor, files, false);
+      compileJavaScriptFiles(monitor, project, files, false);
     } catch (OperationCanceledException e) {
       if (forgetIfCanceled) forgetLastBuiltState();
       throw e;
@@ -227,7 +227,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
       fullBuild(monitor, project);
     } else {
       monitor.worked(1);
-      compileJavaScriptFiles(monitor, files, false);
+      compileJavaScriptFiles(monitor, project, files, false);
     }
 
   }
@@ -238,40 +238,28 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
   /**
    * Compile a collection of JavaScript files.
    * @param monitor  This method reports one unit of work.
+   * @param project  The project the files belong to.
    * @param files  The collection of files to compile.
    * @param force  If true, forces the compilation of all files, even those which are 
    * not modified since their last build.
    * @throws CoreException
    */
-  private void compileJavaScriptFiles(IProgressMonitor monitor, Collection<IFile> files, boolean force) throws CoreException {
+  private void compileJavaScriptFiles(
+      IProgressMonitor monitor, IProject project, Collection<IFile> files, boolean force) throws CoreException {
     SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 1);
-    subMonitor.beginTask("build_compile", files.size());
+    int n = files.size(), i = 0;
+    subMonitor.beginTask("build_compile", n);
+    CompilerOptions options = ClosureCompilerOptions.makeForBuilder(project);
+    boolean stripIncludedFiles = getStripIncludedFiles();
     for (IFile file: files) {
+      ++i;
+      CompilerOptions clonedOptions = i < n ? cloneCompilerOptions(project, options) : options;
       Utils.checkCancel(subMonitor);
       monitor.subTask(messages.format("build_compile_file", file.getName()));
-      compileJavaScriptFile(file, force);
+      compileJavaScriptFile(file, clonedOptions, stripIncludedFiles, force);
       subMonitor.worked(1);
     }
     subMonitor.done();
-  }
-  
-  /**
-   * Compile a JavaScript file.
-   * @param file
-   * @param force
-   * @throws CoreException
-   */
-  private void compileJavaScriptFile(IFile file, boolean force) throws CoreException {
-    OwJsDev.log("Compiling %s", file.getFullPath().toOSString());
-    CompilableJSUnit unit = ResourceProperties.getJSUnit(file);
-    if (unit == null) return;
-    // TODO: We should try to clone the options.
-    CompilerOptions options = ClosureCompilerOptions.makeForBuilder(file.getProject());
-    // TODO: We should avoid calling this for every file.
-    boolean stripIncludedFiles = getStripIncludedFiles();
-    ErrorManager errorManager = new ErrorManagerGeneratingProblemMarkers(unit, file);
-    CompilerRun run = unit.fullCompile(options, errorManager, stripIncludedFiles, force);
-    run.setErrorManager(new NullErrorManager());
   }
 
   private boolean getStripIncludedFiles() {
@@ -281,6 +269,28 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
     } catch (CoreException e) {
       return ClosurePreferenceRecord.getInstance().stripProjectFiles.getDefault();
     }
+  }
+  
+  private CompilerOptions cloneCompilerOptions(IProject project, CompilerOptions options) throws CoreException {
+    try {
+      return (CompilerOptions) options.clone();
+    } catch (CloneNotSupportedException e) {
+      // This should never happen, but anyway, let's do it.
+      OwJsDev.log("ClosureBuilder.cloneCompilerOptions: cannot clone options, generate fresh ones.");
+      return ClosureCompilerOptions.makeForBuilder(project);
+    }
+  }
+  
+  /**
+   * Compile a JavaScript file.
+   */
+  private void compileJavaScriptFile(IFile file, CompilerOptions options, boolean stripIncludedFiles, boolean force) throws CoreException {
+    OwJsDev.log("Compiling %s", file.getFullPath().toOSString());
+    CompilableJSUnit unit = ResourceProperties.getJSUnit(file);
+    if (unit == null) return;
+    ErrorManager errorManager = new ErrorManagerGeneratingProblemMarkers(unit, file);
+    CompilerRun run = unit.fullCompile(options, errorManager, stripIncludedFiles, force);
+    run.setErrorManager(new NullErrorManager());
   }
 
   // **************************************************************************
