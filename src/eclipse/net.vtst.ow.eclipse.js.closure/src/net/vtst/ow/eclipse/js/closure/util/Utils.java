@@ -6,6 +6,8 @@ import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
@@ -135,5 +137,13 @@ public class Utils {
     }
     return false;
   }
-
+  
+  /**
+   * Test whether a progress monitor has been canceled, and if so, throws an exception.
+   * @param monitor
+   * @throws OperationCanceledException
+   */
+  public static void checkCancel(IProgressMonitor monitor) {
+    if (monitor.isCanceled()) throw new OperationCanceledException();
+  }
 }

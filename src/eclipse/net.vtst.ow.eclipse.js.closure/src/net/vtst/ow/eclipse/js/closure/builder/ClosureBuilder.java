@@ -29,6 +29,7 @@ import net.vtst.ow.eclipse.js.closure.compiler.IJSLibraryProvider;
 import net.vtst.ow.eclipse.js.closure.dev.OwJsDev;
 import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
 import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPropertyRecord;
+import net.vtst.ow.eclipse.js.closure.util.Utils;
 
 import org.eclipse.core.resources.IBuildConfiguration;
 import org.eclipse.core.resources.IFile;
@@ -110,44 +111,52 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
    * Perform a full build of a project.
    * @param monitor  The project monitor.  This methods reports two units of work.
    * @param project  The project to build.
-   * @throws CoreException
+   * @throws CoreException, OperationCanceledException
    */
   private void fullBuild(IProgressMonitor monitor, IProject project) throws CoreException {
     monitor.subTask(messages.format("build_prepare"));
-    Compiler compiler = CompilerUtils.makeCompiler(new NullErrorManager());  // TODO!
-    compiler.initOptions(CompilerUtils.makeOptions());
-    File pathOfClosureBase = ClosureCompiler.getPathOfClosureBase(project);
-    if (pathOfClosureBase == null) {
-      monitor.worked(1);
-      return;
-    }
-
-    // Create or get the project
-    JSProject jsProject = ResourceProperties.getOrCreateJSProject(project);
-    updateReferencedProjectsIfNeeded(monitor, compiler, project, jsProject);
-    
-    // Set the compilation units
-    Set<IFile> files = ClosureCompiler.getJavaScriptFiles(project);
-    ResourceProperties.setJavaScriptFiles(project, files);
-    List<CompilableJSUnit> units = new ArrayList<CompilableJSUnit>(files.size());
-    for (IFile file: files) {
-      checkCancel(monitor, true);
-      CompilableJSUnit unit = ResourceProperties.getJSUnit(file);
-      if (unit == null) {
-        unit = new CompilableJSUnit(
-            jsProject, file.getLocation().toFile(), pathOfClosureBase,
-            new CompilationUnitProviderFromEclipseIFile(file));
-        ResourceProperties.setJSUnit(file, unit);
-      }
-      units.add(unit);
-    }
+    boolean forgetIfCanceled = true;
     try {
-      jsProject.setUnits(compiler, units);
-    } catch (CircularDependencyException e) {
-      throw new CoreException(new Status(IStatus.ERROR, OwJsClosurePlugin.PLUGIN_ID, e.getMessage(), e));
+      Compiler compiler = CompilerUtils.makeCompiler(new NullErrorManager());  // TODO!
+      compiler.initOptions(CompilerUtils.makeOptions());
+      File pathOfClosureBase = ClosureCompiler.getPathOfClosureBase(project);
+      if (pathOfClosureBase == null) {
+        monitor.worked(1);
+        return;
+      }
+  
+      // Create or get the project
+      JSProject jsProject = ResourceProperties.getOrCreateJSProject(project);
+      updateReferencedProjectsIfNeeded(monitor, compiler, project, jsProject);
+      
+      // Set the compilation units
+      Set<IFile> files = ClosureCompiler.getJavaScriptFiles(project);
+      ResourceProperties.setJavaScriptFiles(project, files);
+      List<CompilableJSUnit> units = new ArrayList<CompilableJSUnit>(files.size());
+      for (IFile file: files) {
+        Utils.checkCancel(monitor);
+        CompilableJSUnit unit = ResourceProperties.getJSUnit(file);
+        if (unit == null) {
+          unit = new CompilableJSUnit(
+              jsProject, file.getLocation().toFile(), pathOfClosureBase,
+              new CompilationUnitProviderFromEclipseIFile(file));
+          ResourceProperties.setJSUnit(file, unit);
+        }
+        units.add(unit);
+      }
+  
+      try {
+        jsProject.setUnits(compiler, units);
+      } catch (CircularDependencyException e) {
+        throw new CoreException(new Status(IStatus.ERROR, OwJsClosurePlugin.PLUGIN_ID, e.getMessage(), e));
+      }
+      monitor.worked(1);
+      forgetIfCanceled = false;
+      compileJavaScriptFiles(monitor, files, false);
+    } catch (OperationCanceledException e) {
+      if (forgetIfCanceled) forgetLastBuiltState();
+      throw e;
     }
-    monitor.worked(1);
-    compileJavaScriptFiles(monitor, files, false);
   }
   
   // **************************************************************************
@@ -225,19 +234,6 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
 
   // **************************************************************************
   // Helper functions
-  
-  /**
-   * Check whether the build has been canceled, and aborts the build if yes.
-   * @param monitor  The progress monitor to check.
-   * @param forgetLastBuiltState  Set to true if the last built state must be forgotten
-   *   if the build has been canceled.
-   */
-  private void checkCancel(IProgressMonitor monitor, boolean forgetLastBuiltState) {
-    if (monitor.isCanceled()) {
-      if (forgetLastBuiltState) forgetLastBuiltState();
-      throw new OperationCanceledException();  // This is caught by Eclipse Platform.
-    }
-  }
 
   /**
    * Compile a collection of JavaScript files.
@@ -251,7 +247,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
     SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 1);
     subMonitor.beginTask("build_compile", files.size());
     for (IFile file: files) {
-      checkCancel(subMonitor, false);
+      Utils.checkCancel(subMonitor);
       monitor.subTask(messages.format("build_compile_file", file.getName()));
       compileJavaScriptFile(file, force);
       subMonitor.worked(1);

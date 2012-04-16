@@ -20,6 +20,7 @@ import net.vtst.ow.eclipse.js.closure.builder.ClosureNature;
 import net.vtst.ow.eclipse.js.closure.builder.ProjectOrderManager;
 import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
 import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPropertyRecord;
+import net.vtst.ow.eclipse.js.closure.util.Utils;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -158,7 +159,7 @@ public class ClosureCompiler {
         result.add(provider.get(compiler, pathOfClosureBase, pathOfClosureBase));
       }
       for (File libraryPath: ClosureProjectPropertyRecord.getInstance().otherLibraries.get(new ProjectPropertyStore(projects.get(i), OwJsClosurePlugin.PLUGIN_ID))) {
-        // TODO checkCancel(monitor, true);
+        if (monitor != null) Utils.checkCancel(monitor);
         result.add(provider.get(compiler, libraryPath, pathOfClosureBase));
       }
     }
