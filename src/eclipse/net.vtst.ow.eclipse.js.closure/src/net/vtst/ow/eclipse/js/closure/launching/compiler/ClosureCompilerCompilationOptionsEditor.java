@@ -7,11 +7,11 @@ import net.vtst.eclipse.easy.ui.util.SWTFactory;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Group;
 
-public class ClosureCompilerOptionsEditor extends DefaultCompoundEditor {
+public class ClosureCompilerCompilationOptionsEditor extends DefaultCompoundEditor {
   
   private ClosureCompilerLaunchConfigurationRecord record = new ClosureCompilerLaunchConfigurationRecord(); 
 
-  public ClosureCompilerOptionsEditor(IEditorContainer container) {
+  public ClosureCompilerCompilationOptionsEditor(IEditorContainer container) {
     super(container, 3);
     record.compilationLevel.bindEditor(this);
     record.generateExports.bindEditor(this);
@@ -19,7 +19,6 @@ public class ClosureCompilerOptionsEditor extends DefaultCompoundEditor {
         getComposite(), getMessage("formatting"), 3, 3, GridData.FILL_HORIZONTAL);
     record.formattingPrettyPrint.bindEditor(this, group1);
     record.formattingPrintInputDelimiter.bindEditor(this, group1);
-    record.inputResources.bindEditor(this);
   }
 
 }

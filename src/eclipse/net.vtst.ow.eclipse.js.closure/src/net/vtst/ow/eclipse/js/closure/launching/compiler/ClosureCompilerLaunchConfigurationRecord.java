@@ -24,6 +24,9 @@ public class ClosureCompilerLaunchConfigurationRecord extends Record {
     super.initializeByReflection();
   }
   
+  public BooleanField useProjectPropertiesForIncludes = new BooleanField(true);
+  public BooleanField useProjectPropertiesForChecks = new BooleanField(true);
+  
   public StringOptionsField compilationLevel = new StringOptionsField("WHITESPACE_ONLY", "SIMPLE_OPTIMIZATIONS", "ADVANCED_OPTIMIZATIONS");
   public BooleanField formattingPrettyPrint = new BooleanField(false);
   public BooleanField formattingPrintInputDelimiter = new BooleanField(false);
