@@ -187,7 +187,11 @@ MixinDefinitionParameter:
 MixinCall:
   selector+=HashOrClassCrossReference
   (combinator+=MixinCallCombinator selector+=HashOrClassCrossReference)* OPT_SPACE 
-  ('(' OPT_SPACE (parameter+=Term OPT_SPACE (',' OPT_SPACE parameter+=Term OPT_SPACE)*)? ')' OPT_SPACE)?
+  ('(' OPT_SPACE (parameter+=MixinCallParameter OPT_SPACE (',' OPT_SPACE parameter+=MixinCallParameter OPT_SPACE)*)? ')' OPT_SPACE)?
+;
+
+MixinCallParameter:
+  term+=Term (SPACE term+=Term)*
 ;
 
 // RuleSets
