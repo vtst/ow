@@ -57,9 +57,14 @@ public abstract class EasyLaunchConfigurationTab extends AbstractLaunchConfigura
    */
   @Override
   public boolean isValid(ILaunchConfiguration config) {
-    return true;
+    if (editor == null) return true;
+    return editor.isValid();
   }
 
+  public String getErrorMessage() {
+    if (editor == null) return null;
+    return editor.getErrorMessage();
+  }
 
   @Override
   public void addEditor(IEditor editor) {}

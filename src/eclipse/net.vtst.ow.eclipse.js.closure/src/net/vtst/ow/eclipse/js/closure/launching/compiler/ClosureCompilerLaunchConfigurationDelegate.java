@@ -1,5 +1,6 @@
 package net.vtst.ow.eclipse.js.closure.launching.compiler;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,39 +9,33 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import net.vtst.eclipse.easy.ui.properties.stores.IReadOnlyStore;
-import net.vtst.eclipse.easy.ui.properties.stores.IStore;
 import net.vtst.eclipse.easy.ui.properties.stores.LaunchConfigurationReadOnlyStore;
-import net.vtst.eclipse.easy.ui.properties.stores.PluginPreferenceStore;
 import net.vtst.eclipse.easy.ui.properties.stores.ProjectPropertyStore;
 import net.vtst.ow.closure.compiler.compile.DefaultExternsProvider;
 import net.vtst.ow.closure.compiler.deps.AbstractJSProject;
-import net.vtst.ow.closure.compiler.deps.JSLibrary;
-import net.vtst.ow.closure.compiler.deps.JSLibrary.CacheSettings;
 import net.vtst.ow.closure.compiler.deps.JSProject;
 import net.vtst.ow.closure.compiler.deps.JSUnit;
 import net.vtst.ow.closure.compiler.deps.JSUnitProvider;
 import net.vtst.ow.closure.compiler.util.CompilerUtils;
 import net.vtst.ow.eclipse.js.closure.OwJsClosureMessages;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
-import net.vtst.ow.eclipse.js.closure.builder.ClosureNature;
 import net.vtst.ow.eclipse.js.closure.compiler.ClosureCompiler;
 import net.vtst.ow.eclipse.js.closure.compiler.ClosureCompilerOptions;
 import net.vtst.ow.eclipse.js.closure.compiler.JSLibraryProviderForLaunch;
-import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
-import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPropertyRecord;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceVisitor;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -56,9 +51,8 @@ import com.google.javascript.jscomp.deps.SortedDependencies.CircularDependencyEx
 
 public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
   
-  // TODO: Manage output
-  // TODO: Check order of libraries
   // TODO: Run compiler in thread
+  // TODO: If the output file has the .js extension, this creates build errors
   
   private OwJsClosureMessages messages = OwJsClosurePlugin.getDefault().getMessages();
   private ClosureCompilerLaunchConfigurationRecord record = ClosureCompilerLaunchConfigurationRecord.getInstance();
@@ -66,6 +60,7 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
   @Override
   public void launch(ILaunchConfiguration config, String mode, ILaunch launch, IProgressMonitor monitor)
       throws CoreException {
+    // TODO: Fix monitor for library and output
     IReadOnlyStore store = new LaunchConfigurationReadOnlyStore(config);
     List<IResource> resources = record.inputResources.get(store);
     if (resources.isEmpty()) return;
@@ -79,6 +74,9 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
     IReadOnlyStore storeForChecks = record.useProjectPropertiesForChecks.get(store) ? new ProjectPropertyStore(project, OwJsClosurePlugin.PLUGIN_ID) : store; 
     IReadOnlyStore storeForIncludes = record.useProjectPropertiesForIncludes.get(store) ? new ProjectPropertyStore(project, OwJsClosurePlugin.PLUGIN_ID) : store; 
 
+    // Get the output file
+    IFile outputFile = getOutputFile(store, resources);
+    
     // Create and configure the compiler
     // TODO: Change the error manager
     Compiler compiler = CompilerUtils.makeCompiler(CompilerUtils.makePrintingErrorManager(System.out));
@@ -120,7 +118,12 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
       for (JSUnit unit: rootUnitsWithTheirDependencies) module.add(new CompilerInput(unit.getAst(false)));
       // TODO: Manage custom externs
       compiler.compileModules(DefaultExternsProvider.getAsSourceFiles(), Collections.singletonList(module), options);
-      System.out.println(compiler.toSource());
+      if (outputFile.exists()) {
+        outputFile.setContents(new ByteArrayInputStream(compiler.toSource().getBytes("UTF-8")), false, false, monitor);
+      } else {
+        outputFile.create(new ByteArrayInputStream(compiler.toSource().getBytes("UTF-8")), false, monitor);
+      }
+      outputFile.setCharset("UTF-8", monitor);
       compiler.getErrorManager().generateReport();
     } catch (CircularDependencyException e) {
       throw new CoreException(new Status(Status.ERROR, OwJsClosurePlugin.PLUGIN_ID, e.getLocalizedMessage(), e));
@@ -146,6 +149,25 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
       }
     }
     return project;
+  }
+  
+  private IFile getOutputFile(IReadOnlyStore store, List<IResource> resources) throws CoreException {
+    if (record.useDefaultOutputFile.get(store)) {
+      if (resources.size() != 1) {
+        throw new CoreException(new Status(Status.ERROR, OwJsClosurePlugin.PLUGIN_ID, messages.getString("ClosureCompilerLaunchConfigurationDelegate_missingOutputFile")));
+      }
+      IResource resource = resources.get(0);
+      if (resource instanceof IContainer) {
+        return ((IContainer) resource).getFile(new Path("out.jsc"));
+      } else if (resource instanceof IFile) {
+        return ResourcesPlugin.getWorkspace().getRoot().getFile(resource.getFullPath().removeFileExtension().addFileExtension("jsc"));
+      } else {
+        assert false;
+        return null;
+      }
+    } else {
+      return ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(record.outputFile.get(store)));
+    }
   }
 
   /**
