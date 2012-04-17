@@ -95,10 +95,10 @@ public abstract class AbstractJSProject {
       foundNames = Sets.newHashSet(Iterables.concat(provides, requires));
       List<AbstractJSProject> referencedProjects = getReferencedProjects();
       results = new ArrayList<ArrayList<JSUnit>>(referencedProjects.size() + 1);
+      visit(project);
       for (AbstractJSProject referencedProject: referencedProjects) {
         visit(referencedProject);
       }
-      visit(project);
     }
     
     DependencyBuilder(AbstractJSProject project, JSUnit unit) {

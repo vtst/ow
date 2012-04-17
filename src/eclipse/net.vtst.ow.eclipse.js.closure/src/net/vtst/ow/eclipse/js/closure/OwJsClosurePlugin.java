@@ -3,10 +3,10 @@ package net.vtst.ow.eclipse.js.closure;
 import java.net.URL;
 import java.util.logging.Level;
 
-import net.vtst.ow.eclipse.js.closure.builder.JSLibraryProviderForBuilder;
 import net.vtst.ow.eclipse.js.closure.builder.JavaScriptEditorRegistry;
 import net.vtst.ow.eclipse.js.closure.builder.ProjectOrderManager;
 import net.vtst.ow.eclipse.js.closure.compiler.IJSLibraryProvider;
+import net.vtst.ow.eclipse.js.closure.launching.compiler.JSLibraryProviderForBuilder;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;

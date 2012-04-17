@@ -1,4 +1,4 @@
-package net.vtst.ow.eclipse.js.closure.builder;
+package net.vtst.ow.eclipse.js.closure.launching.compiler;
 
 import java.io.File;
 import java.lang.ref.WeakReference;

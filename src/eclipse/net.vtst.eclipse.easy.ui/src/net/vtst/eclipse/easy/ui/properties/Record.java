@@ -9,13 +9,14 @@ import net.vtst.eclipse.easy.ui.properties.fields.IField;
  * {@code initializeByReflection} at initialization.
  */
 public class Record {
-  
   public final void initializeByReflection() {
     for (Field field: this.getClass().getFields()) {
       try {
         Object fieldValue = field.get(this);
         if (fieldValue instanceof IField) {
           ((IField<?>) fieldValue).bind(field.getName());
+        } else if (fieldValue instanceof Record) {
+          ((Record) fieldValue).initializeByReflection();
         }
       } catch (IllegalArgumentException e) {
         e.printStackTrace();

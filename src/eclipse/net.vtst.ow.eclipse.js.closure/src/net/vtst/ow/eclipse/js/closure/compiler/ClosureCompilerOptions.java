@@ -24,35 +24,34 @@ import com.google.javascript.jscomp.WarningLevel;
 public class ClosureCompilerOptions {
   
   // This is based on CommandLineRunner.createOptions() and AbstractCommandLineRunner.setRunOptions()
-  private static CompilerOptions makeInternal(IProject project, IReadOnlyStore launchStore, boolean ideMode) throws CoreException {
-    ClosureProjectPropertyRecord projectRecord = ClosureProjectPropertyRecord.getInstance();
-    ClosureCompilerLaunchConfigurationRecord launchRecord = ClosureCompilerLaunchConfigurationRecord.getInstance();
+  private static CompilerOptions makeInternal(IReadOnlyStore storeForChecks, IReadOnlyStore storeForCompilationOptions, boolean ideMode) throws CoreException {
+    ClosureCompilerLaunchConfigurationRecord record = ClosureCompilerLaunchConfigurationRecord.getInstance();
 
     // From CommandLineRunner.createOptions()
     CompilerOptions options = new CompilerOptions();
-    IReadOnlyStore projectStore = new ProjectPropertyStore(project, OwJsClosurePlugin.PLUGIN_ID);
     options.setCodingConvention(new ClosureCodingConvention());
     CompilationLevel level = CompilationLevel.WHITESPACE_ONLY;
-    if (!ideMode) {
+    if (storeForCompilationOptions != null) {
+      level = record.compilationLevel.get(storeForCompilationOptions);
        level.setOptionsForCompilationLevel(options);
-       if (launchRecord.generateExports.get(launchStore)) {
+       if (record.generateExports.get(storeForCompilationOptions)) {
          options.setGenerateExports(true);
        }
     }
 
-    WarningLevel wLevel = projectRecord.warningLevel.get(projectStore);
+    WarningLevel wLevel = record.checks.warningLevel.get(storeForChecks);
     wLevel.setOptionsForWarningLevel(options);
-    if (!ideMode) {
-      if (launchRecord.formattingPrettyPrint.get(launchStore)) options.prettyPrint = true;
-      if (launchRecord.formattingPrintInputDelimiter.get(launchStore)) options.printInputDelimiter = true;
+    if (storeForCompilationOptions != null) {
+      if (record.formattingPrettyPrint.get(storeForCompilationOptions)) options.prettyPrint = true;
+      if (record.formattingPrintInputDelimiter.get(storeForCompilationOptions)) options.printInputDelimiter = true;
     }
 
-    options.closurePass = projectRecord.processClosurePrimitives.get(projectStore);
+    options.closurePass = record.checks.processClosurePrimitives.get(storeForChecks);
 
-    options.jqueryPass = projectRecord.processJQueryPrimitives.get(projectStore) &&
+    options.jqueryPass = record.checks.processJQueryPrimitives.get(storeForChecks) &&
         CompilationLevel.ADVANCED_OPTIMIZATIONS == level;
 
-    if (projectRecord.processJQueryPrimitives.get(projectStore)) {
+    if (record.checks.processJQueryPrimitives.get(storeForChecks)) {
       options.setCodingConvention(new JqueryCodingConvention());
     }
 
@@ -116,7 +115,7 @@ public class ClosureCompilerOptions {
     //   options.inputPropertyMapSerialized =
     //       VariableMap.load(config.propertyMapInputFile).toBytes();
     // }
-    options.setLanguageIn(projectRecord.languageIn.get(projectStore));
+    options.setLanguageIn(record.checks.languageIn.get(storeForChecks));
 
     // if (!config.outputManifests.isEmpty()) {
     //   Set<String> uniqueNames = Sets.newHashSet();
@@ -138,7 +137,7 @@ public class ClosureCompilerOptions {
     //   }
     // }
 
-    options.setAcceptConstKeyword(projectRecord.acceptConstKeyword.get(projectStore));
+    options.setAcceptConstKeyword(record.checks.acceptConstKeyword.get(storeForChecks));
     // options.transformAMDToCJSModules = config.transformAMDToCJSModules;
     // options.processCommonJSModules = config.processCommonJSModules;
     // options.commonJSModulePathPrefix = config.commonJSModulePathPrefix;
@@ -153,11 +152,12 @@ public class ClosureCompilerOptions {
   }
 
   public static CompilerOptions makeForBuilder(IProject project) throws CoreException {
-    return makeInternal(project, null, true);
+    IReadOnlyStore store = new ProjectPropertyStore(project, OwJsClosurePlugin.PLUGIN_ID);
+    return makeInternal(store, null, true);
   }
   
-  public static CompilerOptions makeForLaunch(IProject project, ILaunchConfiguration config) throws CoreException {
-    return makeInternal(project, new LaunchConfigurationReadOnlyStore(config), false);
+  public static CompilerOptions makeForLaunch(IReadOnlyStore storeForChecks, IReadOnlyStore storeForCompilationOptions) throws CoreException {
+    return makeInternal(storeForChecks, storeForCompilationOptions, false);
   }
 
 }

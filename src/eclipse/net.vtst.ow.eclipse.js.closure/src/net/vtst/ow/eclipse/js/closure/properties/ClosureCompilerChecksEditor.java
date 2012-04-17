@@ -16,17 +16,17 @@ public class ClosureCompilerChecksEditor extends DefaultCompoundEditor {
     Group group1 = SWTFactory.createGroup(
         getComposite(), getMessage("warningAndChecksGroup"), 3, 1, GridData.FILL_HORIZONTAL);
     addControl(group1);
-    record.warningLevel.bindEditor(this, group1);
-    record.checkLevels.bindEditor(this, group1);
+    record.checks.warningLevel.bindEditor(this, group1);
+    record.checks.checkLevels.bindEditor(this, group1);
     
     Group group2 = SWTFactory.createGroup(
         getComposite(), getMessage("inputLanguageGroup"), 3, 1, GridData.FILL_HORIZONTAL);
-    addControl(group1);
-    record.languageIn.bindEditor(this, group2);
-    record.thirdParty.bindEditor(this, group2);
-    record.processClosurePrimitives.bindEditor(this, group2);
-    record.processJQueryPrimitives.bindEditor(this, group2);
-    record.acceptConstKeyword.bindEditor(this, group2);
+    addControl(group2);
+    record.checks.languageIn.bindEditor(this, group2);
+    record.checks.thirdParty.bindEditor(this, group2);
+    record.checks.processClosurePrimitives.bindEditor(this, group2);
+    record.checks.processJQueryPrimitives.bindEditor(this, group2);
+    record.checks.acceptConstKeyword.bindEditor(this, group2);
   }
 
 }

@@ -7,6 +7,7 @@ import net.vtst.eclipse.easy.ui.properties.pages.EasyLaunchConfigurationTab;
 import net.vtst.ow.eclipse.js.closure.OwJsClosureMessages;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.properties.ClosureCompilerChecksEditor;
+import net.vtst.ow.eclipse.js.closure.properties.ClosureIncludesEditor;
 
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
 import org.eclipse.debug.ui.CommonTab;
@@ -55,7 +56,7 @@ public class ClosureCompilerTabGroup extends AbstractLaunchConfigurationTabGroup
           protected ICompositeEditor createEditor() {
             return new ClosureCompilerProjectPropertiesEditor(this, record.useProjectPropertiesForIncludes) {
               public IEditor createDelegate(IEditorContainer container) {
-                return new ClosureCompilerChecksEditor(container);
+                return new ClosureIncludesEditor(container);
               }
             };
         }},

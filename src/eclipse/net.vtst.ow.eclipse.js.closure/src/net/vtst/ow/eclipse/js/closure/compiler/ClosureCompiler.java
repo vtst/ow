@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import net.vtst.eclipse.easy.ui.properties.stores.IReadOnlyStore;
 import net.vtst.eclipse.easy.ui.properties.stores.IStore;
 import net.vtst.eclipse.easy.ui.properties.stores.PluginPreferenceStore;
 import net.vtst.eclipse.easy.ui.properties.stores.ProjectPropertyStore;
@@ -59,12 +60,12 @@ public class ClosureCompiler {
   }
   
   /**
-   * Gets the list of JavaScript files in a project.
-   * @param project  The project to visit.
-   * @return  The list of JavaScript file.  May be empty, but never null.
+   * Gets the list of JavaScript files of a resource (including itself).
+   * @param resource  The resource to visit.
+   * @return  The list of JavaScript files.  May be empty, but never null.
    * @throws CoreException 
    */
-  public static Set<IFile> getJavaScriptFiles(IProject project) throws CoreException {
+  public static Set<IFile> getJavaScriptFiles(IResource resource) throws CoreException {
     final Set<IFile> files = new HashSet<IFile>();
     IResourceVisitor visitor = new IResourceVisitor() {
       @Override
@@ -76,10 +77,32 @@ public class ClosureCompiler {
         return true;
       }
     };
-    project.accept(visitor);
+    resource.accept(visitor);
     return files;
   }
-  
+
+  /**
+   * Gets the list of JavaScript files of a set of resources (including themselves).
+   * @param resources  The resources to visit.
+   * @return  The list of JavaScript files.  May be empty, but never null.
+   * @throws CoreException 
+   */
+  public static Set<IFile> getJavaScriptFiles(Iterable<? extends IResource> resources) throws CoreException {
+    final Set<IFile> files = new HashSet<IFile>();
+    IResourceVisitor visitor = new IResourceVisitor() {
+      @Override
+      public boolean visit(IResource resource) throws CoreException {
+        if (resource instanceof IFile) {
+          IFile file = (IFile) resource;
+          if (ClosureCompiler.isJavaScriptFile(file)) files.add(file);
+        }
+        return true;
+      }
+    };
+    for (IResource resource: resources) resource.accept(visitor);
+    return files;
+  }
+
   /**
    * Get the closure base path for a project (from its properties and the global preferences).
    * @param project
@@ -87,13 +110,20 @@ public class ClosureCompiler {
    * @throws CoreException
    */
   public static File getPathOfClosureBase(IProject project) throws CoreException {
-    IStore ps = new ProjectPropertyStore(project, OwJsClosurePlugin.PLUGIN_ID);
+    return getPathOfClosureBase(new ProjectPropertyStore(project, OwJsClosurePlugin.PLUGIN_ID));
+  }
+
+  /**
+   * Get the closure base path for a store.
+   * @throws CoreException
+   */
+  public static File getPathOfClosureBase(IReadOnlyStore store) throws CoreException {
     ClosureProjectPropertyRecord pr = ClosureProjectPropertyRecord.getInstance();
-    if (pr.useDefaultClosureBasePath.get(ps)) {
+    if (pr.includes.useDefaultClosureBasePath.get(store)) {
       IStore prefs = new PluginPreferenceStore(OwJsClosurePlugin.getDefault().getPreferenceStore());
       return ClosurePreferenceRecord.getInstance().closureBasePath.get(prefs);
     } else {
-      return pr.closureBasePath.get(ps);
+      return pr.includes.closureBasePath.get(store);
     }
   }
 
@@ -137,6 +167,20 @@ public class ClosureCompiler {
     return referencedProjects;
   }
   
+  
+  private static void addJSLibraries(
+      IJSLibraryProvider provider, AbstractCompiler compiler, IProgressMonitor monitor,
+      IReadOnlyStore store, ListWithoutDuplicates<AbstractJSProject> result) throws CoreException {
+    File pathOfClosureBase = getPathOfClosureBase(store);
+    if (pathOfClosureBase != null) {
+      result.add(provider.get(compiler, pathOfClosureBase, pathOfClosureBase));
+    }
+    for (File libraryPath: ClosureProjectPropertyRecord.getInstance().includes.otherLibraries.get(store)) {
+      if (monitor != null) Utils.checkCancel(monitor);
+      result.add(provider.get(compiler, libraryPath, pathOfClosureBase));
+    }
+  }
+
   /**
    * Returns the list of libraries which are imported from a given list of projects.
    * @param provider  The library provider.
@@ -151,17 +195,18 @@ public class ClosureCompiler {
       IJSLibraryProvider provider, AbstractCompiler compiler, IProgressMonitor monitor,
       ArrayList<IProject> projects) throws CoreException {
     ListWithoutDuplicates<AbstractJSProject> result = new ListWithoutDuplicates<AbstractJSProject>();
-    for (int i = projects.size() - 1; i >= 0; --i) {      
-      File pathOfClosureBase = getPathOfClosureBase(projects.get(i));
-      if (pathOfClosureBase != null) {
-        result.add(provider.get(compiler, pathOfClosureBase, pathOfClosureBase));
-      }
-      for (File libraryPath: ClosureProjectPropertyRecord.getInstance().otherLibraries.get(new ProjectPropertyStore(projects.get(i), OwJsClosurePlugin.PLUGIN_ID))) {
-        if (monitor != null) Utils.checkCancel(monitor);
-        result.add(provider.get(compiler, libraryPath, pathOfClosureBase));
-      }
+    for (int i = projects.size() - 1; i >= 0; --i) {
+      addJSLibraries(
+          provider, compiler, monitor, 
+          new ProjectPropertyStore(projects.get(i), OwJsClosurePlugin.PLUGIN_ID), result);
     }
     return result.asList();
   }
-
+  
+  public static List<AbstractJSProject> getJSLibraries(IJSLibraryProvider provider, AbstractCompiler compiler, IProgressMonitor monitor,
+      IReadOnlyStore store) throws CoreException {
+    ListWithoutDuplicates<AbstractJSProject> result = new ListWithoutDuplicates<AbstractJSProject>();
+    addJSLibraries(provider, compiler, monitor, store, result);
+    return result.asList();
+  }
 }

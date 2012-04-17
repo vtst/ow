@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -25,10 +26,12 @@ import net.vtst.ow.closure.compiler.deps.JSProject;
 import net.vtst.ow.closure.compiler.deps.JSUnit;
 import net.vtst.ow.closure.compiler.deps.JSUnitProvider;
 import net.vtst.ow.closure.compiler.util.CompilerUtils;
+import net.vtst.ow.eclipse.js.closure.OwJsClosureMessages;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.builder.ClosureNature;
 import net.vtst.ow.eclipse.js.closure.compiler.ClosureCompiler;
 import net.vtst.ow.eclipse.js.closure.compiler.ClosureCompilerOptions;
+import net.vtst.ow.eclipse.js.closure.compiler.JSLibraryProviderForLaunch;
 import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
 import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPropertyRecord;
 
@@ -38,6 +41,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
@@ -56,127 +60,104 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
   // TODO: Check order of libraries
   // TODO: Run compiler in thread
   
-  private ClosureCompilerLaunchConfigurationRecord launchRecord = ClosureCompilerLaunchConfigurationRecord.getInstance();
-  private ClosureProjectPropertyRecord projectRecord = ClosureProjectPropertyRecord.getInstance();
+  private OwJsClosureMessages messages = OwJsClosurePlugin.getDefault().getMessages();
+  private ClosureCompilerLaunchConfigurationRecord record = ClosureCompilerLaunchConfigurationRecord.getInstance();
 
   @Override
   public void launch(ILaunchConfiguration config, String mode, ILaunch launch, IProgressMonitor monitor)
       throws CoreException {
     IReadOnlyStore store = new LaunchConfigurationReadOnlyStore(config);
-    List<IResource> resources = launchRecord.inputResources.get(store);
+    List<IResource> resources = record.inputResources.get(store);
     if (resources.isEmpty()) return;
     
-    // We arbitrarily take the first project as the master one for getting options.
-    IProject project = resources.get(0).getProject();
-    IReadOnlyStore projectStore = new ProjectPropertyStore(project, OwJsClosurePlugin.PLUGIN_ID);
-    File closureBasePath = projectRecord.closureBasePath.get(projectStore);
-    
+    // Getting the stores for project configurations
+    IProject project = null;
+    if (record.useProjectPropertiesForChecks.get(store) ||
+        record.useProjectPropertiesForIncludes.get(store)) {
+      project = getProject(resources);
+    }
+    IReadOnlyStore storeForChecks = record.useProjectPropertiesForChecks.get(store) ? new ProjectPropertyStore(project, OwJsClosurePlugin.PLUGIN_ID) : store; 
+    IReadOnlyStore storeForIncludes = record.useProjectPropertiesForIncludes.get(store) ? new ProjectPropertyStore(project, OwJsClosurePlugin.PLUGIN_ID) : store; 
+
+    // Create and configure the compiler
+    // TODO: Change the error manager
     Compiler compiler = CompilerUtils.makeCompiler(CompilerUtils.makePrintingErrorManager(System.out));
-    CompilerOptions options = ClosureCompilerOptions.makeForLaunch(project, config);
+    CompilerOptions options = ClosureCompilerOptions.makeForLaunch(storeForChecks, store);
     compiler.initOptions(options);
-    Iterable<IProject> projects = getClosureProjects(resources);
-    List<AbstractJSProject> libraries = getLibraries(compiler, projects);
-    Collection<IFile> selectedJsFiles = getJavaScriptFiles(resources);
-    Collection<IFile> allJsFiles = getJavaScriptFiles(projects);
-    Map<IFile, JSUnit> units = makeJSUnits(closureBasePath, allJsFiles);
-    List<JSUnit> selectedJsUnits = new ArrayList<JSUnit>(selectedJsFiles.size());
-    for (IFile selectedJsFile: selectedJsFiles) selectedJsUnits.add(units.get(selectedJsFile));
+
+    // Get the files to compile
+    Collection<IFile> allFiles, rootFiles;
+    List<AbstractJSProject> libraries;
+    if (record.manageClosureDependencies.get(store)) {
+      // If dependencies are managed, we take all projects containing selected resources,
+      // then all their referenced projects.
+      // TODO: It should not be allowed to customize the includes in this case, we should always
+      // use the project ones.
+      Collection<IProject> projects = getProjects(resources);
+      Comparator<IProject> comparator = OwJsClosurePlugin.getDefault().getProjectOrderManager().get().reverseOrderComparator();
+      ArrayList<IProject> allProjects = ClosureCompiler.getReferencedJavaScriptProjectsRecursively(projects, comparator);
+      libraries = ClosureCompiler.getJSLibraries(new JSLibraryProviderForLaunch(), compiler, monitor, allProjects);
+      allFiles = ClosureCompiler.getJavaScriptFiles(allProjects);
+      rootFiles = ClosureCompiler.getJavaScriptFiles(resources);
+    } else {
+      // If dependencies are not managed, we take only what has been selected.
+      libraries = ClosureCompiler.getJSLibraries(new JSLibraryProviderForLaunch(), compiler, monitor, storeForIncludes);
+      allFiles = ClosureCompiler.getJavaScriptFiles(resources);
+      rootFiles = allFiles;
+    }
+
+    // Build the project to compile
+    File closureBasePath = ClosureCompiler.getPathOfClosureBase(storeForIncludes);
+    Map<IFile, JSUnit> units = makeJSUnits(closureBasePath, allFiles);
+    List<JSUnit> rootUnits = new ArrayList<JSUnit>(rootFiles.size());
+    for (IFile selectedJsFile: rootFiles) rootUnits.add(units.get(selectedJsFile));
     try {
       JSProject jsProject = makeJSProject(compiler, Lists.newArrayList(units.values()), libraries, closureBasePath);
-      List<JSUnit> unitsToBeCompiled = jsProject.getSortedDependenciesOf(selectedJsUnits);
+      List<JSUnit> rootUnitsWithTheirDependencies = jsProject.getSortedDependenciesOf(rootUnits);
+      // TODO: This is not correct, because rootUnits are not sorted.
+      rootUnitsWithTheirDependencies.addAll(rootUnits);
       JSModule module = new JSModule("main");
-      for (JSUnit unit: unitsToBeCompiled) {
-        module.add(new CompilerInput(unit.getAst(false)));
-      }
+      for (JSUnit unit: rootUnitsWithTheirDependencies) module.add(new CompilerInput(unit.getAst(false)));
+      // TODO: Manage custom externs
       compiler.compileModules(DefaultExternsProvider.getAsSourceFiles(), Collections.singletonList(module), options);
       System.out.println(compiler.toSource());
       compiler.getErrorManager().generateReport();
     } catch (CircularDependencyException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      throw new CoreException(new Status(Status.ERROR, OwJsClosurePlugin.PLUGIN_ID, e.getLocalizedMessage(), e));
     } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      throw new CoreException(new Status(Status.ERROR, OwJsClosurePlugin.PLUGIN_ID, e.getLocalizedMessage(), e));
     }
   }
-    
+  
+  /**
+   * @param resources
+   * @return
+   * @throws CoreException
+   */
+  public IProject getProject(Iterable<IResource> resources) throws CoreException {
+    IProject project = null;
+    for (IResource resource: resources) {
+      if (project == null) {
+        project = resource.getProject();
+      } else {
+        if (!project.equals(resource.getProject())) {
+          throw new CoreException(new Status(Status.ERROR, OwJsClosurePlugin.PLUGIN_ID, messages.getString("ClosureCompilerLaunchConfigurationDelegate_differentProjects")));
+        }
+      }
+    }
+    return project;
+  }
+
   /**
    * Get the projects the resources in {@code resources} belong to.  Include recursively
    * their referenced projects. 
    */
-  private Iterable<IProject> getClosureProjects(Iterable<IResource> resources) throws CoreException {
+  private Collection<IProject> getProjects(Iterable<IResource> resources) throws CoreException {
     Set<IProject> projects = new HashSet<IProject>();
-    LinkedList<IProject> projectsToVisit = new LinkedList<IProject>();
     for (IResource resource: resources) {
-      IProject project = resource.getProject();
-      if (project.hasNature(ClosureNature.NATURE_ID) && projects.add(project)) 
-        projectsToVisit.add(project);
-    }
-    while (!projectsToVisit.isEmpty()) {
-      for (IProject referencedProject: projectsToVisit.removeLast().getReferencedProjects()) {
-        if (referencedProject.hasNature(ClosureNature.NATURE_ID) && projects.add(referencedProject)) 
-          projectsToVisit.add(referencedProject);
-      }
+      projects.add(resource.getProject());
     }
     return projects;
-  }
-  
-  /**
-   * Get the JavaScript files which are in a set of resources.
-   * @param resources  The set of resources to scan.
-   * @return  The list of JavaScript files.
-   * @throws CoreException
-   */
-  private Collection<IFile> getJavaScriptFiles(Iterable<? extends IResource> resources) throws CoreException {
-    final Set<IFile> files = new HashSet<IFile>();
-    IResourceVisitor visitor = new IResourceVisitor(){
-      public boolean visit(IResource resource) throws CoreException {
-        if (resource instanceof IFile) {
-          IFile file = (IFile) resource;
-          if (ClosureCompiler.isJavaScriptFile(file)) files.add(file);
-        }
-        return true;
-      }};
-    for (IResource resource: resources) resource.accept(visitor);
-    return files;
-  }
-
-  private List<AbstractJSProject> getLibraries(AbstractCompiler compiler, Iterable<IProject> projects) throws CoreException {
-    CacheSettings cacheSettings = getCacheSettings();
-    List<AbstractJSProject> libraries = new ArrayList<AbstractJSProject>();
-    Set<File> addedLibraries = new HashSet<File>();
-    for (IProject project: projects) {
-      IReadOnlyStore store = new ProjectPropertyStore(project, OwJsClosurePlugin.PLUGIN_ID);
-      File closureBasePath = projectRecord.closureBasePath.get(store);
-      if (addedLibraries.add(closureBasePath)) {
-        libraries.add(getLibrary(compiler, closureBasePath, closureBasePath, true, cacheSettings));
-      }
-      for (File libraryPath: projectRecord.otherLibraries.get(store)) {
-        if (addedLibraries.add(libraryPath)) {
-          libraries.add(getLibrary(compiler, libraryPath, closureBasePath, false, cacheSettings));
-        }
-      }
-    }
-    return libraries;
-  }
-  
-  private JSLibrary getLibrary(AbstractCompiler compiler, File path, File pathOfClosureBase, boolean isClosureBase, CacheSettings cacheSettings) {
-    JSLibrary library = new JSLibrary(path, pathOfClosureBase, cacheSettings);
-    library.setUnits(compiler);
-    return library;
-  }
-  
-  private JSLibrary.CacheSettings getCacheSettings() {
-    ClosurePreferenceRecord r = ClosurePreferenceRecord.getInstance();
-    JSLibrary.CacheSettings result = new JSLibrary.CacheSettings();
-    IStore prefs = new PluginPreferenceStore(OwJsClosurePlugin.getDefault().getPreferenceStore());
-    try {
-      result.cacheDepsFiles = r.cacheLibraryDepsFiles.get(prefs);
-    } catch (CoreException e) {
-      result.cacheDepsFiles = r.cacheLibraryDepsFiles.getDefault();
-    }
-    result.cacheStrippedFiles = JSLibrary.CacheMode.DISABLED;
-    return result;
   }
   
   private Map<IFile, JSUnit> makeJSUnits(File closureBasePath, Collection<IFile> files) {

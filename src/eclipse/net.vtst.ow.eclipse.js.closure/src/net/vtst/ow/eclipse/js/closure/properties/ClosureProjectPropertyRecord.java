@@ -16,25 +16,32 @@ public class ClosureProjectPropertyRecord extends Record {
     super.initializeByReflection();
   }
 
-  public BooleanField useDefaultClosureBasePath = new BooleanField(true);
-  public FileField closureBasePath = new FileField(null, FileField.Type.DIRECTORY);
-
   // Includes
   
-  public FileListField otherLibraries = new FileListField(FileListField.Type.DIRECTORY);
-  public FileListField externs = new FileListField(FileListField.Type.FILE, 
-      new String[]{"*.js", "*"}, new String[]{"js", "all"});
-  public BooleanField useOnlyCustomExterns = new BooleanField(false);
+  public static class IncludesRecord extends Record {
+    public BooleanField useDefaultClosureBasePath = new BooleanField(true);
+    public FileField closureBasePath = new FileField(null, FileField.Type.DIRECTORY);
+    public FileListField otherLibraries = new FileListField(FileListField.Type.DIRECTORY);
+    public FileListField externs = new FileListField(FileListField.Type.FILE, 
+        new String[]{"*.js", "*"}, new String[]{"js", "all"});
+    public BooleanField useOnlyCustomExterns = new BooleanField(false);    
+  }
   
+  public IncludesRecord includes = new IncludesRecord();
+    
   // Compilation (checks)
   
-  public EnumOptionsField<WarningLevel> warningLevel = new EnumOptionsField<WarningLevel>(WarningLevel.class, WarningLevel.DEFAULT);
-  public BooleanField thirdParty = new BooleanField(false);
-  public BooleanField processClosurePrimitives = new BooleanField(true);
-  public BooleanField processJQueryPrimitives = new BooleanField(false);
-  public BooleanField acceptConstKeyword = new BooleanField(false);
-  public EnumOptionsField<LanguageMode> languageIn = new EnumOptionsField<LanguageMode>(CompilerOptions.LanguageMode.class, LanguageMode.ECMASCRIPT3);
-  public CheckLevelsField checkLevels = new CheckLevelsField();  
+  public static class ChecksRecord extends Record {
+    public EnumOptionsField<WarningLevel> warningLevel = new EnumOptionsField<WarningLevel>(WarningLevel.class, WarningLevel.DEFAULT);
+    public BooleanField thirdParty = new BooleanField(false);
+    public BooleanField processClosurePrimitives = new BooleanField(true);
+    public BooleanField processJQueryPrimitives = new BooleanField(false);
+    public BooleanField acceptConstKeyword = new BooleanField(false);
+    public EnumOptionsField<LanguageMode> languageIn = new EnumOptionsField<LanguageMode>(CompilerOptions.LanguageMode.class, LanguageMode.ECMASCRIPT3);
+    public CheckLevelsField checkLevels = new CheckLevelsField();  
+  }
+  
+  public ChecksRecord checks = new ChecksRecord();
 
   private static ClosureProjectPropertyRecord instance;
   public static ClosureProjectPropertyRecord getInstance() {

@@ -5,4 +5,4 @@ Things to improve:
 4. Keys for messages when the same editor is used from several places
 5. Passage d'un sous-editeur à la construction (utile pour embed).
    En d'autres termes, veut-on gérer les constructeurs top/down ou bottom/up
-   
+6. Stores with delegates
