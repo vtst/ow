@@ -175,5 +175,4 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
     jsProject.setReferencedProjects(libraries);
     return jsProject;
   }
-
 }
