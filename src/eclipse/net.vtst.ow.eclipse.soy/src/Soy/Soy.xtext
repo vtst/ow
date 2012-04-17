@@ -173,7 +173,7 @@ LocalVariableDefinition:
 ;
 
 ForeachRange:
-  for_variable=LocalVariableDefinition "in" for_range=DataReference
+  for_variable=LocalVariableDefinition "in" for_range=Expr
 ;
 
 ForCommand:
