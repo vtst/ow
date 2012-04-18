@@ -55,6 +55,7 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
   
   // TODO: Run compiler in thread
   // TODO: If the output file has the .js extension, this creates build errors
+  // TODO: Return status
   
   private OwJsClosureMessages messages = OwJsClosurePlugin.getDefault().getMessages();
   private ClosureCompilerLaunchConfigurationRecord record = ClosureCompilerLaunchConfigurationRecord.getInstance();
