@@ -56,7 +56,7 @@
         name="%closure_compiler_launch_configuration"
         delegate="net.vtst.ow.eclipse.js.closure.launching.compiler.ClosureCompilerLaunchConfigurationDelegate"
         modes="run, debug"               
-        id="net.vtst.ow.eclipse.js.closure.launching.compiler.compiler">        
+        id="net.vtst.ow.eclipse.js.closure.launching.compiler">        
     </launchConfigurationType>
   </extension>
   
@@ -65,22 +65,22 @@
     <!-- Image to be changed -->
     <launchConfigurationTypeImage
         icon="icons/16x16/closure.png"
-        configTypeID="net.vtst.ow.eclipse.js.closure.launching.compiler.compiler"
-        id="net.vtst.ow.eclipse.js.closure.launching.compiler.compiler.image">
+        configTypeID="net.vtst.ow.eclipse.js.closure.launching.compiler"
+        id="net.vtst.ow.eclipse.js.closure.launching.compiler.image">
     </launchConfigurationTypeImage>
   </extension>
   
   <extension point="org.eclipse.debug.ui.launchConfigurationTabGroups">
     <launchConfigurationTabGroup
-        type="net.vtst.ow.eclipse.js.closure.launching.compiler.compiler"
+        type="net.vtst.ow.eclipse.js.closure.launching.compiler"
         class="net.vtst.ow.eclipse.js.closure.launching.compiler.ClosureCompilerTabGroup"
-        id="net.vtst.ow.eclipse.js.closure.launching.compiler.compiler.tabgroup">
+        id="net.vtst.ow.eclipse.js.closure.launching.compiler.tabgroup">
     </launchConfigurationTabGroup>
   </extension>
   
   <extension point="org.eclipse.debug.ui.launchShortcuts">
     <shortcut
-        id="net.vtst.ow.eclipse.js.closure.launching.compiler.compiler.shortcut"
+        id="net.vtst.ow.eclipse.js.closure.launching.compiler.shortcut"
         class="net.vtst.ow.eclipse.js.closure.launching.compiler.ClosureCompilerLaunchShortcut"
         label="%closure_compiler_launch_configuration"
         icon="icons/16x16/closure.png"
@@ -91,8 +91,17 @@
                <count value="1"/>
                <iterate>
                  <or>
-                   <test property="org.eclipse.debug.ui.matchesPattern" value="%js_file_pattern"/>
-                   <test property="org.eclipse.debug.ui.matchesContentType" value="org.eclipse.wst.jsdt.core.jsSource"/>
+                   <and>
+                     <instanceof value="org.eclipse.core.resources.IFile"/>
+                     <or>
+                       <test property="org.eclipse.debug.ui.matchesPattern" value="%js_file_pattern"/>
+                       <test property="org.eclipse.debug.ui.matchesContentType" value="org.eclipse.wst.jsdt.core.jsSource"/>
+                     </or>
+                   </and>
+                   <and>
+                     <instanceof value="org.eclipse.core.resources.IProject"/>
+                     <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.wst.jsdt.core.jsNature"/>
+                   </and>
                 </or>
                </iterate>
              </with>

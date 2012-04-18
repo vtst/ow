@@ -51,6 +51,8 @@ import com.google.javascript.jscomp.deps.SortedDependencies.CircularDependencyEx
 
 public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
   
+  public static final String TYPE_ID = "net.vtst.ow.eclipse.js.closure.launching.compiler";
+  
   // TODO: Run compiler in thread
   // TODO: If the output file has the .js extension, this creates build errors
   
@@ -78,8 +80,8 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
     IFile outputFile = getOutputFile(store, resources);
     
     // Create and configure the compiler
-    // TODO: Change the error manager
-    Compiler compiler = CompilerUtils.makeCompiler(CompilerUtils.makePrintingErrorManager(System.out));
+    ClosureCompilerProcess process = new ClosureCompilerProcess(launch);
+    Compiler compiler = CompilerUtils.makeCompiler(process.getErrorManager());
     CompilerOptions options = ClosureCompilerOptions.makeForLaunch(storeForChecks, store);
     compiler.initOptions(options);
 
@@ -122,7 +124,7 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
         outputFile.create(new ByteArrayInputStream(compiler.toSource().getBytes("UTF-8")), false, monitor);
       }
       outputFile.setCharset("UTF-8", monitor);
-      compiler.getErrorManager().generateReport();
+      process.setTerminated();
     } catch (CircularDependencyException e) {
       throw new CoreException(new Status(Status.ERROR, OwJsClosurePlugin.PLUGIN_ID, e.getLocalizedMessage(), e));
     } catch (IOException e) {
