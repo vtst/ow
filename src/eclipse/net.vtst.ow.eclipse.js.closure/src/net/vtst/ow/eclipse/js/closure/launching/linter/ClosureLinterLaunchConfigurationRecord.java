@@ -27,7 +27,7 @@ public class ClosureLinterLaunchConfigurationRecord extends Record {
   // Project properties
   
   public BooleanField useProjectPropertiesForLinterChecks = new BooleanField(true);
-  public ClosureProjectPropertyRecord.LinterChecksRecord checks = new ClosureProjectPropertyRecord.LinterChecksRecord(); 
+  public ClosureProjectPropertyRecord.LinterChecksRecord linterChecks = new ClosureProjectPropertyRecord.LinterChecksRecord(); 
   
   private static ClosureLinterLaunchConfigurationRecord instance;
   public static ClosureLinterLaunchConfigurationRecord getInstance() {
