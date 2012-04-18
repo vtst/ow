@@ -72,7 +72,8 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
     IProject project = null;
     if (record.useProjectPropertiesForChecks.get(store) ||
         record.useProjectPropertiesForIncludes.get(store)) {
-      project = getProject(resources);
+      project = ClosureCompiler.getCommonProject(resources);
+      if (project == null) throw new CoreException(new Status(Status.ERROR, OwJsClosurePlugin.PLUGIN_ID, messages.getString("ClosureCompilerLaunchConfigurationDelegate_differentProjects")));
     }
     IReadOnlyStore storeForChecks = record.useProjectPropertiesForChecks.get(store) ? new ProjectPropertyStore(project, OwJsClosurePlugin.PLUGIN_ID) : store; 
     IReadOnlyStore storeForIncludes = record.useProjectPropertiesForIncludes.get(store) ? new ProjectPropertyStore(project, OwJsClosurePlugin.PLUGIN_ID) : store; 
@@ -131,25 +132,6 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
     } catch (IOException e) {
       throw new CoreException(new Status(Status.ERROR, OwJsClosurePlugin.PLUGIN_ID, e.getLocalizedMessage(), e));
     }
-  }
-  
-  /**
-   * @param resources
-   * @return
-   * @throws CoreException
-   */
-  public IProject getProject(Iterable<IResource> resources) throws CoreException {
-    IProject project = null;
-    for (IResource resource: resources) {
-      if (project == null) {
-        project = resource.getProject();
-      } else {
-        if (!project.equals(resource.getProject())) {
-          throw new CoreException(new Status(Status.ERROR, OwJsClosurePlugin.PLUGIN_ID, messages.getString("ClosureCompilerLaunchConfigurationDelegate_differentProjects")));
-        }
-      }
-    }
-    return project;
   }
   
   private IFile getOutputFile(IReadOnlyStore store, List<IResource> resources) throws CoreException {

@@ -29,6 +29,7 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
 
@@ -208,5 +209,24 @@ public class ClosureCompiler {
     ListWithoutDuplicates<AbstractJSProject> result = new ListWithoutDuplicates<AbstractJSProject>();
     addJSLibraries(provider, compiler, monitor, store, result);
     return result.asList();
+  }
+
+  
+  /**
+   * Returns the common project of a set of resources.
+   * @param resources  The resources.
+   * @return  The project to which these resources belong to, or {@code null} if all resources do not belong
+   *   to the same project.
+   */
+  public static IProject getCommonProject(Iterable<IResource> resources) {
+    IProject project = null;
+    for (IResource resource: resources) {
+      if (project == null) {
+        project = resource.getProject();
+      } else {
+        if (!project.equals(resource.getProject())) return null;
+      }
+    }
+    return project;
   }
 }
