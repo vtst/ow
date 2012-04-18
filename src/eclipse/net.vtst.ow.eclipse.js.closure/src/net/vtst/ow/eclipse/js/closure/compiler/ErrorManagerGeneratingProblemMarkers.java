@@ -19,7 +19,6 @@ import com.google.javascript.jscomp.JSError;
  */
 public class ErrorManagerGeneratingProblemMarkers extends BasicErrorManager {
   
-  // TODO: This is not defined in plugin.xml!
   private static final String PROBLEM = "net.vtst.ow.eclipse.js.closure.compiler-error";
   
   private Map<String, IFile> fileNameToFile = new HashMap<String, IFile>();
