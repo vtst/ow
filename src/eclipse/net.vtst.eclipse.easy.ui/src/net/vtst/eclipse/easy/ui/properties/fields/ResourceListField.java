@@ -118,8 +118,14 @@ public class ResourceListField<T extends IResource> extends AbstractField<List<T
       if (resource instanceof IFile) {
         IFile file = (IFile) resource;
         if (pattern != null && pattern.matcher(file.getName()).matches()) return true;
-        try { if (contentType != null && file.getContentDescription().getContentType().isKindOf(contentType)) return true; }
-        catch (CoreException e) {}
+        try { 
+          if (file.getContentDescription() == null) return false;
+          IContentType fileContentType = file.getContentDescription().getContentType();
+          if (contentType != null && 
+              fileContentType != null && 
+              fileContentType.isKindOf(contentType)) 
+            return true; 
+        } catch (CoreException e) {}
         return false;
       } else {
         return false;
