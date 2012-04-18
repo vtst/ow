@@ -30,7 +30,7 @@ public class ClosureCompilerLaunchShortcut extends EasyLaunchShortcut<IResource>
   protected List<ILaunchConfiguration> findLaunchConfigurations(IResource resource, String mode) throws CoreException {
     for (ILaunchConfiguration config: getAllLaunchConfigurations()) {
       IReadOnlyStore store = new LaunchConfigurationReadOnlyStore(config);
-      if (record.useAsDefault.get(store) && isSelectedResource(record.inputResources.get(store), resource)) {
+      if (isSelectedResource(record.inputResources.get(store), resource)) {
         return Collections.singletonList(config);
       }
     }

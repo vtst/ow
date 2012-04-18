@@ -25,7 +25,6 @@ public class ClosureCompilerInputsAndOutputsEditor extends DefaultCompoundEditor
     addControl(group1);
     record.inputResources.bindEditor(this, group1);
     record.manageClosureDependencies.bindEditor(this, group1);
-    record.useAsDefault.bindEditor(this, group1);
 
     Group group2 = SWTFactory.createGroup(
         getComposite(), getMessage("outputsGroup"), 3, 1, GridData.FILL_HORIZONTAL);

@@ -39,7 +39,6 @@ public class ClosureCompilerLaunchConfigurationRecord extends Record {
   public BooleanField manageClosureDependencies = new BooleanField(true);
   public StringField outputFile = new StringField("");
   public BooleanField useDefaultOutputFile = new BooleanField(true);
-  public BooleanField useAsDefault = new BooleanField(true);
 
   // Compilation options
 
