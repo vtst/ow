@@ -116,7 +116,7 @@
   <extension point="org.eclipse.debug.core.launchConfigurationTypes">
     <launchConfigurationType
         name="%closure_linter_launch_configuration"
-        delegate="net.vtst.ow.eclipse.js.closure.launching.compiler.ClosureLinterLaunchConfigurationDelegate"
+        delegate="net.vtst.ow.eclipse.js.closure.launching.linter.ClosureLinterLaunchConfigurationDelegate"
         modes="run, debug"               
         id="net.vtst.ow.eclipse.js.closure.launching.linter">        
     </launchConfigurationType>
