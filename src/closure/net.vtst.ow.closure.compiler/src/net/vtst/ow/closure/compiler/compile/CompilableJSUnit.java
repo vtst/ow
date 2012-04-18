@@ -50,7 +50,6 @@ public class CompilableJSUnit extends JSUnit {
     if (allDependenciesModificationStamp < maxDependenciesModificationStamp) {
       allDependenciesModificationStamp = maxDependenciesModificationStamp;
       List<JSUnit> units = project.getSortedDependenciesOf(this);
-      units.add(this);
       orderedUnits = units;
     }
     return orderedUnits;

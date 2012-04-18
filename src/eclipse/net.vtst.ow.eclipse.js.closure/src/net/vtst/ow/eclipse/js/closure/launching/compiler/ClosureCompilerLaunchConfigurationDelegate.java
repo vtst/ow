@@ -112,8 +112,6 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
     try {
       JSProject jsProject = makeJSProject(compiler, Lists.newArrayList(units.values()), libraries, closureBasePath);
       List<JSUnit> rootUnitsWithTheirDependencies = jsProject.getSortedDependenciesOf(rootUnits);
-      // TODO: This is not correct, because rootUnits are not sorted.
-      rootUnitsWithTheirDependencies.addAll(rootUnits);
       JSModule module = new JSModule("main");
       for (JSUnit unit: rootUnitsWithTheirDependencies) module.add(new CompilerInput(unit.getAst(false)));
       // TODO: Manage custom externs

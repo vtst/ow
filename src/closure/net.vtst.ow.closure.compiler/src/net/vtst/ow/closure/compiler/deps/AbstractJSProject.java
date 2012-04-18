@@ -9,6 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import net.vtst.ow.closure.compiler.util.ListWithoutDuplicates;
+
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -87,73 +89,65 @@ public abstract class AbstractJSProject {
    */
   private class DependencyBuilder {
     private ArrayList<ArrayList<JSUnit>> results;
-    private LinkedList<String> namesToVisit;
-    Set<String> foundNames;
+    private LinkedList<String> namesToVisit = new LinkedList<String>();
+    private Set<String> foundNames = new HashSet<String>();
 
-    private void init(AbstractJSProject project, Collection<String> requires, Collection<String> provides) {
-      namesToVisit = Lists.newLinkedList(requires);
-      foundNames = Sets.newHashSet(Iterables.concat(provides, requires));
+    DependencyBuilder(AbstractJSProject project, Iterable<JSUnit> units) {
       List<AbstractJSProject> referencedProjects = getReferencedProjects();
       results = new ArrayList<ArrayList<JSUnit>>(referencedProjects.size() + 1);
-      visit(project);
+      visit(project, units);
       for (AbstractJSProject referencedProject: referencedProjects) {
-        visit(referencedProject);
+        visit(referencedProject, Collections.<JSUnit>emptySet());
       }
     }
     
-    DependencyBuilder(AbstractJSProject project, JSUnit unit) {
-      init(project, unit.getRequires(), unit.getProvides());
-    }
-    
-    DependencyBuilder(AbstractJSProject project, Iterable<JSUnit> units) {
-      Collection<String> requires = new HashSet<String>();
-      Collection<String> provides = new HashSet<String>();
-      for (JSUnit unit: units) {
-        requires.addAll(unit.getRequires());
-        provides.addAll(unit.getProvides());
-      }
-      init(project, requires, provides);
-    }
-
-    
-    void visit(AbstractJSProject project) {
+    void visit(AbstractJSProject project, Iterable<JSUnit> units) {
       LinkedList<String> remainingNames = new LinkedList<String>();
-      ArrayList<JSUnit> unitsInThisProject = new ArrayList<JSUnit>();
+      ListWithoutDuplicates<JSUnit> unitsInThisProject = new ListWithoutDuplicates<JSUnit>();
+      for (JSUnit unit: units) {
+        if (unitsInThisProject.add(unit)) {
+          for (String requiredName: unit.getRequires()) {
+            if (foundNames.add(requiredName)) namesToVisit.add(requiredName);
+          }
+        }
+      }
       while (!namesToVisit.isEmpty()) {
         String name = namesToVisit.remove();
         JSUnit providingUnit = project.getUnitProviding(name);
         if (providingUnit == null) {
           remainingNames.add(name);
         } else {
-          unitsInThisProject.add(providingUnit);
-          for (String requiredName: providingUnit.getRequires()) {
-            if (foundNames.add(requiredName)) namesToVisit.add(requiredName);
+          if (unitsInThisProject.add(providingUnit)) {
+            for (String requiredName: providingUnit.getRequires()) {
+              if (foundNames.add(requiredName)) namesToVisit.add(requiredName);
+            }
           }
         }
       }
       namesToVisit = remainingNames;
-      project.sortUnitsByDependencies(unitsInThisProject);
-      results.add(unitsInThisProject);
+      project.sortUnitsByDependencies(unitsInThisProject.asList());
+      results.add(unitsInThisProject.asList());
     }
     
     ArrayList<JSUnit> get() {
       int size = 0;
       for (ArrayList<JSUnit> list: results) size += list.size();
       ArrayList<JSUnit> result = new ArrayList<JSUnit>(size);
-      for (ArrayList<JSUnit> list:results) result.addAll(list);
+      for (int i = results.size() - 1; i >= 0; --i) {
+        result.addAll(results.get(i));
+      }
       return result;
-    }
-    
+    }    
   }
   
   /**
    * Returns the list of units which are required to build {@code unit}, ordered according to
    * their dependencies.  Units from referenced projects are included.
    * @param unit  The unit to look for, which must be in the list of units of the project.
-   * @return  The units required to build {@code unit} ({@code unit} is not included).
+   * @return  The units required to build {@code unit} ({@code unit} is included).
    */
   public List<JSUnit> getSortedDependenciesOf(JSUnit unit) {
-    DependencyBuilder builder = new DependencyBuilder(this, unit);
+    DependencyBuilder builder = new DependencyBuilder(this, Collections.singleton(unit));
     return builder.get();
   }
   
@@ -161,7 +155,7 @@ public abstract class AbstractJSProject {
    * Returns the list of units which are required to build {@code units}, ordered according to
    * their dependencies.  Units from referenced projects are included.
    * @param units  The units to look for, which must be a subset of the units of the project.
-   * @return  The units required to build {@code units} ({@code units} are not included).
+   * @return  The units required to build {@code units} ({@code units} are included).
    */
   public List<JSUnit> getSortedDependenciesOf(Iterable<JSUnit> units) {
     DependencyBuilder builder = new DependencyBuilder(this, units);
