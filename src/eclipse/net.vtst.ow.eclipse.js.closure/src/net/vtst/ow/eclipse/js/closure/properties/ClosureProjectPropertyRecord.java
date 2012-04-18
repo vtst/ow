@@ -47,21 +47,7 @@ public class ClosureProjectPropertyRecord extends Record {
   
   // Linter
   
-  /*
-   * TODO
-   *     - blank_lines_at_top_level: validatesnumber of blank lines between blocks at
-    top level.
-    - indentation: checks correct indentation of code.
-    - well_formed_author: validates the @author JsDoc tags.
-    - no_braces_around_inherit_doc: forbids braces around @inheritdoc JsDoc
-    tags.
-    - braces_around_type: enforces braces around types in JsDoc tags.
-    - optional_type_marker: checks correct use of optional marker = in param
-    types.
-
-   */
-  
-  public static class LinterRecord extends Record {
+  public static class LinterChecksRecord extends Record {
     public StringField customJsdocTags = new StringField("");
     public FlagListField lintErrorChecks = new FlagListField(new String[]{
         "blank_lines_at_top_level", "indentation", "well_formed_author", "no_braces_around_inherit_doc", "braces_around_type", "optional_type_marker"});
@@ -70,7 +56,7 @@ public class ClosureProjectPropertyRecord extends Record {
     public StringField ignoreLintErrors = new StringField("");
   }
   
-  public LinterRecord linter = new LinterRecord();
+  public LinterChecksRecord linterChecks = new LinterChecksRecord();
 
   private static ClosureProjectPropertyRecord instance;
   public static ClosureProjectPropertyRecord getInstance() {
