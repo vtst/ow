@@ -18,6 +18,7 @@ import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.compiler.ClosureCompiler;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -33,8 +34,10 @@ public class ClosureLinterLaunchConfigurationDelegate extends EasyExtProgramLaun
   // TODO: No proper error message if the gjslint command is not correct.
   
   public static final String TYPE_ID = "net.vtst.ow.eclipse.js.closure.launching.linter";
+  // TODO: Need to put a description text in plugin.xml!
+  private static final String PROBLEM = "net.vtst.ow.eclipse.js.closure.linter-error";
 
-  private OwJsClosureMessages messages = OwJsClosurePlugin.getDefault().getMessages();
+  final OwJsClosureMessages messages = OwJsClosurePlugin.getDefault().getMessages();
   private ClosureLinterLaunchConfigurationRecord record = ClosureLinterLaunchConfigurationRecord.getInstance();
   
   class Fixture {}
@@ -79,9 +82,16 @@ public class ClosureLinterLaunchConfigurationDelegate extends EasyExtProgramLaun
     // Files
     for (IFile file: ClosureCompiler.getJavaScriptFiles(resources)) {
       list.add(file.getLocation().toOSString());
+      clearProblemMarkers(file);
     }
     pb.command(list);
     return pb;
+  }
+  
+  private void clearProblemMarkers(IFile file) throws CoreException {
+    for (IMarker marker : file.findMarkers(PROBLEM, false, 0)) {
+      marker.delete();
+    }
   }
   
   static private class PatternMatchListener extends EasyPatternMatchListener {
@@ -89,6 +99,12 @@ public class ClosureLinterLaunchConfigurationDelegate extends EasyExtProgramLaun
     private IFile file = null;
     private Pattern patternForFile = Pattern.compile("----- FILE  :  (.*) -----");
     private Pattern patternForError = Pattern.compile("(Line ([0-9]+), ([^:]*:[^:]*)): (.*)");
+    private String message;
+    
+    private PatternMatchListener() {
+      OwJsClosureMessages messages = OwJsClosurePlugin.getDefault().getMessages();
+      message = messages.getString("ClosureLinterLaunchConfigurationDelegate_problemMarkerMessage");
+    }
     
     @Override
     public void matchFound(PatternMatchEvent event) {
@@ -110,6 +126,7 @@ public class ClosureLinterLaunchConfigurationDelegate extends EasyExtProgramLaun
           String errorMessage = matcherForError.group(4);
           FileLink link = new FileLink(file, null, -1, -1, lineNumber);
           console.addHyperlink(link, offset, matcherForError.group(1).length());
+          addProblemMarker(file, errorCode, errorMessage, lineNumber);
         }
         return;
       }
@@ -122,6 +139,17 @@ public class ClosureLinterLaunchConfigurationDelegate extends EasyExtProgramLaun
         return;
       }
     } 
+    
+    private void addProblemMarker(IFile file, String errorCode, String errorMessage, int lineNumber) {
+      try {
+        IMarker marker = file.createMarker(PROBLEM);
+        marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+        marker.setAttribute(IMarker.MESSAGE, String.format(message, errorCode, errorMessage));
+        marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+      } catch (CoreException e) {
+        e.printStackTrace();
+      }
+    }
     
     @Override
     public String getPattern() {

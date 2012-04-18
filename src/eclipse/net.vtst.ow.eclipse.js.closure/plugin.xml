@@ -43,9 +43,14 @@
     </javaCompletionProposalComputer>
   </extension>
   
-  <extension id="compiler-error" point="org.eclipse.core.resources.markers">
+  <extension point="org.eclipse.core.resources.markers" id="compiler-error">
     <super type="org.eclipse.core.resources.problemmarker"/>
     <persistent value="true"/>
+  </extension>  
+
+  <extension point="org.eclipse.core.resources.markers" id="linter-error">
+    <super type="org.eclipse.core.resources.problemmarker"/>
+    <persistent value="false"/>
   </extension>  
   
   <!-- ******************************************************************** -->
