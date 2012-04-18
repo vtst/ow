@@ -49,7 +49,7 @@
   </extension>  
   
   <!-- ******************************************************************** -->
-  <!-- Launch configuration for Closure compiler                            -->
+  <!-- Launch configuration for Closure Compiler                            -->
   
   <extension point="org.eclipse.debug.core.launchConfigurationTypes">
     <launchConfigurationType
@@ -83,6 +83,68 @@
         id="net.vtst.ow.eclipse.js.closure.launching.compiler.shortcut"
         class="net.vtst.ow.eclipse.js.closure.launching.compiler.ClosureCompilerLaunchShortcut"
         label="%closure_compiler_launch_configuration"
+        icon="icons/16x16/closure.png"
+        modes="run, debug">
+         <contextualLaunch>
+           <enablement>
+             <with variable="selection">
+               <count value="1"/>
+               <iterate>
+                 <or>
+                   <and>
+                     <instanceof value="org.eclipse.core.resources.IFile"/>
+                     <or>
+                       <test property="org.eclipse.debug.ui.matchesPattern" value="%js_file_pattern"/>
+                       <test property="org.eclipse.debug.ui.matchesContentType" value="org.eclipse.wst.jsdt.core.jsSource"/>
+                     </or>
+                   </and>
+                   <and>
+                     <instanceof value="org.eclipse.core.resources.IProject"/>
+                     <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.wst.jsdt.core.jsNature"/>
+                   </and>
+                </or>
+               </iterate>
+             </with>
+           </enablement>
+       </contextualLaunch>
+     </shortcut>
+  </extension>
+
+  <!-- ******************************************************************** -->
+  <!-- Launch configuration for Closure Linter                              -->
+  
+  <extension point="org.eclipse.debug.core.launchConfigurationTypes">
+    <launchConfigurationType
+        name="%closure_linter_launch_configuration"
+        delegate="net.vtst.ow.eclipse.js.closure.launching.compiler.ClosureCompilerLaunchConfigurationDelegate"
+        modes="run, debug"               
+        id="net.vtst.ow.eclipse.js.closure.launching.linter">        
+    </launchConfigurationType>
+  </extension>
+  
+  <extension point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+    <!-- If you change the icon, change it in the shortcut too! -->
+    <!-- Image to be changed -->
+    <launchConfigurationTypeImage
+        icon="icons/16x16/closure.png"
+        configTypeID="net.vtst.ow.eclipse.js.closure.launching.linter"
+        id="net.vtst.ow.eclipse.js.closure.launching.linter.image">
+    </launchConfigurationTypeImage>
+  </extension>
+  
+  <extension point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+    <launchConfigurationTabGroup
+        type="net.vtst.ow.eclipse.js.closure.launching.linter"
+        class="net.vtst.ow.eclipse.js.closure.launching.linter.ClosureLinterTabGroup"
+        id="net.vtst.ow.eclipse.js.closure.launching.linter.tabgroup">
+    </launchConfigurationTabGroup>
+  </extension>
+  
+  <extension point="org.eclipse.debug.ui.launchShortcuts">
+    <shortcut
+        id="net.vtst.ow.eclipse.js.closure.launching.linter.shortcut"
+        class="net.vtst.ow.eclipse.js.closure.launching.linter.ClosureLinterLaunchShortcut"
+        label="%closure_linter_launch_configuration"
         icon="icons/16x16/closure.png"
         modes="run, debug">
          <contextualLaunch>
@@ -147,6 +209,20 @@
       category="net.vtst.ow.eclipse.js.closure.properties.ClosureMainConfigurationPropertyPage"
       id="net.vtst.ow.eclipse.js.closure.properties.ClosureCompilerChecksPropertyPage"
       name="%closure_compiler_checks_property_page"
+      nameFilter="*">
+      <!-- The property page is enabled for all projects having the jsNature, because
+           it is used to enable or disable the closure nature. -->
+      <enabledWhen>
+        <adapt type="org.eclipse.core.resources.IProject">
+          <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.wst.jsdt.core.jsNature"/>
+        </adapt>
+      </enabledWhen>
+    </page>
+    <page
+      class="net.vtst.ow.eclipse.js.closure.properties.ClosureLinterChecksPropertyPage"
+      category="net.vtst.ow.eclipse.js.closure.properties.ClosureMainConfigurationPropertyPage"
+      id="net.vtst.ow.eclipse.js.closure.properties.ClosureLinterChecksPropertyPage"
+      name="%closure_linter_property_page"
       nameFilter="*">
       <!-- The property page is enabled for all projects having the jsNature, because
            it is used to enable or disable the closure nature. -->
