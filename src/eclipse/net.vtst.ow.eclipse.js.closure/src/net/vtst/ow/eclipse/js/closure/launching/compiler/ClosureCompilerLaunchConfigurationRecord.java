@@ -11,7 +11,6 @@ import net.vtst.eclipse.easy.ui.properties.fields.ResourceListField.Or;
 import net.vtst.eclipse.easy.ui.properties.fields.ResourceListField.ProjectNature;
 import net.vtst.eclipse.easy.ui.properties.fields.ResourceListField.ResourceType;
 import net.vtst.eclipse.easy.ui.properties.fields.StringField;
-import net.vtst.eclipse.easy.ui.properties.fields.StringOptionsField;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.builder.ClosureNature;
 import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPropertyRecord;
@@ -29,13 +28,16 @@ public class ClosureCompilerLaunchConfigurationRecord extends Record {
   }
   
   // Inputs and output
+  
+  public static ResourceListField.IFilter<IResource> getJavaScriptResourceFilter() {
+    return new Or<IResource>(
+        new ProjectNature<IResource>(ClosureNature.NATURE_ID),
+        new ResourceType<IResource>(IFolder.class),
+        new FileType<IResource>(Pattern.compile(".*\\.js"), Platform.getContentTypeManager().getContentType(OwJsClosurePlugin.JS_CONTENT_TYPE_ID)));
+  }
 
   public ResourceListField<IResource> inputResources = 
-      new ResourceListField<IResource>(IResource.class, new Or<IResource>(
-          new ProjectNature<IResource>(ClosureNature.NATURE_ID),
-          new ResourceType<IResource>(IFolder.class),
-          new FileType<IResource>(Pattern.compile(".*\\.js"), Platform.getContentTypeManager().getContentType(OwJsClosurePlugin.JS_CONTENT_TYPE_ID))
-          ));
+      new ResourceListField<IResource>(IResource.class, getJavaScriptResourceFilter());
   public BooleanField manageClosureDependencies = new BooleanField(true);
   public StringField outputFile = new StringField("");
   public BooleanField useDefaultOutputFile = new BooleanField(true);
