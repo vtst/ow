@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.vtst.ow.closure.compiler.deps.JSExtern;
 import net.vtst.ow.closure.compiler.deps.JSUnit;
 import net.vtst.ow.closure.compiler.magic.MagicCompiler;
 import net.vtst.ow.closure.compiler.magic.MagicScopeCreator;
@@ -46,6 +47,7 @@ public class CompilerRun {
 
   private String moduleName;
   private List<JSUnit> sortedUnits;
+  private Collection<JSExtern> externs;
   private Collection<JSUnit> entryPoints;
   private boolean stripIncludedFiles;
   private Map<JSUnit, Long> lastModifiedMapForFullCompile;
@@ -61,9 +63,10 @@ public class CompilerRun {
    */
   public CompilerRun(
       String moduleName, CompilerOptions options, ErrorManager errorManager, 
-      List<JSUnit> sortedUnits, Collection<JSUnit> entryPoints, boolean stripIncludedFiles) {
+      Collection<JSExtern> externs, List<JSUnit> sortedUnits, Collection<JSUnit> entryPoints, boolean stripIncludedFiles) {
     this.moduleName = moduleName;
     this.options = options;
+    this.externs = externs;
     this.sortedUnits = sortedUnits;
     this.entryPoints = entryPoints;
     this.stripIncludedFiles = stripIncludedFiles; 
@@ -124,7 +127,7 @@ public class CompilerRun {
     // compiler.compileModules(
     //   Collections.<SourceFile> emptyList(), Lists.newArrayList(DefaultExternsProvider.getAsModule(), module), options);
     // but this would be less efficient.
-    MagicCompiler.compile(compiler, DefaultExternsProvider.getAsCompilerInputs(), module, options);
+    MagicCompiler.compile(compiler, getExternsAsCompilerInputs(), module, options);
     scopeCreator = new MagicScopeCreator(compiler);
   }
   
@@ -135,6 +138,12 @@ public class CompilerRun {
       if (lastModified == null || lastModified.longValue() < unit.lastModified()) return true;
     }
     return false;
+  }
+  
+  private List<CompilerInput> getExternsAsCompilerInputs() {
+    ArrayList<CompilerInput> result = new ArrayList<CompilerInput>(externs.size());
+    for (JSExtern extern: externs) result.add(new CompilerInput(extern.getClone(false), false));
+    return result;
   }
   
   // **************************************************************************

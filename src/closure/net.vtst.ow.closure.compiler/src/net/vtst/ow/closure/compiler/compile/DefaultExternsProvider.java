@@ -2,6 +2,7 @@ package net.vtst.ow.closure.compiler.compile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,7 +34,16 @@ public class DefaultExternsProvider {
     for (AstFactory astFactory: externs) module.add(new CompilerInput(astFactory.getClone(false)));
     return module;
   }
-  
+
+
+  /**
+   * Get the default externs as a list of {@code JSExtern}.
+   */
+  public static List<JSExtern> getAsJSExterns() {
+    if (externs == null) initialize();
+    return externs;
+  }
+
   /**
    * @return  the externs as a list of {@code CompilerInput}.
    */

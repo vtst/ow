@@ -63,7 +63,7 @@ public class CompilableJSUnit extends JSUnit {
     List<JSUnit> orderedUnits = updateAndGetOrderedUnits();
     if (force || run == null || run.hasChanged(orderedUnits)) {
       CompilerRun newRun = new CompilerRun(
-          this.getName(), options, errorManager, 
+          this.getName(), options, errorManager, DefaultExternsProvider.getAsJSExterns(),
           orderedUnits, Collections.<JSUnit>singleton(this), stripIncludedFiles);
       run = newRun;  // This is atomic
       return newRun;    
