@@ -31,8 +31,6 @@ import org.eclipse.ui.console.PatternMatchEvent;
 
 public class ClosureLinterLaunchConfigurationDelegate extends EasyExtProgramLaunchConfigurationDelegate<ClosureLinterLaunchConfigurationDelegate.Fixture> {
   
-  // TODO: No proper error message if the gjslint command is not correct.
-  
   public static final String TYPE_ID = "net.vtst.ow.eclipse.js.closure.launching.linter";
   private static final String PROBLEM = "net.vtst.ow.eclipse.js.closure.linter-error";
 
