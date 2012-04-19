@@ -2,6 +2,10 @@ package net.vtst.ow.closure.compiler.util;
 
 import net.vtst.ow.closure.compiler.deps.JSUnitProvider;
 
+/**
+ * Keep track of the last modification file of a compilation unit provider.
+ * @author Vincent Simonet
+ */
 public class TimestampKeeper {
   
   private JSUnitProvider.IProvider provider;

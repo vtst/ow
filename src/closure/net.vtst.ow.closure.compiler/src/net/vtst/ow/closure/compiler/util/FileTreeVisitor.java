@@ -1,6 +1,5 @@
 package net.vtst.ow.closure.compiler.util;
 
-
 /**
  * Visitor for a library tree.
  * @author Vincent Simonet

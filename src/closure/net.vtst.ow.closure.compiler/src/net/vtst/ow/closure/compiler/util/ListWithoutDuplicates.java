@@ -5,6 +5,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 
+/**
+ * A list, which ignores addings of elements which are already in the list.
+ * De-duping is performed thanks to a hash set.
+ * @author Vincent Simonet
+ *
+ * @param <T>  The type of the elements of the list.
+ */
 public class ListWithoutDuplicates<T> {
 
   private ArrayList<T> list;
