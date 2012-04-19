@@ -3,10 +3,10 @@ package net.vtst.ow.eclipse.js.closure;
 import java.net.URL;
 import java.util.logging.Level;
 
+import net.vtst.ow.eclipse.js.closure.builder.JSIncludesProviderForBuilder;
 import net.vtst.ow.eclipse.js.closure.builder.JavaScriptEditorRegistry;
 import net.vtst.ow.eclipse.js.closure.builder.ProjectOrderManager;
-import net.vtst.ow.eclipse.js.closure.compiler.IJSLibraryProvider;
-import net.vtst.ow.eclipse.js.closure.launching.compiler.JSLibraryProviderForBuilder;
+import net.vtst.ow.eclipse.js.closure.compiler.IJSIncludesProvider;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
@@ -32,7 +32,7 @@ public class OwJsClosurePlugin extends AbstractUIPlugin {
 	private static OwJsClosurePlugin plugin;
 	private JavaScriptEditorRegistry editorRegistry;
   private OwJsClosureMessages messages;
-  private JSLibraryProviderForBuilder jsLibraryProviderForClosureBuilder;
+  private JSIncludesProviderForBuilder jsLibraryProviderForClosureBuilder;
   private ProjectOrderManager projectOrderManager;
 	
 	/**
@@ -50,7 +50,7 @@ public class OwJsClosurePlugin extends AbstractUIPlugin {
     plugin = this;
     editorRegistry = new JavaScriptEditorRegistry(getWorkbench());
     messages = new OwJsClosureMessages();
-    jsLibraryProviderForClosureBuilder = new JSLibraryProviderForBuilder();
+    jsLibraryProviderForClosureBuilder = new JSIncludesProviderForBuilder();
     projectOrderManager = new ProjectOrderManager();
     ResourcesPlugin.getWorkspace().addResourceChangeListener(projectOrderManager);  // TODO: Add int arg?
     Compiler.setLoggingLevel(Level.OFF);
@@ -71,7 +71,7 @@ public class OwJsClosurePlugin extends AbstractUIPlugin {
 	  return editorRegistry;
 	}
 	
-	public IJSLibraryProvider getJSLibraryProviderForClosureBuilder() {
+	public IJSIncludesProvider getJSLibraryProviderForClosureBuilder() {
 	  return jsLibraryProviderForClosureBuilder;
 	}
 	

@@ -169,15 +169,15 @@ public class ClosureCompiler {
   
   
   private static void addJSLibraries(
-      IJSLibraryProvider provider, AbstractCompiler compiler, IProgressMonitor monitor,
+      IJSIncludesProvider provider, AbstractCompiler compiler, IProgressMonitor monitor,
       IReadOnlyStore store, ListWithoutDuplicates<AbstractJSProject> result) throws CoreException {
     File pathOfClosureBase = getPathOfClosureBase(store);
     if (pathOfClosureBase != null) {
-      result.add(provider.get(compiler, pathOfClosureBase, pathOfClosureBase));
+      result.add(provider.getLibrary(compiler, pathOfClosureBase, pathOfClosureBase));
     }
     for (File libraryPath: ClosureProjectPropertyRecord.getInstance().includes.otherLibraries.get(store)) {
       if (monitor != null) Utils.checkCancel(monitor);
-      result.add(provider.get(compiler, libraryPath, pathOfClosureBase));
+      result.add(provider.getLibrary(compiler, libraryPath, pathOfClosureBase));
     }
   }
 
@@ -192,7 +192,7 @@ public class ClosureCompiler {
    * @throws CoreException
    */
   public static List<AbstractJSProject> getJSLibraries(
-      IJSLibraryProvider provider, AbstractCompiler compiler, IProgressMonitor monitor,
+      IJSIncludesProvider provider, AbstractCompiler compiler, IProgressMonitor monitor,
       ArrayList<IProject> projects) throws CoreException {
     ListWithoutDuplicates<AbstractJSProject> result = new ListWithoutDuplicates<AbstractJSProject>();
     for (int i = projects.size() - 1; i >= 0; --i) {
@@ -203,7 +203,7 @@ public class ClosureCompiler {
     return result.asList();
   }
   
-  public static List<AbstractJSProject> getJSLibraries(IJSLibraryProvider provider, AbstractCompiler compiler, IProgressMonitor monitor,
+  public static List<AbstractJSProject> getJSLibraries(IJSIncludesProvider provider, AbstractCompiler compiler, IProgressMonitor monitor,
       IReadOnlyStore store) throws CoreException {
     ListWithoutDuplicates<AbstractJSProject> result = new ListWithoutDuplicates<AbstractJSProject>();
     addJSLibraries(provider, compiler, monitor, store, result);

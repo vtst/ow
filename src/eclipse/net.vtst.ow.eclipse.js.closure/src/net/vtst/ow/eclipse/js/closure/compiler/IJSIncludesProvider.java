@@ -7,11 +7,10 @@ import net.vtst.ow.closure.compiler.deps.JSLibrary;
 import com.google.javascript.jscomp.AbstractCompiler;
 
 /**
- * Interface for a provider of JavaScript library.  Implementations may cache the libraries
- * or not.
+ * Interface for providing JavaScript includes, which may be libraries or externs.
  * @author Vincent Simonet
  */
-public interface IJSLibraryProvider {
+public interface IJSIncludesProvider {
 
   /**
    * Get a library from the provider.
@@ -21,7 +20,7 @@ public interface IJSLibraryProvider {
    * @param isClosureBase  Whether this library is the closure base library.
    * @return  The library.
    */
-  public JSLibrary get(AbstractCompiler compiler, File libraryPath, File pathOfClosureBase);
+  public JSLibrary getLibrary(AbstractCompiler compiler, File libraryPath, File pathOfClosureBase);
 
   /**
    * Clear any cached data of the provider.

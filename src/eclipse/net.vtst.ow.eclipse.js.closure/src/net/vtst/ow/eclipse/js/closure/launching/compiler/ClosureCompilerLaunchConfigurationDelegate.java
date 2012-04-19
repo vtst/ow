@@ -26,7 +26,6 @@ import net.vtst.ow.eclipse.js.closure.OwJsClosureMessages;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.compiler.ClosureCompiler;
 import net.vtst.ow.eclipse.js.closure.compiler.ClosureCompilerOptions;
-import net.vtst.ow.eclipse.js.closure.compiler.JSLibraryProviderForLaunch;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -97,14 +96,14 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
       Comparator<IProject> comparator = OwJsClosurePlugin.getDefault().getProjectOrderManager().get().reverseOrderComparator();
       ArrayList<IProject> allProjects = ClosureCompiler.getReferencedJavaScriptProjectsRecursively(projects, comparator);
       monitor.subTask(messages.getString("ClosureCompilerLaunchConfigurationDelegate_loadLibraries"));
-      libraries = ClosureCompiler.getJSLibraries(new JSLibraryProviderForLaunch(), compiler, monitor, allProjects);
+      libraries = ClosureCompiler.getJSLibraries(new JSIncludesProviderForLaunch(), compiler, monitor, allProjects);
       monitor.subTask(messages.getString("ClosureCompilerLaunchConfigurationDelegate_prepareCompiler"));
       allFiles = ClosureCompiler.getJavaScriptFiles(allProjects);
       rootFiles = ClosureCompiler.getJavaScriptFiles(resources);
     } else {
       // If dependencies are not managed, we take only what has been selected.
       monitor.subTask(messages.getString("ClosureCompilerLaunchConfigurationDelegate_loadLibraries"));
-      libraries = ClosureCompiler.getJSLibraries(new JSLibraryProviderForLaunch(), compiler, monitor, storeForIncludes);
+      libraries = ClosureCompiler.getJSLibraries(new JSIncludesProviderForLaunch(), compiler, monitor, storeForIncludes);
       monitor.subTask(messages.getString("ClosureCompilerLaunchConfigurationDelegate_prepareCompiler"));
       allFiles = ClosureCompiler.getJavaScriptFiles(resources);
       rootFiles = allFiles;

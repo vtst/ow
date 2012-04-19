@@ -1,4 +1,4 @@
-package net.vtst.ow.eclipse.js.closure.launching.compiler;
+package net.vtst.ow.eclipse.js.closure.builder;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -8,7 +8,7 @@ import net.vtst.eclipse.easy.ui.properties.stores.IStore;
 import net.vtst.eclipse.easy.ui.properties.stores.PluginPreferenceStore;
 import net.vtst.ow.closure.compiler.deps.JSLibrary;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
-import net.vtst.ow.eclipse.js.closure.compiler.IJSLibraryProvider;
+import net.vtst.ow.eclipse.js.closure.compiler.IJSIncludesProvider;
 import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
 
 import org.eclipse.core.runtime.CoreException;
@@ -17,13 +17,13 @@ import com.google.javascript.jscomp.AbstractCompiler;
 
 /**
  * Registry of JavaScript libraries, which cache created libraries.  The cached libraries
- * are kept with references, so that they can be garbage collected if no more project uses
+ * are kept with weak references, so that they can be garbage collected if no more project uses
  * them.
  * <br>
  * <b>Thread safety:</b> This class is thread safe, as it uses a concurrent hash map.
  * @author Vincent Simonet
  */
-public class JSLibraryProviderForBuilder implements IJSLibraryProvider {
+public class JSIncludesProviderForBuilder implements IJSIncludesProvider {
   
   // **************************************************************************
   // Cache of libraries
@@ -75,7 +75,7 @@ public class JSLibraryProviderForBuilder implements IJSLibraryProvider {
    * @param isClosureBase
    * @return
    */
-  public JSLibrary get(AbstractCompiler compiler, File libraryPath, File pathOfClosureBase) {
+  public JSLibrary getLibrary(AbstractCompiler compiler, File libraryPath, File pathOfClosureBase) {
     LibraryKey key = new LibraryKey(libraryPath, pathOfClosureBase);
     JSLibrary library = get(key);
     if (library == null) {

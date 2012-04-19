@@ -22,7 +22,7 @@ import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.compiler.ClosureCompiler;
 import net.vtst.ow.eclipse.js.closure.compiler.ClosureCompilerOptions;
 import net.vtst.ow.eclipse.js.closure.compiler.ErrorManagerGeneratingProblemMarkers;
-import net.vtst.ow.eclipse.js.closure.compiler.IJSLibraryProvider;
+import net.vtst.ow.eclipse.js.closure.compiler.IJSIncludesProvider;
 import net.vtst.ow.eclipse.js.closure.dev.OwJsDev;
 import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
 import net.vtst.ow.eclipse.js.closure.util.Utils;
@@ -57,7 +57,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
   
   public static final String BUILDER_ID = "net.vtst.ow.eclipse.js.closure.closureBuilder";
   
-  private IJSLibraryProvider jsLibraryProvider = OwJsClosurePlugin.getDefault().getJSLibraryProviderForClosureBuilder();
+  private IJSIncludesProvider jsLibraryProvider = OwJsClosurePlugin.getDefault().getJSLibraryProviderForClosureBuilder();
   private OwJsClosureMessages messages = OwJsClosurePlugin.getDefault().getMessages();
   private ProjectOrderManager projectOrderManager = OwJsClosurePlugin.getDefault().getProjectOrderManager();
   
