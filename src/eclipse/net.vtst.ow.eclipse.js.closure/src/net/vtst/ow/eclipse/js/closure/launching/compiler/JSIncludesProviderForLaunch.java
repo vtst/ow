@@ -7,6 +7,7 @@ import net.vtst.eclipse.easy.ui.properties.stores.PluginPreferenceStore;
 import net.vtst.ow.closure.compiler.deps.JSExtern;
 import net.vtst.ow.closure.compiler.deps.JSLibrary;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
+import net.vtst.ow.eclipse.js.closure.compiler.AbstractJSIncludesProvider;
 import net.vtst.ow.eclipse.js.closure.compiler.IJSIncludesProvider;
 import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
 
@@ -14,7 +15,7 @@ import org.eclipse.core.runtime.CoreException;
 
 import com.google.javascript.jscomp.AbstractCompiler;
 
-public class JSIncludesProviderForLaunch implements IJSIncludesProvider {
+public class JSIncludesProviderForLaunch extends AbstractJSIncludesProvider {
 
   public JSLibrary getLibrary(AbstractCompiler compiler, File libraryPath, File pathOfClosureBase) {
     JSLibrary library = new JSLibrary(libraryPath, pathOfClosureBase, getCacheSettingsFromPreferences());

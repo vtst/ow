@@ -15,6 +15,7 @@ import net.vtst.eclipse.easy.ui.properties.stores.IStore;
 import net.vtst.eclipse.easy.ui.properties.stores.PluginPreferenceStore;
 import net.vtst.eclipse.easy.ui.properties.stores.ProjectPropertyStore;
 import net.vtst.ow.closure.compiler.deps.AbstractJSProject;
+import net.vtst.ow.closure.compiler.deps.JSExtern;
 import net.vtst.ow.closure.compiler.util.ListWithoutDuplicates;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.builder.ClosureNature;
@@ -166,50 +167,6 @@ public class ClosureCompiler {
     Collections.sort(referencedProjects, comparator);
     return referencedProjects;
   }
-  
-  
-  private static void addJSLibraries(
-      IJSIncludesProvider provider, AbstractCompiler compiler, IProgressMonitor monitor,
-      IReadOnlyStore store, ListWithoutDuplicates<AbstractJSProject> result) throws CoreException {
-    File pathOfClosureBase = getPathOfClosureBase(store);
-    if (pathOfClosureBase != null) {
-      result.add(provider.getLibrary(compiler, pathOfClosureBase, pathOfClosureBase));
-    }
-    for (File libraryPath: ClosureProjectPropertyRecord.getInstance().includes.otherLibraries.get(store)) {
-      if (monitor != null) Utils.checkCancel(monitor);
-      result.add(provider.getLibrary(compiler, libraryPath, pathOfClosureBase));
-    }
-  }
-
-  /**
-   * Returns the list of libraries which are imported from a given list of projects.
-   * @param provider  The library provider.
-   * @param compiler  The compiler to which errors are reported.
-   * @param monitor  A progress monitor, which is checked for cancellation (may be {@code null}).
-   * @param projects  The projects to scan.
-   * @return The list of libraries, in the order of the projects which require them.  If the
-   *   same library is required by several projects, the last wins.
-   * @throws CoreException
-   */
-  public static List<AbstractJSProject> getJSLibraries(
-      IJSIncludesProvider provider, AbstractCompiler compiler, IProgressMonitor monitor,
-      ArrayList<IProject> projects) throws CoreException {
-    ListWithoutDuplicates<AbstractJSProject> result = new ListWithoutDuplicates<AbstractJSProject>();
-    for (int i = projects.size() - 1; i >= 0; --i) {
-      addJSLibraries(
-          provider, compiler, monitor, 
-          new ProjectPropertyStore(projects.get(i), OwJsClosurePlugin.PLUGIN_ID), result);
-    }
-    return result.asList();
-  }
-  
-  public static List<AbstractJSProject> getJSLibraries(IJSIncludesProvider provider, AbstractCompiler compiler, IProgressMonitor monitor,
-      IReadOnlyStore store) throws CoreException {
-    ListWithoutDuplicates<AbstractJSProject> result = new ListWithoutDuplicates<AbstractJSProject>();
-    addJSLibraries(provider, compiler, monitor, store, result);
-    return result.asList();
-  }
-
   
   /**
    * Returns the common project of a set of resources.

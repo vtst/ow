@@ -309,7 +309,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
     OwJsDev.log("Updating referenced projects of: %s", project.getName());
     ArrayList<IProject> projects = ClosureCompiler.getReferencedJavaScriptProjectsRecursively(
         Collections.singleton(project), projectOrderState.reverseOrderComparator());
-    Collection<AbstractJSProject> libraries = ClosureCompiler.getJSLibraries(jsLibraryProvider, compiler, monitor, projects);
+    Collection<AbstractJSProject> libraries = jsLibraryProvider.getLibraries(compiler, monitor, projects);
     ArrayList<AbstractJSProject> referencedProjects = new ArrayList<AbstractJSProject>(projects.size() + libraries.size());
     for (IProject referencedProject: projects) referencedProjects.add(ResourceProperties.getOrCreateJSProject(referencedProject));
     referencedProjects.addAll(libraries);
