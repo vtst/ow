@@ -1,15 +1,12 @@
 package net.vtst.ow.eclipse.js.closure.compiler;
 
 import net.vtst.eclipse.easy.ui.properties.stores.IReadOnlyStore;
-import net.vtst.eclipse.easy.ui.properties.stores.LaunchConfigurationReadOnlyStore;
 import net.vtst.eclipse.easy.ui.properties.stores.ProjectPropertyStore;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.launching.compiler.ClosureCompilerLaunchConfigurationRecord;
-import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPropertyRecord;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.debug.core.ILaunchConfiguration;
 
 import com.google.javascript.jscomp.ClosureCodingConvention;
 import com.google.javascript.jscomp.CompilationLevel;
