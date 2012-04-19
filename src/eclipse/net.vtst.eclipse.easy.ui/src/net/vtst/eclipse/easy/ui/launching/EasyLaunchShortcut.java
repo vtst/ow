@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.ILaunchShortcut;
@@ -131,6 +132,18 @@ public abstract class EasyLaunchShortcut<Selection> implements ILaunchShortcut {
   protected ILaunchConfiguration adaptLaunchConfiguration(ILaunchConfiguration config, Selection selection, String mode) throws CoreException {
     return config;
   }
+  
+  /**
+   * Helper function to cast a launch configuration as a working copy.
+   * @param config  The launch configuration to cast.
+   * @return  The casted configuration, or a copy of it.
+   * @throws CoreException
+   */
+  protected static ILaunchConfigurationWorkingCopy castILaunchConfigurationAsWorkingCopy(ILaunchConfiguration config) throws CoreException {
+    if (config instanceof ILaunchConfigurationWorkingCopy) return (ILaunchConfigurationWorkingCopy) config;
+    return config.getWorkingCopy();
+  }
+
   
   /**
    * Get the launch configuration adapted to launch a selection.  The default implementation
