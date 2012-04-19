@@ -83,6 +83,10 @@ public class JSUnitProvider {
     
   }
   
+  /**
+   * Compilation unit provider for a library file.
+   * Depending on the cache mode, it will read and/or generate a stripped version of the file.
+   */
   public static class FromLibraryFile extends FromFile {
     
     private static final String EXTENSION_FOR_STRIPPED_FILES = ".ow";
