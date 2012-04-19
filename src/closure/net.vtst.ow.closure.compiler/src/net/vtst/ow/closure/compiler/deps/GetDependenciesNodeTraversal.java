@@ -4,11 +4,8 @@ import java.util.Collection;
 
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CodingConvention;
-import com.google.javascript.jscomp.DiagnosticType;
-import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.NodeTraversal;
 import com.google.javascript.rhino.Node;
-import com.google.javascript.rhino.Token;
 
 /**
  * A node traversal to get the dependencies specified in the goog.require and goog.provide
@@ -16,17 +13,6 @@ import com.google.javascript.rhino.Token;
  * @author Vincent Simonet
  */
 public class GetDependenciesNodeTraversal extends NodeTraversal {
-
-  public static final String GOOG_PROVIDE = "goog.provide";
-  private static final String GOOG_REQUIRE = "goog.require";
-  
-  static final DiagnosticType WRONG_NUMBER_OF_ARGUMENTS = DiagnosticType.warning(
-      "OW_GOOG_DIRECTIVE_WRONG_NUMBER_OF_ARGUMENTS",
-      "{0} expects exactly one argument");
-
-  static final DiagnosticType WRONG_ARGUMENT_TYPE = DiagnosticType.warning(
-      "OW_GOOG_DIRECTIVE_WRONG_ARGUMENT_TYPE",
-      "{0} expects a string literal as argument");
 
   
   /* The typical structure of a root node is: 
@@ -50,7 +36,6 @@ public class GetDependenciesNodeTraversal extends NodeTraversal {
   
   private static class Callback implements NodeTraversal.Callback {
     
-    private AbstractCompiler compiler;
     private CodingConvention codingConvention;
     private Collection<String> providedNames;
     private Collection<String> requiredNames;
@@ -59,50 +44,22 @@ public class GetDependenciesNodeTraversal extends NodeTraversal {
         AbstractCompiler compiler, 
         Collection<String> providedNames, 
         Collection<String> requiredNames) {
-      this.compiler = compiler;
       this.providedNames = providedNames;
       this.requiredNames = requiredNames;
       this.codingConvention = compiler.getCodingConvention();
     }
 
-    // TODO: Re-implement using the coding convention.
     @Override
+    // This code is inspired from CompilerInput.DepsFinder
     public boolean shouldTraverse(NodeTraversal traversal, Node node, Node parent) {
-      switch (node.getType()) {
-      case Token.BLOCK:
-      case Token.SCRIPT:
-      case Token.EXPR_RESULT:
-        return true;
-      case Token.CALL:
-        String callee = node.getFirstChild().getQualifiedName();
-        if (GOOG_REQUIRE.equals(callee)) {
-          if (node.getChildCount() != 2) {
-            compiler.report(JSError.make(node.getSourceFileName(), node, WRONG_NUMBER_OF_ARGUMENTS, GOOG_REQUIRE));
-            return false;
-          }
-          Node argument = node.getChildAtIndex(1);
-          if (argument.getType() == Token.STRING) {
-            requiredNames.add(argument.getString());
-          } else {
-            compiler.report(JSError.make(node.getSourceFileName(), node, WRONG_ARGUMENT_TYPE, GOOG_REQUIRE));
-            return false;            
-          }
-        } else if (GOOG_PROVIDE.equals(callee)) {
-          if (node.getChildCount() != 2) {
-            compiler.report(JSError.make(node.getSourceFileName(), node, WRONG_NUMBER_OF_ARGUMENTS, GOOG_PROVIDE));
-            return false;
-          }
-          Node argument = node.getChildAtIndex(1);
-          if (argument.getType() == Token.STRING) {
-            providedNames.add(argument.getString());
-          } else {
-            compiler.report(JSError.make(node.getSourceFileName(), node, WRONG_ARGUMENT_TYPE, GOOG_PROVIDE));
-            return false;            
-          }
-        }
+      if (node.isCall()) {
+        String require = codingConvention.extractClassNameIfRequire(node, parent);
+        if (require != null) requiredNames.add(require);
+        String provide = codingConvention.extractClassNameIfProvide(node, parent);
+        if (provide != null) providedNames.add(provide);
         return false;
-      default:
-        return false;
+      } else {
+        return (parent == null || parent.isExprResult() || parent.isScript());
       }
     }
 
