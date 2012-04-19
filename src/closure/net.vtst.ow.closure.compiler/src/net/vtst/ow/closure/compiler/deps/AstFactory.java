@@ -9,7 +9,7 @@ import com.google.javascript.rhino.InputId;
 import com.google.javascript.rhino.Node;
 
 /**
- * This class extends {@code JsAst} by allowing clones of the AST to be generated without
+ * This class extends {@code StrippableJsAst} by allowing clones of the AST to be generated without
  * re-parsing the source file if it has not been modified. <br/>
  * Instances of this class should never be passed to a compiler if their clones are used!
  * 
@@ -17,7 +17,6 @@ import com.google.javascript.rhino.Node;
  */
 public class AstFactory extends StrippableJsAst {
   private static final long serialVersionUID = 1L;
-  private Node strippedRoot;
   
   public AstFactory(SourceFile sourceFile) {
     super(sourceFile);
@@ -25,7 +24,6 @@ public class AstFactory extends StrippableJsAst {
   
   public void clearAst() {
     super.clearAst();
-    this.strippedRoot = null;
   }
 
   public JsAst getClone(boolean stripped) {
