@@ -6,6 +6,11 @@ import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
 
+/**
+ * A callback function that strips the contents of functions, except constructors.
+ * This callback is used in {@code StripCompilerPass} and in {@code StrippableJsAst}.
+ * @author Vincent Simonet
+ */
 public class StripNodeTraversalCallback implements NodeTraversal.Callback {
 
   @Override
