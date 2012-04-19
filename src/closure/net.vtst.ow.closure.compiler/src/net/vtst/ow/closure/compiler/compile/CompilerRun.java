@@ -144,7 +144,8 @@ public class CompilerRun {
    * Run a fast compilation
    */
   public synchronized void fastCompile() {
-    // TODO: What happens if one of the units has been deleted?
+    // This should work even if one of the unit has been deleted, because in that case
+    // its provider will return an empty source code.
     for (JSUnit unit: sortedUnits) {
       long current = unit.lastModified();
       Long previous = lastModifiedMapForFastCompile.get(unit);
