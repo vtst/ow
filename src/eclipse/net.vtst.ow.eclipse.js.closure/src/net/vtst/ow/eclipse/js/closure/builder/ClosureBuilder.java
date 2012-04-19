@@ -110,7 +110,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
     boolean forgetIfCanceled = true;
     try {
       Compiler compiler = CompilerUtils.makeCompiler(new NullErrorManager());  // TODO!
-      compiler.initOptions(CompilerUtils.makeOptions());
+      compiler.initOptions(CompilerUtils.makeOptionsForParsingAndErrorReporting());
       File pathOfClosureBase = ClosureCompiler.getPathOfClosureBase(project);
       if (pathOfClosureBase == null) {
         monitor.worked(1);

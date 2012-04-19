@@ -34,7 +34,7 @@ public class JSFileStripper {
   
   public void setupCompiler(Writer writer) {
     compiler = CompilerUtils.makeCompiler(errorManager);
-    options = CompilerUtils.makeOptions();
+    options = CompilerUtils.makeOptionsForParsingAndErrorReporting();
     stripCompilerPass = new StripCompilerPass(compiler, writer);
     CompilerUtils.addCustomCompilerPass(options, stripCompilerPass, CustomPassExecutionTime.BEFORE_OPTIMIZATIONS);
   }

@@ -72,7 +72,7 @@ public class MainForDebug {
 //        module.add(new CompilerInput(JSSourceFile.fromFile(file)));
 //      }
       Compiler compiler = CompilerUtils.makeCompiler(CompilerUtils.makePrintingErrorManager(System.out));
-      CompilerOptions options = CompilerUtils.makeOptions();
+      CompilerOptions options = CompilerUtils.makeOptionsForParsingAndErrorReporting();
       options.checkTypes = true;
       compiler.compile(new JSSourceFile[]{}, new JSModule[]{module}, options);
       System.out.println(compiler.toSource().length());
@@ -105,7 +105,7 @@ INFO: processDefines
   
   public static void compile(JSModule module) {
     Compiler compiler = CompilerUtils.makeCompiler(CompilerUtils.makePrintingErrorManager(System.out));    
-    CompilerOptions options = CompilerUtils.makeOptions();
+    CompilerOptions options = CompilerUtils.makeOptionsForParsingAndErrorReporting();
     compiler.initOptions(options);
     
     JSSourceFile extern = JSSourceFile.fromCode("externs.js", "");

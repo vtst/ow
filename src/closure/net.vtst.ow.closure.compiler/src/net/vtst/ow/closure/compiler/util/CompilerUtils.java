@@ -49,20 +49,17 @@ public class CompilerUtils {
     return compiler;
   }  
 
-  private static void setupOptions(CompilerOptions options) {
+  /**
+   * Create a new compiler options object, with the minimum options for a compiler used either
+   * to parse files (in a tolerant way) or to report errors.
+   * @return  The new compiler options.
+   */
+  public static CompilerOptions makeOptionsForParsingAndErrorReporting() {
+    // These options should remain minimal, because they are used by the stripper.
+    CompilerOptions options = new CompilerOptions();
     options.ideMode = true;
     options.setRewriteNewDateGoogNow(false);
     options.setRemoveAbstractMethods(false);    
-  }
-  
-  /**
-   * Create a new compiler options object, and set the default options we need.
-   * @return  The new compiler options.
-   */
-  public static CompilerOptions makeOptions() {
-    // These options should remain minimal, because they are used by the stripper.
-    CompilerOptions options = new CompilerOptions();
-    setupOptions(options);
     return options;
   }
 
