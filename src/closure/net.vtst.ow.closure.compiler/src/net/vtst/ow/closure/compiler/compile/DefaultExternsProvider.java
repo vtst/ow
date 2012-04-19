@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import net.vtst.ow.closure.compiler.deps.AstFactory;
+import net.vtst.ow.closure.compiler.deps.JSExtern;
 
 import com.google.javascript.jscomp.CommandLineRunner;
 import com.google.javascript.jscomp.CompilerInput;
@@ -19,7 +20,7 @@ import com.google.javascript.jscomp.SourceFile;
  */
 public class DefaultExternsProvider {
   
-  private static List<AstFactory> astFactories;
+  private static List<JSExtern> externs;
 
   /**
    * Get the externs as a {@code JSModule}.  Note that the included compiler inputs are <b>not</b> marked
@@ -27,9 +28,9 @@ public class DefaultExternsProvider {
    * @return  The module containing the externs.
    */
   public static JSModule getAsModule() {
-    if (astFactories == null) initialize();
+    if (externs == null) initialize();
     JSModule module = new JSModule("externs");
-    for (AstFactory astFactory: astFactories) module.add(new CompilerInput(astFactory.getClone(false)));
+    for (AstFactory astFactory: externs) module.add(new CompilerInput(astFactory.getClone(false)));
     return module;
   }
   
@@ -37,9 +38,9 @@ public class DefaultExternsProvider {
    * @return  the externs as a list of {@code CompilerInput}.
    */
   public static List<CompilerInput> getAsCompilerInputs() {
-    if (astFactories == null) initialize();
-    List<CompilerInput> result = new ArrayList<CompilerInput>(astFactories.size());
-    for (AstFactory astFactory: astFactories) result.add(new CompilerInput(astFactory.getClone(false), true));
+    if (externs == null) initialize();
+    List<CompilerInput> result = new ArrayList<CompilerInput>(externs.size());
+    for (JSExtern extern: externs) result.add(new CompilerInput(extern.getClone(false), true));
     return result;    
   }
   
@@ -55,11 +56,11 @@ public class DefaultExternsProvider {
    * Initialized the cached AST factories if they are not yet initialized.
    */
   private static synchronized void initialize() {
-    if (astFactories != null) return;
+    if (externs != null) return;
     try {
-      astFactories = loadExterns();
+      externs = loadExterns();
     } catch (IOException e) {
-      astFactories = Collections.emptyList();
+      externs = Collections.emptyList();
     }
   }
   
@@ -67,11 +68,11 @@ public class DefaultExternsProvider {
    * @return The default externs, as a list of AST factories.
    * @throws IOException
    */
-  private static List<AstFactory> loadExterns() throws IOException {
-    List<SourceFile> externs = getAsSourceFiles();
-    ArrayList<AstFactory> astFactories = new ArrayList<AstFactory>(externs.size());
-    for (SourceFile extern: externs) astFactories.add(new AstFactory(extern));
-    return astFactories;
+  private static List<JSExtern> loadExterns() throws IOException {
+    List<SourceFile> sourceFiles = getAsSourceFiles();
+    ArrayList<JSExtern> externs = new ArrayList<JSExtern>(sourceFiles.size());
+    for (SourceFile sourceFile: sourceFiles) externs.add(new JSExtern(sourceFile));
+    return externs;
   }
   
 }
