@@ -14,6 +14,11 @@ import com.google.javascript.jscomp.JSModule;
 import com.google.javascript.jscomp.Result;
 import com.google.javascript.jscomp.SourceFile;
 
+/**
+ * Wrapper around {@code Compiler}, in order to run a compilation by providing ASTs for externs
+ * instead of source files.
+ * @author Vincent Simonet
+ */
 public class MagicCompiler {
 
   private Compiler compiler;

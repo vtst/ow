@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
 import com.google.javascript.rhino.Node;
 
 /**
- * Wrapper around com.google.javascript.jscomp.CodePrinter, to make it accessible
+ * Wrapper around {@code com.google.javascript.jscomp.CodePrinter}, to make it accessible
  * though it is not a public class.
  * @author Vincent Simonet
  */

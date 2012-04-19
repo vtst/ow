@@ -8,7 +8,7 @@ import com.google.javascript.jscomp.Scope;
 import com.google.javascript.rhino.Node;
 
 /**
- * Wrapper around com.google.javascript.jscomp.PassConfig to access its typed scope creator,
+ * Wrapper around {@code com.google.javascript.jscomp.PassConfig} to access its typed scope creator,
  * though it is not public.
  * @author Vincent Simonet
  */

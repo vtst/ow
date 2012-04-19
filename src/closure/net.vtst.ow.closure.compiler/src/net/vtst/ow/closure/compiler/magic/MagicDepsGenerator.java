@@ -9,6 +9,11 @@ import java.util.Collection;
 import com.google.javascript.jscomp.deps.DependencyInfo;
 import com.google.javascript.jscomp.deps.DepsGenerator;
 
+/**
+ * Wrapper around {@code DepsGenerator}, which makes the method for writing dependency files
+ * available.
+ * @author Vincent Simonet
+ */
 public class MagicDepsGenerator {
   
   private DepsGenerator depsGenerator;
