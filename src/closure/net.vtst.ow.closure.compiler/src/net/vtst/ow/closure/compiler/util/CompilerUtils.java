@@ -19,7 +19,12 @@ import com.google.javascript.jscomp.PrintStreamErrorManager;
  */
 public class CompilerUtils {
 
-  // TODO: This should be moved somewhere else
+  /**
+   * Test whether a file is a JavaScript file.  The current implementation just looks
+   * at the file extension, which must be {@code .js}.
+   * @param file  The file to test.
+   * @return  true iif the file is a JavaScript file.
+   */
   public static boolean isJavaScriptFile(File file) {
     return file.getPath().endsWith(".js");
   }
