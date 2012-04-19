@@ -1,12 +1,10 @@
 package net.vtst.ow.closure.compiler.compile;
 
-import net.vtst.ow.closure.compiler.deps.GetDependenciesNodeTraversal;
-
 import com.google.javascript.jscomp.AbstractCompiler;
+import com.google.javascript.jscomp.CodingConvention;
 import com.google.javascript.jscomp.HotSwapCompilerPass;
 import com.google.javascript.jscomp.NodeTraversal;
 import com.google.javascript.rhino.Node;
-import com.google.javascript.rhino.Token;
 
 /**
  * A compiler pass that builds a mapping of namespaces to declaring nodes (i.e. a 
@@ -17,9 +15,11 @@ public class NamespaceProvidersPass implements HotSwapCompilerPass {
   
   private AbstractCompiler compiler;
   private NamespaceProvidersMap map;
+  private CodingConvention codingConvention;
 
   public NamespaceProvidersPass(AbstractCompiler compiler, NamespaceProvidersMap map) {
     this.compiler = compiler;
+    this.codingConvention = compiler.getCodingConvention();
     this.map = map;
   }
 
@@ -41,29 +41,19 @@ public class NamespaceProvidersPass implements HotSwapCompilerPass {
     
     private Node currentScript;
 
-    // TODO: Re-implement using the coding convention.
-    @Override
+    @Override    
     public boolean shouldTraverse(NodeTraversal traversal, Node node, Node parent) {
-      switch (node.getType()) {
-      case Token.BLOCK:
-      case Token.EXPR_RESULT:
-        return true;
-      case Token.SCRIPT:
-        currentScript = node;
-        return true;
-      case Token.CALL:
-        String callee = node.getFirstChild().getQualifiedName();
-        if (GetDependenciesNodeTraversal.GOOG_PROVIDE.equals(callee)) {
-          if (node.getChildCount() == 2) {
-            Node argument = node.getChildAtIndex(1);
-            if (argument.getType() == Token.STRING) {
-              map.put(argument.getString(), currentScript);
-            }
-          }
+      if (node.isCall()) {
+        String provide = codingConvention.extractClassNameIfProvide(node, parent);
+        if (provide != null) {
+          map.put(provide, currentScript);
         }
         return false;
-      default:
-        return false;
+      } else if (node.isScript()) {
+        currentScript = node;
+        return true;
+      } else {
+        return (parent == null || parent.isExprResult());
       }
     }
 
