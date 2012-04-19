@@ -8,6 +8,11 @@ import com.google.javascript.jscomp.NodeTraversal;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
 
+/**
+ * A compiler pass that builds a mapping of namespaces to declaring nodes (i.e. a 
+ * {@code NamespaceProvidersMap}.
+ * @author Vincent Simonet
+ */
 public class NamespaceProvidersPass implements HotSwapCompilerPass {
   
   private AbstractCompiler compiler;
