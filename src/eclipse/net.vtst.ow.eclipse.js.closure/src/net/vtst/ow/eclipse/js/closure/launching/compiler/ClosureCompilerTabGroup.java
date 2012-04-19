@@ -44,15 +44,15 @@ public class ClosureCompilerTabGroup extends AbstractLaunchConfigurationTabGroup
   public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
     final ClosureCompilerLaunchConfigurationRecord record = new ClosureCompilerLaunchConfigurationRecord(); 
     ILaunchConfigurationTab[] tabs = new ILaunchConfigurationTab[] {
-        new Tab("ClosureCompilerInputsAndOutputs"){
+        new Tab("ClosureCompilerInputsAndOutputs") {
           protected ICompositeEditor createEditor() {
             return new ClosureCompilerInputsAndOutputsEditor(this);
         }},
-        new Tab("ClosureCompilerCompilationOptions"){
+        new Tab("ClosureCompilerCompilationOptions") {
           protected ICompositeEditor createEditor() {
             return new ClosureCompilerCompilationOptionsEditor(this);
         }},
-        new Tab("ClosureCompilerIncludes", "ClosureProjectPropertyPage_"){
+        new Tab("ClosureCompilerIncludes", "ClosureProjectPropertyPage_") {
           protected ICompositeEditor createEditor() {
             return new ClosureCompilerProjectPropertiesEditor(this, record.useProjectPropertiesForIncludes) {
               public IEditor createDelegate(IEditorContainer container) {
@@ -60,7 +60,7 @@ public class ClosureCompilerTabGroup extends AbstractLaunchConfigurationTabGroup
               }
             };
         }},
-        new Tab("ClosureCompilerChecks", "ClosureProjectPropertyPage_"){
+        new Tab("ClosureCompilerChecks", "ClosureProjectPropertyPage_") {
           protected ICompositeEditor createEditor() {
             return new ClosureCompilerProjectPropertiesEditor(this, record.useProjectPropertiesForChecks) {
               public IEditor createDelegate(IEditorContainer container) {
