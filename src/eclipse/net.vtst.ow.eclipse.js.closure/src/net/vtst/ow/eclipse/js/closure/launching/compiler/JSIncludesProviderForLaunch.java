@@ -4,6 +4,7 @@ import java.io.File;
 
 import net.vtst.eclipse.easy.ui.properties.stores.IStore;
 import net.vtst.eclipse.easy.ui.properties.stores.PluginPreferenceStore;
+import net.vtst.ow.closure.compiler.deps.JSExtern;
 import net.vtst.ow.closure.compiler.deps.JSLibrary;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.compiler.IJSIncludesProvider;
@@ -19,6 +20,10 @@ public class JSIncludesProviderForLaunch implements IJSIncludesProvider {
     JSLibrary library = new JSLibrary(libraryPath, pathOfClosureBase, getCacheSettingsFromPreferences());
     library.setUnits(compiler);
     return library;
+  }
+  
+  public JSExtern getExtern(AbstractCompiler compiler, File path) {
+    return new JSExtern(path);
   }
 
   public void clear() {

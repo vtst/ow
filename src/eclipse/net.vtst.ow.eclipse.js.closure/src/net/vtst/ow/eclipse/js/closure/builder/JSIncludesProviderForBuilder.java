@@ -1,15 +1,15 @@
 package net.vtst.ow.eclipse.js.closure.builder;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
-import java.util.concurrent.ConcurrentHashMap;
 
 import net.vtst.eclipse.easy.ui.properties.stores.IStore;
 import net.vtst.eclipse.easy.ui.properties.stores.PluginPreferenceStore;
+import net.vtst.ow.closure.compiler.deps.JSExtern;
 import net.vtst.ow.closure.compiler.deps.JSLibrary;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.compiler.IJSIncludesProvider;
 import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
+import net.vtst.ow.eclipse.js.closure.util.WeakConcurrentHashMap;
 
 import org.eclipse.core.runtime.CoreException;
 
@@ -54,40 +54,47 @@ public class JSIncludesProviderForBuilder implements IJSIncludesProvider {
     }
   }
   
-  private ConcurrentHashMap<LibraryKey, WeakReference<JSLibrary>> libraries = 
-      new ConcurrentHashMap<LibraryKey, WeakReference<JSLibrary>>();
-
-  private JSLibrary get(LibraryKey key) {
-    WeakReference<JSLibrary> ref = libraries.get(key);
-    if (ref == null) return null;
-    else return ref.get();
-  }
-
+  private WeakConcurrentHashMap<LibraryKey, JSLibrary> libraries = 
+      new WeakConcurrentHashMap<LibraryKey, JSLibrary>();
+  
+  private WeakConcurrentHashMap<File, JSExtern> externs =
+      new WeakConcurrentHashMap<File, JSExtern>();
+  
   // **************************************************************************
   // Implementation of IJSLibraryProvider
   
-  /**
-   * Get a library from the cache, or create it and add it to the cache if it is not in
-   * the cache.
-   * @param compiler
-   * @param libraryPath
-   * @param pathOfClosureBase
-   * @param isClosureBase
-   * @return
+  /* (non-Javadoc)
+   * @see net.vtst.ow.eclipse.js.closure.compiler.IJSIncludesProvider#getLibrary(com.google.javascript.jscomp.AbstractCompiler, java.io.File, java.io.File)
    */
   public JSLibrary getLibrary(AbstractCompiler compiler, File libraryPath, File pathOfClosureBase) {
     LibraryKey key = new LibraryKey(libraryPath, pathOfClosureBase);
-    JSLibrary library = get(key);
+    JSLibrary library = libraries.get(key);
     if (library == null) {
       library = new JSLibrary(libraryPath, pathOfClosureBase, getCacheSettings());
       library.setUnits(compiler);
-      libraries.put(key, new WeakReference<JSLibrary>(library));
+      libraries.put(key, library);
     }
     return library;
   }
+
+  /* (non-Javadoc)
+   * @see net.vtst.ow.eclipse.js.closure.compiler.IJSIncludesProvider#getExtern(com.google.javascript.jscomp.AbstractCompiler, java.io.File)
+   */
+  public JSExtern getExtern(AbstractCompiler compiler, File path) {
+    JSExtern extern = externs.get(path);
+    if (extern == null) {
+      extern = new JSExtern(path);
+      externs.put(path, extern);
+    }
+    return extern;
+  }
     
+  /* (non-Javadoc)
+   * @see net.vtst.ow.eclipse.js.closure.compiler.IJSIncludesProvider#clear()
+   */
   public void clear() {
     libraries.clear();
+    externs.clear();
     cacheSettings = null;
   }
   
