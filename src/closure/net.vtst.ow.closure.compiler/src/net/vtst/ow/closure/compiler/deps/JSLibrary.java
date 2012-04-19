@@ -36,13 +36,14 @@ public class JSLibrary extends AbstractJSProject {
     READ_AND_WRITE
   }
   
+  /**
+   * Cache settings specify whether dependency files are cached, and whether stripped versions of
+   * the library files are cached.
+   */
   public static class CacheSettings {
     public CacheMode cacheDepsFiles = CacheMode.DISABLED;
     public CacheMode cacheStrippedFiles = CacheMode.DISABLED;
   }
-  
-  // TODO: It should be checked whether this works on Microsoft Windows, because the paths
-  // in the deps.js file are stored with '/' instead of '\'.
   
   public static final String GOOG = "goog";
   private static final String BASE_FILE = "base.js";
@@ -70,16 +71,27 @@ public class JSLibrary extends AbstractJSProject {
   
   /**
    * Create a new library.
-   * @param path  The root directory for the library.
+   * @param path  The root directory for the library, and the root of the closure base.
    */
   public JSLibrary(File path) {
     this(path, path);
   }
   
+  /**
+   * Create a new library.
+   * @param path  The root directory for the library.
+   * @param pathOfClosureBase  The closure base directory.
+   */
   public JSLibrary(File path, File pathOfClosureBase) {
     this(path, pathOfClosureBase, new CacheSettings());
   }
   
+  /**
+   * Create a new library.
+   * @param path  The root directory for the library.
+   * @param pathOfClosureBase  The closure base directory.
+   * @param cacheSettings  The cache settings to use for this library.
+   */
   public JSLibrary(File path, File pathOfClosureBase, CacheSettings cacheSettings) {
     this.path = path;
     this.pathOfClosureBase = pathOfClosureBase;
