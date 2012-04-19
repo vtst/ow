@@ -52,7 +52,7 @@ public class OwJsClosurePlugin extends AbstractUIPlugin {
     messages = new OwJsClosureMessages();
     jsLibraryProviderForClosureBuilder = new JSIncludesProviderForBuilder();
     projectOrderManager = new ProjectOrderManager();
-    ResourcesPlugin.getWorkspace().addResourceChangeListener(projectOrderManager);  // TODO: Add int arg?
+    ResourcesPlugin.getWorkspace().addResourceChangeListener(projectOrderManager);
     Compiler.setLoggingLevel(Level.OFF);
 	}
 
