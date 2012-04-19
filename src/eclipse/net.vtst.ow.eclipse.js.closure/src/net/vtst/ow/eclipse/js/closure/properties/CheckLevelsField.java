@@ -34,6 +34,8 @@ import com.google.javascript.jscomp.CheckLevel;
 
 public class CheckLevelsField extends AbstractField<Map<String, CheckLevel>> {
   
+  // TODO Add descriptions of checks
+  
   // See http://code.google.com/p/closure-compiler/wiki/Warnings for display names.
   private static String SEPARATOR_1 = "\n";
   private static String SEPARATOR_2 = "=";
@@ -135,9 +137,6 @@ public class CheckLevelsField extends AbstractField<Map<String, CheckLevel>> {
       TableColumn[] columns = new TableColumn[3];
       for (int i = 0; i < columns.length; ++i)
         columns[i] = new TableColumn(table, SWT.NONE);
-      columns[0].setText("Check");
-      columns[1].setText("Description");  // TODO Useful?
-      columns[2].setText("Level");  // TODO Useful?
 
       // Fill the table
       for (String groupName: diagnosticGroups) {
