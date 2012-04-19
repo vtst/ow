@@ -34,7 +34,6 @@ public class ClosureLinterLaunchConfigurationDelegate extends EasyExtProgramLaun
   // TODO: No proper error message if the gjslint command is not correct.
   
   public static final String TYPE_ID = "net.vtst.ow.eclipse.js.closure.launching.linter";
-  // TODO: Need to put a description text in plugin.xml!
   private static final String PROBLEM = "net.vtst.ow.eclipse.js.closure.linter-error";
 
   final OwJsClosureMessages messages = OwJsClosurePlugin.getDefault().getMessages();
