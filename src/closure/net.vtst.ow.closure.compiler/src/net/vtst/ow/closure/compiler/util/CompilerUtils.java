@@ -40,7 +40,7 @@ public class CompilerUtils {
    */
   public static Compiler makeCompiler(ErrorManager errorManager) {
     Compiler compiler = new Compiler(errorManager);
-    compiler.disableThreads();  // TODO If this useful or needed?
+    compiler.disableThreads();
     return compiler;
   }  
 
@@ -79,7 +79,7 @@ public class CompilerUtils {
    * @param error  The error to report.
    */
   public static void reportError(ErrorManager manager, JSError error) {
-    manager.report(error.level, error);
+    manager.report(error.getDefaultLevel(), error);
   }
   
   /**
