@@ -16,8 +16,6 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 
 public class ClosureLinterLaunchShortcut extends EasyLaunchShortcut<IResource> {
   
-  // TODO: This has to be updated!
-  
   ClosureLinterLaunchConfigurationRecord record = new ClosureLinterLaunchConfigurationRecord();
 
   @Override
