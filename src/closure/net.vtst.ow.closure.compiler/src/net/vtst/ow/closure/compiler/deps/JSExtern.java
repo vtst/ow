@@ -14,12 +14,8 @@ public class JSExtern extends AstFactory {
     super(sourceFile);
   }
   
-  public JSExtern(String name, JSUnitProvider.IProvider provider) {
-    super(JSSourceFile.fromGenerator(name, provider));
-  }
-  
   public JSExtern(File file) {
-    this(file.getAbsolutePath(), new JSUnitProvider.FromLibraryFile(file, CacheMode.DISABLED));
+    this(JSSourceFile.fromFile(file));
   }
 
 }

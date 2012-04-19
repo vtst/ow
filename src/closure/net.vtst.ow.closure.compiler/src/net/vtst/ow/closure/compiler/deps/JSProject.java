@@ -27,6 +27,7 @@ public class JSProject extends AbstractJSProject {
 
   private long referencedProjectsModificationStamp = 0;
   private List<AbstractJSProject> referencedProjects;
+  private List<JSExtern> externs;
   
   /**
    * Set the projects referenced by a project.
@@ -59,5 +60,13 @@ public class JSProject extends AbstractJSProject {
   @Override
   protected List<AbstractJSProject> getReferencedProjects() {
     return referencedProjects;
+  }
+  
+  public void setExterns(List<JSExtern> externs) {
+    this.externs = externs;
+  }
+
+  public List<JSExtern> getExterns() {
+    return this.externs;
   }
 }

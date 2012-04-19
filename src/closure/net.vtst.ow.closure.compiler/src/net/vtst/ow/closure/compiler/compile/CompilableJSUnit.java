@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
+import net.vtst.ow.closure.compiler.deps.JSExtern;
 import net.vtst.ow.closure.compiler.deps.JSProject;
 import net.vtst.ow.closure.compiler.deps.JSUnit;
 import net.vtst.ow.closure.compiler.deps.JSUnitProvider.IProvider;
@@ -35,6 +36,14 @@ public class CompilableJSUnit extends JSUnit {
   private CompilerRun run = null;
   private List<JSUnit> orderedUnits = Collections.emptyList();
   private long allDependenciesModificationStamp = -2;
+  private List<JSExtern> externs = Collections.emptyList();
+  
+  /**
+   * Clear the cached dependencies and externs. 
+   */
+  public void clear() {
+    allDependenciesModificationStamp = -2;
+  }
   
   private long getMaxDependenciesModificationStamp() {
     long result = -1;
@@ -49,11 +58,10 @@ public class CompilableJSUnit extends JSUnit {
     long maxDependenciesModificationStamp = getMaxDependenciesModificationStamp();
     if (allDependenciesModificationStamp < maxDependenciesModificationStamp) {
       allDependenciesModificationStamp = maxDependenciesModificationStamp;
-      List<JSUnit> units = project.getSortedDependenciesOf(this);
-      orderedUnits = units;
+      orderedUnits = project.getSortedDependenciesOf(this);
     }
     return orderedUnits;
-  }  
+  }
   
   public CompilerRun fullCompile(CompilerOptions options, ErrorManager errorManager, boolean stripIncludedFiles) {
     return fullCompile(options, errorManager, stripIncludedFiles, true);
@@ -63,7 +71,7 @@ public class CompilableJSUnit extends JSUnit {
     List<JSUnit> orderedUnits = updateAndGetOrderedUnits();
     if (force || run == null || run.hasChanged(orderedUnits)) {
       CompilerRun newRun = new CompilerRun(
-          this.getName(), options, errorManager, DefaultExternsProvider.getAsJSExterns(),
+          this.getName(), options, errorManager, project.getExterns(),
           orderedUnits, Collections.<JSUnit>singleton(this), stripIncludedFiles);
       run = newRun;  // This is atomic
       return newRun;    

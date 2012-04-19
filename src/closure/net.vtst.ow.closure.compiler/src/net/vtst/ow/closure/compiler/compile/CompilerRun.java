@@ -142,7 +142,7 @@ public class CompilerRun {
   
   private List<CompilerInput> getExternsAsCompilerInputs() {
     ArrayList<CompilerInput> result = new ArrayList<CompilerInput>(externs.size());
-    for (JSExtern extern: externs) result.add(new CompilerInput(extern.getClone(false), false));
+    for (JSExtern extern: externs) result.add(new CompilerInput(extern.getClone(false), true));
     return result;
   }
   

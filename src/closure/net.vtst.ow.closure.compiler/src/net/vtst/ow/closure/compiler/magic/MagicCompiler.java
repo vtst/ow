@@ -112,6 +112,7 @@ public class MagicCompiler {
     } catch (IllegalAccessException e) {
       throw new MagicException(e);
     } catch (InvocationTargetException e) {
+      e.getCause().printStackTrace();
       throw new MagicException(e);
     }
   }

@@ -119,7 +119,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
   
       // Create or get the project
       JSProject jsProject = ResourceProperties.getOrCreateJSProject(project);
-      updateReferencedProjectsIfNeeded(monitor, compiler, project, jsProject);
+      boolean jsProjectUpdated = updateJSProjectIfNeeded(monitor, compiler, project, jsProject);
       
       // Set the compilation units
       Set<IFile> files = ClosureCompiler.getJavaScriptFiles(project);
@@ -133,6 +133,8 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
               jsProject, file.getLocation().toFile(), pathOfClosureBase,
               new CompilationUnitProviderFromEclipseIFile(file));
           ResourceProperties.setJSUnit(file, unit);
+        } else {
+          if (jsProjectUpdated) unit.clear();
         }
         units.add(unit);
       }
@@ -299,22 +301,27 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
    * @param compiler  Compiler used to parse libraries.
    * @param project  Project for which references shall be updated.
    * @param jsProject  Project for which references shall be updated.
+   * @return true iif the project has been updated
    * @throws CoreException
    */
-  private void updateReferencedProjectsIfNeeded(
+  // TODO: Clean this method!
+  private boolean updateJSProjectIfNeeded(
       IProgressMonitor monitor, Compiler compiler, 
       IProject project, JSProject jsProject) throws CoreException {
     ProjectOrderManager.State projectOrderState = projectOrderManager.get();
-    if (projectOrderState.getModificationStamp() <= jsProject.getReferencedProjectsModificationStamp()) return;
+    if (projectOrderState.getModificationStamp() <= jsProject.getReferencedProjectsModificationStamp()) return false;
     OwJsDev.log("Updating referenced projects of: %s", project.getName());
     ArrayList<IProject> projects = ClosureCompiler.getReferencedJavaScriptProjectsRecursively(
         Collections.singleton(project), projectOrderState.reverseOrderComparator());
     Collection<AbstractJSProject> libraries = jsLibraryProvider.getLibraries(compiler, monitor, projects);
     ArrayList<AbstractJSProject> referencedProjects = new ArrayList<AbstractJSProject>(projects.size() + libraries.size());
     for (IProject referencedProject: projects) referencedProjects.add(ResourceProperties.getOrCreateJSProject(referencedProject));
+    jsProject.setExterns(jsLibraryProvider.getExterns(compiler, monitor, projects));
+    // After this, referencedProjects contains projects + libraries!
     referencedProjects.addAll(libraries);
     ResourceProperties.setTransitivelyReferencedProjects(project, projects.toArray(new IProject[0]));
     jsProject.setReferencedProjects(referencedProjects, projectOrderState.getModificationStamp());
+    return true;
   }
     
   /**

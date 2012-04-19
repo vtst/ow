@@ -14,6 +14,7 @@ import com.google.javascript.jscomp.AbstractCompiler;
 
 import net.vtst.eclipse.easy.ui.properties.stores.IReadOnlyStore;
 import net.vtst.eclipse.easy.ui.properties.stores.ProjectPropertyStore;
+import net.vtst.ow.closure.compiler.compile.DefaultExternsProvider;
 import net.vtst.ow.closure.compiler.deps.AbstractJSProject;
 import net.vtst.ow.closure.compiler.deps.JSExtern;
 import net.vtst.ow.closure.compiler.util.ListWithoutDuplicates;
@@ -88,9 +89,16 @@ public abstract class AbstractJSIncludesProvider implements IJSIncludesProvider 
 
   // Getting externs
   
+  private static File defaultExterns = new File("///default-externs///");
+  
   private void addExterns(
       AbstractCompiler compiler, IProgressMonitor monitor, IReadOnlyStore store, 
       Set<File> alreadyAdded, List<JSExtern> result) throws CoreException {
+    if (!record.includes.useOnlyCustomExterns.get(store)) {
+      if (alreadyAdded == null || alreadyAdded.add(defaultExterns)) {
+        result.addAll(DefaultExternsProvider.getAsJSExterns());
+      }
+    }
     for (File externPath: record.includes.externs.get(store)) {
       if (monitor != null) Utils.checkCancel(monitor);
       if (alreadyAdded == null || alreadyAdded.add(externPath));
