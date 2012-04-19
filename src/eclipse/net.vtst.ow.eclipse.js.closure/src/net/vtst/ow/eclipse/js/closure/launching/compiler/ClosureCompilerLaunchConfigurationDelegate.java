@@ -53,17 +53,15 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
   
   public static final String TYPE_ID = "net.vtst.ow.eclipse.js.closure.launching.compiler";
   
-  // TODO: Run compiler in thread
   // TODO: If the output file has the .js extension, this creates build errors
-  // TODO: Return status
   
   private OwJsClosureMessages messages = OwJsClosurePlugin.getDefault().getMessages();
   private ClosureCompilerLaunchConfigurationRecord record = ClosureCompilerLaunchConfigurationRecord.getInstance();
 
   @Override
-  public void launch(ILaunchConfiguration config, String mode, ILaunch launch, IProgressMonitor monitor)
-      throws CoreException {
-    // TODO: Fix monitor for library and output
+  public void launch(ILaunchConfiguration config, String mode, ILaunch launch, IProgressMonitor monitor) throws CoreException {
+    monitor.beginTask(config.getName(), 1);
+    monitor.subTask(messages.getString("ClosureCompilerLaunchConfigurationDelegate_prepareCompiler"));
     IReadOnlyStore store = new LaunchConfigurationReadOnlyStore(config);
     List<IResource> resources = record.inputResources.get(store);
     if (resources.isEmpty()) return;
@@ -98,12 +96,16 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
       Collection<IProject> projects = getProjects(resources);
       Comparator<IProject> comparator = OwJsClosurePlugin.getDefault().getProjectOrderManager().get().reverseOrderComparator();
       ArrayList<IProject> allProjects = ClosureCompiler.getReferencedJavaScriptProjectsRecursively(projects, comparator);
+      monitor.subTask(messages.getString("ClosureCompilerLaunchConfigurationDelegate_loadLibraries"));
       libraries = ClosureCompiler.getJSLibraries(new JSLibraryProviderForLaunch(), compiler, monitor, allProjects);
+      monitor.subTask(messages.getString("ClosureCompilerLaunchConfigurationDelegate_prepareCompiler"));
       allFiles = ClosureCompiler.getJavaScriptFiles(allProjects);
       rootFiles = ClosureCompiler.getJavaScriptFiles(resources);
     } else {
       // If dependencies are not managed, we take only what has been selected.
+      monitor.subTask(messages.getString("ClosureCompilerLaunchConfigurationDelegate_loadLibraries"));
       libraries = ClosureCompiler.getJSLibraries(new JSLibraryProviderForLaunch(), compiler, monitor, storeForIncludes);
+      monitor.subTask(messages.getString("ClosureCompilerLaunchConfigurationDelegate_prepareCompiler"));
       allFiles = ClosureCompiler.getJavaScriptFiles(resources);
       rootFiles = allFiles;
     }
@@ -119,6 +121,7 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
       JSModule module = new JSModule("main");
       for (JSUnit unit: rootUnitsWithTheirDependencies) module.add(new CompilerInput(unit.getAst(false)));
       // TODO: Manage custom externs
+      monitor.subTask(messages.getString("ClosureCompilerLaunchConfigurationDelegate_runCompiler"));
       compiler.compileModules(DefaultExternsProvider.getAsSourceFiles(), Collections.singletonList(module), options);
       if (outputFile.exists()) {
         outputFile.setContents(new ByteArrayInputStream(compiler.toSource().getBytes("UTF-8")), false, false, monitor);
@@ -127,6 +130,7 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
       }
       outputFile.setCharset("UTF-8", monitor);
       process.setTerminated();
+      monitor.done();
     } catch (CircularDependencyException e) {
       throw new CoreException(new Status(Status.ERROR, OwJsClosurePlugin.PLUGIN_ID, e.getLocalizedMessage(), e));
     } catch (IOException e) {
