@@ -12,6 +12,11 @@ import com.google.javascript.jscomp.CompilerInput;
 import com.google.javascript.jscomp.JSModule;
 import com.google.javascript.jscomp.SourceFile;
 
+/**
+ * Provides the default externs (which are embeded in the compiler's JAR) under various form.
+ * The default externs' AST are cached, so that they are read only once.
+ * @author Vincent Simonet
+ */
 public class DefaultExternsProvider {
   
   private static List<AstFactory> astFactories;
@@ -38,10 +43,17 @@ public class DefaultExternsProvider {
     return result;    
   }
   
+  /**
+   * @return The default externs, as a list of source files.
+   * @throws IOException
+   */
   public static List<SourceFile> getAsSourceFiles() throws IOException {
     return CommandLineRunner.getDefaultExterns();
   }
   
+  /**
+   * Initialized the cached AST factories if they are not yet initialized.
+   */
   private static synchronized void initialize() {
     if (astFactories != null) return;
     try {
@@ -51,6 +63,10 @@ public class DefaultExternsProvider {
     }
   }
   
+  /**
+   * @return The default externs, as a list of AST factories.
+   * @throws IOException
+   */
   private static List<AstFactory> loadExterns() throws IOException {
     List<SourceFile> externs = getAsSourceFiles();
     ArrayList<AstFactory> astFactories = new ArrayList<AstFactory>(externs.size());
