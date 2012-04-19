@@ -130,8 +130,6 @@ public class MagicCompiler {
   public Result compile(List<CompilerInput> externs, JSModule module, CompilerOptions options) {
     // The compile method should only be called once.
     Preconditions.checkState(compiler.getRoot() == null);
-    // TODO: This could be delted once we are sure we did it.
-    for (CompilerInput input: externs) Preconditions.checkArgument(input.isExtern());
 
     try {
       init(externs, module, options);
