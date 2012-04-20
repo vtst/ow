@@ -5,20 +5,21 @@ import java.util.List;
 import net.vtst.eclipse.easy.ui.util.Utils;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
 
 /**
- * Wrapping of {@code IProject} into {@code IStore}.
+ * Wrapping of {@code IResource} into {@code IStore}.
  * @author Vincent Simonet
  */
-public class ProjectPropertyStore implements IStore {
+public class ResourcePropertyStore implements IStore {
   
-  private IProject project;
+  private IResource resource;
   private String qualifier;
 
-  public ProjectPropertyStore(IProject project, String qualifier) {
-    this.project = project;
+  public ResourcePropertyStore(IResource resource, String qualifier) {
+    this.resource = resource;
     this.qualifier = qualifier;
   }
   
@@ -27,11 +28,11 @@ public class ProjectPropertyStore implements IStore {
   }
   
   private String getPersistentProperty(String localName) throws CoreException {
-    return project.getPersistentProperty(getName(localName));
+    return resource.getPersistentProperty(getName(localName));
   }
   
   private void setPersistentProperty(String localName, String value) throws CoreException {
-    project.setPersistentProperty(getName(localName), value);
+    resource.setPersistentProperty(getName(localName), value);
   }
 
   @Override

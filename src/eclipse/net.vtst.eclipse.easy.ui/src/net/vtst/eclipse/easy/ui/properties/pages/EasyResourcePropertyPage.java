@@ -6,24 +6,24 @@ import net.vtst.eclipse.easy.ui.properties.editors.IEditor;
 import net.vtst.eclipse.easy.ui.properties.editors.IEditorChangeEvent;
 import net.vtst.eclipse.easy.ui.properties.editors.IEditorContainer;
 import net.vtst.eclipse.easy.ui.properties.stores.IStore;
-import net.vtst.eclipse.easy.ui.properties.stores.ProjectPropertyStore;
+import net.vtst.eclipse.easy.ui.properties.stores.ResourcePropertyStore;
 
-import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.dialogs.PropertyPage;
 
 /**
- * A project property page, implemented by a {@code ICompositeEditor}.
+ * A resource property page, implemented by a {@code ICompositeEditor}.
  * @author Vincent Simonet
  */
-public abstract class EasyProjectPropertyPage extends PropertyPage implements IEditorContainer {
+public abstract class EasyResourcePropertyPage extends PropertyPage implements IEditorContainer {
 
   private ICompositeEditor editor;
   private Composite parent;
   
-  public EasyProjectPropertyPage() {
+  public EasyResourcePropertyPage() {
     super();
   }
 
@@ -85,7 +85,7 @@ public abstract class EasyProjectPropertyPage extends PropertyPage implements IE
   }
   
   private IStore getStore() {
-    return new ProjectPropertyStore(getProject(), getPropertyQualifier());
+    return new ResourcePropertyStore(getResource(), getPropertyQualifier());
   }
   
   /**
@@ -98,7 +98,7 @@ public abstract class EasyProjectPropertyPage extends PropertyPage implements IE
   /**
    * @return  The project resource edited by this page.
    */
-  protected IProject getProject() {
-    return (IProject) getElement();
+  protected IResource getResource() {
+    return (IResource) getElement();
   }
 }
