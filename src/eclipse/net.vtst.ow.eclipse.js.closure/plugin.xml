@@ -187,9 +187,9 @@
 
   <extension point="org.eclipse.ui.propertyPages">
     <page
-      class="net.vtst.ow.eclipse.js.closure.properties.ClosureMainConfigurationPropertyPage"
+      class="net.vtst.ow.eclipse.js.closure.properties.project.ClosureMainConfigurationPropertyPage"
       category="org.eclipse.wst.jsdt.internal.ui.preferences.JavaScriptMainPage"
-      id="net.vtst.ow.eclipse.js.closure.properties.ClosureMainConfigurationPropertyPage"
+      id="net.vtst.ow.eclipse.js.closure.properties.project.ClosureMainConfigurationPropertyPage"
       name="%closure_property_page"
       nameFilter="*">
       <!-- The property page is enabled for all projects having the jsNature, because
@@ -201,9 +201,9 @@
       </enabledWhen>
     </page>
     <page
-      class="net.vtst.ow.eclipse.js.closure.properties.ClosureIncludesPropertyPage"
-      category="net.vtst.ow.eclipse.js.closure.properties.ClosureMainConfigurationPropertyPage"
-      id="net.vtst.ow.eclipse.js.closure.properties.ClosureIncludesPropertyPage"
+      class="net.vtst.ow.eclipse.js.closure.properties.project.ClosureIncludesPropertyPage"
+      category="net.vtst.ow.eclipse.js.closure.properties.project.ClosureMainConfigurationPropertyPage"
+      id="net.vtst.ow.eclipse.js.closure.properties.project.ClosureIncludesPropertyPage"
       name="%closure_includes_property_page"
       nameFilter="*">
       <!-- The property page is enabled for all projects having the jsNature, because
@@ -215,9 +215,9 @@
       </enabledWhen>
     </page>
     <page
-      class="net.vtst.ow.eclipse.js.closure.properties.ClosureCompilerChecksPropertyPage"
-      category="net.vtst.ow.eclipse.js.closure.properties.ClosureMainConfigurationPropertyPage"
-      id="net.vtst.ow.eclipse.js.closure.properties.ClosureCompilerChecksPropertyPage"
+      class="net.vtst.ow.eclipse.js.closure.properties.project.ClosureCompilerChecksPropertyPage"
+      category="net.vtst.ow.eclipse.js.closure.properties.project.ClosureMainConfigurationPropertyPage"
+      id="net.vtst.ow.eclipse.js.closure.properties.project.ClosureCompilerChecksPropertyPage"
       name="%closure_compiler_checks_property_page"
       nameFilter="*">
       <!-- The property page is enabled for all projects having the jsNature, because
@@ -229,9 +229,9 @@
       </enabledWhen>
     </page>
     <page
-      class="net.vtst.ow.eclipse.js.closure.properties.ClosureLinterChecksPropertyPage"
-      category="net.vtst.ow.eclipse.js.closure.properties.ClosureMainConfigurationPropertyPage"
-      id="net.vtst.ow.eclipse.js.closure.properties.ClosureLinterChecksPropertyPage"
+      class="net.vtst.ow.eclipse.js.closure.properties.project.ClosureLinterChecksPropertyPage"
+      category="net.vtst.ow.eclipse.js.closure.properties.project.ClosureMainConfigurationPropertyPage"
+      id="net.vtst.ow.eclipse.js.closure.properties.project.ClosureLinterChecksPropertyPage"
       name="%closure_linter_property_page"
       nameFilter="*">
       <!-- The property page is enabled for all projects having the jsNature, because
