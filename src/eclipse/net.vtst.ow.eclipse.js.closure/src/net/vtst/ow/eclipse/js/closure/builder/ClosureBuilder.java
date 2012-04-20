@@ -21,7 +21,6 @@ import net.vtst.ow.eclipse.js.closure.OwJsClosureMessages;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.compiler.ClosureCompiler;
 import net.vtst.ow.eclipse.js.closure.compiler.ClosureCompilerOptions;
-import net.vtst.ow.eclipse.js.closure.compiler.ErrorManagerGeneratingProblemMarkers;
 import net.vtst.ow.eclipse.js.closure.compiler.IJSIncludesProvider;
 import net.vtst.ow.eclipse.js.closure.dev.OwJsDev;
 import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
@@ -29,6 +28,7 @@ import net.vtst.ow.eclipse.js.closure.util.Utils;
 
 import org.eclipse.core.resources.IBuildConfiguration;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
@@ -115,9 +115,9 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
   private void fullBuild(IProgressMonitor monitor, IProject project) throws CoreException {
     monitor.subTask(messages.format("build_prepare"));
     boolean forgetIfCanceled = true;
+    Compiler compiler = CompilerUtils.makeCompiler(new ErrorManagerForProjectBuild(project));
+    compiler.initOptions(CompilerUtils.makeOptionsForParsingAndErrorReporting());
     try {
-      Compiler compiler = CompilerUtils.makeCompiler(new NullErrorManager());  // TODO!
-      compiler.initOptions(CompilerUtils.makeOptionsForParsingAndErrorReporting());
       File pathOfClosureBase = ClosureCompiler.getPathOfClosureBase(project);
       if (pathOfClosureBase == null) {
         monitor.worked(1);
@@ -148,17 +148,18 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
   
       try {
         jsProject.setUnits(compiler, units);
+        monitor.worked(1);
+        forgetIfCanceled = false;
+        compileJavaScriptFiles(monitor, project, files, false);
       } catch (CircularDependencyException e) {
         CompilerUtils.reportError(compiler, JSError.make(CIRCULAR_DEPENDENCY_ERROR, e.getMessage()));
         forgetLastBuiltState();
-        return;
       }
-      monitor.worked(1);
-      forgetIfCanceled = false;
-      compileJavaScriptFiles(monitor, project, files, false);
     } catch (OperationCanceledException e) {
       if (forgetIfCanceled) forgetLastBuiltState();
       throw e;
+    } finally {
+      compiler.getErrorManager().generateReport();      
     }
   }
   
@@ -297,7 +298,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
     OwJsDev.log("Compiling %s", file.getFullPath().toOSString());
     CompilableJSUnit unit = ResourceProperties.getJSUnit(file);
     if (unit == null) return;
-    ErrorManager errorManager = new ErrorManagerGeneratingProblemMarkers(unit, file);
+    ErrorManager errorManager = new ErrorManagerForFileBuild(unit, file);
     CompilerRun run = unit.fullCompile(options, errorManager, stripIncludedFiles, force);
     run.setErrorManager(new NullErrorManager());
   }
