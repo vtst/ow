@@ -28,7 +28,6 @@ import net.vtst.ow.eclipse.js.closure.util.Utils;
 
 import org.eclipse.core.resources.IBuildConfiguration;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
@@ -48,7 +47,6 @@ import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.DiagnosticType;
 import com.google.javascript.jscomp.ErrorManager;
 import com.google.javascript.jscomp.JSError;
-import com.google.javascript.jscomp.JSModule;
 import com.google.javascript.jscomp.deps.SortedDependencies.CircularDependencyException;
 
 /**

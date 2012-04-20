@@ -6,21 +6,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-
-import com.google.javascript.jscomp.AbstractCompiler;
-
 import net.vtst.eclipse.easy.ui.properties.stores.IReadOnlyStore;
 import net.vtst.eclipse.easy.ui.properties.stores.ProjectPropertyStore;
 import net.vtst.ow.closure.compiler.compile.DefaultExternsProvider;
 import net.vtst.ow.closure.compiler.deps.AbstractJSProject;
 import net.vtst.ow.closure.compiler.deps.JSExtern;
-import net.vtst.ow.closure.compiler.util.ListWithoutDuplicates;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPropertyRecord;
 import net.vtst.ow.eclipse.js.closure.util.Utils;
+
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+
+import com.google.javascript.jscomp.AbstractCompiler;
 
 public abstract class AbstractJSIncludesProvider implements IJSIncludesProvider {
   

@@ -2,21 +2,16 @@ package net.vtst.ow.eclipse.js.closure.compiler;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
+import net.vtst.eclipse.easy.ui.properties.stores.IReadOnlyStore;
+import net.vtst.ow.closure.compiler.deps.AbstractJSProject;
+import net.vtst.ow.closure.compiler.deps.JSExtern;
+import net.vtst.ow.closure.compiler.deps.JSLibrary;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-
-import net.vtst.eclipse.easy.ui.properties.stores.IReadOnlyStore;
-import net.vtst.eclipse.easy.ui.properties.stores.ProjectPropertyStore;
-import net.vtst.ow.closure.compiler.deps.AbstractJSProject;
-import net.vtst.ow.closure.compiler.deps.JSExtern;
-import net.vtst.ow.closure.compiler.deps.JSLibrary;
-import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
-import net.vtst.ow.eclipse.js.closure.compiler.AbstractJSIncludesProvider.JSLibraryKey;
 
 import com.google.javascript.jscomp.AbstractCompiler;
 

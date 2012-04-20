@@ -8,7 +8,6 @@ import net.vtst.ow.closure.compiler.deps.JSExtern;
 import net.vtst.ow.closure.compiler.deps.JSLibrary;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.compiler.AbstractJSIncludesProvider;
-import net.vtst.ow.eclipse.js.closure.compiler.IJSIncludesProvider;
 import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
 
 import org.eclipse.core.runtime.CoreException;
