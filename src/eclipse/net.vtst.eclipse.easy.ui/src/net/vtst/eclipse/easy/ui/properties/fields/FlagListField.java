@@ -16,6 +16,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 
 // TODO The editor should be implemented with check boxes.
 public class FlagListField extends AbstractField<Set<String>> {
@@ -45,7 +48,7 @@ public class FlagListField extends AbstractField<Set<String>> {
   protected static class Editor extends AbstractFieldEditor<Set<String>> {
 
     private Label label;
-    private org.eclipse.swt.widgets.List list;
+    private Table list;
     private FlagListField field;
 
     public Editor(IEditorContainer container, Composite parent, FlagListField field) {
@@ -54,32 +57,33 @@ public class FlagListField extends AbstractField<Set<String>> {
       int hspan = getColumnCount(parent);
       if (hspan < 2) return;  // TODO
       label = SWTFactory.createLabel(parent, getMessage(), 1);
-      list = new org.eclipse.swt.widgets.List(parent, SWT.MULTI | SWT.CHECK | SWT.V_SCROLL | SWT.BORDER);
+      list = new Table(parent, SWT.V_SCROLL | SWT.CHECK | SWT.BORDER);
       list.addSelectionListener(this);
       GridData gd = new GridData(GridData.FILL_BOTH);
       gd.horizontalSpan = hspan - 1;
       list.setLayoutData(gd);
-      for (int i = 0; i < field.flags.length; ++i) list.add(getMessage(field.flags[i]));
+      TableColumn column = new TableColumn(list, SWT.NONE);
+      for (int i = 0; i < field.flags.length; ++i) {
+        TableItem item = new TableItem(list, SWT.NONE);
+        item.setText(new String[] {getMessage(field.flags[i])});
+      }
+      column.pack();
     }
 
     @Override
     public Set<String> getCurrentValue() {
       Set<String> value = new HashSet<String>();
       for (int i = 0; i < field.flags.length; ++i) {
-        if (list.isSelected(i)) value.add(field.flags[i]);
+        if (list.getItem(i).getChecked()) value.add(field.flags[i]);
       }
       return value;
     }
     
     @Override
     public void setCurrentValue(Set<String> value) {
-      ArrayList<Integer> selection = new ArrayList<Integer>(value.size());
       for (int i = 0; i < field.flags.length; ++i) {
-        if (value.contains(field.flags[i])) selection.add(i);
+        list.getItem(i).setChecked(value.contains(field.flags[i]));
       }
-      int[] selection2 = new int[selection.size()];
-      for (int j = 0; j < selection2.length; ++j) selection2[j] = selection.get(j);
-      list.setSelection(selection2);
     }
 
     @Override
