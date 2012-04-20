@@ -1,7 +1,7 @@
 package net.vtst.ow.eclipse.js.closure.compiler;
 
 import net.vtst.eclipse.easy.ui.properties.stores.IReadOnlyStore;
-import net.vtst.eclipse.easy.ui.properties.stores.ProjectPropertyStore;
+import net.vtst.eclipse.easy.ui.properties.stores.ResourcePropertyStore;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.launching.compiler.ClosureCompilerLaunchConfigurationRecord;
 
@@ -150,7 +150,7 @@ public class ClosureCompilerOptions {
   }
 
   public static CompilerOptions makeForBuilder(IProject project) throws CoreException {
-    IReadOnlyStore store = new ProjectPropertyStore(project, OwJsClosurePlugin.PLUGIN_ID);
+    IReadOnlyStore store = new ResourcePropertyStore(project, OwJsClosurePlugin.PLUGIN_ID);
     return makeInternal(store, null, true);
   }
   

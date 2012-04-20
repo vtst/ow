@@ -12,7 +12,7 @@ import net.vtst.eclipse.easy.ui.launching.EasyLaunchConfigurationDelegateUtils.I
 import net.vtst.eclipse.easy.ui.launching.EasyPatternMatchListener;
 import net.vtst.eclipse.easy.ui.properties.stores.IReadOnlyStore;
 import net.vtst.eclipse.easy.ui.properties.stores.LaunchConfigurationReadOnlyStore;
-import net.vtst.eclipse.easy.ui.properties.stores.ProjectPropertyStore;
+import net.vtst.eclipse.easy.ui.properties.stores.ResourcePropertyStore;
 import net.vtst.ow.eclipse.js.closure.OwJsClosureMessages;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.compiler.ClosureCompiler;
@@ -60,7 +60,7 @@ public class ClosureLinterLaunchConfigurationDelegate extends EasyExtProgramLaun
     if (record.useProjectPropertiesForLinterChecks.get(store)) {
       IProject project = ClosureCompiler.getCommonProject(resources);
       if (project == null) throw new CoreException(new Status(Status.ERROR, OwJsClosurePlugin.PLUGIN_ID, messages.getString("ClosureLinterLaunchConfigurationDelegate_differentProjects")));
-      store = new ProjectPropertyStore(project, OwJsClosurePlugin.PLUGIN_ID);
+      store = new ResourcePropertyStore(project, OwJsClosurePlugin.PLUGIN_ID);
     }
     String customJsDocTags = record.linterChecks.customJsdocTags.get(storeForLinterOptions);
     if (customJsDocTags.length() > 0) {

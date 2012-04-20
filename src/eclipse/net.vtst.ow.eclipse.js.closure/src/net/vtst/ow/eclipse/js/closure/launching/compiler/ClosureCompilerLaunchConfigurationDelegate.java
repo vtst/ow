@@ -15,7 +15,7 @@ import java.util.Set;
 
 import net.vtst.eclipse.easy.ui.properties.stores.IReadOnlyStore;
 import net.vtst.eclipse.easy.ui.properties.stores.LaunchConfigurationReadOnlyStore;
-import net.vtst.eclipse.easy.ui.properties.stores.ProjectPropertyStore;
+import net.vtst.eclipse.easy.ui.properties.stores.ResourcePropertyStore;
 import net.vtst.ow.closure.compiler.deps.AbstractJSProject;
 import net.vtst.ow.closure.compiler.deps.JSExtern;
 import net.vtst.ow.closure.compiler.deps.JSProject;
@@ -24,6 +24,7 @@ import net.vtst.ow.closure.compiler.deps.JSUnitProvider;
 import net.vtst.ow.closure.compiler.util.CompilerUtils;
 import net.vtst.ow.eclipse.js.closure.OwJsClosureMessages;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
+import net.vtst.ow.eclipse.js.closure.builder.ResourceProperties;
 import net.vtst.ow.eclipse.js.closure.compiler.ClosureCompiler;
 import net.vtst.ow.eclipse.js.closure.compiler.ClosureCompilerOptions;
 import net.vtst.ow.eclipse.js.closure.compiler.IJSIncludesProvider;
@@ -75,8 +76,8 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
       project = ClosureCompiler.getCommonProject(resources);
       if (project == null) throw new CoreException(new Status(Status.ERROR, OwJsClosurePlugin.PLUGIN_ID, messages.getString("ClosureCompilerLaunchConfigurationDelegate_differentProjects")));
     }
-    IReadOnlyStore storeForChecks = record.useProjectPropertiesForChecks.get(store) ? new ProjectPropertyStore(project, OwJsClosurePlugin.PLUGIN_ID) : store; 
-    IReadOnlyStore storeForIncludes = record.useProjectPropertiesForIncludes.get(store) ? new ProjectPropertyStore(project, OwJsClosurePlugin.PLUGIN_ID) : store; 
+    IReadOnlyStore storeForChecks = record.useProjectPropertiesForChecks.get(store) ? new ResourcePropertyStore(project, OwJsClosurePlugin.PLUGIN_ID) : store; 
+    IReadOnlyStore storeForIncludes = record.useProjectPropertiesForIncludes.get(store) ? new ResourcePropertyStore(project, OwJsClosurePlugin.PLUGIN_ID) : store; 
 
     // Get the output file
     IFile outputFile = getOutputFile(store, resources);

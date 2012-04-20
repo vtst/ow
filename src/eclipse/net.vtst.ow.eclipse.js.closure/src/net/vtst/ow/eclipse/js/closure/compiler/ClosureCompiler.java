@@ -12,7 +12,7 @@ import java.util.Set;
 import net.vtst.eclipse.easy.ui.properties.stores.IReadOnlyStore;
 import net.vtst.eclipse.easy.ui.properties.stores.IStore;
 import net.vtst.eclipse.easy.ui.properties.stores.PluginPreferenceStore;
-import net.vtst.eclipse.easy.ui.properties.stores.ProjectPropertyStore;
+import net.vtst.eclipse.easy.ui.properties.stores.ResourcePropertyStore;
 import net.vtst.ow.closure.compiler.util.ListWithoutDuplicates;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.builder.ClosureNature;
@@ -104,7 +104,7 @@ public class ClosureCompiler {
    * @throws CoreException
    */
   public static File getPathOfClosureBase(IProject project) throws CoreException {
-    return getPathOfClosureBase(new ProjectPropertyStore(project, OwJsClosurePlugin.PLUGIN_ID));
+    return getPathOfClosureBase(new ResourcePropertyStore(project, OwJsClosurePlugin.PLUGIN_ID));
   }
 
   /**

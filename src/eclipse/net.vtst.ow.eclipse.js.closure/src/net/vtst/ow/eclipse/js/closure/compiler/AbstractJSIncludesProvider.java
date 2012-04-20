@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.vtst.eclipse.easy.ui.properties.stores.IReadOnlyStore;
-import net.vtst.eclipse.easy.ui.properties.stores.ProjectPropertyStore;
+import net.vtst.eclipse.easy.ui.properties.stores.ResourcePropertyStore;
 import net.vtst.ow.closure.compiler.compile.DefaultExternsProvider;
 import net.vtst.ow.closure.compiler.deps.AbstractJSProject;
 import net.vtst.ow.closure.compiler.deps.JSExtern;
@@ -75,7 +75,7 @@ public abstract class AbstractJSIncludesProvider implements IJSIncludesProvider 
     for (int i = projects.size() - 1; i >= 0; --i) {
       addLibraries(
           compiler, monitor, 
-          new ProjectPropertyStore(projects.get(i), OwJsClosurePlugin.PLUGIN_ID), keys, result);
+          new ResourcePropertyStore(projects.get(i), OwJsClosurePlugin.PLUGIN_ID), keys, result);
     }
     return result;
   }
@@ -112,7 +112,7 @@ public abstract class AbstractJSIncludesProvider implements IJSIncludesProvider 
     for (int i = projects.size() - 1; i >= 0; --i) {
       addExterns(
           compiler, monitor, 
-          new ProjectPropertyStore(projects.get(i), OwJsClosurePlugin.PLUGIN_ID), keys, result);
+          new ResourcePropertyStore(projects.get(i), OwJsClosurePlugin.PLUGIN_ID), keys, result);
     }
     return result;
   }

@@ -1,17 +1,18 @@
 package net.vtst.ow.eclipse.js.closure.properties;
 
-import net.vtst.eclipse.easy.ui.properties.pages.EasyProjectPropertyPage;
+import net.vtst.eclipse.easy.ui.properties.pages.EasyResourcePropertyPage;
 import net.vtst.ow.eclipse.js.closure.OwJsClosureMessages;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.builder.ClosureNature;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.preference.IPreferencePageContainer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
-public abstract class ClosureAsbtractPropertyPage extends EasyProjectPropertyPage {
+public abstract class ClosureAsbtractPropertyPage extends EasyResourcePropertyPage {
 
   private OwJsClosureMessages messages = OwJsClosurePlugin.getDefault().getMessages();;
     
@@ -49,9 +50,9 @@ public abstract class ClosureAsbtractPropertyPage extends EasyProjectPropertyPag
   public boolean performOk() {
     boolean result = super.performOk();
     if (result) {
-      IProject p = getProject();
+      IResource project = getResource();
       try {
-        p.touch(null);
+        project.touch(null);
       } catch (CoreException e) {
         e.printStackTrace();
       }
