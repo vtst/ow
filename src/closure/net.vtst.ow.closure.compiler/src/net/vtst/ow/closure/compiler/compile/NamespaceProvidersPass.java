@@ -11,7 +11,6 @@ import com.google.javascript.rhino.Node;
  * {@code NamespaceProvidersMap}.
  * @author Vincent Simonet
  */
-// TODO: It seems not to work
 public class NamespaceProvidersPass implements HotSwapCompilerPass {
   
   private AbstractCompiler compiler;

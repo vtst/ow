@@ -88,6 +88,15 @@ public class StripCompilerPass implements CompilerPass {
       // In the ascending phase, we pretty-print scripts.
       switch (node.getType()) {
       case Token.SCRIPT:
+        if (node.getJSDocInfo() != null) {
+          // The JSDocInfo attached to the SCRIPT node may contain the file overview.
+          try {
+            writer.write(node.getJSDocInfo().getOriginalCommentString());
+          } catch (IOException e) {
+            exception = e;
+            return;
+          }
+        }
         for (Node child: node.children()) {
           MagicCodePrinterBuilder builder = 
               new MagicCodePrinterBuilder(child, true, false);
