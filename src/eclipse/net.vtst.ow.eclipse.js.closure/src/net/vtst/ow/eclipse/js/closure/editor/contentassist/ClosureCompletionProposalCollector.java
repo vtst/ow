@@ -130,7 +130,7 @@ public class ClosureCompletionProposalCollector {
    * @param propertyName  The name of the property.
    * @return  The doc info, or null if not found.
    */
-  private JSDocInfo getJSDocInfoOfProperty(ObjectType objectType, String propertyName) {
+  public static JSDocInfo getJSDocInfoOfProperty(ObjectType objectType, String propertyName) {
     for (; objectType != null;
         objectType = objectType.getImplicitPrototype()) {
       JSDocInfo docInfo = objectType.getOwnPropertyJSDocInfo(propertyName);
