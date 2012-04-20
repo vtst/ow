@@ -339,7 +339,7 @@ public abstract class AbstractCompletionProposal
     return additionalProposalInfo.getHTMLString();
   }
   
-  IInformationControlCreator informationControlCreator;
+  private IInformationControlCreator informationControlCreator;
   
   public IInformationControlCreator getInformationControlCreator() {
     Shell shell = context.getViewer().getTextWidget().getShell();
