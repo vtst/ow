@@ -161,8 +161,8 @@ public class JSUnit implements DependencyInfo {
 
   /**
    * Get a clone of the AST for the file.
-   * @return
    */
+  // TODO: Is this thread safe (when the AST is parsed?)
   public synchronized JsAst getAst(boolean stripped) {
     return astFactory.getClone(stripped);
   }
