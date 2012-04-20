@@ -23,5 +23,6 @@ Import-Package: org.eclipse.debug.internal.ui,
  org.eclipse.jface.text.contentassist,
  org.eclipse.jface.text.link,
  org.eclipse.ui,
+ org.eclipse.ui.editors.text,
  org.eclipse.ui.texteditor,
  org.eclipse.ui.texteditor.link
