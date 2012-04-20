@@ -23,6 +23,7 @@ public class ResourceProperties {
   private static final QualifiedName JS_FILES = new QualifiedName(OwJsClosurePlugin.PLUGIN_ID, "Files");
   private static final QualifiedName JS_UNIT = new QualifiedName(OwJsClosurePlugin.PLUGIN_ID, "JSUnit");
   private static final QualifiedName REFERENCED_PROJECTS = new QualifiedName(OwJsClosurePlugin.PLUGIN_ID, "ReferencedProjects");
+  private static final QualifiedName GENERATED_BY_COMPILER = new QualifiedName(OwJsClosurePlugin.PLUGIN_ID, "GeneratedByCompiler");
   
   
   /**
@@ -121,6 +122,15 @@ public class ResourceProperties {
       return null;
     }
   }
+
+  /**
+   * Clear the properties stored in a file.
+   * @param file
+   * @throws CoreException
+   */
+  private static void clearFile(IFile file) throws CoreException {
+    setJSUnit(file, null);
+  }
   
   /**
    * Clear the properties stored in a project (and its files).
@@ -130,7 +140,7 @@ public class ResourceProperties {
   public static void clearProject(IProject project) throws CoreException {
     Iterable<IFile> files = getJavaScriptFiles(project);
     if (files != null) {
-      for (IFile file: files) setJSUnit(file, null);
+      for (IFile file: files) clearFile(file);
     }
     setJavaScriptFiles(project, null);
     setJSProject(project, null);
