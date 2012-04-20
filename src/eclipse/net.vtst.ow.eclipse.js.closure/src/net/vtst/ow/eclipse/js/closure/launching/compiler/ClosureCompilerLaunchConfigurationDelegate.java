@@ -16,8 +16,8 @@ import java.util.Set;
 import net.vtst.eclipse.easy.ui.properties.stores.IReadOnlyStore;
 import net.vtst.eclipse.easy.ui.properties.stores.LaunchConfigurationReadOnlyStore;
 import net.vtst.eclipse.easy.ui.properties.stores.ProjectPropertyStore;
-import net.vtst.ow.closure.compiler.compile.DefaultExternsProvider;
 import net.vtst.ow.closure.compiler.deps.AbstractJSProject;
+import net.vtst.ow.closure.compiler.deps.JSExtern;
 import net.vtst.ow.closure.compiler.deps.JSProject;
 import net.vtst.ow.closure.compiler.deps.JSUnit;
 import net.vtst.ow.closure.compiler.deps.JSUnitProvider;
@@ -47,6 +47,7 @@ import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerInput;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.JSModule;
+import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.jscomp.deps.SortedDependencies.CircularDependencyException;
 
 public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
@@ -121,9 +122,8 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
       List<JSUnit> rootUnitsWithTheirDependencies = jsProject.getSortedDependenciesOf(rootUnits);
       JSModule module = new JSModule("main");
       for (JSUnit unit: rootUnitsWithTheirDependencies) module.add(new CompilerInput(unit.getAst(false)));
-      // TODO: Manage custom externs
       monitor.subTask(messages.getString("ClosureCompilerLaunchConfigurationDelegate_runCompiler"));
-      compiler.compileModules(DefaultExternsProvider.getAsSourceFiles(), Collections.singletonList(module), options);
+      compiler.compileModules(getExterns(compiler, monitor, storeForIncludes), Collections.singletonList(module), options);
       if (outputFile.exists()) {
         outputFile.setContents(new ByteArrayInputStream(compiler.toSource().getBytes("UTF-8")), false, false, monitor);
       } else {
@@ -137,6 +137,13 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
     } catch (IOException e) {
       throw new CoreException(new Status(Status.ERROR, OwJsClosurePlugin.PLUGIN_ID, e.getLocalizedMessage(), e));
     }
+  }
+  
+  private List<SourceFile> getExterns(AbstractCompiler compiler, IProgressMonitor monitor, IReadOnlyStore store) throws CoreException {
+    List<JSExtern> externs = includesProvider.getExterns(compiler, monitor, store);
+    List<SourceFile> sourceFiles = new ArrayList<SourceFile>(externs.size());
+    for (JSExtern extern: externs) sourceFiles.add(extern.getSourceFile());
+    return sourceFiles;
   }
   
   private IFile getOutputFile(IReadOnlyStore store, List<IResource> resources) throws CoreException {
