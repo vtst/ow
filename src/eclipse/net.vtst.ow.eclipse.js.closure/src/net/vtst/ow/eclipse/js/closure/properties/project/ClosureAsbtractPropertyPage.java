@@ -1,4 +1,4 @@
-package net.vtst.ow.eclipse.js.closure.properties;
+package net.vtst.ow.eclipse.js.closure.properties.project;
 
 import net.vtst.eclipse.easy.ui.properties.pages.EasyResourcePropertyPage;
 import net.vtst.ow.eclipse.js.closure.OwJsClosureMessages;

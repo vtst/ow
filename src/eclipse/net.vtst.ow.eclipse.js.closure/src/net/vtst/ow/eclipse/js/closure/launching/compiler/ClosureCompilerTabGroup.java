@@ -6,8 +6,8 @@ import net.vtst.eclipse.easy.ui.properties.editors.IEditorContainer;
 import net.vtst.eclipse.easy.ui.properties.pages.EasyLaunchConfigurationTab;
 import net.vtst.ow.eclipse.js.closure.OwJsClosureMessages;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
-import net.vtst.ow.eclipse.js.closure.properties.ClosureCompilerChecksEditor;
-import net.vtst.ow.eclipse.js.closure.properties.ClosureIncludesEditor;
+import net.vtst.ow.eclipse.js.closure.properties.project.ClosureCompilerChecksEditor;
+import net.vtst.ow.eclipse.js.closure.properties.project.ClosureIncludesEditor;
 
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
 import org.eclipse.debug.ui.CommonTab;

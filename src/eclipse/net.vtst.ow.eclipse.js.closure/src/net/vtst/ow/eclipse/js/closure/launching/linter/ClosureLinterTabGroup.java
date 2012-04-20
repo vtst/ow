@@ -7,7 +7,7 @@ import net.vtst.eclipse.easy.ui.properties.pages.EasyLaunchConfigurationTab;
 import net.vtst.ow.eclipse.js.closure.OwJsClosureMessages;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.launching.compiler.ClosureCompilerProjectPropertiesEditor;
-import net.vtst.ow.eclipse.js.closure.properties.ClosureLinterChecksEditor;
+import net.vtst.ow.eclipse.js.closure.properties.project.ClosureLinterChecksEditor;
 
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
 import org.eclipse.debug.ui.CommonTab;

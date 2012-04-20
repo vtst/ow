@@ -17,8 +17,8 @@ import net.vtst.ow.closure.compiler.util.ListWithoutDuplicates;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.builder.ClosureNature;
 import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
-import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPropertyRecord;
 import net.vtst.ow.eclipse.js.closure.properties.file.ClosureFilePropertyRecord;
+import net.vtst.ow.eclipse.js.closure.properties.project.ClosureProjectPropertyRecord;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;

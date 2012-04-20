@@ -5,7 +5,7 @@ import net.vtst.eclipse.easy.ui.properties.fields.BooleanField;
 import net.vtst.eclipse.easy.ui.properties.fields.ResourceListField;
 import net.vtst.eclipse.easy.ui.properties.fields.StringField;
 import net.vtst.ow.eclipse.js.closure.launching.compiler.ClosureCompilerLaunchConfigurationRecord;
-import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPropertyRecord;
+import net.vtst.ow.eclipse.js.closure.properties.project.ClosureProjectPropertyRecord;
 
 import org.eclipse.core.resources.IResource;
 

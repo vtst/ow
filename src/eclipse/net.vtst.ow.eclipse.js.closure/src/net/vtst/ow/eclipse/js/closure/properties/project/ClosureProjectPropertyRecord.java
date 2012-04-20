@@ -1,4 +1,4 @@
-package net.vtst.ow.eclipse.js.closure.properties;
+package net.vtst.ow.eclipse.js.closure.properties.project;
 
 import net.vtst.eclipse.easy.ui.properties.Record;
 import net.vtst.eclipse.easy.ui.properties.fields.BooleanField;

@@ -1,4 +1,4 @@
-package net.vtst.ow.eclipse.js.closure.properties;
+package net.vtst.ow.eclipse.js.closure.properties.project;
 
 import java.util.Arrays;
 import java.util.Collections;
