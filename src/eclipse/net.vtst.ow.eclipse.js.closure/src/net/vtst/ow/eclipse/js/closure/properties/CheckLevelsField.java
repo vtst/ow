@@ -1,5 +1,6 @@
 package net.vtst.ow.eclipse.js.closure.properties;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,9 +34,7 @@ import org.eclipse.swt.widgets.TableItem;
 import com.google.javascript.jscomp.CheckLevel;
 
 public class CheckLevelsField extends AbstractField<Map<String, CheckLevel>> {
-  
-  // TODO Add descriptions of checks
-  
+    
   // See http://code.google.com/p/closure-compiler/wiki/Warnings for display names.
   private static String SEPARATOR_1 = "\n";
   private static String SEPARATOR_2 = "=";
@@ -102,18 +101,18 @@ public class CheckLevelsField extends AbstractField<Map<String, CheckLevel>> {
     public Editor(IEditorContainer container, Composite parent, IField<Map<String, CheckLevel>> field) {
       super(container, field);
       int hspan = getColumnCount(parent);
-      if (hspan < 2) return;  // TODO
-      label = SWTFactory.createLabel(parent, getMessage(), 1);
+      label = SWTFactory.createLabel(parent, getMessage(), hspan);
       label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
       
       createInternalTables();
-      createTable(parent, hspan - 1);
+      createTable(parent, hspan);
       createTableEditor();    
     }
     
     private void createInternalTables() {
       Map<String, ?> diagnosticGroupMap = (new MagicDiagnosticGroups()).getRegisteredGroups();
       diagnosticGroups = diagnosticGroupMap.keySet().toArray(new String[0]);
+      Arrays.sort(diagnosticGroups);
       currentValues = new HashMap<String, CheckLevel>(diagnosticGroupMap.size());
       for (String groupName: diagnosticGroups) currentValues.put(groupName, CheckLevel.OFF);
 
@@ -141,7 +140,7 @@ public class CheckLevelsField extends AbstractField<Map<String, CheckLevel>> {
       // Fill the table
       for (String groupName: diagnosticGroups) {
         TableItem item = new TableItem(table, SWT.NONE);
-        item.setText(new String[] {groupName, groupName, checkLevelDisplayNames[0]});
+        item.setText(new String[] {groupName, checkLevelDisplayNames[0], getMessage(groupName)});
       }
       for (TableColumn column: columns) column.pack();
     }
@@ -154,8 +153,8 @@ public class CheckLevelsField extends AbstractField<Map<String, CheckLevel>> {
       editor.horizontalAlignment = SWT.LEFT;
       editor.grabHorizontal = true;
       editor.minimumWidth = 50;
-      // editing the column #2
-      final int EDITABLECOLUMN = 2;
+      // editing the column #1
+      final int EDITABLECOLUMN = 1;
       
       table.addSelectionListener(new SelectionAdapter() {
         public void widgetSelected(SelectionEvent e) {
@@ -202,10 +201,10 @@ public class CheckLevelsField extends AbstractField<Map<String, CheckLevel>> {
       for (int i = 0; i < diagnosticGroups.length; ++i) {
         CheckLevel level = value.get(diagnosticGroups[i]);
         if (level == null) {
-          table.getItem(i).setText(2, checkLevelDisplayNames[0]);
+          table.getItem(i).setText(1, checkLevelDisplayNames[0]);
         } else {
           currentValues.put(diagnosticGroups[i], value.get(diagnosticGroups[i]));
-          table.getItem(i).setText(2, checkLevelDisplayNames[level.ordinal() + 1]);
+          table.getItem(i).setText(1, checkLevelDisplayNames[level.ordinal() + 1]);
         }
       }
     }
