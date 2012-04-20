@@ -45,7 +45,10 @@ import org.eclipse.core.runtime.jobs.Job;
 
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
+import com.google.javascript.jscomp.DiagnosticType;
 import com.google.javascript.jscomp.ErrorManager;
+import com.google.javascript.jscomp.JSError;
+import com.google.javascript.jscomp.JSModule;
 import com.google.javascript.jscomp.deps.SortedDependencies.CircularDependencyException;
 
 /**
@@ -56,7 +59,11 @@ import com.google.javascript.jscomp.deps.SortedDependencies.CircularDependencyEx
 public class ClosureBuilder extends IncrementalProjectBuilder {
   
   public static final String BUILDER_ID = "net.vtst.ow.eclipse.js.closure.closureBuilder";
-  
+
+  private static final DiagnosticType CIRCULAR_DEPENDENCY_ERROR =
+      DiagnosticType.error("JSC_CIRCULAR_DEP",
+          "Circular dependency detected: {0}");
+
   private IJSIncludesProvider jsLibraryProvider = OwJsClosurePlugin.getDefault().getJSLibraryProviderForClosureBuilder();
   private OwJsClosureMessages messages = OwJsClosurePlugin.getDefault().getMessages();
   private ProjectOrderManager projectOrderManager = OwJsClosurePlugin.getDefault().getProjectOrderManager();
@@ -142,7 +149,9 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
       try {
         jsProject.setUnits(compiler, units);
       } catch (CircularDependencyException e) {
-        throw new CoreException(new Status(IStatus.ERROR, OwJsClosurePlugin.PLUGIN_ID, e.getMessage(), e));
+        CompilerUtils.reportError(compiler, JSError.make(CIRCULAR_DEPENDENCY_ERROR, e.getMessage()));
+        forgetLastBuiltState();
+        return;
       }
       monitor.worked(1);
       forgetIfCanceled = false;
