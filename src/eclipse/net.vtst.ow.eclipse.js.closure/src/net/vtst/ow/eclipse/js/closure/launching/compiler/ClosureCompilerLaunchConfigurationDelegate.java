@@ -24,10 +24,10 @@ import net.vtst.ow.closure.compiler.deps.JSUnitProvider;
 import net.vtst.ow.closure.compiler.util.CompilerUtils;
 import net.vtst.ow.eclipse.js.closure.OwJsClosureMessages;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
-import net.vtst.ow.eclipse.js.closure.builder.ResourceProperties;
 import net.vtst.ow.eclipse.js.closure.compiler.ClosureCompiler;
 import net.vtst.ow.eclipse.js.closure.compiler.ClosureCompilerOptions;
 import net.vtst.ow.eclipse.js.closure.compiler.IJSIncludesProvider;
+import net.vtst.ow.eclipse.js.closure.properties.file.ClosureFilePropertyRecord;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -54,8 +54,6 @@ import com.google.javascript.jscomp.deps.SortedDependencies.CircularDependencyEx
 public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
   
   public static final String TYPE_ID = "net.vtst.ow.eclipse.js.closure.launching.compiler";
-  
-  // TODO: If the output file has the .js extension, this creates build errors
   
   private OwJsClosureMessages messages = OwJsClosurePlugin.getDefault().getMessages();
   private ClosureCompilerLaunchConfigurationRecord record = ClosureCompilerLaunchConfigurationRecord.getInstance();
@@ -131,6 +129,7 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
         outputFile.create(new ByteArrayInputStream(compiler.toSource().getBytes("UTF-8")), false, monitor);
       }
       outputFile.setCharset("UTF-8", monitor);
+      ClosureFilePropertyRecord.getInstance().generatedByCompiler.set(new ResourcePropertyStore(outputFile, OwJsClosurePlugin.PLUGIN_ID), true);
       process.setTerminated();
       monitor.done();
     } catch (CircularDependencyException e) {

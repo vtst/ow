@@ -18,6 +18,7 @@ import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.builder.ClosureNature;
 import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
 import net.vtst.ow.eclipse.js.closure.properties.ClosureProjectPropertyRecord;
+import net.vtst.ow.eclipse.js.closure.properties.file.ClosureFilePropertyRecord;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -50,7 +51,10 @@ public class ClosureCompiler {
     IContentDescription contentDescription = file.getContentDescription();
     if (contentDescription == null) return false;
     IContentType contentType = contentDescription.getContentType();
-    return contentType.isKindOf(jsContentType);
+    if (!contentType.isKindOf(jsContentType)) return false;
+    if (ClosureFilePropertyRecord.getInstance().generatedByCompiler.get(new ResourcePropertyStore(file, OwJsClosurePlugin.PLUGIN_ID)))
+      return false;
+    return true;
   }
   
   /**
