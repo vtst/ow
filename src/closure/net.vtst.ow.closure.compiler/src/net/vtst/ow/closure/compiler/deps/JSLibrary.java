@@ -29,7 +29,7 @@ import com.google.javascript.jscomp.deps.SortedDependencies.CircularDependencyEx
  * @author Vincent Simonet
  */
 public class JSLibrary extends AbstractJSProject {
-  
+
   public enum CacheMode {
     DISABLED,
     READ_ONLY,
@@ -61,6 +61,10 @@ public class JSLibrary extends AbstractJSProject {
   static final DiagnosticType OW_CANNOT_PARSE_DEPS_LINE = DiagnosticType.warning(
       "OW_CANNOT_PARSE_DEPS_LINE",
       "Cannot parse line.");
+
+  private static final DiagnosticType LIBRARY_NOT_FOUND = DiagnosticType.warning(
+      "OW_LIBRARY_NOT_FOUND",
+      "Library not found: {0}");
 
   private File path;
   private File pathOfClosureBase;
@@ -171,7 +175,11 @@ public class JSLibrary extends AbstractJSProject {
         units.add(unit);
       }
     };
-    visitor.visit(path);
+    if (path.exists()) {
+      visitor.visit(path);
+    } else {
+      CompilerUtils.reportError(compiler, JSError.make(LIBRARY_NOT_FOUND, path.toString()));
+    }
     return units;
   }
   
