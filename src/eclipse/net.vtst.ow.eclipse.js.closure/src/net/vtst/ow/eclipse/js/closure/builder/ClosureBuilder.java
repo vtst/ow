@@ -312,23 +312,26 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
    * @return true iif the project has been updated
    * @throws CoreException
    */
-  // TODO: Clean this method!
   private boolean updateJSProjectIfNeeded(
       IProgressMonitor monitor, Compiler compiler, 
       IProject project, JSProject jsProject) throws CoreException {
+    // Get the referenced projects and libraries
     ProjectOrderManager.State projectOrderState = projectOrderManager.get();
     if (projectOrderState.getModificationStamp() <= jsProject.getReferencedProjectsModificationStamp()) return false;
     OwJsDev.log("Updating referenced projects of: %s", project.getName());
     ArrayList<IProject> projects = ClosureCompiler.getReferencedJavaScriptProjectsRecursively(
         Collections.singleton(project), projectOrderState.reverseOrderComparator());
     Collection<AbstractJSProject> libraries = jsLibraryProvider.getLibraries(compiler, monitor, projects);
-    ArrayList<AbstractJSProject> referencedProjects = new ArrayList<AbstractJSProject>(projects.size() + libraries.size());
-    for (IProject referencedProject: projects) referencedProjects.add(ResourceProperties.getOrCreateJSProject(referencedProject));
-    jsProject.setExterns(jsLibraryProvider.getExterns(compiler, monitor, projects));
-    // After this, referencedProjects contains projects + libraries!
-    referencedProjects.addAll(libraries);
+
+    // Build the list of referenced projects and libraries
+    ArrayList<AbstractJSProject> referencedProjectsAndLibraries = new ArrayList<AbstractJSProject>(projects.size() + libraries.size());
+    for (IProject referencedProject: projects) referencedProjectsAndLibraries.add(ResourceProperties.getOrCreateJSProject(referencedProject));
+    referencedProjectsAndLibraries.addAll(libraries);
+    
+    // Store the results in the jsProject.
     ResourceProperties.setTransitivelyReferencedProjects(project, projects.toArray(new IProject[0]));
-    jsProject.setReferencedProjects(referencedProjects, projectOrderState.getModificationStamp());
+    jsProject.setReferencedProjects(referencedProjectsAndLibraries, projectOrderState.getModificationStamp());
+    jsProject.setExterns(jsLibraryProvider.getExterns(compiler, monitor, projects));
     return true;
   }
     
