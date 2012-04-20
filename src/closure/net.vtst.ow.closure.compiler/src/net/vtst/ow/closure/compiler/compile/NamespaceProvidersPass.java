@@ -54,7 +54,7 @@ public class NamespaceProvidersPass implements HotSwapCompilerPass {
         currentScript = node;
         return true;
       } else {
-        return (parent == null || parent.isExprResult());
+        return (parent == null || parent.isExprResult() || parent.isScript());
       }
     }
 
