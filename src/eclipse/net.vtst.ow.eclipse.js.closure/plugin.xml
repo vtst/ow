@@ -37,7 +37,7 @@
     id="ClosureCompletionProposalComputer"
     name="%closure_completion_proposal_computer">
     <javaCompletionProposalComputer
-      class="net.vtst.ow.eclipse.js.closure.contentassist.ClosureCompletionProposalComputer"
+      class="net.vtst.ow.eclipse.js.closure.editor.contentassist.ClosureCompletionProposalComputer"
       categoryId="net.vtst.ow.eclipse.js.closure.ClosureCompletionProposalCategory">
       <partition type="__dftl_partition_content_type"/>
     </javaCompletionProposalComputer>

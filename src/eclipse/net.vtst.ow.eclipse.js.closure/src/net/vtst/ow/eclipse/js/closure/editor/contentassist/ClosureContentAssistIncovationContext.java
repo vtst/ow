@@ -1,4 +1,4 @@
-package net.vtst.ow.eclipse.js.closure.contentassist;
+package net.vtst.ow.eclipse.js.closure.editor.contentassist;
 
 import java.util.Collections;
 
