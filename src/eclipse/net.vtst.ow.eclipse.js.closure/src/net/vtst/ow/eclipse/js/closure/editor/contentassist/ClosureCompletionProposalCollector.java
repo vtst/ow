@@ -213,6 +213,11 @@ public class ClosureCompletionProposalCollector {
     return node != null && !node.isSyntheticBlock() && node.getLineno() >= 0;
   }
   
+  /**
+   * Tests whether a property name should be shown as a completion proposal.
+   * @param name  A property name.
+   * @return  true if {@code name} should be shown as a completion proposal.
+   */
   private boolean isVisibleName(String name) {
     int n = name.length();
     if (n < 4) return true;
