@@ -1,15 +1,11 @@
 package net.vtst.ow.eclipse.js.closure.editor.hover;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
-import java.util.List;
 
 import net.vtst.ow.closure.compiler.compile.CompilableJSUnit;
 import net.vtst.ow.closure.compiler.compile.CompilerRun;
 import net.vtst.ow.eclipse.js.closure.builder.ResourceProperties;
 import net.vtst.ow.eclipse.js.closure.editor.contentassist.ClosureAdditionalProposalInfo;
-import net.vtst.ow.eclipse.js.closure.editor.contentassist.ClosureCompletionProposal;
 import net.vtst.ow.eclipse.js.closure.editor.contentassist.ClosureCompletionProposalCollector;
 
 import org.eclipse.core.resources.IFile;
