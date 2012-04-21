@@ -336,7 +336,7 @@ public abstract class AbstractCompletionProposal
     if (additionalProposalInfo == null) {
       additionalProposalInfo = makeAdditionalProposalInfo();
     }
-    return additionalProposalInfo.getHTMLString();
+    return additionalProposalInfo.getHTMLStringForHover();
   }
   
   private IInformationControlCreator informationControlCreator;

@@ -18,7 +18,15 @@ import com.google.javascript.rhino.jstype.FunctionType;
 import com.google.javascript.rhino.jstype.JSType;
 import com.google.javascript.rhino.jstype.ObjectType;
 
-public class ClosureHoverInfo implements IAdditionalProposalInfo {
+/**
+ * Class for storing the information about a JS element.  It provides some logic which is
+ * common to completion proposals and hovers.  
+ * It implements {@code IAdditionalProposalInfo}, so that it can be passed by a 
+ * completion proposal as an additional proposal info for display when a completion
+ * proposal is selected.
+ * @author Vincent Simonet
+ */
+public class ClosureJSElementInfo implements IAdditionalProposalInfo {
   
   private OwJsClosureMessages messages;
   
@@ -35,19 +43,19 @@ public class ClosureHoverInfo implements IAdditionalProposalInfo {
    * @param docInfo  The doc info to use for filling the proposal info.
    * @param type  The type to use for filling the proposal info.
    */
-  public ClosureHoverInfo(Node node, JSDocInfo docInfo, JSType type) {
+  public ClosureJSElementInfo(Node node, JSDocInfo docInfo, JSType type) {
     this.node = node;
     this.docInfo = docInfo;
     this.type = type;
   }
   
-  public ClosureHoverInfo(String qualifiedName, Node node, JSDocInfo docInfo, JSType type) {
+  public ClosureJSElementInfo(String qualifiedName, Node node, JSDocInfo docInfo, JSType type) {
     this(node, docInfo, type);
     this.qualifiedName = qualifiedName;
   }
 
   @Override
-  public String getHTMLString() {
+  public String getHTMLStringForHover() {
     if (htmlString == null) buildHTMLString();
     return htmlString;
   }
