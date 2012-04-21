@@ -94,7 +94,7 @@ public class CompilerRun {
     return module;
   }
   
-  public Map<JSUnit, Long> buildLastModifiedMap(List<JSUnit> sortedUnits) {
+  private Map<JSUnit, Long> buildLastModifiedMap(List<JSUnit> sortedUnits) {
     Map<JSUnit, Long> map = new HashMap<JSUnit, Long>();
     for (JSUnit unit: sortedUnits) {
       map.put(unit, unit.lastModified());
@@ -168,7 +168,7 @@ public class CompilerRun {
     }
   }
   
-  public void processCustomPassesOnNewScript(JsAst ast) {
+  private void processCustomPassesOnNewScript(JsAst ast) {
     if (options.customPasses == null) return;
     Node scriptRoot = ast.getAstRoot(compiler);
     Node originalRoot = compiler.getRoot();
