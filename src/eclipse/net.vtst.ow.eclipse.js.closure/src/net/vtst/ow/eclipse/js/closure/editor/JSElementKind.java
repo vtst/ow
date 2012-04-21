@@ -1,8 +1,5 @@
 package net.vtst.ow.eclipse.js.closure.editor;
 
-import com.google.javascript.rhino.JSDocInfo.Visibility;
-
-import net.vtst.ow.eclipse.js.closure.OwJsClosureImages;
 
 /**
  * The different kind of JavaScript elements.  Kinds are used to choose the right icon,

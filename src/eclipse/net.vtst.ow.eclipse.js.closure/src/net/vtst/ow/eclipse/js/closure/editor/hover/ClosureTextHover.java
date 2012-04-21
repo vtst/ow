@@ -97,7 +97,7 @@ public class ClosureTextHover extends AbstractTextHover {
       // TODO: Add the name and kind as title in the completion proposal
       if (nameNode == null || !(nameNodeType instanceof ObjectType)) return null;
       ObjectType objectType = (ObjectType) nameNodeType;
-      JSDocInfo docInfo = ClosureCompletionProposalCollector.getJSDocInfoOfProperty(objectType, propertyName);
+      // JSDocInfo docInfo = ClosureCompletionProposalCollector.getJSDocInfoOfProperty(objectType, propertyName);
       //return new JSElementInfo(objectType.getPropertyNode(propertyName), objectType.getPropertyType(propertyName), docInfo, false, false);
     }
     return null;

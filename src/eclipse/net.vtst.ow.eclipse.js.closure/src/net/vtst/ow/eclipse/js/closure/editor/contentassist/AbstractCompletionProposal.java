@@ -6,7 +6,6 @@ import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
 import net.vtst.ow.eclipse.js.closure.util.Utils;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.internal.text.html.BrowserInformationControl;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
@@ -323,6 +322,10 @@ public abstract class AbstractCompletionProposal
   // **************************************************************************
   // Proposal info
   
+  /**
+   * @return  A factory class for the additional proposal info.  The factory
+   *   class should implement caching.
+   */
   protected abstract IAdditionalProposalInfoProvider getAdditionalProposalInfoProvider();
   
   /* (non-Javadoc)

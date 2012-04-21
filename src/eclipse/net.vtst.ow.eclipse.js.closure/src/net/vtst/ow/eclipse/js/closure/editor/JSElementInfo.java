@@ -13,10 +13,11 @@ import net.vtst.ow.eclipse.js.closure.util.Utils;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import com.google.javascript.jscomp.NodeUtil;
+import com.google.javascript.jscomp.Scope.Var;
 import com.google.javascript.rhino.JSDocInfo;
+import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
-import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.jstype.FunctionType;
 import com.google.javascript.rhino.jstype.JSType;
 import com.google.javascript.rhino.jstype.ObjectType;
@@ -49,14 +50,17 @@ public class JSElementInfo implements IAdditionalProposalInfoProvider {
   // HTML generation
   private StringBuffer buf;
   private String htmlString;
-  
+
+  // **************************************************************************
+  // Constructor and factories
+
   /**
    * Create a new additional proposal info.
    * @param node  The node to which the proposal info is relative.
    * @param docInfo  The doc info to use for filling the proposal info.
    * @param type  The type to use for filling the proposal info.
    */
-  public JSElementInfo(
+  private JSElementInfo(
       CompilerRun run, Node node, JSType type, JSDocInfo docInfo,
       boolean isProperty, boolean isLocalVariable) {
     this.run = run;
@@ -67,6 +71,38 @@ public class JSElementInfo implements IAdditionalProposalInfoProvider {
     this.isLocalVariable = isLocalVariable;
     this.isNamespace = isNamespace(node);
     this.kind = computeKind();
+  }
+  
+  /**
+   * Creates a new {@code JSElementInfo} from a top-level variable.
+   * @param run  The compiler run (to be used to retrieve further information).
+   * @param var  The top-level variable.
+   * @return  A new {@code JSElementInfo}.
+   */
+  public static JSElementInfo makeFromVar(CompilerRun run, Var var) {
+    return new JSElementInfo(run, var.getNameNode(), var.getType(), var.getJSDocInfo(), false, var.isLocal());
+  }
+  
+  public static JSElementInfo makeFromProperty(CompilerRun run, ObjectType type, String propertyName) {
+    return new JSElementInfo(
+        run, type.getPropertyNode(propertyName), type.getPropertyType(propertyName), 
+        getJSDocInfoOfProperty(type, propertyName), true, false);
+  }
+  
+  // TODO Should be private
+  /**
+   * Get the doc info for a property in an object type, by walking through the type hierarchy.
+   * @param objectType  The objectType to which the property belong to.
+   * @param propertyName  The name of the property.
+   * @return  The doc info, or null if not found.
+   */
+  public static JSDocInfo getJSDocInfoOfProperty(ObjectType objectType, String propertyName) {
+    for (; objectType != null;
+        objectType = objectType.getImplicitPrototype()) {
+      JSDocInfo docInfo = objectType.getOwnPropertyJSDocInfo(propertyName);
+      if (docInfo != null) return docInfo;
+    }
+    return null;    
   }
   
   // **************************************************************************

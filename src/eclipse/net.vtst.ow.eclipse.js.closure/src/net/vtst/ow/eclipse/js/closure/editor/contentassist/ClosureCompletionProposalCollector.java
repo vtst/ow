@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.vtst.ow.closure.compiler.compile.CompilerRun;
+import net.vtst.ow.eclipse.js.closure.editor.JSElementInfo;
 
 import com.google.common.collect.Lists;
 import com.google.javascript.jscomp.Scope;
@@ -64,14 +65,11 @@ public class ClosureCompletionProposalCollector {
     String prefix = context.getPrefix();
     LinkedList<ClosureCompletionProposal> list = new LinkedList<ClosureCompletionProposal>();
     for (Var var: context.getCompilerRun().getAllSymbols(context.getNode())) {
-      if (isValidFor(var.getName(), prefix) && isSimpleName(var.getName())) {
-        Node node = var.getNameNode();
-        String name = var.getName();
-        if (isConcreteNode(node) && isVisibleName(name)) {
-          list.add(new ClosureCompletionProposal(
-              context, name, node, var.getType(), var.getJSDocInfo(),
-              false, var.isLocal()));
-        }
+      String name = var.getName();
+      if (isValidForPrefix(name, prefix) && isSimpleName(name) &&
+          isVisibleName(name) && isConcreteNode(var.getNameNode())) {
+        list.add(new ClosureCompletionProposal(
+            context, name, JSElementInfo.makeFromVar(context.getCompilerRun(), var)));
       }
     }
     return list;
@@ -96,22 +94,6 @@ public class ClosureCompletionProposalCollector {
       collectProposalsFromType(map, context.getPrefix(), type);
     }
     return Lists.newArrayList(map.values());
-  }
-
-  
-  /**
-   * Get the doc info for a property in an object type, by walking through the type hierarchy.
-   * @param objectType  The objectType to which the property belong to.
-   * @param propertyName  The name of the property.
-   * @return  The doc info, or null if not found.
-   */
-  public static JSDocInfo getJSDocInfoOfProperty(ObjectType objectType, String propertyName) {
-    for (; objectType != null;
-        objectType = objectType.getImplicitPrototype()) {
-      JSDocInfo docInfo = objectType.getOwnPropertyJSDocInfo(propertyName);
-      if (docInfo != null) return docInfo;
-    }
-    return null;    
   }
   
   /**
@@ -145,16 +127,15 @@ public class ClosureCompletionProposalCollector {
     if (alternateType instanceof ObjectType) {
       ObjectType alternateObjectType = (ObjectType) alternateType;
       for (String propertyName: alternateObjectType.getPropertyNames()) {
-        if (isValidFor(propertyName, prefix)) {
+        if (isValidForPrefix(propertyName, prefix) && isVisibleName(propertyName)) {
           ClosureCompletionProposal proposal = map.get(propertyName);
           if (proposal == null) {
-            Node node = alternateObjectType.getPropertyNode(propertyName);
-            if (isConcreteNode(node) && isVisibleName(propertyName)) {
-              JSDocInfo docInfo = getJSDocInfoOfProperty(alternateObjectType, propertyName);
-              JSType propertyType = alternateObjectType.getPropertyType(propertyName);
-              proposal = new ClosureCompletionProposal(
-                  context, propertyName, node, propertyType, docInfo,
-                  true, false);
+            // This is slightly unefficient, because we build the elementInfo before
+            // checking that the node is concrete.  But I'm not sure it is useful to
+            // complicate the code for this particular case.
+            JSElementInfo elementInfo = JSElementInfo.makeFromProperty(context.getCompilerRun(), alternateObjectType, propertyName);
+            if (isConcreteNode(elementInfo.getNode())) {
+              proposal = new ClosureCompletionProposal(context, propertyName, elementInfo);
               map.put(propertyName, proposal);
             }
           }
@@ -206,7 +187,7 @@ public class ClosureCompletionProposalCollector {
    * @param prefix  The last segment of the context
    * @return true if {@code name} is a valid completion proposal name.
    */
-  private boolean isValidFor(String name, String prefix) {
+  private boolean isValidForPrefix(String name, String prefix) {
     return name.startsWith(prefix);
   }
 }

@@ -3,14 +3,11 @@ package net.vtst.ow.eclipse.js.closure.editor.contentassist;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-
 import net.vtst.ow.eclipse.js.closure.editor.JSElementInfo;
 import net.vtst.ow.eclipse.js.closure.util.Utils;
 
 import com.google.common.base.Preconditions;
 import com.google.javascript.jscomp.NodeUtil;
-import com.google.javascript.rhino.JSDocInfo;
 import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
@@ -29,19 +26,11 @@ public class ClosureCompletionProposal extends AbstractCompletionProposal {
   /**
    * @param context  The context in which the completion proposal is created.
    * @param name  The name of the completion proposal, used as display and completion strings.
-   * @param node  The name node for the completion proposal.
-   * @param type  The type for the completion proposal.
-   * @param docInfo  The doc info for the completion proposal.
-   * @param isProperty  true if this is a completion proposal for an object property.
-   * @param isLocalVariable  true if this is a completion proposal for a local variable.
-   * @param isNamespace  true if this is a completion proposal for a namespace.
+   * @param elementInfo  The element info for the completion proposal.
    */
-  public ClosureCompletionProposal(
-      ClosureContentAssistIncovationContext context, String name, 
-      Node node, JSType type, JSDocInfo docInfo,
-      boolean isProperty, boolean isLocalVariable) {
+  public ClosureCompletionProposal(ClosureContentAssistIncovationContext context, String name, JSElementInfo elementInfo) {
     super(context, name);
-    elementInfo = new JSElementInfo(context.getCompilerRun(), node, type, docInfo, isProperty, isLocalVariable);
+    this.elementInfo = elementInfo;
   }
 
   @Override
@@ -132,7 +121,6 @@ public class ClosureCompletionProposal extends AbstractCompletionProposal {
     return elementInfo;
   }
 
-  // TODO: This is temporary and should be deleted
   public void addVisibility(Visibility extraVisibility) {
     elementInfo.addVisibility(extraVisibility);
   }
