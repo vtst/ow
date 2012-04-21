@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.vtst.ow.eclipse.js.closure.OwJsClosureImages;
+import net.vtst.ow.eclipse.js.closure.editor.ClosureHoverInfo;
 import net.vtst.ow.eclipse.js.closure.util.Utils;
 
 import com.google.common.base.Preconditions;
@@ -239,7 +240,7 @@ public class ClosureCompletionProposal extends AbstractCompletionProposal {
       Node namespaceNode = context.getNamespaceProvider(node.getQualifiedName());
       if (namespaceNode != null) docInfo = namespaceNode.getJSDocInfo();
     }
-    return new ClosureAdditionalProposalInfo(node, docInfo, type);
+    return new ClosureHoverInfo(node, docInfo, type);
   }
 
   // **************************************************************************

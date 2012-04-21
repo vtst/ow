@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import net.vtst.ow.closure.compiler.compile.CompilableJSUnit;
 import net.vtst.ow.closure.compiler.compile.CompilerRun;
 import net.vtst.ow.eclipse.js.closure.builder.ResourceProperties;
-import net.vtst.ow.eclipse.js.closure.editor.contentassist.ClosureAdditionalProposalInfo;
+import net.vtst.ow.eclipse.js.closure.editor.ClosureHoverInfo;
 import net.vtst.ow.eclipse.js.closure.editor.contentassist.ClosureCompletionProposalCollector;
 
 import org.eclipse.core.resources.IFile;
@@ -73,7 +73,7 @@ public class ClosureTextHover extends AbstractTextHover {
     }
   }
   
-  protected ClosureAdditionalProposalInfo getInfo(Node node, Scope scope) {
+  protected ClosureHoverInfo getInfo(Node node, Scope scope) {
     LinkedList<String> qualifiedName = getQualifiedName(node);
     if (qualifiedName.isEmpty()) return null;
     String name = qualifiedName.removeFirst();
@@ -81,7 +81,7 @@ public class ClosureTextHover extends AbstractTextHover {
     Var var = scope.getVar(name);
     if (var == null) return null;
     if (qualifiedName.isEmpty()) {
-      return new ClosureAdditionalProposalInfo(var.getNameNode(), var.getJSDocInfo(), var.getType());
+      return new ClosureHoverInfo(var.getNameNode(), var.getJSDocInfo(), var.getType());
     } else {
       Node nameNode = var.getNameNode();
       JSType nameNodeType = nameNode.getJSType();
@@ -98,7 +98,7 @@ public class ClosureTextHover extends AbstractTextHover {
       if (nameNode == null || !(nameNodeType instanceof ObjectType)) return null;
       ObjectType objectType = (ObjectType) nameNodeType;
       JSDocInfo docInfo = ClosureCompletionProposalCollector.getJSDocInfoOfProperty(objectType, propertyName);
-      return new ClosureAdditionalProposalInfo(objectType.getPropertyNode(propertyName), docInfo, objectType.getPropertyType(propertyName));
+      return new ClosureHoverInfo(objectType.getPropertyNode(propertyName), docInfo, objectType.getPropertyType(propertyName));
     }
   }
   
@@ -111,7 +111,7 @@ public class ClosureTextHover extends AbstractTextHover {
     Node node = run.getNode(unit, region.getOffset());
     Scope scope = run.getScope(node);
     if (node == null || scope == null) return null;
-    ClosureAdditionalProposalInfo info = getInfo(node, scope);
+    ClosureHoverInfo info = getInfo(node, scope);
     if (info == null) return null;
     return info.getHTMLString();
   }

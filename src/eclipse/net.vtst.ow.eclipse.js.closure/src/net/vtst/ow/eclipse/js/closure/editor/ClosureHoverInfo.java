@@ -1,9 +1,10 @@
-package net.vtst.ow.eclipse.js.closure.editor.contentassist;
+package net.vtst.ow.eclipse.js.closure.editor;
 
 import java.util.Set;
 
 import net.vtst.ow.eclipse.js.closure.OwJsClosureMessages;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
+import net.vtst.ow.eclipse.js.closure.editor.contentassist.IAdditionalProposalInfo;
 import net.vtst.ow.eclipse.js.closure.util.HTMLPrinter;
 import net.vtst.ow.eclipse.js.closure.util.Utils;
 
@@ -17,7 +18,7 @@ import com.google.javascript.rhino.jstype.FunctionType;
 import com.google.javascript.rhino.jstype.JSType;
 import com.google.javascript.rhino.jstype.ObjectType;
 
-public class ClosureAdditionalProposalInfo implements IAdditionalProposalInfo {
+public class ClosureHoverInfo implements IAdditionalProposalInfo {
   
   private OwJsClosureMessages messages;
   
@@ -34,13 +35,13 @@ public class ClosureAdditionalProposalInfo implements IAdditionalProposalInfo {
    * @param docInfo  The doc info to use for filling the proposal info.
    * @param type  The type to use for filling the proposal info.
    */
-  public ClosureAdditionalProposalInfo(Node node, JSDocInfo docInfo, JSType type) {
+  public ClosureHoverInfo(Node node, JSDocInfo docInfo, JSType type) {
     this.node = node;
     this.docInfo = docInfo;
     this.type = type;
   }
   
-  public ClosureAdditionalProposalInfo(String qualifiedName, Node node, JSDocInfo docInfo, JSType type) {
+  public ClosureHoverInfo(String qualifiedName, Node node, JSDocInfo docInfo, JSType type) {
     this(node, docInfo, type);
     this.qualifiedName = qualifiedName;
   }
