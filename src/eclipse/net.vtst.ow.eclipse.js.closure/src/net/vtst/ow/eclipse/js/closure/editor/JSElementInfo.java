@@ -83,12 +83,36 @@ public class JSElementInfo implements IAdditionalProposalInfoProvider {
     return new JSElementInfo(run, var.getNameNode(), var.getType(), var.getJSDocInfo(), false, var.isLocal());
   }
   
+  /**
+   * Creates a new {@code JSElementInfo} from a property.
+   * @param run  The compiler run (to be used to retrieve further information).
+   * @param type  The object type the property belongs to.
+   * @param propertyName  The name of the property.  It <b>must</b> exist.
+   * @return  A new {@code JSElementInfo}.  
+   */
   public static JSElementInfo makeFromProperty(CompilerRun run, ObjectType type, String propertyName) {
     return new JSElementInfo(
         run, type.getPropertyNode(propertyName), type.getPropertyType(propertyName), 
         getJSDocInfoOfProperty(type, propertyName), true, false);
   }
-  
+
+  /**
+   * Creates a new {@code JSElementInfo} from a property.
+   * @param run  The compiler run (to be used to retrieve further information).
+   * @param type  The type the property may belong to.
+   * @param propertyName  The name of the property.  It may exist or not.
+   * @return  A new {@code JSElementInfo}, or null.
+   */
+  public static JSElementInfo makeFromPropertyOrNull(CompilerRun run, JSType type, String propertyName) {
+    if (type instanceof ObjectType) {
+      ObjectType objectType = (ObjectType) type;
+      if (objectType.hasProperty(propertyName)) {
+        return makeFromProperty(run, objectType, propertyName);
+      }
+    }
+    return null;
+  }
+
   /**
    * Get the doc info for a property in an object type, by walking through the type hierarchy.
    * @param objectType  The objectType to which the property belong to.

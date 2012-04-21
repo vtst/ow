@@ -6,7 +6,6 @@ import net.vtst.ow.closure.compiler.compile.CompilableJSUnit;
 import net.vtst.ow.closure.compiler.compile.CompilerRun;
 import net.vtst.ow.eclipse.js.closure.builder.ResourceProperties;
 import net.vtst.ow.eclipse.js.closure.editor.JSElementInfo;
-import net.vtst.ow.eclipse.js.closure.editor.contentassist.ClosureCompletionProposalCollector;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IRegion;
@@ -16,11 +15,9 @@ import org.eclipse.ui.IFileEditorInput;
 
 import com.google.javascript.jscomp.Scope;
 import com.google.javascript.jscomp.Scope.Var;
-import com.google.javascript.rhino.JSDocInfo;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
 import com.google.javascript.rhino.jstype.JSType;
-import com.google.javascript.rhino.jstype.ObjectType;
 
 // TODO: Update web page to mention the configuration to do
 public class ClosureTextHover extends AbstractTextHover {
@@ -28,7 +25,7 @@ public class ClosureTextHover extends AbstractTextHover {
   private static String THIS = "this";
 
   /**
-   * @return The file edited in the current editor.
+   * @return The file edited in the current editor, or null.
    */
   private IFile getFile() {
     IEditorInput editorInput = getEditor().getEditorInput();
@@ -36,12 +33,20 @@ public class ClosureTextHover extends AbstractTextHover {
     return ((IFileEditorInput) editorInput).getFile();
   }
   
+  /**
+   * @return The JavaScript unit edited in the current editor, or null.
+   */
   private CompilableJSUnit getJSUnit() {
     IFile file = getFile();
     if (file == null) return null;
     return ResourceProperties.getJSUnitOrNullIfCoreException(file);
   }
   
+  /**
+   * Get the compiler run for a JavaScript unit, and update it.
+   * @param unit  The JavaScript unit.
+   * @return  The compiler run, or null.
+   */
   private CompilerRun getCompilerRun(CompilableJSUnit unit) {
     CompilerRun run = unit.getLastAvailableCompilerRun();
     if (run != null) run.fastCompile();
@@ -50,7 +55,12 @@ public class ClosureTextHover extends AbstractTextHover {
     return run;
   }
   
-  protected LinkedList<String> getQualifiedName(Node node) {
+  /**
+   * Get the qualified name for a node of a JavaScript AST.
+   * @param node  The node.
+   * @return  The qualified name (never null, but may be empty).
+   */
+  private LinkedList<String> getQualifiedName(Node node) {
     LinkedList<String> result = new LinkedList<String>();
     while (true) {
       switch (node.getType()) {
@@ -73,36 +83,30 @@ public class ClosureTextHover extends AbstractTextHover {
     }
   }
   
-  protected JSElementInfo getInfo(Node node, Scope scope) {
+  /**
+   * @return  The element info for a given node, or null.
+   */
+  private JSElementInfo getElementInfo(CompilerRun run, Node node) {
+    Scope scope = run.getScope(node);
+    if (scope == null) return null;
     LinkedList<String> qualifiedName = getQualifiedName(node);
     if (qualifiedName.isEmpty()) return null;
-    String name = qualifiedName.removeFirst();
-    // TODO: "this" to be implemented
-    Var var = scope.getVar(name);
-    if (var == null) return null;
+    String propertyName = qualifiedName.removeLast();
     if (qualifiedName.isEmpty()) {
-      //return new JSElementInfo(var.getNameNode(), var.getType(), var.getJSDocInfo(), false, false);
+      // This is a top level node
+      Var var = scope.getVar(propertyName);
+      if (var == null) return null;
+      else return JSElementInfo.makeFromVar(run, var);
     } else {
-      Node nameNode = var.getNameNode();
-      JSType nameNodeType = nameNode.getJSType();
-      String propertyName = qualifiedName.removeFirst();
-      while (!qualifiedName.isEmpty()) {
-        if (nameNode == null || !(nameNodeType instanceof ObjectType)) return null;
-        ObjectType objectType = (ObjectType) nameNodeType;
-        nameNode = objectType.getPropertyNode(propertyName);
-        nameNodeType = objectType.getPropertyType(propertyName);
-        propertyName = qualifiedName.removeFirst();
-      }
-      // TODO: Code to share with completion proposal
-      // TODO: Add the name and kind as title in the completion proposal
-      if (nameNode == null || !(nameNodeType instanceof ObjectType)) return null;
-      ObjectType objectType = (ObjectType) nameNodeType;
-      // JSDocInfo docInfo = ClosureCompletionProposalCollector.getJSDocInfoOfProperty(objectType, propertyName);
-      //return new JSElementInfo(objectType.getPropertyNode(propertyName), objectType.getPropertyType(propertyName), docInfo, false, false);
+      // This is a property
+      JSType type = run.getTypeOfQualifiedName(scope, qualifiedName);
+      return JSElementInfo.makeFromPropertyOrNull(run, type, propertyName);
     }
-    return null;
   }
   
+  /* (non-Javadoc)
+   * @see net.vtst.ow.eclipse.js.closure.editor.hover.AbstractTextHover#getHoverHTML(org.eclipse.jface.text.ITextViewer, org.eclipse.jface.text.IRegion)
+   */
   @Override
   protected String getHoverHTML(ITextViewer viewer, IRegion region) {
     CompilableJSUnit unit = getJSUnit();
@@ -110,9 +114,8 @@ public class ClosureTextHover extends AbstractTextHover {
     CompilerRun run = getCompilerRun(unit);
     if (run == null) return null;
     Node node = run.getNode(unit, region.getOffset());
-    Scope scope = run.getScope(node);
-    if (node == null || scope == null) return null;
-    JSElementInfo info = getInfo(node, scope);
+    if (node == null) return null;
+    JSElementInfo info = getElementInfo(run, node);
     if (info == null) return null;
     return info.getHTMLStringForHover();
   }
