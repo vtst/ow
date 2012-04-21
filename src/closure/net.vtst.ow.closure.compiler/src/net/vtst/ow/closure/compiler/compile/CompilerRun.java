@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,6 +30,8 @@ import com.google.javascript.jscomp.PassConfig;
 import com.google.javascript.jscomp.Scope;
 import com.google.javascript.jscomp.Scope.Var;
 import com.google.javascript.rhino.Node;
+import com.google.javascript.rhino.jstype.JSType;
+import com.google.javascript.rhino.jstype.ObjectType;
 
 /**
  * Wrapper class to handle the compilation of a JS unit, and to provide the results.
@@ -249,5 +252,38 @@ public class CompilerRun {
    */
   public Node getNamespaceProvider(String namespace) {
     return namespaceToScriptNode.get(namespace);
+  }
+  
+  private static String THIS = "this";
+  
+  /**
+   * Return the type of the object designated by a name in the given scope.
+   * Takes care of "this".
+   * @param scope  The scope to look in.
+   * @param name  The name to look at.
+   * @return  The type, or null.
+   */
+  private JSType getTypeOfName(Scope scope, String name) {
+    if (THIS.equals(name)) return scope.getTypeOfThis();
+    Var var = scope.getVar(name);
+    if (var == null) return null;
+    else return var.getType();
+  }
+  
+  /**
+   * Get the type of the object designated by a qualified name in a given scope.
+   * @param scope  The scope to look in.
+   * @param qualifiedName  The qualified name to look at.
+   * @return  The type, or null.
+   */
+  public JSType getTypeOfQualifiedName(Scope scope, List<String> qualifiedName) {
+    ListIterator<String> it = qualifiedName.listIterator();
+    if (!it.hasNext()) return null;
+    JSType type = getTypeOfName(scope, it.next());
+    while (it.hasNext()) {
+      if (!(type instanceof ObjectType)) return null;
+      type = ((ObjectType) type).getPropertyType(it.next());
+    }
+    return type;
   }
 }

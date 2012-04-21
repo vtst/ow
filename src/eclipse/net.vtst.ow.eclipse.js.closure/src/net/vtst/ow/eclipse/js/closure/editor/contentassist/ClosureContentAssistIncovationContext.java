@@ -1,6 +1,7 @@
 package net.vtst.ow.eclipse.js.closure.editor.contentassist;
 
 import java.util.Collections;
+import java.util.List;
 
 import net.vtst.ow.closure.compiler.compile.CompilableJSUnit;
 import net.vtst.ow.closure.compiler.compile.CompilerRun;
@@ -13,8 +14,8 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.wst.jsdt.ui.text.java.ContentAssistInvocationContext;
 
-import com.google.javascript.jscomp.Scope;
-import com.google.javascript.jscomp.Scope.Var;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import com.google.javascript.rhino.Node;
 
 /**
@@ -141,10 +142,14 @@ public class ClosureContentAssistIncovationContext implements IContentAssistInvo
     }
   }
   
-  public String[] getPath() {
-    if (prefixOffset == pathOffset) return new String[]{};
+  /**
+   * @return The qualified name of the prefix of the invocation context.
+   */
+  public List<String> getPrefixAsQualifiedName() {
+    if (prefixOffset == pathOffset) return Collections.emptyList();
     try {
-      return getDocument().get(pathOffset, prefixOffset - pathOffset - 1).split("\\.");
+      return Lists.newArrayList(
+          Splitter.on('.').split(getDocument().get(pathOffset, prefixOffset - pathOffset - 1)));
     } catch (BadLocationException e) {
       assert false;
       return null;

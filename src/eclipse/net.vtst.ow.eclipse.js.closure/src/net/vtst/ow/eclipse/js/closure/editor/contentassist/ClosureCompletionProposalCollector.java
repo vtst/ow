@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import net.vtst.ow.closure.compiler.compile.CompilerRun;
+
 import com.google.common.collect.Lists;
 import com.google.javascript.jscomp.Scope;
 import com.google.javascript.jscomp.Scope.Var;
@@ -22,8 +24,6 @@ import com.google.javascript.rhino.jstype.UnionType;
  */
 public class ClosureCompletionProposalCollector {
 
-  private static String THIS = "this";
-
   private ClosureContentAssistIncovationContext context;
   
   public ClosureCompletionProposalCollector(ClosureContentAssistIncovationContext context) {
@@ -35,18 +35,20 @@ public class ClosureCompletionProposalCollector {
    * @return  The list of the completion proposals.
    */
   public List<ClosureCompletionProposal> getProposals() {
-    String[] segments = context.getPath();
-    if (segments.length > 0) {
-      JSType type = getTypeOfPath(segments);
-      if (type != null) {
-        return getProposalsFromType(type);    
-      }
-    } else {
+    CompilerRun run = context.getCompilerRun();
+    List<String> qualifiedName = context.getPrefixAsQualifiedName();
+    if (qualifiedName.isEmpty()) {
       try {
         return getProposalsFromScope();
-      } catch (RuntimeException e) {}
-    } 
-    return Collections.emptyList();
+      } catch (RuntimeException e) {
+        return Collections.emptyList();
+      }      
+    } else {
+      Scope scope = run.getScope(context.getNode());
+      JSType type = run.getTypeOfQualifiedName(scope, qualifiedName);
+      if (type == null) return Collections.emptyList();
+      else return getProposalsFromType(type);
+    }
   }
 
   // **************************************************************************
@@ -77,33 +79,6 @@ public class ClosureCompletionProposalCollector {
   
   // **************************************************************************
   // Getting completion proposals from properties
-    
-  /**
-   * Get the type of the prefix in the context.  For instance, if the prefix is
-   * foo.bar.x, this method will return the type of foo.bar (or null if it cannot
-   * be determined).
-   * @param segments  The segments which constitute the prefix
-   * @return  The type, or null if no type can be found in the context.
-   */
-  private JSType getTypeOfPath(String[] segments) {
-    assert segments.length > 0;
-    Scope scope = context.getCompilerRun().getScope(context.getNode());
-    if (scope != null) {
-      JSType type = null;
-      if (THIS.equals(segments[0])) {
-        type = scope.getTypeOfThis();
-      } else {
-        Var var = scope.getVar(segments[0]);
-        if (var != null) type = var.getType();
-      }
-      for (int i = 1; i < segments.length; ++i) {
-        if (type == null) break;
-        type = type.findPropertyType(segments[i]);
-      }
-      return type;
-    }
-    return null;
-  }
 
   /**
    * Compute the list of completion proposals for a given type and last segment.
