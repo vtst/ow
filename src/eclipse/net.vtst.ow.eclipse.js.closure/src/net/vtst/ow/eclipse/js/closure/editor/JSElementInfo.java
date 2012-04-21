@@ -89,14 +89,13 @@ public class JSElementInfo implements IAdditionalProposalInfoProvider {
         getJSDocInfoOfProperty(type, propertyName), true, false);
   }
   
-  // TODO Should be private
   /**
    * Get the doc info for a property in an object type, by walking through the type hierarchy.
    * @param objectType  The objectType to which the property belong to.
    * @param propertyName  The name of the property.
    * @return  The doc info, or null if not found.
    */
-  public static JSDocInfo getJSDocInfoOfProperty(ObjectType objectType, String propertyName) {
+  private static JSDocInfo getJSDocInfoOfProperty(ObjectType objectType, String propertyName) {
     for (; objectType != null;
         objectType = objectType.getImplicitPrototype()) {
       JSDocInfo docInfo = objectType.getOwnPropertyJSDocInfo(propertyName);
