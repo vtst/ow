@@ -115,10 +115,10 @@ public class ClosureCompletionProposalCollector {
     Map<String, ClosureCompletionProposal> map = new HashMap<String, ClosureCompletionProposal>();
     if (type instanceof UnionType) {
       for (JSType alternateType: ((UnionType) type).getAlternates()) {
-        collectProposalsFromType(map, context.getPrefix(), alternateType, type);
+        collectProposalsFromType(map, context.getPrefix(), alternateType);
       }
     } else {
-      collectProposalsFromType(map, context.getPrefix(), type, type);
+      collectProposalsFromType(map, context.getPrefix(), type);
     }
     return Lists.newArrayList(map.values());
   }
@@ -166,7 +166,7 @@ public class ClosureCompletionProposalCollector {
    */
   private void collectProposalsFromType(
       Map<String, ClosureCompletionProposal> map,
-      String prefix, JSType alternateType, JSType type) {
+      String prefix, JSType alternateType) {
     if (alternateType instanceof ObjectType) {
       ObjectType alternateObjectType = (ObjectType) alternateType;
       for (String propertyName: alternateObjectType.getPropertyNames()) {
