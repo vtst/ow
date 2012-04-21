@@ -323,20 +323,14 @@ public abstract class AbstractCompletionProposal
   // **************************************************************************
   // Proposal info
   
-  /**
-   * @return The additional proposal info for the completion proposal.  Should never be null.
+  protected abstract IAdditionalProposalInfoProvider getAdditionalProposalInfoProvider();
+  
+  /* (non-Javadoc)
+   * @see org.eclipse.jface.text.contentassist.ICompletionProposalExtension5#getAdditionalProposalInfo(org.eclipse.core.runtime.IProgressMonitor)
    */
-  protected abstract IAdditionalProposalInfo makeAdditionalProposalInfo();
-  
-  private IAdditionalProposalInfo additionalProposalInfo = null;
-  
-  
   @Override
-  public Object getAdditionalProposalInfo(IProgressMonitor monitor) {
-    if (additionalProposalInfo == null) {
-      additionalProposalInfo = makeAdditionalProposalInfo();
-    }
-    return additionalProposalInfo.getHTMLStringForHover();
+  public String getAdditionalProposalInfo(IProgressMonitor monitor) {
+    return getAdditionalProposalInfoProvider().getHTMLStringForHover();
   }
   
   private IInformationControlCreator informationControlCreator;
@@ -360,7 +354,7 @@ public abstract class AbstractCompletionProposal
   
   @Override
   public String getAdditionalProposalInfo() {
-    return (String) getAdditionalProposalInfo(new NullProgressMonitor());
+    return getAdditionalProposalInfo(null);
   }
   
   @Override

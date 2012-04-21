@@ -2,9 +2,11 @@ package net.vtst.ow.eclipse.js.closure.editor;
 
 import java.util.Set;
 
+import net.vtst.ow.closure.compiler.compile.CompilerRun;
+import net.vtst.ow.eclipse.js.closure.OwJsClosureImages;
 import net.vtst.ow.eclipse.js.closure.OwJsClosureMessages;
 import net.vtst.ow.eclipse.js.closure.OwJsClosurePlugin;
-import net.vtst.ow.eclipse.js.closure.editor.contentassist.IAdditionalProposalInfo;
+import net.vtst.ow.eclipse.js.closure.editor.contentassist.IAdditionalProposalInfoProvider;
 import net.vtst.ow.eclipse.js.closure.util.HTMLPrinter;
 import net.vtst.ow.eclipse.js.closure.util.Utils;
 
@@ -14,6 +16,7 @@ import com.google.javascript.jscomp.NodeUtil;
 import com.google.javascript.rhino.JSDocInfo;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
+import com.google.javascript.rhino.JSDocInfo.Visibility;
 import com.google.javascript.rhino.jstype.FunctionType;
 import com.google.javascript.rhino.jstype.JSType;
 import com.google.javascript.rhino.jstype.ObjectType;
@@ -26,33 +29,166 @@ import com.google.javascript.rhino.jstype.ObjectType;
  * proposal is selected.
  * @author Vincent Simonet
  */
-public class ClosureJSElementInfo implements IAdditionalProposalInfo {
+public class JSElementInfo implements IAdditionalProposalInfoProvider {
   
   private OwJsClosureMessages messages;
+  private CompilerRun run;
   
+  // Input properties
   private Node node;
   private JSDocInfo docInfo;
   private JSType type;
-  private String qualifiedName;
+  private boolean isProperty;
+  private boolean isLocalVariable;
+  private Visibility visibility = Visibility.PUBLIC;
+  
+  // Computed properties
+  private JSElementKind kind;
+  private boolean isNamespace;
+  
+  // HTML generation
   private StringBuffer buf;
   private String htmlString;
-
+  
   /**
    * Create a new additional proposal info.
    * @param node  The node to which the proposal info is relative.
    * @param docInfo  The doc info to use for filling the proposal info.
    * @param type  The type to use for filling the proposal info.
    */
-  public ClosureJSElementInfo(Node node, JSDocInfo docInfo, JSType type) {
+  public JSElementInfo(
+      CompilerRun run, Node node, JSType type, JSDocInfo docInfo,
+      boolean isProperty, boolean isLocalVariable) {
+    this.run = run;
     this.node = node;
-    this.docInfo = docInfo;
     this.type = type;
+    this.docInfo = docInfo;
+    this.isProperty = isProperty;
+    this.isLocalVariable = isLocalVariable;
+    this.isNamespace = isNamespace(node);
+    this.kind = computeKind();
   }
   
-  public ClosureJSElementInfo(String qualifiedName, Node node, JSDocInfo docInfo, JSType type) {
-    this(node, docInfo, type);
-    this.qualifiedName = qualifiedName;
+  // **************************************************************************
+  // Computing properties of the element
+  
+  private boolean isNamespace(Node node) {
+    // First, check whether the node's parent or its grand parent is tagged
+    // as a name space.
+    Node parent = node.getParent();
+    if (parent == null) return false;
+    if (parent.getBooleanProp(Node.IS_NAMESPACE)) return true;
+    Node parent2 = parent.getParent();
+    if (parent2 == null) return false;
+    if (parent2.getBooleanProp(Node.IS_NAMESPACE)) return true;
+    // Special case for name spaces which are defined by var foo = {} or var foo = foo || {}.
+    if (parent2.getType() != Token.SCRIPT || 
+        parent.getType() != Token.VAR ||
+        node.getType() != Token.NAME) return false;
+    boolean hasValidNode = false;
+    for (Node child: node.children()) {
+      int type = child.getType();
+      if (type == Token.OBJECTLIT && !child.hasChildren()) {
+        hasValidNode = true;
+      } else if (type == Token.OR) {
+        for (Node child2: child.children()) {
+          if (child2.getType() == Token.OBJECTLIT && !child2.hasChildren()) {
+            hasValidNode = true;
+          }
+        }
+      } else {
+        return false;
+      }
+    }
+    return hasValidNode;
   }
+  
+  /**
+   * Compute the kind of the completion proposal.
+   * @return  The kind of the completion proposal.
+   */
+  private JSElementKind computeKind() {
+    if (isNamespace) return JSElementKind.NAMESPACE;
+    if (docInfo != null) {
+      if (docInfo.isConstructor()) {
+        return JSElementKind.CLASS;
+      } else if (docInfo.isInterface()) {
+        return JSElementKind.INTERFACE;
+      } else if (docInfo.isConstant()) {
+        return JSElementKind.CONSTANT;
+      }
+    }
+    if (type.isEnumType()) return JSElementKind.ENUM;
+    if (isProperty) {
+      if (type.isFunctionType()) return JSElementKind.METHOD;
+      else return JSElementKind.FIELD;
+    } else if (isLocalVariable) {
+      return JSElementKind.LOCAL_VARIABLE;
+    } else {
+      return JSElementKind.GLOBAL_VARIABLE;
+    }    
+  }
+  
+  public JSElementKind getKind() { return kind; }
+  public Node getNode() { return node; }
+  public JSType getType() { return type; }
+  
+  public String getImageName() {
+    switch (kind) {
+    case NAMESPACE: return OwJsClosureImages.PACKAGE;
+    case CLASS: 
+      switch (visibility) {
+      case PRIVATE: return OwJsClosureImages.CLASS_PRIVATE;
+      case PROTECTED: return OwJsClosureImages.CLASS_PROTECTED;
+      case PUBLIC: return OwJsClosureImages.CLASS_PUBLIC;
+      }
+    case INTERFACE:
+      switch (visibility) {
+      case PRIVATE: return OwJsClosureImages.INTERFACE_PRIVATE;
+      case PROTECTED: return OwJsClosureImages.INTERFACE_PROTECTED;
+      case PUBLIC: return OwJsClosureImages.INTERFACE_PUBLIC;
+      }
+    case ENUM: 
+      switch (visibility) {
+      case PRIVATE: return OwJsClosureImages.ENUM_PRIVATE;
+      case PROTECTED: return OwJsClosureImages.ENUM_PROTECTED;
+      case PUBLIC: return OwJsClosureImages.ENUM_PUBLIC;
+      }
+    case METHOD:
+      switch (visibility) {
+      case PRIVATE: return OwJsClosureImages.METHOD_PRIVATE;
+      case PROTECTED: return OwJsClosureImages.METHOD_PROTECTED;
+      case PUBLIC: return OwJsClosureImages.METHOD_PUBLIC;
+      }
+      break;
+    case FIELD:
+      switch (visibility) {
+      case PRIVATE: return OwJsClosureImages.FIELD_PRIVATE;
+      case PROTECTED: return OwJsClosureImages.FIELD_PROTECTED;
+      case PUBLIC: return OwJsClosureImages.FIELD_PUBLIC;
+      }
+      break;
+    case GLOBAL_VARIABLE: return OwJsClosureImages.GLOBAL_VARIABLE;
+    case LOCAL_VARIABLE: return OwJsClosureImages.LOCAL_VARIABLE;
+    case CONSTANT: return OwJsClosureImages.CONSTANT;
+    }
+    return null;
+  }
+
+  /**
+   * Add a new visibility to the completion proposal.  By default, completion proposal are
+   * considered as public.  The finally computed visibility is the lowest one.
+   * @param extraVisibility  The visibility to add.
+   */
+  public void addVisibility(Visibility extraVisibility) {
+    if (visibility == Visibility.PROTECTED && extraVisibility == Visibility.PRIVATE ||
+        visibility == Visibility.PUBLIC && (extraVisibility == Visibility.PRIVATE || extraVisibility == Visibility.PROTECTED)) {
+      visibility = extraVisibility;
+    }
+  }
+
+  // **************************************************************************
+  // Generating HTML string
 
   @Override
   public String getHTMLStringForHover() {
@@ -64,15 +200,21 @@ public class ClosureJSElementInfo implements IAdditionalProposalInfo {
    * Build the HTML string for the proposal info.
    */
   private void buildHTMLString() {
+    if (isNamespace) {
+      Node namespaceNode = run.getNamespaceProvider(node.getQualifiedName());
+      if (namespaceNode != null) docInfo = namespaceNode.getJSDocInfo();
+    }
     buf = new StringBuffer();
     messages = OwJsClosurePlugin.getDefault().getMessages();
     if (docInfo != null) {
       HTMLPrinter.insertPageProlog(buf, 0, "");
+      /*
       if (qualifiedName != null) {
         buf.append("<b>");
         buf.append(qualifiedName);
         buf.append("</b><p>");
       }
+      */
       if (docInfo.hasFileOverview()) {
         writeFileOverview();
       } else {
@@ -91,7 +233,7 @@ public class ClosureJSElementInfo implements IAdditionalProposalInfo {
     buf = null;
   }
 
-  // **************************************************************************
+  // --------------------------------------------------------------------------
   // Formatting 
   
   private void openSection(String title) {
@@ -122,7 +264,7 @@ public class ClosureJSElementInfo implements IAdditionalProposalInfo {
     closeSection();
   }
 
-  // **************************************************************************
+  // --------------------------------------------------------------------------
   // Description
   
   private void writeDescription(String description) {
@@ -153,8 +295,7 @@ public class ClosureJSElementInfo implements IAdditionalProposalInfo {
     }
   }
 
-
-  // **************************************************************************
+  // --------------------------------------------------------------------------
   // Type information
   // (see com.google.javascript.jscomp.TypedCodeGenerator)
   

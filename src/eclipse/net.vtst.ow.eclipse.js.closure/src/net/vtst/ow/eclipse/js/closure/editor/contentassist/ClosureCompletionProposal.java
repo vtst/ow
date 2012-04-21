@@ -3,8 +3,9 @@ package net.vtst.ow.eclipse.js.closure.editor.contentassist;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.vtst.ow.eclipse.js.closure.OwJsClosureImages;
-import net.vtst.ow.eclipse.js.closure.editor.ClosureJSElementInfo;
+import org.eclipse.core.runtime.IProgressMonitor;
+
+import net.vtst.ow.eclipse.js.closure.editor.JSElementInfo;
 import net.vtst.ow.eclipse.js.closure.util.Utils;
 
 import com.google.common.base.Preconditions;
@@ -22,33 +23,8 @@ import com.google.javascript.rhino.jstype.JSType;
  * @author Vincent Simonet
  */
 public class ClosureCompletionProposal extends AbstractCompletionProposal {
-  
-  /**
-   * The different kind of completion proposals.  Kinds are used to choose the right icon,
-   * and to adapt some aspect of the behavior of the completion proposal.
-   */
-  private enum Kind {
-    NAMESPACE,
-    CLASS,
-    INTERFACE,
-    ENUM,
-    METHOD,
-    FIELD,
-    GLOBAL_VARIABLE,
-    LOCAL_VARIABLE,
-    CONSTANT,
-    UNKNOWN;
-  }
 
-  private Kind kind;
-  private Visibility visibility = Visibility.PUBLIC;
-  private ClosureContentAssistIncovationContext context;
-  private Node node;
-  private JSType type;
-  private JSDocInfo docInfo;
-  private boolean isProperty;
-  private boolean isLocalVariable;
-  private boolean isNamespace;
+  private JSElementInfo elementInfo;
 
   /**
    * @param context  The context in which the completion proposal is created.
@@ -65,57 +41,12 @@ public class ClosureCompletionProposal extends AbstractCompletionProposal {
       Node node, JSType type, JSDocInfo docInfo,
       boolean isProperty, boolean isLocalVariable) {
     super(context, name);
-    isNamespace = isNamespace(node);
-    this.context = context;
-    this.node = node;
-    this.type = type;
-    this.docInfo = docInfo;
-    this.isProperty = isProperty;
-    this.isLocalVariable = isLocalVariable;
-    this.kind = getKind();
-  }
-
-  /**
-   * Add a new visibility to the completion proposal.  By default, completion proposal are
-   * considered as public.  The finally computed visibility is the lowest one.
-   * @param extraVisibility  The visibility to add.
-   */
-  public void addVisibility(Visibility extraVisibility) {
-    if (visibility == Visibility.PROTECTED && extraVisibility == Visibility.PRIVATE ||
-        visibility == Visibility.PUBLIC && (extraVisibility == Visibility.PRIVATE || extraVisibility == Visibility.PROTECTED)) {
-      visibility = extraVisibility;
-    }
-  }
-
-  /**
-   * Compute the kind of the completion proposal.
-   * @return  The kind of the completion proposal.
-   */
-  private Kind getKind() {
-    if (isNamespace) return Kind.NAMESPACE;
-    if (docInfo != null) {
-      if (docInfo.isConstructor()) {
-        return Kind.CLASS;
-      } else if (docInfo.isInterface()) {
-        return Kind.INTERFACE;
-      } else if (docInfo.isConstant()) {
-        return Kind.CONSTANT;
-      }
-    }
-    if (type.isEnumType()) return Kind.ENUM;
-    if (isProperty) {
-      if (type.isFunctionType()) return Kind.METHOD;
-      else return Kind.FIELD;
-    } else if (isLocalVariable) {
-      return Kind.LOCAL_VARIABLE;
-    } else {
-      return Kind.GLOBAL_VARIABLE;
-    }    
+    elementInfo = new JSElementInfo(context.getCompilerRun(), node, type, docInfo, isProperty, isLocalVariable);
   }
 
   @Override
   public int getRelevance() {
-    switch (kind) {
+    switch (elementInfo.getKind()) {
     case LOCAL_VARIABLE: 
       return 5;
     case NAMESPACE: 
@@ -136,53 +67,15 @@ public class ClosureCompletionProposal extends AbstractCompletionProposal {
 
   @Override
   protected String getImageName() {
-    switch (kind) {
-    case NAMESPACE: return OwJsClosureImages.PACKAGE;
-    case CLASS: 
-      switch (visibility) {
-      case PRIVATE: return OwJsClosureImages.CLASS_PRIVATE;
-      case PROTECTED: return OwJsClosureImages.CLASS_PROTECTED;
-      case PUBLIC: return OwJsClosureImages.CLASS_PUBLIC;
-      }
-    case INTERFACE:
-      switch (visibility) {
-      case PRIVATE: return OwJsClosureImages.INTERFACE_PRIVATE;
-      case PROTECTED: return OwJsClosureImages.INTERFACE_PROTECTED;
-      case PUBLIC: return OwJsClosureImages.INTERFACE_PUBLIC;
-      }
-    case ENUM: 
-      switch (visibility) {
-      case PRIVATE: return OwJsClosureImages.ENUM_PRIVATE;
-      case PROTECTED: return OwJsClosureImages.ENUM_PROTECTED;
-      case PUBLIC: return OwJsClosureImages.ENUM_PUBLIC;
-      }
-    case METHOD:
-      switch (visibility) {
-      case PRIVATE: return OwJsClosureImages.METHOD_PRIVATE;
-      case PROTECTED: return OwJsClosureImages.METHOD_PROTECTED;
-      case PUBLIC: return OwJsClosureImages.METHOD_PUBLIC;
-      }
-      break;
-    case FIELD:
-      switch (visibility) {
-      case PRIVATE: return OwJsClosureImages.FIELD_PRIVATE;
-      case PROTECTED: return OwJsClosureImages.FIELD_PROTECTED;
-      case PUBLIC: return OwJsClosureImages.FIELD_PUBLIC;
-      }
-      break;
-    case GLOBAL_VARIABLE: return OwJsClosureImages.GLOBAL_VARIABLE;
-    case LOCAL_VARIABLE: return OwJsClosureImages.LOCAL_VARIABLE;
-    case CONSTANT: return OwJsClosureImages.CONSTANT;
-    }
-    return null;
+    return elementInfo.getImageName();
   }
 
   @Override
   protected List<Fragment> makeFragments() {
     LinkedList<Fragment> list = new LinkedList<Fragment>();
     list.add(new Fragment(getDisplayString()));
-    if (type.isFunctionType()) {
-      addFragmentsForFunctionParameters(list, Utils.getFunctionNode(node));
+    if (elementInfo.getType().isFunctionType()) {
+      addFragmentsForFunctionParameters(list, Utils.getFunctionNode(elementInfo.getNode()));
     }
     return list;
   }
@@ -218,7 +111,7 @@ public class ClosureCompletionProposal extends AbstractCompletionProposal {
 
   @Override
   protected char[] makeTriggerCharacters() {
-    switch (kind) {
+    switch (elementInfo.getKind()) {
     case NAMESPACE: 
       return new char[]{'.'};
     case CLASS:
@@ -235,46 +128,12 @@ public class ClosureCompletionProposal extends AbstractCompletionProposal {
   }
 
   @Override
-  protected IAdditionalProposalInfo makeAdditionalProposalInfo() {
-    if (isNamespace) {
-      Node namespaceNode = context.getCompilerRun().getNamespaceProvider(node.getQualifiedName());
-      if (namespaceNode != null) docInfo = namespaceNode.getJSDocInfo();
-    }
-    return new ClosureJSElementInfo(node, docInfo, type);
+  protected IAdditionalProposalInfoProvider getAdditionalProposalInfoProvider() {
+    return elementInfo;
   }
 
-  // **************************************************************************
-  // Managing name spaces
-  
-  private boolean isNamespace(Node node) {
-    // First, check whether the node's parent or its grand parent is tagged
-    // as a name space.
-    Node parent = node.getParent();
-    if (parent == null) return false;
-    if (parent.getBooleanProp(Node.IS_NAMESPACE)) return true;
-    Node parent2 = parent.getParent();
-    if (parent2 == null) return false;
-    if (parent2.getBooleanProp(Node.IS_NAMESPACE)) return true;
-    // Special case for name spaces which are defined by var foo = {} or var foo = foo || {}.
-    if (parent2.getType() != Token.SCRIPT || 
-        parent.getType() != Token.VAR ||
-        node.getType() != Token.NAME) return false;
-    boolean hasValidNode = false;
-    for (Node child: node.children()) {
-      int type = child.getType();
-      if (type == Token.OBJECTLIT && !child.hasChildren()) {
-        hasValidNode = true;
-      } else if (type == Token.OR) {
-        for (Node child2: child.children()) {
-          if (child2.getType() == Token.OBJECTLIT && !child2.hasChildren()) {
-            hasValidNode = true;
-          }
-        }
-      } else {
-        return false;
-      }
-    }
-    return hasValidNode;
+  // TODO: This is temporary and should be deleted
+  public void addVisibility(Visibility extraVisibility) {
+    elementInfo.addVisibility(extraVisibility);
   }
-
 }
