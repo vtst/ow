@@ -24,6 +24,7 @@ public class ClosureAdditionalProposalInfo implements IAdditionalProposalInfo {
   private Node node;
   private JSDocInfo docInfo;
   private JSType type;
+  private String qualifiedName;
   private StringBuffer buf;
   private String htmlString;
 
@@ -37,6 +38,11 @@ public class ClosureAdditionalProposalInfo implements IAdditionalProposalInfo {
     this.node = node;
     this.docInfo = docInfo;
     this.type = type;
+  }
+  
+  public ClosureAdditionalProposalInfo(String qualifiedName, Node node, JSDocInfo docInfo, JSType type) {
+    this(node, docInfo, type);
+    this.qualifiedName = qualifiedName;
   }
 
   @Override
@@ -53,6 +59,11 @@ public class ClosureAdditionalProposalInfo implements IAdditionalProposalInfo {
     messages = OwJsClosurePlugin.getDefault().getMessages();
     if (docInfo != null) {
       HTMLPrinter.insertPageProlog(buf, 0, "");
+      if (qualifiedName != null) {
+        buf.append("<b>");
+        buf.append(qualifiedName);
+        buf.append("</b><p>");
+      }
       if (docInfo.hasFileOverview()) {
         writeFileOverview();
       } else {
