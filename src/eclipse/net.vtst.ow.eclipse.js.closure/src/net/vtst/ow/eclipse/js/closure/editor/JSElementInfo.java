@@ -267,13 +267,12 @@ public class JSElementInfo implements IAdditionalProposalInfoProvider {
     messages = OwJsClosurePlugin.getDefault().getMessages();
     if (docInfo != null) {
       HTMLPrinter.insertPageProlog(buf, 0, "");
-      /*
+      String qualifiedName = node.getQualifiedName();
       if (qualifiedName != null) {
         buf.append("<b>");
         buf.append(qualifiedName);
-        buf.append("</b><p>");
+        buf.append("</b><p><hr><p>");
       }
-      */
       if (docInfo.hasFileOverview()) {
         writeFileOverview();
       } else {
