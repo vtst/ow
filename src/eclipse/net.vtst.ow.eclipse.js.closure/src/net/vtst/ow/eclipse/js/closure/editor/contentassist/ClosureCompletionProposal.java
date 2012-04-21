@@ -237,7 +237,7 @@ public class ClosureCompletionProposal extends AbstractCompletionProposal {
   @Override
   protected IAdditionalProposalInfo makeAdditionalProposalInfo() {
     if (isNamespace) {
-      Node namespaceNode = context.getNamespaceProvider(node.getQualifiedName());
+      Node namespaceNode = context.getCompilerRun().getNamespaceProvider(node.getQualifiedName());
       if (namespaceNode != null) docInfo = namespaceNode.getJSDocInfo();
     }
     return new ClosureHoverInfo(node, docInfo, type);

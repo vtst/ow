@@ -55,6 +55,7 @@ public class ClosureContentAssistIncovationContext implements IContentAssistInvo
   public ClosureContentAssistIncovationContext(ContentAssistInvocationContext context) {
     this.context = context;
     computePrefixAndPathOffsets();
+    computeCompilerRun();
   }
   
   // **************************************************************************
@@ -161,54 +162,42 @@ public class ClosureContentAssistIncovationContext implements IContentAssistInvo
   // **************************************************************************
   // Compilation
 
-  /**
-   * Returns the file for the document that content assist is invoked on, as returned by the
-   * editor registry.
-   * @return  The file, or null if unknown.
-   */
-  private IFile getFile() {
-    return OwJsClosurePlugin.getDefault().getEditorRegistry().getFile(getDocument());
-  }
-  
   private CompilerRun run = null;
-  private Node node;
+  private Node node = null;
   
-  private void lazyCompile() {
-    if (run != null) return;
-    IFile file = getFile();
-    if (file == null) return;
-    CompilableJSUnit unit = ResourceProperties.getJSUnitOrNullIfCoreException(file);
-    if (unit == null) return;
-    run = unit.getLastAvailableCompilerRun();
-    if (run == null) return;
-    run.fastCompile();
-    node = run.getNode(unit, getPrefixOffset());
+  private void computeCompilerRun() {
+    IFile file = OwJsClosurePlugin.getDefault().getEditorRegistry().getFile(getDocument());
+    if (file != null) {
+      CompilableJSUnit unit = ResourceProperties.getJSUnitOrNullIfCoreException(file);
+      if (unit != null) {
+        run = unit.getLastAvailableCompilerRun();
+        if (run != null) {
+          run.fastCompile();
+          node = run.getNode(unit, getPrefixOffset());
+        }
+      }
+    }
   }
-  
+    
   /**
-   * Returns all symbols which are defined at the location where content assist is invoked.
-   * @return  An iterable over all symbols, empty if the symbols cannot be computed for whatever reason.
+   * @return Whether a node has been found for this invocation context in the output of the compiler.
    */
-  public Iterable<Var> getAllSymbols() {
-    lazyCompile();
-    if (run == null || node == null) return Collections.emptyList();
-    return run.getAllSymbols(node);
+  public boolean hasNode() {
+    return run != null;
   }
-  
+
   /**
-   * Returns the scope at the location where content assist is invoked.
-   * @return  The scope, or null if it cannot be retrieved for whatever reason.
+   * @return The compiler run for this invocation context.
    */
-  public Scope getScope() {
-    lazyCompile();
-    if (run == null) return null;
-    return run.getScope(node);
+  public CompilerRun getCompilerRun() {
+    return run;
   }
-  
-  public Node getNamespaceProvider(String namespace) {
-    lazyCompile();
-    if (run == null) return null;
-    return run.getNamespaceProvider(namespace);
+
+  /**
+   * @return The node for this invocation context.
+   */
+  public Node getNode() {
+    return node;
   }
 
 }

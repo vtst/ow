@@ -61,7 +61,7 @@ public class ClosureCompletionProposalCollector {
   private List<ClosureCompletionProposal> getProposalsFromScope() {
     String prefix = context.getPrefix();
     LinkedList<ClosureCompletionProposal> list = new LinkedList<ClosureCompletionProposal>();
-    for (Var var: context.getAllSymbols()) {
+    for (Var var: context.getCompilerRun().getAllSymbols(context.getNode())) {
       if (isValidFor(var.getName(), prefix) && isSimpleName(var.getName())) {
         Node node = var.getNameNode();
         String name = var.getName();
@@ -87,7 +87,7 @@ public class ClosureCompletionProposalCollector {
    */
   private JSType getTypeOfPath(String[] segments) {
     assert segments.length > 0;
-    Scope scope = context.getScope();
+    Scope scope = context.getCompilerRun().getScope(context.getNode());
     if (scope != null) {
       JSType type = null;
       if (THIS.equals(segments[0])) {
