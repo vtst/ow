@@ -107,7 +107,13 @@ public class JSElementInfo implements IAdditionalProposalInfoProvider {
     if (type instanceof ObjectType) {
       ObjectType objectType = (ObjectType) type;
       if (objectType.hasProperty(propertyName)) {
-        return makeFromProperty(run, objectType, propertyName);
+        Node propertyNode = objectType.getPropertyNode(propertyName);
+        JSType propertyType = objectType.getPropertyType(propertyName);
+        if (propertyNode != null && propertyType != null) {
+          return new JSElementInfo(
+              run, propertyNode, propertyType, 
+              getJSDocInfoOfProperty(objectType, propertyName), true, false);
+        }
       }
     }
     return null;

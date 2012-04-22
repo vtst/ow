@@ -51,7 +51,6 @@ public class ClosureTextHover extends AbstractTextHover {
     CompilerRun run = unit.getLastAvailableCompilerRun();
     if (run != null) run.fastCompile();
     // TODO: Is this thread safe with the completion proposal computer to access further the run?
-    run.fastCompile();
     return run;
   }
   
