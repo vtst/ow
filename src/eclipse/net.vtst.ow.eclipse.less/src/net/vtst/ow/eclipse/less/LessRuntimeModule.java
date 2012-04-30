@@ -8,7 +8,6 @@ import net.vtst.ow.eclipse.less.resource.LessLocationInFileProvider;
 import net.vtst.ow.eclipse.less.resource.LessResourceDescriptionStrategy;
 import net.vtst.ow.eclipse.less.scoping.LessQualifiedNameProvider;
 import net.vtst.ow.eclipse.less.formatting.LessHiddenTokenHelper;
-import net.vtst.ow.eclipse.less.parser.LessValueConverterService;
 
 import org.eclipse.xtext.conversion.IValueConverterService;
 import org.eclipse.xtext.linking.ILinkingDiagnosticMessageProvider;
@@ -45,11 +44,6 @@ public class LessRuntimeModule extends net.vtst.ow.eclipse.less.AbstractLessRunt
   
   public Class<? extends ILocationInFileProvider> bindILocationInFileProvider() {
     return LessLocationInFileProvider.class;
-  }
-
-  @Override
-  public Class<? extends IValueConverterService> bindIValueConverterService() {
-    return LessValueConverterService.class;
   }
 
   public Class<? extends IHiddenTokenHelper> bindIHiddenTokenHelper() {
