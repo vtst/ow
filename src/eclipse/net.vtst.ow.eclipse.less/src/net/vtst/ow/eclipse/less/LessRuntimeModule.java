@@ -7,8 +7,12 @@ import net.vtst.eclipse.easyxtext.guice.EasyXtextModule;
 import net.vtst.ow.eclipse.less.resource.LessLocationInFileProvider;
 import net.vtst.ow.eclipse.less.resource.LessResourceDescriptionStrategy;
 import net.vtst.ow.eclipse.less.scoping.LessQualifiedNameProvider;
+import net.vtst.ow.eclipse.less.formatting.LessHiddenTokenHelper;
+import net.vtst.ow.eclipse.less.parser.LessValueConverterService;
 
+import org.eclipse.xtext.conversion.IValueConverterService;
 import org.eclipse.xtext.linking.ILinkingDiagnosticMessageProvider;
+import org.eclipse.xtext.parsetree.reconstr.IHiddenTokenHelper;
 import org.eclipse.xtext.resource.IDefaultResourceDescriptionStrategy;
 import org.eclipse.xtext.resource.ILocationInFileProvider;
 
@@ -28,6 +32,7 @@ public class LessRuntimeModule extends net.vtst.ow.eclipse.less.AbstractLessRunt
   public void configure(Binder binder) {
     super.configure(binder);
     binder.install(new EasyXtextModule());
+    //binder.bind(LessHiddenTokenHelper.class).to(IHiddenTokenHelper.class);
   }
   
   public Class<? extends org.eclipse.xtext.naming.IQualifiedNameProvider> bindIQualifiedNameProvider() {
@@ -40,6 +45,15 @@ public class LessRuntimeModule extends net.vtst.ow.eclipse.less.AbstractLessRunt
   
   public Class<? extends ILocationInFileProvider> bindILocationInFileProvider() {
     return LessLocationInFileProvider.class;
+  }
+
+  @Override
+  public Class<? extends IValueConverterService> bindIValueConverterService() {
+    return LessValueConverterService.class;
+  }
+
+  public Class<? extends IHiddenTokenHelper> bindIHiddenTokenHelper() {
+    return LessHiddenTokenHelper.class;
   }
 
   // Scoping
