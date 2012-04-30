@@ -290,7 +290,6 @@ DataReferenceDotIdent returns ecore::EString: '.' IDENT;
 DataReferenceDotIndex: '.' index=DEC_DIGITS_AS_STRING | '.' index=FLOAT | '.' index=DEC_DIGITS_DOT ident=IDENT;  // DEC_INTEGER == DEC_DIGITS
 
 INTEGER returns ecore::EString: DEC_DIGITS | HEX_INTEGER;
-CSS_IDENT returns ecore::EString: '-'? IDENT ('-' | IDENT)*;
 DEC_DIGITS_AS_STRING returns ecore::EString: DEC_DIGITS;
 
 // ****************************************************************************
@@ -332,6 +331,7 @@ terminal FUNCTION_TAG : '*/6';  // Fake terminal used by the CustomizedSoyLexer
 terminal PRINT_DIRECTIVE_TAG : '*/7';  // Fake terminal used by the CustomizedSoyLexer
 terminal CALL_COMMAND_ATTRIBUTE_DQ : '*/8';  // Fake terminal used by the CustomizedSoyLexer
 terminal HTML_IDENT : '*/9';  // Fake terminal used by the CustomizedSoyLexer
+terminal CSS_IDENT : '*/A';  // Fake terminal used by the CustomizedSoyLexer
 // This is required to properly parse a command like {foo}. It's split by CustomSoyLexer
 terminal PRINT_IDENT : "{" IDENT;
 

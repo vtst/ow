@@ -60,7 +60,7 @@ public class CustomizedSoyLexer extends InternalSoyLexer {
    * The number of modes handled by the lexer.  The modes shall be indexed from 0
    * to {@code NUMBER_OF_MODES} - 1.
    */
-  private final static int NUMBER_OF_MODES = 8;
+  private final static int NUMBER_OF_MODES = 9;
   
   /** The default mode. */
   private final static int MODE_DEFAULT = 0;
@@ -78,6 +78,8 @@ public class CustomizedSoyLexer extends InternalSoyLexer {
   private final static int MODE_LITERAL = 6;
   /** Within a special single-line command which shall be parsed as a directive */
   private final static int MODE_SPECIAL_SL_COMMENT = 7;
+  /** Within a css command */
+  private final static int MODE_COMMAND_CSS = 8;
   /** A special value for modes, used in the transition table only. It indicates
    * that the previous mode has to be activated.
    */
@@ -129,6 +131,9 @@ public class CustomizedSoyLexer extends InternalSoyLexer {
         } else if (tokenNameContainsSubstringAtPosition(tokenName, "literal", 2) ||
             tokenNameContainsSubstringAtPosition(tokenName, "{literal", 2)) {
           return MODE_LITERAL;
+        } else if (tokenNameContainsSubstringAtPosition(tokenName, "css", 2) ||
+            tokenNameContainsSubstringAtPosition(tokenName, "{css", 2)) {
+          return MODE_COMMAND_CSS;
         } else if (!tokenName.endsWith("}'")) {
           if (tokenNameContainsSubstringAtPosition(tokenName, "{", 2)) return MODE_COMMAND_2;
           else return MODE_COMMAND;
@@ -144,6 +149,8 @@ public class CustomizedSoyLexer extends InternalSoyLexer {
     case MODE_COMMAND_CALL:
       if (tokenName.endsWith("}'")) return MODE_PREVIOUS;
       return sourceMode;
+    case MODE_COMMAND_CSS:
+      return MODE_PREVIOUS;
     case MODE_SOY_DOC:
       return MODE_SOY_DOC;
     case MODE_LITERAL:
@@ -338,7 +345,7 @@ public class CustomizedSoyLexer extends InternalSoyLexer {
   }
 
   /**
-   * Lex a literal to its end.  The method shall once the opening tag is consumed.
+   * Lex a literal to its end.  The method shall be called  once the opening tag is consumed.
    * It does not consume the closing tag.
    * @throws RecognitionException  if the literal is not terminated.
    */
@@ -358,6 +365,22 @@ public class CustomizedSoyLexer extends InternalSoyLexer {
         break;
       default:
         input.consume();
+      }
+    }
+  }
+  
+  /**
+   * Lex a CSS command to its end.  The method shall be called  once the opening tag is consumed.
+   * It does not consume the closing tag.
+   */
+  private void mCssCommand() {
+    css_loop: while (true) {
+      switch (input.LA(1)) {
+        case Token.EOF:
+        case '}':
+          break css_loop;
+        default:
+          input.consume();
       }
     }
   }
@@ -497,6 +520,11 @@ public class CustomizedSoyLexer extends InternalSoyLexer {
       break;
     case MODE_SOY_DOC:
       state.type = mSoyDoc();
+      state.channel = DEFAULT_TOKEN_CHANNEL;
+      break;
+    case MODE_COMMAND_CSS:
+      mCssCommand();
+      state.type = RULE_CSS_IDENT;
       state.channel = DEFAULT_TOKEN_CHANNEL;
       break;
     default:
