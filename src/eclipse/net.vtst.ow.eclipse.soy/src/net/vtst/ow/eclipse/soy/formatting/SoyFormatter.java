@@ -3,25 +3,40 @@
  */
 package net.vtst.ow.eclipse.soy.formatting;
 
-import org.eclipse.xtext.formatting.impl.AbstractDeclarativeFormatter;
-import org.eclipse.xtext.formatting.impl.FormattingConfig;
+import java.io.IOException;
 
-/**
- * This class contains custom formatting description.
- * 
- * see : http://www.eclipse.org/Xtext/documentation/latest/xtext.html#formatting
- * on how and when to use it 
- * 
- * Also see {@link org.eclipse.xtext.xtext.XtextFormattingTokenSerializer} as an example
- */
-public class SoyFormatter extends AbstractDeclarativeFormatter {
-	
-	@Override
-	protected void configureFormatting(FormattingConfig c) {
-// It's usually a good idea to activate the following three statements.
-// They will add and preserve newlines around comments
-//		c.setLinewrap(0, 1, 2).before(getGrammarAccess().getSL_COMMENTRule());
-//		c.setLinewrap(0, 1, 2).before(getGrammarAccess().getML_COMMENTRule());
-//		c.setLinewrap(0, 1, 1).after(getGrammarAccess().getML_COMMENTRule());
-	}
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.xtext.formatting.IFormatter;
+import org.eclipse.xtext.parsetree.reconstr.ITokenStream;
+
+public class SoyFormatter implements IFormatter {
+  
+  private class TokenStream implements ITokenStream {
+    
+    private ITokenStream outputStream;
+
+    public TokenStream(ITokenStream outputStream) {
+      this.outputStream = outputStream;
+    }
+
+    @Override
+    public void flush() throws IOException {
+      outputStream.flush();
+    }
+
+    @Override
+    public void writeHidden(EObject grammarElement, String value) throws IOException {
+      outputStream.writeHidden(grammarElement, value);
+    }
+
+    @Override
+    public void writeSemantic(EObject grammarElement, String value) throws IOException {
+      outputStream.writeSemantic(grammarElement, value);
+    }
+  }
+
+  @Override
+  public ITokenStream createFormatterStream(String initalIndentation, ITokenStream outputStream, boolean preserveWhitespaces) {
+    return new TokenStream(outputStream);
+  }
 }
