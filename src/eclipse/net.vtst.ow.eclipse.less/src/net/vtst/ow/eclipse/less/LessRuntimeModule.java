@@ -24,8 +24,8 @@ public class LessRuntimeModule extends net.vtst.ow.eclipse.less.AbstractLessRunt
   public static String PLUGIN_ID = "net.vtst.ow.eclipse.less";
   public static String CONTENT_TYPE_ID = "net.vtst.ow.eclipse.less";
   
-  public static String LESS_EXTENSION = ".less";
-  public static String CSS_EXTENSION = ".css";
+  public static String LESS_EXTENSION = "less";
+  public static String CSS_EXTENSION = "css";
 
   public LessRuntimeModule() {
     CssProfile.initializeRegistry();
