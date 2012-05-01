@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import net.vtst.ow.eclipse.less.LessRuntimeModule;
 import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.less.LessPackage;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
@@ -41,7 +42,7 @@ public class LessImportStatementResolver {
   // Retrieving imported statements (for scope computation)
   
   /**
-   * Compute the set of statements which are imported by an import statements.  This function manages recursive
+   * Compute the set of statements which are imported by an import statement.  This function manages recursive
    * import statements.  The result is cached to ensure efficiency.
    * @param importStatement  The import statement to resolve.
    * @return  The list of top-level statements of the imported stylesheets.
@@ -119,10 +120,23 @@ public class LessImportStatementResolver {
    */
   public URI getURI(ImportStatement importStatement) {
     URI uri = URI.createURI(importStatement.getUri());
-    if (!EcoreUtil2.isValidUri(importStatement, uri)) return null;
-    else return uri;
+    String fileExtension = uri.fileExtension();
+    if (fileExtension == null) uri = uri.appendFileExtension(LessRuntimeModule.LESS_EXTENSION);
+    if (EcoreUtil2.isValidUri(importStatement, uri)) {
+      return uri;
+    } else {
+      return null;
+   }
   }
 
+  /**
+   * @param uri
+   * @return true iif uri is the URI of a LESS StyleSheet.
+   */
+  private boolean isLessStyleSheetURI(URI uri) {
+    return LessRuntimeModule.LESS_EXTENSION.equals(uri.fileExtension());
+  }
+  
   /**
    * Get an imported style sheet.
    * @param resource  The resource which is importing. 
@@ -130,6 +144,7 @@ public class LessImportStatementResolver {
    * @return  The imported style sheet, or {@code null}.
    */
   private StyleSheet getImportedStyleSheet(Resource resource, URI uri) {
+    if (!isLessStyleSheetURI(uri)) return null;
     LoadOnDemandResourceDescriptions resourceDescriptions = loadOnDemandDescriptions.get();
     resourceDescriptions.initialize(new IResourceDescriptions.NullImpl(), Collections.singleton(uri), resource);
     IResourceDescription resourceDescription = resourceDescriptions.getResourceDescription(uri);
@@ -145,7 +160,7 @@ public class LessImportStatementResolver {
    * @param importStatement  The import statement.
    * @return The style sheet, or {@code null}.
    */
-  public StyleSheet getImportedStyleSheet(ImportStatement importStatement) {
+  private StyleSheet getImportedStyleSheet(ImportStatement importStatement) {
     return getImportedStyleSheet(importStatement.eResource(), getURI(importStatement));
   }
 }
