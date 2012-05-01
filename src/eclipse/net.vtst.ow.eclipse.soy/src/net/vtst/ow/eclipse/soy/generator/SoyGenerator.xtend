@@ -10,6 +10,6 @@ import org.eclipse.xtext.generator.IFileSystemAccess
 class SoyGenerator implements IGenerator {
 	
 	override void doGenerate(Resource resource, IFileSystemAccess fsa) {
-		//TODO implment me
+		//TODO implement me
 	}
 }
