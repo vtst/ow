@@ -27,8 +27,6 @@ This Eclipse plugin requires:
 KNOWN ISSUES
 
 The following constructs of the LESS language are not (yet) supported:
-- Media queries (media.less, http://www.w3.org/TR/css3-mediaqueries/)
-- CSS3 selectors (css-3.less)
 - CSS escapes (css-escapes.less)
 - Empty property values (css.less)
 - Special case of the font: property
@@ -37,6 +35,7 @@ distribution in which the limitation becomes visible).
 
 The following features are not supported in the editor:
 - Refactoring.
+
 
 ********************************************************************************
 LICENSE
