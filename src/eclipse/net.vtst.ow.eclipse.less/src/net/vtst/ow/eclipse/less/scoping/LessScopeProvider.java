@@ -218,7 +218,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
   /** Test whether a pattern matches a HashOrClass.
    * @return
    */
-  private boolean matches(String pattern, HashOrClass obj) {
+  private boolean isMatching(String pattern, HashOrClass obj) {
     return pattern.isEmpty() || pattern.equals(obj.getIdent());
   }
 
@@ -282,7 +282,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
         computeMixinMatchesDown(importedStatements, pattern, match, matches);
       } else if (obj instanceof MixinDefinition) {
         MixinDefinition mixinDefinition = (MixinDefinition) obj;
-        if (matches(pattern.get(match.size()), mixinDefinition.getSelector())) {
+        if (isMatching(pattern.get(match.size()), mixinDefinition.getSelector())) {
           hasMatch = true;
           computeMixinMatchesDown(mixinDefinition.getBlock(), pattern, cloneAndAdd(match, mixinDefinition.getSelector()), matches);
         }
@@ -319,7 +319,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
     if (selectors.size() == 1 && selectors.get(0).getCriteria().size() == 1) {
       // Only one piece of selector, partial match is possible
       EObject criteria = selectors.get(0).getCriteria().get(0);
-      if (criteria instanceof HashOrClass && matches(pattern.get(match.size()), (HashOrClass) criteria)) {
+      if (criteria instanceof HashOrClass && isMatching(pattern.get(match.size()), (HashOrClass) criteria)) {
         return cloneAndAdd(match, (HashOrClass) criteria);
       } else {
         return null;
@@ -333,7 +333,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
       for (SimpleSelector selector: selectors) {
         for (EObject criteria: selector.getCriteria()) {
           if (!(criteria instanceof HashOrClass)) return null;
-          if (i < pattern_size && matches(pattern.get(i), (HashOrClass) criteria)) {
+          if (i < pattern_size && isMatching(pattern.get(i), (HashOrClass) criteria)) {
             extMatch.add((HashOrClass) criteria);
             ++i;
           }
