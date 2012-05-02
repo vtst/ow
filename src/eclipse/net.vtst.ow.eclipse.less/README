@@ -41,7 +41,6 @@ The following features are not supported in the editor:
 TODO
 
 * Mixin matching on arity
-* Mixin guards
 * Type checking functions, not
 
 

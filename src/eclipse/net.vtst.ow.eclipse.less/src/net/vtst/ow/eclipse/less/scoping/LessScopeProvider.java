@@ -13,6 +13,7 @@ import net.vtst.ow.eclipse.less.less.HashOrClassCrossReference;
 import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.less.InnerRuleSet;
 import net.vtst.ow.eclipse.less.less.InnerSelector;
+import net.vtst.ow.eclipse.less.less.LessPackage;
 import net.vtst.ow.eclipse.less.less.MixinCall;
 import net.vtst.ow.eclipse.less.less.MixinDefinition;
 import net.vtst.ow.eclipse.less.less.MixinDefinitionParameter;
@@ -25,10 +26,13 @@ import net.vtst.ow.eclipse.less.less.ToplevelStatement;
 import net.vtst.ow.eclipse.less.less.VariableCrossReference;
 import net.vtst.ow.eclipse.less.less.VariableDefinition;
 import net.vtst.ow.eclipse.less.less.VariableDefinitionIdent;
+import net.vtst.ow.eclipse.less.services.LessGrammarAccess;
 
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.xtext.naming.QualifiedName;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import org.eclipse.xtext.resource.EObjectDescription;
@@ -75,15 +79,21 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
    * Results for Block and StyleSheet are cached.
    */
   public IScope computeVariableScope(final EObject context, EReference ref) {
-    if (context == null) {
+    EObject container = context.eContainer();
+    if (container == null) {
       return IScope.NULLSCOPE;
-    } else if (context instanceof Block) {
-      return computeVariableScopeOfStatements(context, BlockUtils.iterator((Block) context), ref);
-    } else if (context instanceof StyleSheet) {
-      return computeVariableScopeOfStatements(context, getStyleSheetStatements((StyleSheet) context), ref);
-    } else {
-      return computeVariableScope(context.eContainer(), ref);
+    } else if (container instanceof Block) {
+      return computeVariableScopeOfStatements(container, BlockUtils.iterator((Block) container), ref);
+    } else if (container instanceof StyleSheet) {
+      return computeVariableScopeOfStatements(container, getStyleSheetStatements((StyleSheet) container), ref);
+    } else if (container instanceof MixinDefinition) {
+      EStructuralFeature containingFeature = context.eContainingFeature();
+      if (containingFeature.equals(LessPackage.eINSTANCE.getMixinDefinition_Guards()) ||
+          containingFeature.equals(LessPackage.eINSTANCE.getMixinDefinition_Block())) {
+        return computeVariableScopeOfMixinDefinition((MixinDefinition) container, ref);
+      }
     }
+    return computeVariableScope(container, ref);
   }
     
   /** Compute the scope of a context, which contains the statements returned by iterable.
@@ -94,14 +104,23 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
         List<IEObjectDescription> variableDefinitions = new ArrayList<IEObjectDescription>();
         // Go through the variables bound by the statements
         addVariableDefinitions(statements, variableDefinitions);
-        // Go through the variables bound by the container
-        EObject container = context.eContainer();
-        if (container instanceof MixinDefinition) {
-          addVariableDefinitions((MixinDefinition) container, variableDefinitions);
-        }
-        return MapBasedScope.createScope(computeVariableScope(container, ref), variableDefinitions);
+        return MapBasedScope.createScope(computeVariableScope(context, ref), variableDefinitions);
       }
     });
+  }
+  
+  /**
+   * Compute the scope of a mixin definition, binding the parameters of the definition.
+   */
+  public IScope computeVariableScopeOfMixinDefinition(final MixinDefinition context, final EReference ref) {
+    return cache.get(Tuples.pair(LessScopeProvider.class, context), context.eResource(), new Provider<IScope>() {
+      public IScope get() {
+        List<IEObjectDescription> variableDefinitions = new ArrayList<IEObjectDescription>();
+        // Go through the variables bound by the container
+        addVariableDefinitions(context, variableDefinitions);
+        return MapBasedScope.createScope(computeVariableScope(context, ref), variableDefinitions);
+      }
+    });    
   }
   
   /** Add the variables defined by a set of statements.
