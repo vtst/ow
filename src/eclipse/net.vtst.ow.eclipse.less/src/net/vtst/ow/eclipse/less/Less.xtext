@@ -365,10 +365,14 @@ ExtendedTerm2 returns ExtendedTerm:
   (OPT_SPACE operator+=('*' | '/') OPT_SPACE term+=SimpleTerm)*
 ;
 
+VariableCrossReference:
+  VariableDefinitionIdent | MixinDefinition
+;
+
 // This rule does not end with OPT_SPACE, because of operators in Expr
 SimpleTerm:
   NumericLiteral
-  | {AtVariableTerm} var=[VariableDefinitionIdent|AT_IDENT]
+  | {AtVariableTerm} var=[VariableCrossReference|AT_IDENT]
   | {At2VariableTerm} var=AT2_IDENT
   | FunctionTerm
   | {ParenthesizedTerm} '(' OPT_SPACE term=ExtendedTerm11 OPT_SPACE ')'

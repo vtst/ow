@@ -22,6 +22,7 @@ import net.vtst.ow.eclipse.less.less.StyleSheet;
 import net.vtst.ow.eclipse.less.less.ToplevelRuleSet;
 import net.vtst.ow.eclipse.less.less.ToplevelSelector;
 import net.vtst.ow.eclipse.less.less.ToplevelStatement;
+import net.vtst.ow.eclipse.less.less.VariableCrossReference;
 import net.vtst.ow.eclipse.less.less.VariableDefinition;
 import net.vtst.ow.eclipse.less.less.VariableDefinitionIdent;
 
@@ -44,6 +45,8 @@ import com.google.inject.Provider;
 
 public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
   
+  private static final String ARGUMENTS_VARIABLE_NAME = "@arguments";
+
   // The cache contains pairs (LessScopeProvider.class, context) for variable scopes
   // and triples (LessScopeProvider.HashOrClassCrossReferenceclass, context, prefix) for mixin scopes.
   @Inject
@@ -62,7 +65,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
   /** Entry point for the calculation of the scope of a cross-reference to
    * a VariableDefinitionIdent.
    */
-  IScope scope_VariableDefinitionIdent(EObject context, EReference ref) {
+  IScope scope_VariableCrossReference(EObject context, EReference ref) {
     return computeVariableScope(context, ref);
   }
   
@@ -121,7 +124,8 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
       if (parameter instanceof MixinDefinitionVariable) {
         variableDefinitions.add(getEObjectDescriptionFor(((MixinDefinitionVariable) parameter).getVariable()));
       }
-    }    
+    }
+    variableDefinitions.add(EObjectDescription.create(QualifiedName.create(ARGUMENTS_VARIABLE_NAME), mixinDefinition));
   }
   
   /** Create the object description for a variable definition ident.
