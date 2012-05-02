@@ -10,6 +10,6 @@ import org.eclipse.xtext.generator.IFileSystemAccess
 class LessGenerator implements IGenerator {
 	
 	override void doGenerate(Resource resource, IFileSystemAccess fsa) {
-		//TODO implment me
+		//TODO implement me
 	}
 }
