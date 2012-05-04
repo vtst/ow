@@ -13,7 +13,6 @@ public class LessHiddenTokenHelper implements IHiddenTokenHelper {
   @Inject
   LessGrammarAccess grammarAccess;
 
-  @Override
   public boolean isWhitespace(AbstractRule rule) {
     boolean r = rule != null && (
         rule.equals(grammarAccess.getSPACERule())
@@ -22,17 +21,14 @@ public class LessHiddenTokenHelper implements IHiddenTokenHelper {
     return r;
   }
 
-  @Override
   public boolean isComment(AbstractRule rule) {
     return false;
   }
 
-  @Override
   public AbstractRule getWhitespaceRuleFor(String whitespace) {
     return grammarAccess.getWSRule();
   }
 
-  @Override
   public AbstractRule getWhitespaceRuleFor(ParserRule context, String whitespace) {
     return grammarAccess.getWSRule();
   }

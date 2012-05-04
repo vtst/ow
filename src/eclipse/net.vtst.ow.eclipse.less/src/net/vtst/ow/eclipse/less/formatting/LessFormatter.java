@@ -32,7 +32,6 @@ public class LessFormatter implements IFormatter {
     }
   };
 
-  @Override
   public ITokenStream createFormatterStream(String indent, ITokenStream out, boolean preserveWhitespaces) {
     return new TokenStream(out);
   }
@@ -106,19 +105,16 @@ public class LessFormatter implements IFormatter {
       }
     }
     
-    @Override
     public void flush() throws IOException {
       format();
       for (Token token: tokens) token.writeTo(outputStream);
       tokens.clear();
     }
 
-    @Override
     public void writeHidden(EObject grammarElement, String value) throws IOException {
       //tokens.add(new LessFormattingToken(grammarAccess, grammarElement, value, true));
     }
 
-    @Override
     public void writeSemantic(EObject grammarElement, String value) throws IOException {
       if (grammarElement instanceof Keyword) {
         System.out.println("'" + ((Keyword) grammarElement).getValue() + "'");

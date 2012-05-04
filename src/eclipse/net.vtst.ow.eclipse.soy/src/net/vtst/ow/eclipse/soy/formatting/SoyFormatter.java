@@ -19,23 +19,19 @@ public class SoyFormatter implements IFormatter {
       this.outputStream = outputStream;
     }
 
-    @Override
     public void flush() throws IOException {
       outputStream.flush();
     }
 
-    @Override
     public void writeHidden(EObject grammarElement, String value) throws IOException {
       outputStream.writeHidden(grammarElement, value);
     }
 
-    @Override
     public void writeSemantic(EObject grammarElement, String value) throws IOException {
       outputStream.writeSemantic(grammarElement, value);
     }
   }
 
-  @Override
   public ITokenStream createFormatterStream(String initalIndentation, ITokenStream outputStream, boolean preserveWhitespaces) {
     return new TokenStream(outputStream);
   }

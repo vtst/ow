@@ -42,5 +42,11 @@
    <feature url="features/net.vtst.ow.eclipse.js.closure.feature_0.2.1.jar" id="net.vtst.ow.eclipse.js.closure.feature" version="0.2.1">
       <category name="net.vtst.ow"/>
    </feature>
+   <feature url="features/net.vtst.ow.eclipse.less.feature_1.0.5.jar" id="net.vtst.ow.eclipse.less.feature" version="1.0.5">
+      <category name="net.vtst.ow"/>
+   </feature>
+   <feature url="features/net.vtst.ow.eclipse.soy.feature_1.0.4.jar" id="net.vtst.ow.eclipse.soy.feature" version="1.0.4">
+      <category name="net.vtst.ow"/>
+   </feature>
    <category-def name="net.vtst.ow" label="net.vtst.ow"/>
 </site>
