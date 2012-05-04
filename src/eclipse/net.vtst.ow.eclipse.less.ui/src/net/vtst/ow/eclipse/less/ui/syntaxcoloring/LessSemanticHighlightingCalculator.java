@@ -7,6 +7,8 @@ import net.vtst.eclipse.easyxtext.ui.syntaxcoloring.EasySemanticHighlightingCalc
 import net.vtst.ow.eclipse.less.less.Declaration;
 import net.vtst.ow.eclipse.less.less.MediaExpression;
 import net.vtst.ow.eclipse.less.less.MediaQuery;
+import net.vtst.ow.eclipse.less.less.MixinDefinitionGuard;
+import net.vtst.ow.eclipse.less.less.MixinDefinitionGuards;
 import net.vtst.ow.eclipse.less.services.LessGrammarAccess;
 
 import com.google.inject.Inject;
@@ -29,6 +31,9 @@ public class LessSemanticHighlightingCalculator extends EasySemanticHighlighting
     bindRule(grammar.getMediaFeatureRule(), highlightingConfig.MEDIA_FEATURE);
     bindKeyword(":", MediaExpression.class, highlightingConfig.MEDIA_FEATURE);
     bindKeyword("not", MediaQuery.class, highlightingConfig.PROPERTY);
+    // TODO Is this useful once the mixin definitions are correctly colored?
+    bindKeyword("when", MixinDefinitionGuards.class, highlightingConfig.SELECTOR);
+    bindKeyword("not", MixinDefinitionGuard.class, highlightingConfig.SELECTOR);
   }
 
 }

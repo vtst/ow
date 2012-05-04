@@ -13,6 +13,7 @@ import net.vtst.ow.eclipse.less.less.HashOrClassCrossReference;
 import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.less.InnerRuleSet;
 import net.vtst.ow.eclipse.less.less.InnerSelector;
+import net.vtst.ow.eclipse.less.less.LessPackage;
 import net.vtst.ow.eclipse.less.less.MixinCall;
 import net.vtst.ow.eclipse.less.less.MixinDefinition;
 import net.vtst.ow.eclipse.less.less.MixinDefinitionParameter;
@@ -22,12 +23,16 @@ import net.vtst.ow.eclipse.less.less.StyleSheet;
 import net.vtst.ow.eclipse.less.less.ToplevelRuleSet;
 import net.vtst.ow.eclipse.less.less.ToplevelSelector;
 import net.vtst.ow.eclipse.less.less.ToplevelStatement;
+import net.vtst.ow.eclipse.less.less.VariableCrossReference;
 import net.vtst.ow.eclipse.less.less.VariableDefinition;
 import net.vtst.ow.eclipse.less.less.VariableDefinitionIdent;
+import net.vtst.ow.eclipse.less.services.LessGrammarAccess;
 
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.xtext.naming.QualifiedName;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import org.eclipse.xtext.resource.EObjectDescription;
@@ -44,6 +49,8 @@ import com.google.inject.Provider;
 
 public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
   
+  private static final String ARGUMENTS_VARIABLE_NAME = "@arguments";
+
   // The cache contains pairs (LessScopeProvider.class, context) for variable scopes
   // and triples (LessScopeProvider.HashOrClassCrossReferenceclass, context, prefix) for mixin scopes.
   @Inject
@@ -62,7 +69,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
   /** Entry point for the calculation of the scope of a cross-reference to
    * a VariableDefinitionIdent.
    */
-  IScope scope_VariableDefinitionIdent(EObject context, EReference ref) {
+  IScope scope_VariableCrossReference(EObject context, EReference ref) {
     return computeVariableScope(context, ref);
   }
   
@@ -72,15 +79,21 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
    * Results for Block and StyleSheet are cached.
    */
   public IScope computeVariableScope(final EObject context, EReference ref) {
-    if (context == null) {
+    EObject container = context.eContainer();
+    if (container == null) {
       return IScope.NULLSCOPE;
-    } else if (context instanceof Block) {
-      return computeVariableScopeOfStatements(context, BlockUtils.iterator((Block) context), ref);
-    } else if (context instanceof StyleSheet) {
-      return computeVariableScopeOfStatements(context, getStyleSheetStatements((StyleSheet) context), ref);
-    } else {
-      return computeVariableScope(context.eContainer(), ref);
+    } else if (container instanceof Block) {
+      return computeVariableScopeOfStatements(container, BlockUtils.iterator((Block) container), ref);
+    } else if (container instanceof StyleSheet) {
+      return computeVariableScopeOfStatements(container, getStyleSheetStatements((StyleSheet) container), ref);
+    } else if (container instanceof MixinDefinition) {
+      EStructuralFeature containingFeature = context.eContainingFeature();
+      if (containingFeature.equals(LessPackage.eINSTANCE.getMixinDefinition_Guards()) ||
+          containingFeature.equals(LessPackage.eINSTANCE.getMixinDefinition_Block())) {
+        return computeVariableScopeOfMixinDefinition((MixinDefinition) container, ref);
+      }
     }
+    return computeVariableScope(container, ref);
   }
     
   /** Compute the scope of a context, which contains the statements returned by iterable.
@@ -91,14 +104,23 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
         List<IEObjectDescription> variableDefinitions = new ArrayList<IEObjectDescription>();
         // Go through the variables bound by the statements
         addVariableDefinitions(statements, variableDefinitions);
-        // Go through the variables bound by the container
-        EObject container = context.eContainer();
-        if (container instanceof MixinDefinition) {
-          addVariableDefinitions((MixinDefinition) container, variableDefinitions);
-        }
-        return MapBasedScope.createScope(computeVariableScope(container, ref), variableDefinitions);
+        return MapBasedScope.createScope(computeVariableScope(context, ref), variableDefinitions);
       }
     });
+  }
+  
+  /**
+   * Compute the scope of a mixin definition, binding the parameters of the definition.
+   */
+  public IScope computeVariableScopeOfMixinDefinition(final MixinDefinition context, final EReference ref) {
+    return cache.get(Tuples.pair(LessScopeProvider.class, context), context.eResource(), new Provider<IScope>() {
+      public IScope get() {
+        List<IEObjectDescription> variableDefinitions = new ArrayList<IEObjectDescription>();
+        // Go through the variables bound by the container
+        addVariableDefinitions(context, variableDefinitions);
+        return MapBasedScope.createScope(computeVariableScope(context, ref), variableDefinitions);
+      }
+    });    
   }
   
   /** Add the variables defined by a set of statements.
@@ -121,7 +143,8 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
       if (parameter instanceof MixinDefinitionVariable) {
         variableDefinitions.add(getEObjectDescriptionFor(((MixinDefinitionVariable) parameter).getVariable()));
       }
-    }    
+    }
+    variableDefinitions.add(EObjectDescription.create(QualifiedName.create(ARGUMENTS_VARIABLE_NAME), mixinDefinition));
   }
   
   /** Create the object description for a variable definition ident.
@@ -195,7 +218,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
   /** Test whether a pattern matches a HashOrClass.
    * @return
    */
-  private boolean matches(String pattern, HashOrClass obj) {
+  private boolean isMatching(String pattern, HashOrClass obj) {
     return pattern.isEmpty() || pattern.equals(obj.getIdent());
   }
 
@@ -259,7 +282,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
         computeMixinMatchesDown(importedStatements, pattern, match, matches);
       } else if (obj instanceof MixinDefinition) {
         MixinDefinition mixinDefinition = (MixinDefinition) obj;
-        if (matches(pattern.get(match.size()), mixinDefinition.getSelector())) {
+        if (isMatching(pattern.get(match.size()), mixinDefinition.getSelector())) {
           hasMatch = true;
           computeMixinMatchesDown(mixinDefinition.getBlock(), pattern, cloneAndAdd(match, mixinDefinition.getSelector()), matches);
         }
@@ -296,7 +319,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
     if (selectors.size() == 1 && selectors.get(0).getCriteria().size() == 1) {
       // Only one piece of selector, partial match is possible
       EObject criteria = selectors.get(0).getCriteria().get(0);
-      if (criteria instanceof HashOrClass && matches(pattern.get(match.size()), (HashOrClass) criteria)) {
+      if (criteria instanceof HashOrClass && isMatching(pattern.get(match.size()), (HashOrClass) criteria)) {
         return cloneAndAdd(match, (HashOrClass) criteria);
       } else {
         return null;
@@ -310,7 +333,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
       for (SimpleSelector selector: selectors) {
         for (EObject criteria: selector.getCriteria()) {
           if (!(criteria instanceof HashOrClass)) return null;
-          if (i < pattern_size && matches(pattern.get(i), (HashOrClass) criteria)) {
+          if (i < pattern_size && isMatching(pattern.get(i), (HashOrClass) criteria)) {
             extMatch.add((HashOrClass) criteria);
             ++i;
           }

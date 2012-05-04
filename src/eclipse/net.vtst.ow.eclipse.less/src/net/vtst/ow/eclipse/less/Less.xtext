@@ -169,7 +169,7 @@ MixinDefinition:
   '(' OPT_SPACE 
   (parameter+=MixinDefinitionParameter 
     (',' OPT_SPACE parameter+=MixinDefinitionParameter)*
-  )? ')' OPT_SPACE
+  )? ')' OPT_SPACE guards=MixinDefinitionGuards?
   block=Block
 ;
 
@@ -180,6 +180,22 @@ MixinDefinitionParameter:
   | {MixinDefinitionPattern} ident=IDENT_OR_KEYWORD OPT_SPACE
   | {MixinDefinitionPattern} string=STRING OPT_SPACE
   | {MixinDefinitionPattern} number=NumericLiteral OPT_SPACE
+;
+
+MixinDefinitionGuards:
+  'when' OPT_SPACE guard+=MixinDefinitionGuard (',' OPT_SPACE guard+=MixinDefinitionGuard)*
+;
+
+MixinDefinitionGuard:
+  ('not' OPT_SPACE)? '(' expr=MixinDefinitionGuardExpr ')' OPT_SPACE
+;
+
+MixinDefinitionGuardExpr:
+  term+=MixinDefinitionGuardTerm OPT_SPACE (('>' | '>=' | '=' '=<' '<') OPT_SPACE term+=MixinDefinitionGuardTerm OPT_SPACE)? 
+;
+
+MixinDefinitionGuardTerm: 
+  {MixinDefinitionGuardTerm} 'true' | Term
 ;
 
 // There are trailing OPT_SPACE after Hash/Class, because there is no in
@@ -267,7 +283,7 @@ HASH_IDENT returns ecore::EString: HASH_COLOR | HASH_OTHER;
 // This rule does not end with OPT_SPACE, because of combinators
 Class: ident=CLASS_IDENT;
 CLASS_IDENT returns ecore::EString: '.' IDENT_OR_KEYWORD;
-IDENT_OR_KEYWORD returns ecore::EString: IDENT | 'and' | 'even' | 'n' | 'not' | 'odd' | 'only';
+IDENT_OR_KEYWORD returns ecore::EString: IDENT | 'and' | 'even' | 'n' | 'not' | 'odd' | 'only' | 'when';
 
 // This rule does not end with OPT_SPACE, because of combinators
 Attrib:
@@ -365,10 +381,14 @@ ExtendedTerm2 returns ExtendedTerm:
   (OPT_SPACE operator+=('*' | '/') OPT_SPACE term+=SimpleTerm)*
 ;
 
+VariableCrossReference:
+  VariableDefinitionIdent | MixinDefinition
+;
+
 // This rule does not end with OPT_SPACE, because of operators in Expr
 SimpleTerm:
   NumericLiteral
-  | {AtVariableTerm} var=[VariableDefinitionIdent|AT_IDENT]
+  | {AtVariableTerm} var=[VariableCrossReference|AT_IDENT]
   | {At2VariableTerm} var=AT2_IDENT
   | FunctionTerm
   | {ParenthesizedTerm} '(' OPT_SPACE term=ExtendedTerm11 OPT_SPACE ')'
