@@ -46,6 +46,7 @@ public class ClosureCompletionProposalCollector {
       }      
     } else {
       Scope scope = run.getScope(context.getNode());
+      if (scope == null) return Collections.emptyList();
       JSType type = run.getTypeOfQualifiedName(scope, qualifiedName);
       if (type == null) return Collections.emptyList();
       else return getProposalsFromType(type);
