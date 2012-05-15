@@ -115,7 +115,15 @@ public class WorkspaceFileLaunchAttribute extends AbstractStringLaunchAttribute 
           if (element instanceof IFile) {
             IFile file = (IFile) element;
             if (pattern != null && pattern.matcher(file.getName()).matches()) return true;
-            try { if (contentType != null && file.getContentDescription().getContentType().isKindOf(contentType)) return true; }
+            try { 
+              if (file.getContentDescription() != null) {
+                IContentType fileContentType = file.getContentDescription().getContentType();
+                if (contentType != null && 
+                    fileContentType != null && 
+                    fileContentType.isKindOf(contentType)) 
+                  return true; 
+              }
+            }
             catch (CoreException e) {}
             return false;
           } else {
