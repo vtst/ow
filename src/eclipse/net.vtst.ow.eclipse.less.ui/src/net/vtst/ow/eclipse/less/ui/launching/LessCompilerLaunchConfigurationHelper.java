@@ -21,6 +21,8 @@ public class LessCompilerLaunchConfigurationHelper extends EasyLaunchConfigurati
   public StringLaunchAttribute command = new StringLaunchAttribute("lessc");
   public BooleanLaunchAttribute verbose = new BooleanLaunchAttribute(false);
   public BooleanLaunchAttribute compress = new BooleanLaunchAttribute(true);
+  public BooleanLaunchAttribute yuiCompress = new BooleanLaunchAttribute(false);
+  public BooleanLaunchAttribute strictImports = new BooleanLaunchAttribute(false);
   public StringOptionsLaunchAttribute optimization = new StringOptionsLaunchAttribute(new String[]{"0", "1", "2"});
 
   public WorkspaceFileLaunchAttribute inputFile = 

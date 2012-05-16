@@ -53,7 +53,9 @@ public class LessCompilerOptionsTab extends EasyLaunchConfigurationTab {
     Group compilationOptions = SWTFactory.createGroup(parent, messages.getString("lconf_compilation_options"), 2, 2, GridData.FILL_HORIZONTAL);
     configHelper.command.createControl(this, compilationOptions, 2);
     configHelper.verbose.createControl(this, compilationOptions, 2);
+    configHelper.strictImports.createControl(this, compilationOptions, 2);
     configHelper.compress.createControl(this, compilationOptions, 2);
+    configHelper.yuiCompress.createControl(this, compilationOptions, 2);
     configHelper.optimization.createControl(this, compilationOptions, 2);
 
     Group inputsOutputs = SWTFactory.createGroup(parent, messages.getString("lconf_inputs_outputs"), 3, 2, GridData.FILL_HORIZONTAL);

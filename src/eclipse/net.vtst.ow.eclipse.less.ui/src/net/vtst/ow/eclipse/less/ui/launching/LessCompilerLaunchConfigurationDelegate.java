@@ -88,6 +88,8 @@ public class LessCompilerLaunchConfigurationDelegate
     list.add(launchConfigHelper.command.getValue(config));
     if (launchConfigHelper.verbose.getBooleanValue(config)) list.add("--verbose");
     if (launchConfigHelper.compress.getBooleanValue(config)) list.add("--compress");
+    if (launchConfigHelper.yuiCompress.getBooleanValue(config)) list.add("--yui-compress");
+    if (launchConfigHelper.strictImports.getBooleanValue(config)) list.add("--strict-imports");
     list.add("-O" + launchConfigHelper.optimization.getValue(config));
     list.add("--no-color");
     list.add(fixture.inputFile.getRawLocation().makeAbsolute().toOSString());
