@@ -152,16 +152,19 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     EObject crossReference = crossReferences.get(0);
     if (!(crossReference instanceof HashOrClass)) return;
     HashOrClass hashOrClass = (HashOrClass) crossReference;
-    Pair<Integer, Integer> expected = getNumberOfParametersForMixin(hashOrClass);
-    int provided = mixinCall.getParameter().size();
-    if (provided < expected.getFirst() || provided > expected.getSecond()) {
-      String message = 
-          (expected.getFirst() == expected.getSecond() ?
-              String.format(messages.getString("illegal_number_of_parameters_for_mixin"),
-                  hashOrClass.getIdent(), expected.getFirst(), provided) :
-              String.format(messages.getString("illegal_number_of_parameters_for_mixin_range"),
-                  hashOrClass.getIdent(), expected.getFirst(), expected.getSecond(), provided));
-      warning(message, mixinCall, LessPackage.eINSTANCE.getMixinCall_Selector(), 0);
+    // We do not check the arguments if the called mixin is undefined, in order to avoid multiple error messages.
+    if (hashOrClass.getIdent() != null) {
+      Pair<Integer, Integer> expected = getNumberOfParametersForMixin(hashOrClass);
+      int provided = mixinCall.getParameter().size();
+      if (provided < expected.getFirst() || provided > expected.getSecond()) {
+        String message = 
+            (expected.getFirst() == expected.getSecond() ?
+                String.format(messages.getString("illegal_number_of_parameters_for_mixin"),
+                    hashOrClass.getIdent(), expected.getFirst(), provided) :
+                String.format(messages.getString("illegal_number_of_parameters_for_mixin_range"),
+                    hashOrClass.getIdent(), expected.getFirst(), expected.getSecond(), provided));
+        warning(message, mixinCall, LessPackage.eINSTANCE.getMixinCall_Selector(), 0);
+      }
     }
   }
   
