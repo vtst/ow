@@ -155,8 +155,7 @@ CharsetStatement:
 
 // There is a trailing OPT_SPACE in this rule, because there is no in Term
 VariableDefinition:
-  variable=VariableDefinitionIdent OPT_SPACE ':' OPT_SPACE term+=Term
-  ((SPACE term+=Term)* | (OPT_SPACE ',' OPT_SPACE term+=Term)+) OPT_SPACE
+  variable=VariableDefinitionIdent OPT_SPACE ':' OPT_SPACE expr=Expr
 ;
 
 VariableDefinitionIdent:
