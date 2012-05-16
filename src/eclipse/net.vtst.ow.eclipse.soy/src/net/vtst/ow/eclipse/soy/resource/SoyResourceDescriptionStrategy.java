@@ -1,7 +1,9 @@
 package net.vtst.ow.eclipse.soy.resource;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import net.vtst.ow.eclipse.soy.soy.Declaration;
 import net.vtst.ow.eclipse.soy.soy.DelTemplate;
@@ -24,13 +26,15 @@ import com.google.inject.Inject;
 
 public class SoyResourceDescriptionStrategy implements IDefaultResourceDescriptionStrategy {
   
+  public static String NAMESPACE = "NAMESPACE";
+  
   @Inject 
   IQualifiedNameConverter converter;
 
   public boolean createEObjectDescriptions(EObject object,
       IAcceptor<IEObjectDescription> acceptor) {
     if (object instanceof SoyFile) {
-      getEObjectDescriptions(converter, (SoyFile) object, false, acceptor);
+      getEObjectDescriptions(converter, (SoyFile) object, acceptor);
     }
     return false;
   }
@@ -43,8 +47,10 @@ public class SoyResourceDescriptionStrategy implements IDefaultResourceDescripti
   // The following static functions are used for the current class (SoyResourceDescriptionStrategy)
   // and for SoyScopeProvider.
   
-  public static void getEObjectDescriptionsFromTemplates(IQualifiedNameConverter converter, SoyFile soyFile, boolean localNames, IAcceptor<IEObjectDescription> acceptor) {
+  public static void getEObjectDescriptionsFromTemplates(IQualifiedNameConverter converter, SoyFile soyFile, IAcceptor<IEObjectDescription> acceptor) {
     QualifiedName namespaceQN = getNamespaceQualifiedName(converter, soyFile.getNamespace());
+    // For local names, we store the namespace in the user data map, so that it can be checked by SoyGlobalScopeFilter.
+    Map<String, String> userData = Collections.singletonMap(NAMESPACE, namespaceQN == null ? "" : namespaceQN.toString());
     for (Template template: soyFile.getTemplate()) {
       String ident = template.getIdent();
       if (ident != null) {
@@ -52,8 +58,7 @@ public class SoyResourceDescriptionStrategy implements IDefaultResourceDescripti
             QualifiedName templateName = converter.toQualifiedName(ident);
             if (namespaceQN != null)
               acceptor.accept(EObjectDescription.create(namespaceQN.append(templateName.getLastSegment()), template));
-            if (localNames) 
-              acceptor.accept(EObjectDescription.create(templateName, template));
+            acceptor.accept(EObjectDescription.create(templateName, template, userData));
         } else if (template instanceof DelTemplate) {
           QualifiedName templateName = converter.toQualifiedName(ident);
           acceptor.accept(EObjectDescription.create(templateName, template));
@@ -76,19 +81,19 @@ public class SoyResourceDescriptionStrategy implements IDefaultResourceDescripti
     }
   }
   
-  public static void getEObjectDescriptions(IQualifiedNameConverter converter, SoyFile soyFile, boolean localNames, IAcceptor<IEObjectDescription> acceptor) {
-    getEObjectDescriptionsFromTemplates(converter, soyFile, localNames, acceptor);
+  public static void getEObjectDescriptions(IQualifiedNameConverter converter, SoyFile soyFile, IAcceptor<IEObjectDescription> acceptor) {
+    getEObjectDescriptionsFromTemplates(converter, soyFile, acceptor);
     getEObjectDescriptionsFromDeclarations(converter, soyFile, acceptor);
   }
 
-  public static Iterable<IEObjectDescription> getEObjectDescriptions(IQualifiedNameConverter converter, SoyFile soyFile, boolean localNames) {
+  public static Iterable<IEObjectDescription> getEObjectDescriptions(IQualifiedNameConverter converter, SoyFile soyFile) {
     final List<IEObjectDescription> list = new ArrayList<IEObjectDescription>();
     IAcceptor<IEObjectDescription> acceptor = new IAcceptor<IEObjectDescription>() {
       public void accept(IEObjectDescription t) {
         list.add(t);
       }
     };
-    getEObjectDescriptions(converter, soyFile, localNames, acceptor);
+    getEObjectDescriptions(converter, soyFile, acceptor);
     return list;
   }
 

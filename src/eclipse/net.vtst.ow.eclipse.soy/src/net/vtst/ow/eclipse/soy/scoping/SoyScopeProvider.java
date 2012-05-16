@@ -6,6 +6,7 @@ package net.vtst.ow.eclipse.soy.scoping;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.vtst.ow.eclipse.soy.resource.SoyGlobalScopeFilter;
 import net.vtst.ow.eclipse.soy.resource.SoyResourceDescriptionStrategy;
 import net.vtst.ow.eclipse.soy.soy.ForCommand;
 import net.vtst.ow.eclipse.soy.soy.ForeachCommand;
@@ -76,8 +77,9 @@ public class SoyScopeProvider extends AbstractDeclarativeScopeProvider {
   public IScope getToplevelScopeFromSoyFile(final SoyFile soyFile, final EReference ref) {
     return cache.get(Tuples.create(SoyScopeProvider.class, "getToplevelScope", Tuples.pair(soyFile, ref)), soyFile.eResource(), new Provider<IScope>() {
       public IScope get() {
-        Iterable<IEObjectDescription> localScope = SoyResourceDescriptionStrategy.getEObjectDescriptions(converter, soyFile, true);
-        return MapBasedScope.createScope(getGlobalScope(soyFile.eResource(), ref, null), localScope);
+        Iterable<IEObjectDescription> localScope = SoyResourceDescriptionStrategy.getEObjectDescriptions(converter, soyFile);
+        IScope globalScope = getGlobalScope(soyFile.eResource(), ref, new SoyGlobalScopeFilter(soyFile.getNamespace()));
+        return MapBasedScope.createScope(globalScope, localScope);
       }
     });
   }
