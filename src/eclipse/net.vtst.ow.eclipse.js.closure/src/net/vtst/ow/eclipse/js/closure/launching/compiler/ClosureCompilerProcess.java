@@ -90,16 +90,18 @@ public class ClosureCompilerProcess implements IProcess {
     IFile file;
     String fileName;
     ErrorInfo(JSError error) {
-      IFile[] errorFiles = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI((new File(error.sourceName)).toURI());
-      if (errorFiles.length > 0) {
-        this.file = errorFiles[0];
-        this.fileName = errorFiles[0].getFullPath().toOSString();
-        this.error = JSError.make(this.fileName, error.lineNumber, error.getCharno(), error.getDefaultLevel(), error.getType(), error.description);
-      } else {
-        this.file = null;
-        this.fileName = null;
-        this.error = error;
+      if (error.sourceName != null) {
+        IFile[] errorFiles = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI((new File(error.sourceName)).toURI());
+        if (errorFiles.length > 0) {
+          this.file = errorFiles[0];
+          this.fileName = errorFiles[0].getFullPath().toOSString();
+          this.error = JSError.make(this.fileName, error.lineNumber, error.getCharno(), error.getDefaultLevel(), error.getType(), error.description);
+          return;
+        } 
       }
+      this.file = null;
+      this.fileName = null;
+      this.error = error;
     }
   }
   
