@@ -408,7 +408,7 @@ NumericLiteral:
   | {EmsTerm} value=EMS
   | {ExsTerm} value=EXS
   | {AngleTerm} value=ANGLE
-  | {AngleTerm} value=TIME
+  | {TimeTerm} value=TIME
   | {FreqTerm} value=FREQ
   | {HashColorTerm} value=HASH_COLOR
 ;
