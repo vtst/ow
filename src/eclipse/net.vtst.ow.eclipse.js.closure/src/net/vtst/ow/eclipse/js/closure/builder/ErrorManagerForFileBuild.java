@@ -8,6 +8,8 @@ import net.vtst.ow.eclipse.js.closure.compiler.ErrorManagerGeneratingProblemMark
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceVisitor;
+import org.eclipse.core.runtime.CoreException;
 
 /**
  * An error manager which generates problem markers for reporting errors.
@@ -24,8 +26,10 @@ public class ErrorManagerForFileBuild extends ErrorManagerGeneratingProblemMarke
   }
 
   @Override
-  protected Iterable<? extends IResource> getResources() {
-    return fileNameToFile.values();
+  protected void accept(IResourceVisitor visitor) throws CoreException {
+    for (IFile file: fileNameToFile.values()) {
+      file.accept(visitor);
+    }
   }
 
   @Override

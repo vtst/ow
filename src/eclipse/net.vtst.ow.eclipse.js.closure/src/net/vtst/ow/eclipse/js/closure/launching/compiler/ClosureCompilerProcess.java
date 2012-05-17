@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.vtst.ow.eclipse.js.closure.compiler.ClosureCompiler;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.debug.core.DebugException;
@@ -90,18 +92,14 @@ public class ClosureCompilerProcess implements IProcess {
     IFile file;
     String fileName;
     ErrorInfo(JSError error) {
-      if (error.sourceName != null) {
-        IFile[] errorFiles = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI((new File(error.sourceName)).toURI());
-        if (errorFiles.length > 0) {
-          this.file = errorFiles[0];
-          this.fileName = errorFiles[0].getFullPath().toOSString();
-          this.error = JSError.make(this.fileName, error.lineNumber, error.getCharno(), error.getDefaultLevel(), error.getType(), error.description);
-          return;
-        } 
+      this.file = ClosureCompiler.getFileFromSourceName(error.sourceName);
+      if (this.file == null) {
+        this.fileName = null;
+        this.error = error;
+      } else {
+        this.fileName = this.file.getFullPath().toOSString();
+        this.error = JSError.make(this.fileName, error.lineNumber, error.getCharno(), error.getDefaultLevel(), error.getType(), error.description);        
       }
-      this.file = null;
-      this.fileName = null;
-      this.error = error;
     }
   }
   

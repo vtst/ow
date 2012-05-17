@@ -24,10 +24,13 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
+
+import com.google.javascript.jscomp.JSError;
 
 /**
  * This class implements static methods which are useful for using the Closure Compiler.
@@ -181,5 +184,20 @@ public class ClosureCompiler {
       }
     }
     return project;
+  }
+  
+  /**
+   * Convert a source name (as returned by the closure compiler in an Error) into an Eclipse IFile.
+   * @param sourceName  The source name to convert.
+   * @return  The corresponding file, or null if not found in the workspace.
+   */
+  public static IFile getFileFromSourceName(String sourceName) {
+    if (sourceName == null) return null;
+    IFile[] errorFiles = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI((new File(sourceName)).toURI());
+    if (errorFiles.length > 0) {
+      return errorFiles[0];
+    } else {
+      return null;
+    }
   }
 }

@@ -2,6 +2,7 @@ package net.vtst.ow.eclipse.js.closure.compiler;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 
 import com.google.javascript.jscomp.BasicErrorManager;
@@ -23,16 +24,20 @@ public abstract class ErrorManagerGeneratingProblemMarkers extends BasicErrorMan
    * Sub-classes must implement this method to specify the set of resources it manages.
    * @return  The collection of resources controlled by this error manager.
    */
-  protected abstract Iterable<? extends IResource> getResources();
+  protected abstract void accept(IResourceVisitor visitor) throws CoreException;
   
   protected abstract IResource getResource(String sourceName);
   
   private void clearProblemMarkers() throws CoreException {
-    for (IResource resource: getResources()) {
-      for (IMarker marker : resource.findMarkers(getMarkerType(), false, 0)) {
-        marker.delete();
+    accept(new IResourceVisitor() {
+      @Override
+      public boolean visit(IResource resource) throws CoreException {
+        for (IMarker marker : resource.findMarkers(getMarkerType(), false, 0)) {
+          marker.delete();
+        }
+        return true;
       }
-    }
+    });
   }
 
   @Override
