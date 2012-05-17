@@ -12,6 +12,9 @@ CONFIGURATION TAB
 -------------------------------------------------------------------------------
 TODO
 
+- Reporting of parse errors is not done in the right project if the file is parsed for the first time
+  in another project.
+
 - Check that my understanding of compiler options is correct.
 - Can we clone compiler options?
 
