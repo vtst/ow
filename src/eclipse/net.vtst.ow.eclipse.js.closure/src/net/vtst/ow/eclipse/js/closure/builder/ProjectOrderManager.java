@@ -70,7 +70,7 @@ public class ProjectOrderManager implements IResourceChangeListener {
     IProject[] projects = workspace.getRoot().getProjects();
     ArrayList<IProject> projectsWithNature = new ArrayList<IProject>(projects.length);
     for (IProject project: projects) {
-      if (project.hasNature(ClosureNature.NATURE_ID)) {
+      if (project.isOpen() && project.hasNature(ClosureNature.NATURE_ID)) {
         projectsWithNature.add(project);
       }
     }
@@ -135,6 +135,10 @@ public class ProjectOrderManager implements IResourceChangeListener {
   public void resourceChanged(IResourceChangeEvent event) {
     State localState = state;
     if (localState == null || localState.dirty) return;
+    if (event.getDelta() == null) {
+      localState.dirty = true;
+      return;
+    }
     ResourceDeltaVisitor visitor = new ResourceDeltaVisitor(localState);
     try {
       event.getDelta().accept(visitor);

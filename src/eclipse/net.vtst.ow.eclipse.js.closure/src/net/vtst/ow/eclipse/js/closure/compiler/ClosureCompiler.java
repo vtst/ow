@@ -141,7 +141,7 @@ public class ClosureCompiler {
     while (!projectsToVisit.isEmpty()) {
       IProject visitedProject = projectsToVisit.remove();
       for (IProject referencedProject: visitedProject.getReferencedProjects()) {
-        if (referencedProject.hasNature(ClosureNature.NATURE_ID)) {
+        if (referencedProject.isOpen() && referencedProject.hasNature(ClosureNature.NATURE_ID)) {
           if (result.add(referencedProject)) projectsToVisit.add(referencedProject);
         }
       }
