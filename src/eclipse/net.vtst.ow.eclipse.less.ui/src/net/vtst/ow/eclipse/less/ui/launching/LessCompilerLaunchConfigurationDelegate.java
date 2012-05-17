@@ -86,14 +86,14 @@ public class LessCompilerLaunchConfigurationDelegate
     ProcessBuilder pb = super.getProcessBuilder(config, fixture);
     List<String> list = new ArrayList<String>();
     list.add(launchConfigHelper.command.getValue(config));
+    list.add(fixture.inputFile.getRawLocation().makeAbsolute().toOSString());
+    list.add(fixture.outputFile.getRawLocation().makeAbsolute().toOSString());
     if (launchConfigHelper.verbose.getBooleanValue(config)) list.add("--verbose");
     if (launchConfigHelper.compress.getBooleanValue(config)) list.add("--compress");
     if (launchConfigHelper.yuiCompress.getBooleanValue(config)) list.add("--yui-compress");
     if (launchConfigHelper.strictImports.getBooleanValue(config)) list.add("--strict-imports");
     list.add("-O" + launchConfigHelper.optimization.getValue(config));
     list.add("--no-color");
-    list.add(fixture.inputFile.getRawLocation().makeAbsolute().toOSString());
-    list.add(fixture.outputFile.getRawLocation().makeAbsolute().toOSString());
     pb.command(list);
     return pb;
   }
