@@ -6,7 +6,6 @@ package net.vtst.ow.eclipse.soy.scoping;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.vtst.ow.eclipse.soy.resource.SoyGlobalScopeFilter;
 import net.vtst.ow.eclipse.soy.resource.SoyResourceDescriptionStrategy;
 import net.vtst.ow.eclipse.soy.soy.ForCommand;
 import net.vtst.ow.eclipse.soy.soy.ForeachCommand;

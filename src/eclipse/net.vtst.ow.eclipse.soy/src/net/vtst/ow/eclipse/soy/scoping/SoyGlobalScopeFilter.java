@@ -1,5 +1,6 @@
-package net.vtst.ow.eclipse.soy.resource;
+package net.vtst.ow.eclipse.soy.scoping;
 
+import net.vtst.ow.eclipse.soy.resource.SoyResourceDescriptionStrategy;
 import net.vtst.ow.eclipse.soy.soy.Namespace;
 
 import org.eclipse.xtext.naming.QualifiedName;
@@ -23,7 +24,6 @@ public class SoyGlobalScopeFilter implements Predicate<IEObjectDescription> {
     }
   }
 
-  @Override
   public boolean apply(IEObjectDescription input) {
     QualifiedName qn = input.getQualifiedName();
     if (qn.getFirstSegment().isEmpty()) {
