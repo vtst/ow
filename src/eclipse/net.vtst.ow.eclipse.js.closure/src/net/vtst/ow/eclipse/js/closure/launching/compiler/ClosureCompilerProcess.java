@@ -40,10 +40,9 @@ public class ClosureCompilerProcess implements IProcess {
     this.launch = launch;
     launch.addProcess(this);
     IConsole console = DebugUITools.getConsole(this);
-    if (console instanceof TextConsole)
+    if (console instanceof TextConsole) {
       ((TextConsole) console).addPatternMatchListener(patternMatchListener);
-    else
-      System.out.println("CONSOLE NOT FOUND");
+    }
   }
 
   @SuppressWarnings("rawtypes")
