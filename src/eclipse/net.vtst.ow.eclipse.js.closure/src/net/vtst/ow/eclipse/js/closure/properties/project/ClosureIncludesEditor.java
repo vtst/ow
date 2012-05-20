@@ -24,7 +24,6 @@ public class ClosureIncludesEditor extends DefaultCompoundEditor {
         getComposite(), getMessage("otherIncludesGroup"), 3, 1, GridData.FILL_BOTH);
     addControl(group2);
     record.includes.otherLibraries.bindEditor(this, group2);
-    SWTFactory.createLabel(group2, getMessage("otherLibrariesHelp"), 3);
     record.includes.externs.bindEditor(this, group2);
     record.includes.useOnlyCustomExterns.bindEditor(this, group2);
   }
