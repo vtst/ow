@@ -2,6 +2,7 @@ package net.vtst.ow.closure.compiler.magic;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -61,6 +62,12 @@ public class Magic {
         return nestedClass;
     }
     throw new MagicException();
+  }
+  
+  public static void catchInvocationTargetException(InvocationTargetException exception) {
+    Throwable cause = exception.getCause();
+    if (cause instanceof RuntimeException) throw (RuntimeException) cause;
+    throw new MagicException(exception);    
   }
 
 }

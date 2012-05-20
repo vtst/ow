@@ -36,6 +36,7 @@ public class MagicDepsGenerator {
       if (throwable instanceof IOException) {
         throw (IOException) throwable;
       }
+      Magic.catchInvocationTargetException(e);
     }
   }
 

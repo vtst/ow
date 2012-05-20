@@ -48,7 +48,7 @@ public class MagicCodePrinterBuilder {
     } catch (IllegalAccessException e) {
       throw new MagicException(e);
     } catch (InvocationTargetException e) {
-      throw new MagicException(e);
+      Magic.catchInvocationTargetException(e);
     }
   }
   
@@ -64,7 +64,8 @@ public class MagicCodePrinterBuilder {
     } catch (IllegalAccessException e) {
       throw new MagicException(e);
     } catch (InvocationTargetException e) {
-      throw new MagicException(e);
+      Magic.catchInvocationTargetException(e);
+      return null;
     }
   }
 

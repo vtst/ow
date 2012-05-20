@@ -13,6 +13,7 @@ public class MagicException extends RuntimeException {
   public MagicException() {}
 
   public MagicException(Exception e) {
+    super(e);
     exception = e;
   }
   
