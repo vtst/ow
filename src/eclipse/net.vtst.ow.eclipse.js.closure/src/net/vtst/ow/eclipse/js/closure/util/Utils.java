@@ -1,10 +1,15 @@
 package net.vtst.ow.eclipse.js.closure.util;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.resources.ICommand;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -145,5 +150,29 @@ public class Utils {
    */
   public static void checkCancel(IProgressMonitor monitor) {
     if (monitor.isCanceled()) throw new OperationCanceledException();
+  }
+  
+  /**
+   * @param resources  A series of resources.
+   * @param files  A set of files.
+   * @return  A set of all the files which are in <code>resources</code> or contained in a resource from <code>resources</code>
+   *   and in <code>files</code>.
+   * @throws CoreException
+   */
+  public static Set<IFile> getAllContainedFilesWhichAreInSet(Iterable<IResource> resources, final Set<IFile> files) throws CoreException {
+    final Set<IFile> result = new HashSet<IFile>(files.size());
+    for (IResource resource: resources) {
+      resource.accept(new IResourceVisitor() {
+        public boolean visit(IResource resource) throws CoreException {
+          if (resource instanceof IFile) {
+            IFile file = (IFile) resource;
+            if (files.contains(file)) result.add(file);
+            return false;
+          } else {
+            return true;
+          }
+        }});
+    }
+    return result;
   }
 }

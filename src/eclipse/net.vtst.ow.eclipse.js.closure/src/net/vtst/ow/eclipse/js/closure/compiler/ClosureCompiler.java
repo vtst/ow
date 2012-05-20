@@ -95,10 +95,12 @@ public class ClosureCompiler {
       for (IIncludePathEntry includePathEntry: expandedClassPath) {
         if (!(includePathEntry instanceof ClasspathEntry)) continue;
         final ClasspathEntry entry = (ClasspathEntry) includePathEntry;
-        switch (entry.getEntryKind()) {
+        int entryKind = entry.getEntryKind();
+        if (entryKind != IIncludePathEntry.CPE_SOURCE && entryKind != IIncludePathEntry.CPE_LIBRARY) continue;
+        IResource includeResource = ResourcesPlugin.getWorkspace().getRoot().findMember(entry.getPath());
+        if (includeResource == null) continue;
+        switch (entryKind) {
         case IIncludePathEntry.CPE_SOURCE:
-          IResource includeResource = ResourcesPlugin.getWorkspace().getRoot().findMember(entry.getPath());
-          if (includeResource == null) continue;
           includeResource.accept(new IResourceVisitor() {
             public boolean visit(IResource resource) throws CoreException {
               if (resource instanceof IFile) {
@@ -118,6 +120,9 @@ public class ClosureCompiler {
             }});
           break;
         case IIncludePathEntry.CPE_LIBRARY:
+          if (includeResource instanceof IFile && project.equals(includeResource.getProject())) {
+            result.add((IFile) includeResource);
+          }
           break;
         }
       }
@@ -129,12 +134,27 @@ public class ClosureCompiler {
   }
   
   /**
-   * Gets the list of JavaScript files of a resource (including itself).
-   * @param resource  The resource to visit.
-   * @return  The list of JavaScript files.  May be empty, but never null.
-   * @throws CoreException 
+   * Same as <code>getJavaScriptFilesOfProject</code>, for a series of projects.
+   * @param projects
+   * @return The JavaScript files included in the series of projects (as defined in the class path).
+   * @throws CoreException
    */
-  public static Set<IFile> getJavaScriptFiles(IResource resource) throws CoreException {
+  public static Set<IFile> getJavaScriptFilesOfProjects(Iterable<IProject> projects) throws CoreException {
+    Set<IFile> result = new HashSet<IFile>();
+    for (IProject project: projects) {
+      result.addAll(getJavaScriptFilesOfProject(project));
+    }
+    return result;
+  }
+  
+  /**
+   * Fallback function to get the JavaScript files of a resource which is not a project (i.e. a folder
+   * or a single file).
+   * @param resource  The resource to visit.
+   * @return  The set of JavaScript files included in the resource.
+   * @throws CoreException
+   */
+  private static Set<IFile> getJavaScriptFilesOfOtherResource(IResource resource) throws CoreException {
     final Set<IFile> files = new HashSet<IFile>();
     IResourceVisitor visitor = new IResourceVisitor() {
       @Override
@@ -147,7 +167,21 @@ public class ClosureCompiler {
       }
     };
     resource.accept(visitor);
-    return files;
+    return files;    
+  }
+  
+  /**
+   * Gets the list of JavaScript files of a resource (including itself).
+   * @param resource  The resource to visit.
+   * @return  The list of JavaScript files.  May be empty, but never null.
+   * @throws CoreException 
+   */
+  public static Set<IFile> getJavaScriptFiles(IResource resource) throws CoreException {
+    if (resource instanceof IProject) {
+      return getJavaScriptFilesOfProject((IProject) resource);
+    } else {
+      return getJavaScriptFilesOfOtherResource(resource);
+    }
   }
 
   /**
@@ -157,19 +191,11 @@ public class ClosureCompiler {
    * @throws CoreException 
    */
   public static Set<IFile> getJavaScriptFiles(Iterable<? extends IResource> resources) throws CoreException {
-    final Set<IFile> files = new HashSet<IFile>();
-    IResourceVisitor visitor = new IResourceVisitor() {
-      @Override
-      public boolean visit(IResource resource) throws CoreException {
-        if (resource instanceof IFile) {
-          IFile file = (IFile) resource;
-          if (ClosureCompiler.isJavaScriptFile(file)) files.add(file);
-        }
-        return true;
-      }
-    };
-    for (IResource resource: resources) resource.accept(visitor);
-    return files;
+    final Set<IFile> result = new HashSet<IFile>();
+    for (IResource resource: resources) {
+      result.addAll(getJavaScriptFiles(resource));
+    }
+    return result;
   }
 
   /**

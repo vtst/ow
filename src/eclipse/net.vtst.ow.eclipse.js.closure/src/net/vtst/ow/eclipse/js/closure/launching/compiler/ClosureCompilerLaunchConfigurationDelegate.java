@@ -28,6 +28,7 @@ import net.vtst.ow.eclipse.js.closure.compiler.ClosureCompiler;
 import net.vtst.ow.eclipse.js.closure.compiler.ClosureCompilerOptions;
 import net.vtst.ow.eclipse.js.closure.compiler.IJSIncludesProvider;
 import net.vtst.ow.eclipse.js.closure.properties.file.ClosureFilePropertyRecord;
+import net.vtst.ow.eclipse.js.closure.util.Utils;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -87,7 +88,7 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
     compiler.initOptions(options);
 
     // Get the files to compile
-    Collection<IFile> allFiles, rootFiles;
+    Set<IFile> allFiles, rootFiles;
     List<AbstractJSProject> libraries;
     if (record.manageClosureDependencies.get(store)) {
       // If dependencies are managed, we take all projects containing selected resources,
@@ -100,8 +101,11 @@ public class ClosureCompilerLaunchConfigurationDelegate extends LaunchConfigurat
       monitor.subTask(messages.getString("ClosureCompilerLaunchConfigurationDelegate_loadLibraries"));
       libraries = includesProvider.getLibraries(compiler, monitor, allProjects);
       monitor.subTask(messages.getString("ClosureCompilerLaunchConfigurationDelegate_prepareCompiler"));
-      allFiles = ClosureCompiler.getJavaScriptFiles(allProjects);
-      rootFiles = ClosureCompiler.getJavaScriptFiles(resources);
+      allFiles = ClosureCompiler.getJavaScriptFilesOfProjects(allProjects);
+      for (IResource resource: resources) {
+        if (!(resource instanceof IProject)) allFiles.addAll(ClosureCompiler.getJavaScriptFiles(resource));
+      }
+      rootFiles = Utils.getAllContainedFilesWhichAreInSet(resources, allFiles);
     } else {
       // If dependencies are not managed, we take only what has been selected.
       monitor.subTask(messages.getString("ClosureCompilerLaunchConfigurationDelegate_loadLibraries"));
