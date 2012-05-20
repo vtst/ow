@@ -20,22 +20,29 @@ import net.vtst.ow.eclipse.js.closure.preferences.ClosurePreferenceRecord;
 import net.vtst.ow.eclipse.js.closure.properties.file.ClosureFilePropertyRecord;
 import net.vtst.ow.eclipse.js.closure.properties.project.ClosureProjectPropertyRecord;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
-
-import com.google.javascript.jscomp.JSError;
+import org.eclipse.wst.jsdt.core.IIncludePathEntry;
+import org.eclipse.wst.jsdt.core.JavaScriptCore;
+import org.eclipse.wst.jsdt.core.JavaScriptModelException;
+import org.eclipse.wst.jsdt.internal.core.ClasspathEntry;
+import org.eclipse.wst.jsdt.internal.core.JavaProject;
+import org.eclipse.wst.jsdt.internal.core.util.Util;
 
 /**
  * This class implements static methods which are useful for using the Closure Compiler.
  * @author Vincent Simonet
  */
+@SuppressWarnings("restriction")
 public class ClosureCompiler {
 
   private static final String JS_CONTENT_TYPE_ID =
@@ -58,6 +65,67 @@ public class ClosureCompiler {
     if (ClosureFilePropertyRecord.getInstance().generatedByCompiler.get(new ResourcePropertyStore(file, OwJsClosurePlugin.PLUGIN_ID)))
       return false;
     return true;
+  }
+  
+  // Inspired from org.eclipse.wst.jsdt.internal.core.builder.AbstractImageBuilder.isExcludedFromProject
+  private static boolean isExcludedFromProject(JavaProject javaProject, IIncludePathEntry[] expandedClassPath, IPath containerPath) throws JavaScriptModelException {
+    // answer whether the folder should be ignored when walking the project as a source folder
+    if (containerPath.segmentCount() > 2) return false; // is a subfolder of a package
+    for (IIncludePathEntry includePathEntry: expandedClassPath) {
+      if (!(includePathEntry instanceof ClasspathEntry)) continue;
+      final ClasspathEntry entry = (ClasspathEntry) includePathEntry;
+      if (containerPath.equals(entry.getOutputLocation())) return true;
+    }
+    // skip default output folder which may not be used by any source folder
+    return containerPath.equals(javaProject.getOutputLocation());
+  }
+  
+  /**
+   * Get the JavaScript files from a project, according to the class path entries of the project.
+   * @param project
+   * @return  The set of JavaScript files, may be empty but not null.
+   * @throws CoreException
+   */
+  // Inspired from org.eclipse.wst.jsdt.internal.core.builder.AbstractImageBuilder.addAllSourceFiles
+  public static Set<IFile> getJavaScriptFilesOfProject(IProject project) throws CoreException {
+    final JavaProject javaProject = (JavaProject) JavaScriptCore.create(project);
+    final Set<IFile> result = new HashSet<IFile>();
+    try {
+      final IIncludePathEntry[] expandedClassPath = javaProject.getExpandedClasspath();
+      for (IIncludePathEntry includePathEntry: expandedClassPath) {
+        if (!(includePathEntry instanceof ClasspathEntry)) continue;
+        final ClasspathEntry entry = (ClasspathEntry) includePathEntry;
+        switch (entry.getEntryKind()) {
+        case IIncludePathEntry.CPE_SOURCE:
+          IResource includeResource = ResourcesPlugin.getWorkspace().getRoot().findMember(entry.getPath());
+          if (includeResource == null) continue;
+          includeResource.accept(new IResourceVisitor() {
+            public boolean visit(IResource resource) throws CoreException {
+              if (resource instanceof IFile) {
+                IFile file = (IFile) resource;
+                if (ClosureCompiler.isJavaScriptFile(file) &&
+                    !Util.isExcluded(file.getFullPath(), entry.fullInclusionPatternChars(), entry.fullExclusionPatternChars(), false)) {
+                  result.add(file);
+                }
+                return false;
+              } else if (resource instanceof IContainer) {
+                IContainer container = (IContainer) resource;
+                if (isExcludedFromProject(javaProject, expandedClassPath, container.getFullPath())) return false;
+                return (
+                    !Util.isExcluded(container.getFullPath(), entry.fullInclusionPatternChars(), entry.fullExclusionPatternChars(), false) ||
+                    entry.fullInclusionPatternChars() != null);
+              } else return false;
+            }});
+          break;
+        case IIncludePathEntry.CPE_LIBRARY:
+          break;
+        }
+      }
+      return result;
+    } catch (JavaScriptModelException e) {
+      e.printStackTrace();
+      return Collections.emptySet();
+    }
   }
   
   /**

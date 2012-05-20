@@ -25,4 +25,7 @@ Import-Package: org.eclipse.debug.internal.ui,
  org.eclipse.ui,
  org.eclipse.ui.editors.text,
  org.eclipse.ui.texteditor,
- org.eclipse.ui.texteditor.link
+ org.eclipse.ui.texteditor.link,
+ org.eclipse.wst.jsdt.core,
+ org.eclipse.wst.jsdt.internal.core,
+ org.eclipse.wst.jsdt.internal.core.util

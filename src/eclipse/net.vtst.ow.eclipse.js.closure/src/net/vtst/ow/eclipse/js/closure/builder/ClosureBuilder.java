@@ -85,6 +85,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
 	    int kind, Map<String, String> args, IProgressMonitor monitor) throws CoreException {
 	  IProject project = getProject();
     OwJsDev.log("Start build: %s", project.getName());
+
 	  monitor.beginTask(messages.format("build_closure", project.getName()), 2);
 		if (kind == FULL_BUILD) {
       fullBuild(monitor, project);
@@ -127,7 +128,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
       boolean jsProjectUpdated = updateJSProjectIfNeeded(monitor, compiler, project, jsProject);
       
       // Set the compilation units
-      Set<IFile> files = ClosureCompiler.getJavaScriptFiles(project);
+      Set<IFile> files = ClosureCompiler.getJavaScriptFilesOfProject(project);
       ResourceProperties.setJavaScriptFiles(project, files);
       List<CompilableJSUnit> units = new ArrayList<CompilableJSUnit>(files.size());
       for (IFile file: files) {
