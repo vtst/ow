@@ -57,5 +57,8 @@
    <feature url="features/net.vtst.ow.eclipse.js.closure.feature_0.2.2.jar" id="net.vtst.ow.eclipse.js.closure.feature" version="0.2.2">
       <category name="net.vtst.ow"/>
    </feature>
+   <feature url="features/net.vtst.ow.eclipse.js.closure.feature_0.2.3.jar" id="net.vtst.ow.eclipse.js.closure.feature" version="0.2.3">
+      <category name="net.vtst.ow"/>
+   </feature>
    <category-def name="net.vtst.ow" label="net.vtst.ow"/>
 </site>
