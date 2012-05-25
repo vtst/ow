@@ -6,10 +6,12 @@ import net.vtst.eclipse.easy.ui.properties.editors.IEditor;
 import net.vtst.eclipse.easy.ui.properties.editors.IEditorChangeEvent;
 import net.vtst.eclipse.easy.ui.properties.editors.IEditorContainer;
 import net.vtst.eclipse.easy.ui.properties.stores.IStore;
+import net.vtst.eclipse.easy.ui.properties.stores.NullStore;
 import net.vtst.eclipse.easy.ui.properties.stores.ResourcePropertyStore;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.dialogs.PropertyPage;
@@ -85,7 +87,9 @@ public abstract class EasyResourcePropertyPage extends PropertyPage implements I
   }
   
   private IStore getStore() {
-    return new ResourcePropertyStore(getResource(), getPropertyQualifier());
+    IResource resource = getResource();
+    if (resource == null) return new NullStore();
+    return new ResourcePropertyStore(resource, getPropertyQualifier());
   }
   
   /**
@@ -99,6 +103,10 @@ public abstract class EasyResourcePropertyPage extends PropertyPage implements I
    * @return  The project resource edited by this page.
    */
   protected IResource getResource() {
-    return (IResource) getElement();
+    IAdaptable element = getElement();
+    if (element instanceof IResource) return (IResource) element;
+    Object resource = element.getAdapter(IResource.class);
+    if (resource instanceof IResource) return (IResource) resource;
+    return null;
   }
 }
