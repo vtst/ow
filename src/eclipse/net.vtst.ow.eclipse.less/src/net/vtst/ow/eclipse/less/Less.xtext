@@ -427,15 +427,20 @@ Uri:
 // causes Xtext to crash.  A workaround was to configure Xtext to use XML 1.1,
 // but this reveals another bug.
 
+terminal fragment H : '0' .. '9' | 'a' .. 'f';
+terminal fragment H1_6 : H (H (H (H (H (H)?)?)?)?)?;
+terminal fragment UNICODE : '\\' H1_6 ('\r\n' | ' ' | '\t' | '\r' | '\n' /*| '\f' */)?;
+terminal fragment ESCAPE : UNICODE | '\\' !('\r' | '\n' /*| '\f'*/ | H);
+terminal fragment NL : '\n' | '\r\n' | '\r' /*| '\f'*/;
 terminal fragment IDENT_CHAR : ('_'|'a'..'z'|'A'..'Z'|'0'..'9'|'-');
 terminal IDENT : '-'? ('_'|'a'..'z'|'A'..'Z') IDENT_CHAR*;
 terminal PERCENT : '%';
 terminal AT_IDENT: '@' IDENT_CHAR+;
 terminal AT2_IDENT: '@' '@' IDENT_CHAR+;
-terminal STRING : 
-      '"' ( !('\n' | '\r' /*| '\f'*/ | '"') | ('\\' ('\n' | '\n' '\r' | '\r' /*| '\f'*/)) )* '"' |
-      "'" ( '\\' ('b'|'t'|'n'|'f'|'r'|'u'|'"'|"'"|'\\') | !('\\'|"'") )* "'"
-    ; 
+terminal fragment STRING1: '"' (!('\n' | '\r' /*| '\f'*/ | '\\' | '\"') | '\\' NL | ESCAPE)* '"';
+terminal fragment STRING2: '\'' (!('\n' | '\r' /*| '\f'*/ | '\\' | '\'') | '\\' NL | ESCAPE)* '\'';
+terminal STRING : STRING1 | STRING2;
+
 terminal JS_EVALUATION : '`' (!'`')* '`';
 terminal HASH_COLOR : '#' ('0'..'9'|'a'..'f'|'A'..'F')('0'..'9'|'a'..'f'|'A'..'F')('0'..'9'|'a'..'f'|'A'..'F')
   (('0'..'9'|'a'..'f'|'A'..'F')('0'..'9'|'a'..'f'|'A'..'F')('0'..'9'|'a'..'f'|'A'..'F'))?
