@@ -22,6 +22,7 @@ import net.vtst.ow.eclipse.js.closure.properties.project.ClosureProjectPropertyR
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
@@ -79,7 +80,7 @@ public class ClosureCompiler {
     // skip default output folder which may not be used by any source folder
     return containerPath.equals(javaProject.getOutputLocation());
   }
-  
+    
   /**
    * Get the JavaScript files from a project, according to the class path entries of the project.
    * @param project
@@ -90,6 +91,7 @@ public class ClosureCompiler {
   public static Set<IFile> getJavaScriptFilesOfProject(IProject project) throws CoreException {
     final JavaProject javaProject = (JavaProject) JavaScriptCore.create(project);
     final Set<IFile> result = new HashSet<IFile>();
+    boolean hasClasspathEntry = false;
     try {
       final IIncludePathEntry[] expandedClassPath = javaProject.getExpandedClasspath();
       for (IIncludePathEntry includePathEntry: expandedClassPath) {
@@ -101,6 +103,7 @@ public class ClosureCompiler {
         if (includeResource == null) continue;
         switch (entryKind) {
         case IIncludePathEntry.CPE_SOURCE:
+          hasClasspathEntry = true;
           includeResource.accept(new IResourceVisitor() {
             public boolean visit(IResource resource) throws CoreException {
               if (resource instanceof IFile) {
@@ -111,20 +114,41 @@ public class ClosureCompiler {
                 }
                 return false;
               } else if (resource instanceof IContainer) {
-                IContainer container = (IContainer) resource;
-                if (isExcludedFromProject(javaProject, expandedClassPath, container.getFullPath())) return false;
-                return (
-                    !Util.isExcluded(container.getFullPath(), entry.fullInclusionPatternChars(), entry.fullExclusionPatternChars(), false) ||
-                    entry.fullInclusionPatternChars() != null);
+                try {
+                  IContainer container = (IContainer) resource;
+                  if (container instanceof IFolder &&
+                      isExcludedFromProject(javaProject, expandedClassPath, container.getFullPath())) {
+                    return false;
+                  }
+                  return (
+                      !Util.isExcluded(container.getFullPath(), entry.fullInclusionPatternChars(), entry.fullExclusionPatternChars(), false) ||
+                      entry.fullInclusionPatternChars() != null);
+                } catch (Exception e) {
+                  e.printStackTrace();
+                  return false;
+                }
               } else return false;
             }});
           break;
         case IIncludePathEntry.CPE_LIBRARY:
           if (includeResource instanceof IFile && project.equals(includeResource.getProject())) {
+            hasClasspathEntry = true;
             result.add((IFile) includeResource);
           }
           break;
         }
+      }
+      if (!hasClasspathEntry) {
+        // If there was no class path entry, we add all JavaScript files from the project.
+        project.accept(new IResourceVisitor() {
+          public boolean visit(IResource resource) throws CoreException {
+            if (resource instanceof IFile) {
+              IFile file = (IFile) resource;
+              if (ClosureCompiler.isJavaScriptFile(file)) result.add(file);
+            }
+            return true;
+          }
+        });
       }
       return result;
     } catch (JavaScriptModelException e) {
