@@ -10,13 +10,11 @@ public class LessValueConverterService extends AbstractDeclarativeValueConverter
 
   private IValueConverter<String> stringValueConverter = new IValueConverter<String>() {
 
-    @Override
     public String toValue(String string, INode node)
         throws ValueConverterException {
       return string;
     }
 
-    @Override
     public String toString(String value) throws ValueConverterException {
       return value;
     }
