@@ -23,4 +23,6 @@ public class LessHighlightingConfiguration extends EasyHighlightingConfiguration
   public EasyTextAttribute MIXIN_CALL = new EasyTextAttribute(0, 0, 192, SWT.NORMAL);
   public EasyTextAttribute MEDIA_QUERY_KEYWORD = new EasyTextAttribute(127, 0, 85, SWT.BOLD + SWT.ITALIC);
   public EasyTextAttribute MEDIA_FEATURE = new EasyTextAttribute(127, 0, 85, SWT.BOLD);
+  public EasyTextAttribute NUMERIC_LITERAL = new EasyTextAttribute();
+  
 }
