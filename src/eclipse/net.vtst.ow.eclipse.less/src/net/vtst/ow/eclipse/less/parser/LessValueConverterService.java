@@ -25,5 +25,16 @@ public class LessValueConverterService extends AbstractDeclarativeValueConverter
   public IValueConverter<String> getSTRINGConverter() {
     return stringValueConverter;
   }
+  
+  /**
+   * Return the string denoted by a string literal.  This is useful for URI.
+   * Note that the current implementation does not unescape escape sequences.
+   * @param string
+   * @return
+   */
+  public static String getStringValue(String string) {
+    if (string.length() < 2) return "";
+    return string.substring(1, string.length() - 1);
+  }
 
 }

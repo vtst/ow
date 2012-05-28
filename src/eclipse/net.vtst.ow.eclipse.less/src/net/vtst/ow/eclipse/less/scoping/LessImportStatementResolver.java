@@ -11,6 +11,7 @@ import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.less.LessPackage;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
 import net.vtst.ow.eclipse.less.less.ToplevelStatement;
+import net.vtst.ow.eclipse.less.parser.LessValueConverterService;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -119,7 +120,7 @@ public class LessImportStatementResolver {
    * @return  The imported URI, or {@code null} if the URI of the import statement is not valid.
    */
   public URI getURI(ImportStatement importStatement) {
-    URI uri = URI.createURI(importStatement.getUri());
+    URI uri = URI.createURI(LessValueConverterService.getStringValue(importStatement.getUri()));
     String fileExtension = uri.fileExtension();
     if (fileExtension == null) uri = uri.appendFileExtension(LessRuntimeModule.LESS_EXTENSION);
     if (EcoreUtil2.isValidUri(importStatement, uri)) {
