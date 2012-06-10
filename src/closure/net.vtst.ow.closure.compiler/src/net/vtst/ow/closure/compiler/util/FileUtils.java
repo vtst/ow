@@ -21,7 +21,8 @@ public class FileUtils {
   public static boolean isAbsolute(File file) {
     String path = file.getPath();
     for (File root: File.listRoots()) {
-      if (path.startsWith(root.getPath())) return true;
+      String rootPath = root.getPath();
+      if (path.regionMatches(true, 0, rootPath, 0, rootPath.length())) return true;
     }
     return false;
   }
