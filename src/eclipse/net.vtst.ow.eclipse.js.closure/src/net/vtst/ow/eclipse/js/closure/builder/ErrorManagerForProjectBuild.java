@@ -39,6 +39,7 @@ public class ErrorManagerForProjectBuild extends ErrorManagerGeneratingProblemMa
 
   @Override
   protected IResource getResource(String sourceName) {
+    if (sourceName == null) return project;
     if (cachedFiles.containsKey(sourceName)) return cachedFiles.get(sourceName);
     IFile file = ClosureCompiler.getFileFromSourceName(sourceName);
     cachedFiles.put(sourceName, file);
