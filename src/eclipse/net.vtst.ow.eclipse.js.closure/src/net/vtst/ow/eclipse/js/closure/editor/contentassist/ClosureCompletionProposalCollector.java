@@ -189,6 +189,9 @@ public class ClosureCompletionProposalCollector {
    * @return true if {@code name} is a valid completion proposal name.
    */
   private boolean isValidForPrefix(String name, String prefix) {
-    return name.startsWith(prefix);
+    // Test if name starts by prefix, ignoring case.
+    // This check must be consistent with the one implemented in 
+    // AbstractCompletionProposal.validate
+    return name.regionMatches(true, 0, prefix, 0, prefix.length());
   }
 }

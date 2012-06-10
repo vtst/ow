@@ -52,6 +52,7 @@ public abstract class AbstractCompletionProposal
 
   private IContentAssistInvocationContext context;
   private String completionString;
+  private String completionStringLowerCase;
   
   /**
    * Create a new completion proposal.
@@ -61,6 +62,7 @@ public abstract class AbstractCompletionProposal
   public AbstractCompletionProposal(IContentAssistInvocationContext context, String completionString) {
     this.context = context;
     this.completionString = completionString;
+    this.completionStringLowerCase = completionString.toLowerCase();
   }
   
   /**
@@ -106,6 +108,7 @@ public abstract class AbstractCompletionProposal
     if (event != null &&
         event.getOffset() < invocationOffset + matchLength + (nextCharDoesNotMatch ? 1 : 0) &&
         event.getOffset() + event.getLength() >= invocationOffset) {
+      
       nextCharDoesNotMatch = false;
       matchLength = Math.min(matchLength, Math.max(0, event.getOffset() - invocationOffset));
     }
@@ -116,7 +119,7 @@ public abstract class AbstractCompletionProposal
       try {
         while (matchLength < offset - invocationOffset) {
           if (prefixLength + matchLength < completionString.length() &&
-              document.getChar(invocationOffset + matchLength) == completionString.charAt(prefixLength + matchLength)) {
+              Character.toLowerCase(document.getChar(invocationOffset + matchLength)) == completionStringLowerCase.charAt(prefixLength + matchLength)) {
             ++matchLength;
           } else {
             break;
