@@ -5,7 +5,7 @@ Bundle-Vendor: %Bundle-Vendor
 Bundle-Version: 1.0.5
 Bundle-SymbolicName: net.vtst.ow.eclipse.soy; singleton:=true
 Bundle-ActivationPolicy: lazy
-Require-Bundle: org.eclipse.xtext;bundle-version="2.0.0";visibility:=reexport,
+Require-Bundle: org.eclipse.xtext;bundle-version="2.2.1";visibility:=reexport,
  org.apache.log4j;bundle-version="1.2.15";visibility:=reexport,
  org.apache.commons.logging;bundle-version="1.0.4";resolution:=optional;visibility:=reexport,
  org.eclipse.xtext.generator;resolution:=optional,

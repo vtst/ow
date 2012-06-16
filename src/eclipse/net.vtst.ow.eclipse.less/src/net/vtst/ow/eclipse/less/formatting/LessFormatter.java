@@ -14,7 +14,6 @@ import org.eclipse.xtext.formatting.IIndentationInformation;
 import org.eclipse.xtext.parsetree.reconstr.IHiddenTokenHelper;
 import org.eclipse.xtext.parsetree.reconstr.ITokenStream;
 
-import com.google.common.base.Strings;
 import com.google.inject.Inject;
 
 public class LessFormatter implements IFormatter {
@@ -178,9 +177,16 @@ public class LessFormatter implements IFormatter {
       setNewLine(indentLevel, 1);
     }
     
+    private String repeat(String string, int repetitions) {
+      StringBuffer buffer = new StringBuffer(string.length() * repetitions);
+      for (int i = 0; i < repetitions; ++i)
+        buffer.append(string);
+      return buffer.toString();
+    }
+    
     public void setNewLine(int indentLevel, int numberOfNewLines) {
       if (isWhiteSpace()) {
-        value = Strings.repeat("\n", numberOfNewLines) + Strings.repeat(indentInfo.getIndentString(), indentLevel);
+        value = repeat("\n", numberOfNewLines) + repeat(indentInfo.getIndentString(), indentLevel);
       }
     }
     
