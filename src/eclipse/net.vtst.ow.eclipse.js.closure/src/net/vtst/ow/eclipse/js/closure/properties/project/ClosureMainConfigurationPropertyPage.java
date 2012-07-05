@@ -7,7 +7,9 @@ import net.vtst.ow.eclipse.js.closure.builder.ClosureNature;
 import net.vtst.ow.eclipse.js.closure.util.Utils;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -50,10 +52,20 @@ public class ClosureMainConfigurationPropertyPage extends ClosureAsbtractPropert
   
   public boolean performOk() {
     try {
-      Utils.setProjectNature((IProject) getElement(), ClosureNature.NATURE_ID, enableClosureSupport.getSelection());
+      IProject project = getProject();
+      if (project != null) Utils.setProjectNature(project, ClosureNature.NATURE_ID, enableClosureSupport.getSelection());
     } catch (CoreException e) {
       return false;
     }
     return super.performOk();
   }
+  
+  protected IProject getProject() {
+	IAdaptable element = getElement();
+	if (element instanceof IProject) return (IProject) element;
+	Object project = element.getAdapter(IProject.class);
+	if (project instanceof IProject) return (IProject) project;
+	return null;
+  }
+
 }
