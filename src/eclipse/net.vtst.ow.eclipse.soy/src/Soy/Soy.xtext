@@ -318,20 +318,20 @@ terminal DOLLAR_IDENT: '$' IDENT;
 terminal WS: (" " | "\t" | "\n" | "\r")+;
 
 terminal SOY_DOC_OPEN : '/**';
-terminal SOY_DOC_TEXT : '*/1';  // Fake terminal used by the CustomizedSoyLexer
-terminal SOY_DOC_TAG_PARAM : '*/2';  // Fake terminal used by the CustomizedSoyLexer
-terminal SOY_DOC_TAG_PARAM_OPTIONAL : '*/3';  // Fake terminal used by the CustomizedSoyLexer
-terminal SOY_DOC_IDENT : '*/4';  // Fake terminal used by the CustomizedSoyLexer
-terminal SOY_DOC_CLOSE : '*/5';  // Fake terminal used by the CustomizedSoyLexer
+terminal SOY_DOC_TEXT : '*//*-1';  // Fake terminal used by the CustomizedSoyLexer
+terminal SOY_DOC_TAG_PARAM : '*//*-2';  // Fake terminal used by the CustomizedSoyLexer
+terminal SOY_DOC_TAG_PARAM_OPTIONAL : '*//*-3';  // Fake terminal used by the CustomizedSoyLexer
+terminal SOY_DOC_IDENT : '*//*-4';  // Fake terminal used by the CustomizedSoyLexer
+terminal SOY_DOC_CLOSE : '*//*-5';  // Fake terminal used by the CustomizedSoyLexer
 terminal ML_COMMENT : ('/*' !'*') -> '*/';
 // The remainder of the comment is lexed by CustomSoyLexer
 // terminal SL_COMMENT   : '//' !('\n'|'\r')* ('\r'? '\n')?;
 terminal SL_COMMENT : '//';
-terminal FUNCTION_TAG : '*/6';  // Fake terminal used by the CustomizedSoyLexer
-terminal PRINT_DIRECTIVE_TAG : '*/7';  // Fake terminal used by the CustomizedSoyLexer
-terminal CALL_COMMAND_ATTRIBUTE_DQ : '*/8';  // Fake terminal used by the CustomizedSoyLexer
-terminal HTML_IDENT : '*/9';  // Fake terminal used by the CustomizedSoyLexer
-terminal CSS_IDENT : '*/A';  // Fake terminal used by the CustomizedSoyLexer
+terminal FUNCTION_TAG : '*//*-6';  // Fake terminal used by the CustomizedSoyLexer
+terminal PRINT_DIRECTIVE_TAG : '*//*-7';  // Fake terminal used by the CustomizedSoyLexer
+terminal CALL_COMMAND_ATTRIBUTE_DQ : '*//*-8';  // Fake terminal used by the CustomizedSoyLexer
+terminal HTML_IDENT : '*//*-9';  // Fake terminal used by the CustomizedSoyLexer
+terminal CSS_IDENT : '*//*-A';  // Fake terminal used by the CustomizedSoyLexer
 // This is required to properly parse a command like {foo}. It's split by CustomSoyLexer
 terminal PRINT_IDENT : "{" IDENT;
 
