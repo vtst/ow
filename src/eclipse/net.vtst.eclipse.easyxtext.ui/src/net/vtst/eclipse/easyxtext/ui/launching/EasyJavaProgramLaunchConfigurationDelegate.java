@@ -151,7 +151,7 @@ public class EasyJavaProgramLaunchConfigurationDelegate<Fixture> extends Abstrac
   
         // VM-specific attributes
         @SuppressWarnings("unchecked")
-        Map<String, String[]> vmAttributesMap = getVMSpecificAttributesMap(config);
+        Map<String, Object> vmAttributesMap = getVMSpecificAttributesMap(config);
   
         // Classpath
         String[] classpath = getClasspath(config);
