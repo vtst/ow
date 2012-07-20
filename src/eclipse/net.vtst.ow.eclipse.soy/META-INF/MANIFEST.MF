@@ -26,8 +26,7 @@ Import-Package: net.vtst.eclipse.easyxtext.parser,
  org.apache.commons.logging,
  org.apache.log4j,
  org.eclipse.xtend2.lib;resolution:=optional,
- org.eclipse.xtext.xbase.lib,
- org.eclipse.xtext.xtend2.lib
+ org.eclipse.xtext.xbase.lib
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: net.vtst.ow.eclipse.soy,
  net.vtst.ow.eclipse.soy.parser,
