@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 1.0.6
+Bundle-Version: 1.0.7
 Bundle-SymbolicName: net.vtst.ow.eclipse.soy; singleton:=true
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.xtext;bundle-version="2.2.1";visibility:=reexport,
@@ -19,7 +19,7 @@ Require-Bundle: org.eclipse.xtext;bundle-version="2.2.1";visibility:=reexport,
  org.eclipse.xtext.common.types,
  org.eclipse.core.resources;bundle-version="3.7.100",
  org.eclipse.core.runtime;bundle-version="3.7.0",
- net.vtst.eclipse.easyxtext;bundle-version="1.0.5"
+ net.vtst.eclipse.easyxtext;bundle-version="1.0.6"
 Import-Package: net.vtst.eclipse.easyxtext.parser,
  net.vtst.eclipse.easyxtext.resource,
  net.vtst.eclipse.easyxtext.util,

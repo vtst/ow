@@ -2,7 +2,7 @@
 <feature
       id="net.vtst.ow.eclipse.js.closure.feature"
       label="Ow JavaScript"
-      version="0.2.6"
+      version="0.2.7"
       provider-name="Vincent Simonet">
 
    <description url="http://www.normalesup.org/~simonet/soft/ow/eclipse-javascript.en.html">
