@@ -8,9 +8,11 @@ import net.vtst.ow.eclipse.js.closure.builder.ClosureNature;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.preference.IPreferencePageContainer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.wst.jsdt.internal.core.JavaProject;
 
 public abstract class ClosureAsbtractPropertyPage extends EasyResourcePropertyPage {
 
@@ -62,9 +64,15 @@ public abstract class ClosureAsbtractPropertyPage extends EasyResourcePropertyPa
 
   protected boolean hasNature() {
     try {
-      return ((IProject) getElement()).hasNature(ClosureNature.NATURE_ID);
+      IResource resource = getResource();
+      if (resource instanceof IProject) {
+        return ((IProject) resource).hasNature(ClosureNature.NATURE_ID);
+      } else {
+        return false;
+      }
     } catch (CoreException e) {
       return false;
     }
   }
+  
 }
