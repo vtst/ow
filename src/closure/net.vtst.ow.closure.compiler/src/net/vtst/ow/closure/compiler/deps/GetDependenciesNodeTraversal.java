@@ -2,6 +2,8 @@ package net.vtst.ow.closure.compiler.deps;
 
 import java.util.Collection;
 
+import javax.management.modelmbean.RequiredModelMBean;
+
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CodingConvention;
 import com.google.javascript.jscomp.NodeTraversal;
@@ -26,12 +28,14 @@ public class GetDependenciesNodeTraversal extends NodeTraversal {
             STRING vtst 1 [source_file: src/test.js] [length: 6]
   */
   
+  private Collection<String> requiredNames;
 
   public GetDependenciesNodeTraversal(
       AbstractCompiler compiler, 
       Collection<String> providedNames, 
       Collection<String> requiredNames) {
     super(compiler, new Callback(compiler, providedNames, requiredNames));
+    this.requiredNames = requiredNames;
   }
   
   private static class Callback implements NodeTraversal.Callback {
@@ -66,6 +70,13 @@ public class GetDependenciesNodeTraversal extends NodeTraversal {
     @Override
     public void visit(NodeTraversal traversal, Node node, Node parent) {}
     
+  }
+  
+  public void traverse(Node node) {
+    // We need to add the 'goog' object so that base.js is included even if no goog.require statement
+    // is present in the file.
+    requiredNames.add(JSLibrary.GOOG);
+    super.traverse(node);
   }
   
   /**
