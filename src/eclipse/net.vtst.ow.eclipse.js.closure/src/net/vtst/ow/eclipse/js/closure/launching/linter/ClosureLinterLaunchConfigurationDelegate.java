@@ -45,7 +45,8 @@ public class ClosureLinterLaunchConfigurationDelegate extends EasyExtProgramLaun
     List<String> list = new ArrayList<String>();
 
     // Command
-    if (record.fixLintErrors.get(store)) {
+    boolean fixLintErrors = record.fixLintErrors.get(store);
+    if (fixLintErrors) {
       list.add(record.fixjsstyleCommand.get(store));
     } else {
       list.add(record.gjslintCommand.get(store));
@@ -74,7 +75,8 @@ public class ClosureLinterLaunchConfigurationDelegate extends EasyExtProgramLaun
     }
     list.add(record.linterChecks.strictClosureStyle.get(storeForLinterOptions) ? "--strict" : "--nostrict");
     list.add(record.linterChecks.missingJsdoc.get(storeForLinterOptions) ? "--jsdoc" : "--nojsdoc");
-    list.add("--nobeep");  // Otherwise we have a special character in the output
+    if (!fixLintErrors)
+      list.add("--nobeep");  // Otherwise we have a special character in the output
     
     // Files
     for (IFile file: ClosureCompiler.getJavaScriptFiles(resources)) {
