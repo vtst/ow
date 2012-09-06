@@ -50,16 +50,18 @@ SPACE returns ecore::EString:
 
 ToplevelOrInnerStatement:
   MixinDefinition
+  // LESS accepts @media, @page, @font-face and @charset statements within other
+  // blocks, and move them at top level.
+  | MediaStatement
+  | PageStatement
+  | FontFaceStatement
+  | CharsetStatement
 ;
   
 ToplevelStatement:
   VariableDefinition ';' OPT_SPACE
   | ToplevelRuleSet
   | ImportStatement
-  | MediaStatement
-  | PageStatement
-  | FontFaceStatement
-  | CharsetStatement
   | ToplevelOrInnerStatement
   // This is required to avoid issues with syntax coloring when typing a variable definition.
   // There is a validation rule to report the error.
