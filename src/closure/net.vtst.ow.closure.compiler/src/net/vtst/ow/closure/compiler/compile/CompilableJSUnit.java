@@ -64,12 +64,17 @@ public class CompilableJSUnit extends JSUnit {
   }
   
   public CompilerRun fullCompile(CompilerOptions options, ErrorManager errorManager, boolean stripIncludedFiles) {
-    return fullCompile(options, errorManager, stripIncludedFiles, true);
-  }
-  
-  public CompilerRun fullCompile(CompilerOptions options, ErrorManager errorManager, boolean stripIncludedFiles, boolean force) {
+      return fullCompile(options, errorManager, stripIncludedFiles, true, false, false);
+	  }
+	  
+  public CompilerRun fullCompile(CompilerOptions options, ErrorManager errorManager, boolean stripIncludedFiles, boolean force, boolean singleCompile, boolean compile) {
+    if (singleCompile) {
+      run = null;
+      if (!compile)
+    	  return null;
+    }
     List<JSUnit> orderedUnits = updateAndGetOrderedUnits();
-    if (force || run == null || run.hasChanged(orderedUnits)) {
+    if (compile || force || run == null || run.hasChanged(orderedUnits)) {
       CompilerRun newRun = new CompilerRun(
           this.getName(), options, errorManager, project.getExterns(),
           orderedUnits, Collections.<JSUnit>singleton(this), stripIncludedFiles);
