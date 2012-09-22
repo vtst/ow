@@ -102,7 +102,6 @@ public abstract class EasyHighlightingConfiguration implements
       acceptor.acceptDefaultHighlighting(id,
           getDisplayNameForHighlightingConfiguration(id), attribute);
     }
-    attributes.clear();
   }
 
 }
