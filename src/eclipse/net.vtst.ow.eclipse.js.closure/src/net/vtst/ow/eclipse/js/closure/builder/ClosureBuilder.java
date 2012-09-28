@@ -297,9 +297,23 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
     OwJsDev.log("Compiling %s", file.getFullPath().toOSString());
     CompilableJSUnit unit = ResourceProperties.getJSUnit(file);
     if (unit == null) return;
+    boolean compile = false;
+    boolean singleCompile = true; // new switch
+    
+    // find open editors
+    for (IWorkbenchWindow window : PlatformUI.getWorkbench().getWorkbenchWindows()) {
+        for (IWorkbenchPage page : window.getPages()) {
+            for (IEditorReference editor : page.getEditorReferences()) {
+            	if(file.getName().equals(editor.getName()))
+            		compile = true;
+            }
+        }
+    }    		
+    
     ErrorManager errorManager = new ErrorManagerForFileBuild(unit, file);
-    CompilerRun run = unit.fullCompile(options, errorManager, stripIncludedFiles, force);
-    run.setErrorManager(new NullErrorManager());
+    CompilerRun run = unit.fullCompile(options, errorManager, stripIncludedFiles, force, singleCompile, compile);
+    if(run != null)
+    	run.setErrorManager(new NullErrorManager());
   }
 
   // **************************************************************************
