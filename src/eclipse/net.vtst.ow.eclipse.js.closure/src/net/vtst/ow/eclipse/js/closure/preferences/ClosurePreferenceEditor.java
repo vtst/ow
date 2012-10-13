@@ -23,6 +23,8 @@ public class ClosurePreferenceEditor extends DefaultCompoundEditor {
     record.cacheLibraryStrippedFiles.bindEditor(this, group1);
     Group group2 = SWTFactory.createGroup(getComposite(), getMessage("otherOptionsGroup"), 3, 1, GridData.FILL_HORIZONTAL);
     record.stripProjectFiles.bindEditor(this, group2);
+    record.doNotKeepCompilationResultsOfClosedFilesInMemory.bindEditor(this, group2);
+    record.doNotCompileClosedFiles.bindEditor(this, group2);
   }
   
 }

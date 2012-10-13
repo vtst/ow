@@ -18,6 +18,8 @@ public class ClosurePreferenceRecord extends Record {
   public EnumOptionsField<CacheMode> cacheLibraryDepsFiles = 
       new EnumOptionsField<CacheMode>(CacheMode.class, CacheMode.READ_AND_WRITE);
   public BooleanField stripProjectFiles = new BooleanField(true);
+  public BooleanField doNotKeepCompilationResultsOfClosedFilesInMemory = new BooleanField(false);
+  public BooleanField doNotCompileClosedFiles = new BooleanField(false);
 
   private static ClosurePreferenceRecord instance;
   public static ClosurePreferenceRecord getInstance() {

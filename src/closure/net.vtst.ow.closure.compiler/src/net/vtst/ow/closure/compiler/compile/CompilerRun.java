@@ -47,6 +47,7 @@ public class CompilerRun {
   private PassConfig passes;
   private MagicScopeCreator scopeCreator;
   private NamespaceProvidersMap namespaceToScriptNode = new NamespaceProvidersMap();
+  private boolean keepCompilationResultsInMemory = true;
 
   private String moduleName;
   private List<JSUnit> sortedUnits;
@@ -66,20 +67,22 @@ public class CompilerRun {
    */
   public CompilerRun(
       String moduleName, CompilerOptions options, ErrorManager errorManager, 
-      Collection<JSExtern> externs, List<JSUnit> sortedUnits, Collection<JSUnit> entryPoints, boolean stripIncludedFiles) {
+      Collection<JSExtern> externs, List<JSUnit> sortedUnits, Collection<JSUnit> entryPoints,
+      boolean keepCompilationResultsInMemory, boolean stripIncludedFiles) {
     this.moduleName = moduleName;
     this.options = options;
     this.externs = externs;
     this.sortedUnits = sortedUnits;
     this.entryPoints = entryPoints;
+    this.keepCompilationResultsInMemory = keepCompilationResultsInMemory;
     this.stripIncludedFiles = stripIncludedFiles; 
     // Initializes the compiler and do the first compile
-    setupCompiler(errorManager);
-    compile();
+    compile(errorManager);
   }
   
   public void setErrorManager(ErrorManager errorManager) {
-    this.compiler.setErrorManager(errorManager);
+    if (compiler == null) return;
+    compiler.setErrorManager(errorManager);
   }
   
   private boolean shouldStrip(JSUnit unit) {
@@ -106,10 +109,10 @@ public class CompilerRun {
   }
 
   /**
-   * Initialize the JavaScript compiler
-   * @param errorManager
+   * Run the initial compilation.
    */
-  private void setupCompiler(ErrorManager errorManager) {
+  private void compile(ErrorManager errorManager) {
+    // Set-up the compiler
     compiler = CompilerUtils.makeCompiler(errorManager);
     compiler.initOptions(options);
     passes = new DefaultPassConfig(options);
@@ -117,21 +120,27 @@ public class CompilerRun {
         options, new NamespaceProvidersPass(compiler, namespaceToScriptNode),
         CustomPassExecutionTime.BEFORE_CHECKS);
     compiler.setPassConfig(passes);
-  }
-
-  /**
-   * Run the initial compilation.
-   */
-  private void compile() {
+    
+    // Store the modification info
     lastModifiedMapForFullCompile = buildLastModifiedMap(sortedUnits);
     lastModifiedMapForFastCompile = Maps.newHashMap(lastModifiedMapForFullCompile);
+
+    // Run compilation
     JSModule module = buildJSModule();
     // For avoiding the magic, we could do:
     // compiler.compileModules(
     //   Collections.<SourceFile> emptyList(), Lists.newArrayList(DefaultExternsProvider.getAsModule(), module), options);
     // but this would be less efficient.
     MagicCompiler.compile(compiler, getExternsAsCompilerInputs(), module, options);
-    scopeCreator = new MagicScopeCreator(compiler);
+    
+    // Set-up post-compilation state
+    if (keepCompilationResultsInMemory) {
+      scopeCreator = new MagicScopeCreator(compiler);
+    } else {
+      compiler = null;
+      passes = null;
+      options = null;
+    }
   }
   
   public boolean hasChanged(List<JSUnit> newSortedUnits) {
@@ -156,6 +165,7 @@ public class CompilerRun {
    * Run a fast compilation
    */
   public synchronized void fastCompile() {
+    if (!keepCompilationResultsInMemory) return;
     // This should work even if one of the unit has been deleted, because in that case
     // its provider will return an empty source code.
     for (JSUnit unit: sortedUnits) {
@@ -172,6 +182,7 @@ public class CompilerRun {
   }
   
   private void processCustomPassesOnNewScript(JsAst ast) {
+    if (!keepCompilationResultsInMemory) return;
     if (options.customPasses == null) return;
     Node scriptRoot = ast.getAstRoot(compiler);
     Node originalRoot = compiler.getRoot();
@@ -184,11 +195,16 @@ public class CompilerRun {
 
   // **************************************************************************
   // Accessing to the result of the compilation
+  
+  public boolean getKeepCompilationResultsInMemory() {
+    return keepCompilationResultsInMemory;
+  }
 
   /**
    * @return  The root node of the compilation result.
    */
   public Node getRoot() {
+    if (!keepCompilationResultsInMemory) return null;
     return compiler.getRoot();
   }
 
@@ -199,6 +215,7 @@ public class CompilerRun {
    * @return  The node, or null if not found.
    */
   public Node getNode(JSUnit unit, int offset) {
+    if (!keepCompilationResultsInMemory) return null;
     // It would have been cleaner to use the input id to identify the input file, instead of the name.
     // But much more complicated.
     return FindLocationNodeTraversal.findNode(compiler, compiler.getRoot(), unit.getName(), offset);
@@ -210,6 +227,7 @@ public class CompilerRun {
    * @return  The scope of the node, or null if not found.
    */
   public Scope getScope(Node node) {
+    if (!keepCompilationResultsInMemory) return null;
     while (node != null) {
       Scope scope = scopeCreator.getScope(node);
       if (scope != null) return scope;
@@ -263,7 +281,7 @@ public class CompilerRun {
    * @param name  The name to look at.
    * @return  The type, or null.
    */
-  private JSType getTypeOfName(Scope scope, String name) {
+  private static JSType getTypeOfName(Scope scope, String name) {
     if (THIS.equals(name)) return scope.getTypeOfThis();
     Var var = scope.getVar(name);
     if (var == null) return null;
@@ -276,7 +294,7 @@ public class CompilerRun {
    * @param qualifiedName  The qualified name to look at.
    * @return  The type, or null.
    */
-  public JSType getTypeOfQualifiedName(Scope scope, List<String> qualifiedName) {
+  public static JSType getTypeOfQualifiedName(Scope scope, List<String> qualifiedName) {
     ListIterator<String> it = qualifiedName.listIterator();
     if (!it.hasNext()) return null;
     JSType type = getTypeOfName(scope, it.next());

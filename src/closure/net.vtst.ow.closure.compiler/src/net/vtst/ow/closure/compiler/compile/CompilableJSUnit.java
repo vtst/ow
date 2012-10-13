@@ -63,16 +63,27 @@ public class CompilableJSUnit extends JSUnit {
     return orderedUnits;
   }
   
-  public CompilerRun fullCompile(CompilerOptions options, ErrorManager errorManager, boolean stripIncludedFiles) {
-    return fullCompile(options, errorManager, stripIncludedFiles, true);
+  public CompilerRun fullCompile(
+      CompilerOptions options, ErrorManager errorManager, 
+      boolean keepCompilationResultsInMemory, boolean stripIncludedFiles) {
+    return fullCompile(options, errorManager, keepCompilationResultsInMemory, stripIncludedFiles, true);
   }
   
-  public CompilerRun fullCompile(CompilerOptions options, ErrorManager errorManager, boolean stripIncludedFiles, boolean force) {
+  public CompilerRun fullCompile(
+      CompilerOptions options, ErrorManager errorManager, 
+      boolean keepCompilationResultsInMemory, boolean stripIncludedFiles, boolean force) {
     List<JSUnit> orderedUnits = updateAndGetOrderedUnits();
-    if (force || run == null || run.hasChanged(orderedUnits)) {
+    // A full run is required if one of the following conditions happen:
+    // - force,
+    // - there is no previous run,
+    // - the unit has changed since the last compilation,
+    // - the previous run did not keep compilation results in memory, and one now requires to keep
+    //   them.
+    if (force || run == null || run.hasChanged(orderedUnits) ||
+        (keepCompilationResultsInMemory && !run.getKeepCompilationResultsInMemory())) {
       CompilerRun newRun = new CompilerRun(
           this.getName(), options, errorManager, project.getExterns(),
-          orderedUnits, Collections.<JSUnit>singleton(this), stripIncludedFiles);
+          orderedUnits, Collections.<JSUnit>singleton(this), keepCompilationResultsInMemory, stripIncludedFiles);
       run = newRun;  // This is atomic
       return newRun;    
     } else {
