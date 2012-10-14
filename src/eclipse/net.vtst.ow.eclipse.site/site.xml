@@ -87,5 +87,11 @@
    <feature url="features/net.vtst.ow.eclipse.soy.feature_1.0.7.jar" id="net.vtst.ow.eclipse.soy.feature" version="1.0.7">
       <category name="net.vtst.ow"/>
    </feature>
+   <feature url="features/net.vtst.ow.eclipse.less.feature_1.0.11.jar" id="net.vtst.ow.eclipse.less.feature" version="1.0.11">
+      <category name="net.vtst.ow"/>
+   </feature>
+   <feature url="features/net.vtst.ow.eclipse.soy.feature_1.0.8.jar" id="net.vtst.ow.eclipse.soy.feature" version="1.0.8">
+      <category name="net.vtst.ow"/>
+   </feature>
    <category-def name="net.vtst.ow" label="net.vtst.ow"/>
 </site>
