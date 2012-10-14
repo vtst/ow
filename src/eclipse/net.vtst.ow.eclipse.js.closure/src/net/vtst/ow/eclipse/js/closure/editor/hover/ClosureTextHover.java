@@ -98,7 +98,7 @@ public class ClosureTextHover extends AbstractTextHover {
       else return JSElementInfo.makeFromVar(run, var);
     } else {
       // This is a property
-      JSType type = run.getTypeOfQualifiedName(scope, qualifiedName);
+      JSType type = CompilerRun.getTypeOfQualifiedName(scope, qualifiedName);
       return JSElementInfo.makeFromPropertyOrNull(run, type, propertyName);
     }
   }

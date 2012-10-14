@@ -1,6 +1,8 @@
 package net.vtst.ow.eclipse.js.closure.builder;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.vtst.ow.closure.compiler.util.MultiHashMap;
@@ -109,12 +111,15 @@ public abstract class AbstractEditorRegistry {
     if (file == null || document == null) return;
     editorToFile.put(textEditor, file);
     editorToDocument.put(textEditor, document);
-    fileToEditors.put(file, textEditor);
+    boolean newlyOpenedFile = fileToEditors.put(file, textEditor);
     if (documentToEditors.put(document, textEditor)) {
       DocumentListener listener = makeDocumentListener(document);
       documentToListener.put(document, listener);
       document.addDocumentListener(listener);
       documentToFile.put(document, file);
+    }
+    if (newlyOpenedFile) {
+      triggerFileOpenListener(file);
     }
   }
 
@@ -229,6 +234,25 @@ public abstract class AbstractEditorRegistry {
         lastModificationTime = System.currentTimeMillis();
       }
       return lastModificationTime;
+    }
+  }
+  
+  // **************************************************************************
+  // FileOpenListener
+  
+  public interface IFileOpenListener {
+    public void fileOpen(IFile file);
+  }
+  
+  List<IFileOpenListener> fileOpenListeners = new ArrayList<IFileOpenListener>();
+  
+  public void addFileOpenListener(IFileOpenListener listener) {
+    fileOpenListeners.add(listener);
+  }
+  
+  private void triggerFileOpenListener(IFile file) {
+    for (IFileOpenListener listener : fileOpenListeners) {
+      listener.fileOpen(file);
     }
   }
 }

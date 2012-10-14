@@ -15,6 +15,7 @@ import net.vtst.ow.eclipse.soy.soy.CallParam;
 import net.vtst.ow.eclipse.soy.soy.Command;
 import net.vtst.ow.eclipse.soy.soy.CommandAttribute;
 import net.vtst.ow.eclipse.soy.soy.DelCallCommand;
+import net.vtst.ow.eclipse.soy.soy.DelTemplate;
 import net.vtst.ow.eclipse.soy.soy.Expr;
 import net.vtst.ow.eclipse.soy.soy.FunctionCall;
 import net.vtst.ow.eclipse.soy.soy.FunctionDeclaration;
@@ -39,6 +40,7 @@ import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.nodemodel.ICompositeNode;
 import org.eclipse.xtext.nodemodel.INode;
 import org.eclipse.xtext.nodemodel.impl.HiddenLeafNode;
+import org.eclipse.xtext.nodemodel.impl.LeafNode;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import org.eclipse.xtext.validation.Check;
 
@@ -219,6 +221,57 @@ public class SoyJavaValidator extends AbstractSoyJavaValidator {
   
   // **************************************************************************
   // Template definitions
+  
+  /**
+   * Check that the template commands are at the beginning of their lines.
+   */
+  @Check
+  public void checkTemplateNewLine(Template template) {
+    doCheckNewLineKeywords(template);
+  }
+
+  /**
+   * Check that the template commands are at the beginning of their lines.
+   */
+  @Check
+  public void checkTemplateNewLine(DelTemplate template) {
+    doCheckNewLineKeywords(template);
+  }
+  
+  /**
+   * Keywords that must appear at the beginning of a line. 
+   */
+  private static Set<String> keywordsBeginOfLine = new HashSet<String>(
+      Arrays.asList(new String[]{"{template", "{/template}", "{deltemplate", "{/deltemplate}"}));
+  
+  /**
+   * Check that the keywords in {@code keywordsBeginOfLine} that appear within
+   * {@code object} are all at the beginning of a line.
+   * @param object
+   */
+  private void doCheckNewLineKeywords(EObject object) {
+    ICompositeNode parserNode = NodeModelUtils.getNode(object);
+    INode previousNode = null;
+    for (INode node: parserNode.getChildren()) {
+      EObject grammarElement = node.getGrammarElement();
+      if (grammarElement instanceof Keyword) {
+        Keyword keyword = (Keyword) grammarElement;
+        if (keywordsBeginOfLine.contains(keyword.getValue()) && !nodeEndsByNewLine(previousNode)) {
+          error(messages.getString("keyword_must_be_after_newline"), node.getSemanticElement(), null, -1);
+        }
+      }
+      previousNode = node;
+    }    
+  }
+  
+  private boolean nodeEndsByNewLine(INode node) {
+    if (node == null) return true;
+    String text = node.getText();
+    int i = text.length() - 1;
+    if (i < 0) return false;
+    char c = text.charAt(i);
+    return c == '\n' || c == '\r';
+  }
 
   /**
    * Check the uniqueness of templates (regular and del) in a soy file.

@@ -41,6 +41,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.ui.PlatformUI;
 
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
@@ -65,6 +66,7 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
   private IJSIncludesProvider jsLibraryProvider = OwJsClosurePlugin.getDefault().getJSLibraryProviderForClosureBuilder();
   private OwJsClosureMessages messages = OwJsClosurePlugin.getDefault().getMessages();
   private ProjectOrderManager projectOrderManager = OwJsClosurePlugin.getDefault().getProjectOrderManager();
+  private JavaScriptEditorRegistry editorRegistry = OwJsClosurePlugin.getDefault().getEditorRegistry();
   
   public ClosureBuilder() {
     super();
@@ -254,17 +256,22 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
     subMonitor.beginTask("build_compile", n);
     CompilerOptions options = ClosureCompilerOptions.makeForBuilder(project);
     boolean stripIncludedFiles = getStripIncludedFiles();
+    boolean doNotKeepCompilationResultsOfClosedFilesInMemory = getDoNotKeepCompilationResultsOfClosedFilesInMemory();
+    boolean doNotCompileClosedFiles = getDoNotCompileClosedFiles();
     for (IFile file: files) {
       ++i;
-      CompilerOptions clonedOptions = i < n ? cloneCompilerOptions(project, options) : options;
+      boolean fileIsOpen = (editorRegistry.getTextEditor(file) != null);
       Utils.checkCancel(subMonitor);
       monitor.subTask(messages.format("build_compile_file", file.getName()));
-      compileJavaScriptFile(file, clonedOptions, stripIncludedFiles, force);
+      if (fileIsOpen || !doNotCompileClosedFiles) {
+        CompilerOptions clonedOptions = i < n ? cloneCompilerOptions(project, options) : options;
+        compileJavaScriptFile(file, clonedOptions, fileIsOpen, stripIncludedFiles, doNotKeepCompilationResultsOfClosedFilesInMemory, force);
+      }
       subMonitor.worked(1);
     }
     subMonitor.done();
   }
-
+  
   /**
    * @return  The status of the workspace preference stripProjectFiles.
    */
@@ -276,7 +283,31 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
       return ClosurePreferenceRecord.getInstance().stripProjectFiles.getDefault();
     }
   }
-  
+
+  /**
+   * @return  The status of the workspace preference doNotCompileClosedFiles.
+   */
+  private boolean getDoNotKeepCompilationResultsOfClosedFilesInMemory() {
+    IStore store = new PluginPreferenceStore(OwJsClosurePlugin.getDefault().getPreferenceStore());
+    try {
+      return ClosurePreferenceRecord.getInstance().doNotKeepCompilationResultsOfClosedFilesInMemory.get(store);
+    } catch (CoreException e) {
+      return ClosurePreferenceRecord.getInstance().doNotKeepCompilationResultsOfClosedFilesInMemory.getDefault();
+    }
+  }
+
+  /**
+   * @return  The status of the workspace preference doNotCompileClosedFiles.
+   */
+  private boolean getDoNotCompileClosedFiles() {
+    IStore store = new PluginPreferenceStore(OwJsClosurePlugin.getDefault().getPreferenceStore());
+    try {
+      return ClosurePreferenceRecord.getInstance().doNotCompileClosedFiles.get(store);
+    } catch (CoreException e) {
+      return ClosurePreferenceRecord.getInstance().doNotCompileClosedFiles.getDefault();
+    }
+  }
+
   /**
    * Clone a {@code CompilerOptions} object.  If the cloning fails, generate a fresh one.
    */
@@ -293,12 +324,19 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
   /**
    * Compile a JavaScript file.
    */
-  private void compileJavaScriptFile(IFile file, CompilerOptions options, boolean stripIncludedFiles, boolean force) throws CoreException {
+  private void compileJavaScriptFile(
+      IFile file, CompilerOptions options,
+      boolean fileIsOpen,
+      boolean stripIncludedFiles, 
+      boolean doNotKeepCompilationResultsOfClosedFilesInMemory,
+      boolean force) throws CoreException {
     OwJsDev.log("Compiling %s", file.getFullPath().toOSString());
     CompilableJSUnit unit = ResourceProperties.getJSUnit(file);
     if (unit == null) return;
     ErrorManager errorManager = new ErrorManagerForFileBuild(unit, file);
-    CompilerRun run = unit.fullCompile(options, errorManager, stripIncludedFiles, force);
+    boolean keepCompilationResultsInMemory = !doNotKeepCompilationResultsOfClosedFilesInMemory || fileIsOpen;
+    boolean force2 = force || editorRegistry.isNewlyOpenedFile(file);
+    CompilerRun run = unit.fullCompile(options, errorManager, keepCompilationResultsInMemory, stripIncludedFiles, force2);
     run.setErrorManager(new NullErrorManager());
   }
 
