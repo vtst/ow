@@ -123,7 +123,7 @@ public class LessImportStatementResolver {
     URI uri = URI.createURI(LessValueConverterService.getStringValue(importStatement.getUri()));
     String fileExtension = uri.fileExtension();
     if (fileExtension == null) uri = uri.appendFileExtension(LessRuntimeModule.LESS_EXTENSION);
-    if (EcoreUtil2.isValidUri(importStatement, uri)) {
+    if (!uri.isFile() || EcoreUtil2.isValidUri(importStatement, uri)) {
       return uri;
     } else {
       return null;
@@ -135,7 +135,7 @@ public class LessImportStatementResolver {
    * @return true iif uri is the URI of a LESS StyleSheet.
    */
   private boolean isLessStyleSheetURI(URI uri) {
-    return LessRuntimeModule.LESS_EXTENSION.equals(uri.fileExtension());
+    return uri.isFile() && LessRuntimeModule.LESS_EXTENSION.equals(uri.fileExtension());
   }
   
   /**
