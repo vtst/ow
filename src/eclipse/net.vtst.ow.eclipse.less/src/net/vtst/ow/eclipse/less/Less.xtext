@@ -57,9 +57,14 @@ ToplevelOrInnerStatement:
   | FontFaceStatement
   | CharsetStatement
 ;
+
+GlobalMixinCall:
+	MixinCall ';' OPT_SPACE
+;
   
 ToplevelStatement:
   VariableDefinition ';' OPT_SPACE
+  | GlobalMixinCall
   | ToplevelRuleSet
   | ImportStatement
   | ToplevelOrInnerStatement
@@ -164,16 +169,6 @@ VariableDefinitionIdent:
   ident=AT_IDENT 
 ;
 
-/* Note this only consider mixins with arguments, mixins without arguments are like normal blocks */
-MixinDefinition:
-  selector=HashOrClass OPT_SPACE
-  '(' OPT_SPACE 
-  (parameter+=MixinDefinitionParameter 
-    (',' OPT_SPACE parameter+=MixinDefinitionParameter)*
-  )? ')' OPT_SPACE guards=MixinDefinitionGuards?
-  block=Block
-;
-
 // There is a trailing OPT_SPACE in this rule, because there is no in Term
 MixinDefinitionParameter: 
   {MixinDefinitionVariable} variable=VariableDefinitionIdent OPT_SPACE
@@ -199,12 +194,27 @@ MixinDefinitionGuardTerm:
   {MixinDefinitionGuardTerm} 'true' | Term
 ;
 
+//MixinDefinitionOrCall:
+//	selector+=HashOrClassCrossReference
+//	(())
+//;
+
 // There are trailing OPT_SPACE after Hash/Class, because there is no in
 // Hash/Class.
 MixinCall:
   selector+=HashOrClassCrossReference
   (combinator+=MixinCallCombinator selector+=HashOrClassCrossReference)* OPT_SPACE 
   ('(' OPT_SPACE (parameter+=MixinCallParameter OPT_SPACE (',' OPT_SPACE parameter+=MixinCallParameter OPT_SPACE)*)? ')' OPT_SPACE)?
+;
+
+/* Note this only consider mixins with arguments, mixins without arguments are like normal blocks */
+MixinDefinition:
+  selector=HashOrClass OPT_SPACE
+  '(' OPT_SPACE 
+  (parameter+=MixinDefinitionParameter 
+    (',' OPT_SPACE parameter+=MixinDefinitionParameter)*
+  )? ')' OPT_SPACE guards=MixinDefinitionGuards?
+  block=Block
 ;
 
 MixinCallParameter:
@@ -262,7 +272,8 @@ SimpleSelector:
   (criteria+=DefaultSelecotrs)*
   | {SimpleSelectorWithoutRoot} (
       criteria+=DefaultSelecotrs
-    )+
+    )+ 
+  | criteria+=DeprecatedSelectorInterploationIdent
 ;
 
 SimpleSelectorInNot:
@@ -279,6 +290,10 @@ DefaultSelecotrsWithoutNot:
 ;
 DefaultSelecotrs:
 	(HashOrClass | Attrib | Pseudo | VariableSelector IDENT_OR_KEYWORD?) AMPERSAND_IDENT?
+;
+
+DeprecatedSelectorInterploationIdent:
+	'(' OPT_SPACE EscapedStringTerm OPT_SPACE ')'
 ;
 
 VariableSelector:
@@ -367,10 +382,14 @@ Term:
   {IdentTerm} ident=IDENT_OR_KEYWORD
   | {StringTerm} string=STRING
   | {UriTerm} uri=Uri
-  | {EscapedStringTerm} '~' string=STRING
+  | EscapedStringTerm
   | {JsEvaluationTerm} js=JS_EVALUATION
   | {EscapedJsEvaluationTerm} '~' js=JS_EVALUATION
   | ExtendedTerm
+;
+
+EscapedStringTerm:
+	{EscapedStringTerm} '~' string=STRING
 ;
 
 /*

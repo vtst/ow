@@ -26,6 +26,7 @@ public class LessSemanticHighlightingCalculator extends EasySemanticHighlighting
 
   @Override
   protected void configure() {
+	bindRule(grammar.getDeprecatedSelectorInterploationIdentRule(), highlightingConfig.DEPRECATED_SELECTOR_INTERPOLATION);
 	bindRule(grammar.getAMPERSAND_IDENTRule(), highlightingConfig.AMPERSAND);
 	bindRule(grammar.getVariableSelectorRule(), highlightingConfig.VARIABLE_USE);
     bindRule(grammar.getInnerSelectorRule(), highlightingConfig.SELECTOR);
