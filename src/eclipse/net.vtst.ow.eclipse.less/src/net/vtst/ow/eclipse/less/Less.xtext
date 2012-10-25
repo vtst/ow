@@ -112,7 +112,7 @@ BlockSemicolon:
 // @ statements
 
 ImportStatement:
-  '@import' OPT_SPACE uri=(STRING | Uri) OPT_SPACE media_queries=MediaQueryList ';' OPT_SPACE
+  ('@import'|'@import-once') OPT_SPACE uri=(STRING | Uri) OPT_SPACE media_queries=MediaQueryList ';' OPT_SPACE
 ;
 
 MediaStatement:
@@ -259,19 +259,35 @@ MixinCallCombinator returns Combinator:
 // This rule does not end with OPT_SPACE, because of combinators
 SimpleSelector:
   {SimpleSelectorWithRoot} root=(IDENT_OR_KEYWORD | '*' | AMPERSAND_IDENT)
-  (criteria+=HashOrClass | criteria+=Attrib | criteria+=Pseudo)*
+  (criteria+=DefaultSelecotrs)*
   | {SimpleSelectorWithoutRoot} (
-      criteria+=HashOrClass | criteria+=Attrib | criteria+=Pseudo
+      criteria+=DefaultSelecotrs
     )+
 ;
+
 SimpleSelectorInNot:
   {SimpleSelectorInNotWithRoot} root=(IDENT_OR_KEYWORD | '*' | AMPERSAND_IDENT)
-  (criteria+=HashOrClass | criteria+=Attrib | criteria+=PseudoWithoutNot)*
+  (criteria+=DefaultSelecotrsWithoutNot)*
   | {SimpleSelectorInNotWithoutRoot} (
-      criteria+=HashOrClass | criteria+=Attrib | criteria+=PseudoWithoutNot
+      criteria+=DefaultSelecotrsWithoutNot
     )+
 ;
 AMPERSAND_IDENT returns ecore::EString: '&' IDENT_OR_KEYWORD?;
+
+DefaultSelecotrsWithoutNot:
+	(HashOrClass | Attrib | PseudoWithoutNot | VariableSelector IDENT_OR_KEYWORD?) AMPERSAND_IDENT?
+;
+DefaultSelecotrs:
+	(HashOrClass | Attrib | Pseudo | VariableSelector IDENT_OR_KEYWORD?) AMPERSAND_IDENT?
+;
+
+VariableSelector:
+	VariableSelectorIdent;
+
+VariableSelectorIdent:
+	ident = VARIABLE_SELECTOR_IDENT;	
+	
+VARIABLE_SELECTOR_IDENT returns ecore::EString: '@{' IDENT '}';
 
 HashOrClass: Hash | Class;
 HashOrClassCrossReference: ident=[HashOrClass|HASH_OR_CLASS_IDENT];
@@ -307,6 +323,7 @@ PseudoWithoutNot:
 PseudoClassFunctionArgument:
   ident=IDENT
   | nth=PseudoClassNth  //  This includes NUMBER
+  | VariableSelector
 ;
 
 /* TODO: odd, even and n as keywords */
