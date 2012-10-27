@@ -2,7 +2,7 @@
 <feature
       id="net.vtst.ow.eclipse.less.feature"
       label="LESS"
-      version="1.0.11"
+      version="1.0.12"
       provider-name="Vincent Simonet">
 
    <description url="http://www.normalesup.org/~simonet/soft/ow/eclipse-less.en.html">

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="net.vtst.ow.eclipse.js.closure.feature"
-      label="Ow JavaScript"
-      version="0.2.7"
+      label="JSDT for Closure"
+      version="0.2.8"
       provider-name="Vincent Simonet">
 
    <description url="http://www.normalesup.org/~simonet/soft/ow/eclipse-javascript.en.html">

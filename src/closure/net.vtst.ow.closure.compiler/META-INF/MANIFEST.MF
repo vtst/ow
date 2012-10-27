@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Closure Compiler support
 Bundle-SymbolicName: net.vtst.ow.closure.compiler;singleton:=true
-Bundle-Version: 0.2.7
+Bundle-Version: 0.2.8
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: com.google.common.base,
  com.google.common.collect,
