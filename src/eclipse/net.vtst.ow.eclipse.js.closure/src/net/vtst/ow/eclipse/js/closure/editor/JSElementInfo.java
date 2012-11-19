@@ -183,7 +183,7 @@ public class JSElementInfo implements IAdditionalProposalInfoProvider {
         return JSElementKind.CONSTANT;
       }
     }
-    if (type.isEnumType()) return JSElementKind.ENUM;
+    if (type != null && type.isEnumType()) return JSElementKind.ENUM;
     if (isProperty) {
       if (type.isFunctionType()) return JSElementKind.METHOD;
       else return JSElementKind.FIELD;
