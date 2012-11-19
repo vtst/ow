@@ -74,7 +74,7 @@ public class ResourceProperties {
    */
   @SuppressWarnings("unchecked")
   public static Collection<IFile> getJavaScriptFiles(IProject project) throws CoreException {
-    Object obj = project.getSessionProperty(JS_PROJECT);
+    Object obj = project.getSessionProperty(JS_FILES);
     if (obj instanceof Collection<?>) return (Collection<IFile>) obj;
     return null;    
   }

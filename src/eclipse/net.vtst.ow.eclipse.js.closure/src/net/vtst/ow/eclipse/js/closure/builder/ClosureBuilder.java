@@ -103,6 +103,18 @@ public class ClosureBuilder extends IncrementalProjectBuilder {
     OwJsDev.log("End build: %s", project.getName());
 		return ResourceProperties.getTransitivelyReferencedProjects(project);
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.resources.IncrementalProjectBuilder#clean(org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	protected void clean(IProgressMonitor monitor) throws CoreException {
+    IProject project = getProject();
+    OwJsDev.log("Clean build: %s", project.getName());
+    ResourceProperties.clearProject(project);
+    // Note that this heavily rely that clean is called on all projects before build is called
+    // on any project (otherwise, it would be pretty unefficient).
+    jsLibraryProvider.clear();
+	}
 
 	// **************************************************************************
 	// Full build
