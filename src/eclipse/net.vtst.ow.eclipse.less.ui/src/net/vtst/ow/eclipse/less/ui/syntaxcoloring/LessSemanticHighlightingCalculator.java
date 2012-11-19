@@ -33,15 +33,7 @@ public class LessSemanticHighlightingCalculator extends EasySemanticHighlighting
     bindRule(grammar.getHashOrClassCrossReferenceRule(), highlightingConfig.MIXIN_CALL);
     bindRule(grammar.getPropertyRule(), highlightingConfig.PROPERTY);
     bindRule(grammar.getVariableDefinitionIdentRule(), highlightingConfig.VARIABLE_DEFINITION);
-    bindRule(grammar.getNUMBERRule(), NumericLiteral.class, highlightingConfig.NUMERIC_LITERAL);
-    bindRule(grammar.getPERCENTAGERule(), NumericLiteral.class, highlightingConfig.NUMERIC_LITERAL);
-    bindRule(grammar.getLENGTHRule(), NumericLiteral.class, highlightingConfig.NUMERIC_LITERAL);
-    bindRule(grammar.getEMSRule(), NumericLiteral.class, highlightingConfig.NUMERIC_LITERAL);
-    bindRule(grammar.getEXSRule(), NumericLiteral.class, highlightingConfig.NUMERIC_LITERAL);
-    bindRule(grammar.getANGLERule(), NumericLiteral.class, highlightingConfig.NUMERIC_LITERAL);
-    bindRule(grammar.getTIMERule(), NumericLiteral.class, highlightingConfig.NUMERIC_LITERAL);
-    bindRule(grammar.getFREQRule(), NumericLiteral.class, highlightingConfig.NUMERIC_LITERAL);
-    bindRule(grammar.getHASH_COLORRule(), NumericLiteral.class, highlightingConfig.NUMERIC_LITERAL);
+    bindRule(grammar.getNumericLiteralRule(), NumericLiteral.class, highlightingConfig.NUMERIC_LITERAL);
     bindKeyword(":", Declaration.class, highlightingConfig.PROPERTY);
     bindRule(grammar.getMediaFeatureRule(), highlightingConfig.MEDIA_FEATURE);
     bindKeyword(":", MediaExpression.class, highlightingConfig.MEDIA_FEATURE);

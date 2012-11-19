@@ -19,6 +19,7 @@ import net.vtst.ow.eclipse.less.less.MixinCall;
 import net.vtst.ow.eclipse.less.less.MixinDefinition;
 import net.vtst.ow.eclipse.less.less.MixinDefinitionParameter;
 import net.vtst.ow.eclipse.less.less.MixinDefinitionVariable;
+import net.vtst.ow.eclipse.less.less.NumberWithUnitTerm;
 import net.vtst.ow.eclipse.less.less.PseudoClassNthSpecialCase;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
 import net.vtst.ow.eclipse.less.less.VariableDefinition;
@@ -30,6 +31,7 @@ import org.eclipse.xtext.util.Pair;
 import org.eclipse.xtext.util.Tuples;
 import org.eclipse.xtext.validation.Check;
 
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
  
 
@@ -224,6 +226,32 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
       ++i; if (i == n) return true; else c = special.charAt(i);
     }
     return false;
+  }
+  
+  // Check that units are among the ones defined by the CSS standard.
+  // http://www.w3.org/TR/css3-values/
+  private static Set<String> CSS_UNITS = Sets.newHashSet(
+      // Font-relative lengths
+      "em", "ex", "ch", "rem",
+      // Viewport-percentage lengths
+      "vw", "vh", "vmin", "vmax",
+      // Absolute lengths
+      "cm", "mm", "in", "pt", "pc", "px",
+      // Angles
+      "deg", "grad", "rad", "turn",
+      // Times
+      "s", "ms",
+      // Frequencies
+      "hz", "khz",
+      // Resolutions
+      "dpi", "dpcm", "dppx");
+  
+  @Check
+  public void checkNumberWithUnitTerm(NumberWithUnitTerm term) {
+    String unit = term.getUnit();
+    if (unit != null && !CSS_UNITS.contains(unit.toLowerCase())) {
+      warning(messages.getString("unknown_css_unit"), term, LessPackage.eINSTANCE.getNumberWithUnitTerm_Unit(), 0);
+    }
   }
 
 }

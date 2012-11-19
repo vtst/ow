@@ -406,12 +406,7 @@ FunctionTerm:
 NumericLiteral:
   {NumberTerm} value=NUMBER
   | {PercentageTerm} value=PERCENTAGE
-  | {LengthTerm} value=LENGTH
-  | {EmsTerm} value=EMS
-  | {ExsTerm} value=EXS
-  | {AngleTerm} value=ANGLE
-  | {TimeTerm} value=TIME
-  | {FreqTerm} value=FREQ
+  | {NumberWithUnitTerm} value=NUMBER unit=IDENT
   | {HashColorTerm} value=HASH_COLOR
 ;
 
@@ -452,12 +447,18 @@ terminal HASH_COLOR : '#' ('0'..'9'|'a'..'f'|'A'..'F')('0'..'9'|'a'..'f'|'A'..'F
 terminal HASH_OTHER : '#' ('_'|'a'..'z'|'A'..'Z'|'0'..'9'|'-')+;
 terminal NUMBER :  (('0' .. '9')+) | (('0' .. '9')* '.' ('0' .. '9')+);
 terminal PERCENTAGE : NUMBER '%';
-terminal LENGTH : NUMBER ('px' | 'cm' | 'mm' | 'in' | 'pt' | 'pc');
-terminal EMS : NUMBER 'em';
-terminal EXS : NUMBER 'ex';
-terminal ANGLE : NUMBER ('deg' | 'rad' | 'grad');
-terminal TIME : NUMBER ('ms' | 's');
+// http://www.w3.org/TR/css3-values/
+// TODO: Units should be case insensitive.
+/*
+terminal fragment FONT_RELATIVE_LENGTH_UNITS : 'em' | 'ex' | 'ch' | 'rem';
+terminal fragment VIEWPORT_PERCENTAGE_LENGTH_UNITS : 'vw' | 'vh' | 'vmin' | 'vmax';
+terminal fragment ABSOLUTE_LENGTH_UNITS : 'cm' | 'mm' | 'in' | 'pt' | 'pc' | 'px';
+terminal fragment RESOLUTION_UNIT : 'dpi' | 'dpcm' | 'dppx';
+terminal LENGTH : NUMBER ('px' | 'cm' | 'mm' | 'in' | 'pt' | 'pc' | 'em' | 'ex' | 'ch' | 'rem'  | 'vw' | 'vh');
+terminal ANGLE : NUMBER ('deg' | 'grad' | 'rad' | 'turn');
+terminal TIME : NUMBER ('s' | 'ms');
 terminal FREQ : NUMBER ('hz' | 'khz');
+*/
 terminal ML_COMMENT : '/*' -> '*/';
 terminal SL_COMMENT   : '//' !('\n'|'\r')* ('\r'? '\n')?;
 terminal WS : (' ' | '\t' | '\r' | '\n' /*| '\f'*/)+;
