@@ -17,7 +17,9 @@ public class LessHighlightingConfiguration extends EasyHighlightingConfiguration
   public EasyTextAttribute COMMENT = new EasyTextAttribute(63, 127, 95, SWT.NORMAL);
   public EasyTextAttribute PROPERTY = new EasyTextAttribute(127, 0, 85, SWT.BOLD);
   public EasyTextAttribute SELECTOR = new EasyTextAttribute(0, 0, 192, SWT.BOLD);
+  public EasyTextAttribute AMPERSAND = new EasyTextAttribute(9, 150, 255, SWT.BOLD + SWT.ITALIC);
   public EasyTextAttribute STRING = new EasyTextAttribute(127, 159, 191);
+  public EasyTextAttribute DEPRECATED_SELECTOR_INTERPOLATION = new EasyTextAttribute(210, 70, 0);
   public EasyTextAttribute VARIABLE_DEFINITION = new EasyTextAttribute(0, 0, 192, SWT.BOLD);
   public EasyTextAttribute VARIABLE_USE = new EasyTextAttribute(0, 0, 192, SWT.NORMAL);
   public EasyTextAttribute MIXIN_CALL = new EasyTextAttribute(0, 0, 192, SWT.NORMAL);
