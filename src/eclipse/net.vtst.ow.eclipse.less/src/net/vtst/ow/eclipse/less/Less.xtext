@@ -112,7 +112,8 @@ BlockSemicolon:
 // @ statements
 
 ImportStatement:
-  '@import' OPT_SPACE uri=(STRING | Uri) OPT_SPACE media_queries=MediaQueryList ';' OPT_SPACE
+  ('@import' | '@import-multiple' | '@import-once')
+  OPT_SPACE uri=(STRING | Uri) OPT_SPACE media_queries=MediaQueryList ';' OPT_SPACE
 ;
 
 MediaStatement:
