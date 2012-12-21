@@ -260,19 +260,26 @@ MixinCallCombinator returns Combinator:
 // This rule does not end with OPT_SPACE, because of combinators
 SimpleSelector:
   {SimpleSelectorWithRoot} root=(IDENT_OR_KEYWORD | '*' | AMPERSAND_IDENT)
-  (criteria+=HashOrClass | criteria+=Attrib | criteria+=Pseudo)*
+  (criteria+=HashOrClass | criteria+=VariableSelector | criteria+=Attrib | criteria+=Pseudo)*
   | {SimpleSelectorWithoutRoot} (
-      criteria+=HashOrClass | criteria+=Attrib | criteria+=Pseudo
+      criteria+=HashOrClass | criteria+=VariableSelector | criteria+=Attrib | criteria+=Pseudo
     )+
 ;
 SimpleSelectorInNot:
   {SimpleSelectorInNotWithRoot} root=(IDENT_OR_KEYWORD | '*' | AMPERSAND_IDENT)
-  (criteria+=HashOrClass | criteria+=Attrib | criteria+=PseudoWithoutNot)*
+  (criteria+=HashOrClass | criteria+=VariableSelector | criteria+=Attrib | criteria+=PseudoWithoutNot)*
   | {SimpleSelectorInNotWithoutRoot} (
-      criteria+=HashOrClass | criteria+=Attrib | criteria+=PseudoWithoutNot
+      criteria+=HashOrClass | criteria+=VariableSelector | criteria+=Attrib | criteria+=PseudoWithoutNot
     )+
 ;
 AMPERSAND_IDENT returns ecore::EString: '&' IDENT_OR_KEYWORD?;
+
+// This terminal is a hack in order to have a custom value converter which prepend a '@'.  See
+// the code of org.eclipse.xtext.linking.impl.LinkingHelper.
+IDENT_OR_KEYWORD_PREPEND_AT returns ecore::EString: IDENT_OR_KEYWORD;
+VariableSelector:
+  '.' '@' '{' ident=[VariableCrossReference|IDENT_OR_KEYWORD_PREPEND_AT] '}'
+;
 
 HashOrClass: Hash | Class;
 HashOrClassCrossReference: ident=[HashOrClass|HASH_OR_CLASS_IDENT];

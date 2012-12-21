@@ -12,7 +12,6 @@ import net.vtst.ow.eclipse.less.less.MixinDefinitionGuard;
 import net.vtst.ow.eclipse.less.less.MixinDefinitionGuards;
 import net.vtst.ow.eclipse.less.less.NumericLiteral;
 import net.vtst.ow.eclipse.less.services.LessGrammarAccess;
-import net.vtst.ow.eclipse.less.services.LessGrammarAccess.NumericLiteralElements;
 
 import com.google.inject.Inject;
 
@@ -29,6 +28,7 @@ public class LessSemanticHighlightingCalculator extends EasySemanticHighlighting
     bindRule(grammar.getInnerSelectorRule(), highlightingConfig.SELECTOR);
     bindRule(grammar.getToplevelSelectorRule(), highlightingConfig.SELECTOR);
     bindRule(grammar.getHashOrClassRule(), MixinDefinition.class, highlightingConfig.SELECTOR);
+    bindRule(grammar.getVariableSelectorRule(), MixinDefinition.class, highlightingConfig.SELECTOR);
     bindRule(grammar.getHashOrClassCrossReferenceRule(), highlightingConfig.MIXIN_CALL);
     bindRule(grammar.getHashOrClassCrossReferenceRule(), highlightingConfig.MIXIN_CALL);
     bindRule(grammar.getPropertyRule(), highlightingConfig.PROPERTY);
