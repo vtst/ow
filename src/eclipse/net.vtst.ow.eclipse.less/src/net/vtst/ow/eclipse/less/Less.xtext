@@ -57,9 +57,14 @@ ToplevelOrInnerStatement:
   | FontFaceStatement
   | CharsetStatement
 ;
+
+UnterminatedToplevelOrInnerStatement:
+  VariableDefinition
+  | MixinCall
+;
   
 ToplevelStatement:
-  VariableDefinition ';' OPT_SPACE
+  UnterminatedToplevelOrInnerStatement ';' OPT_SPACE
   | ToplevelRuleSet
   | ImportStatement
   | ToplevelOrInnerStatement
@@ -75,8 +80,7 @@ InnerStatement:
 
 UnterminatedInnerStatement:
   Declaration
-  | VariableDefinition
-  | MixinCall
+  | UnterminatedToplevelOrInnerStatement
 ;
 
 // Several statements include a block.  This rule would accept some ';' that are not legal.
