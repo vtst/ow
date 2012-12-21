@@ -126,18 +126,28 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   @Check
   public void checkMixinDefinitionParameters(MixinDefinition mixinDefinition) {
     boolean hasOptional = false;
+    boolean lastOptional = false;
     int index = 0;
+    int firstOptionalIndex = 0;
     for (MixinDefinitionParameter parameter: mixinDefinition.getParameter()) {
-      if (parameter instanceof MixinDefinitionVariable &&
-          ((MixinDefinitionVariable) parameter).getDefault_value().size() > 0) {
-        hasOptional = true;
+      lastOptional = parameter instanceof MixinDefinitionVariable &&
+          ((MixinDefinitionVariable) parameter).getDefault_value().size() > 0;
+      if (lastOptional) {
+        if (!hasOptional) {
+          hasOptional = true;
+          firstOptionalIndex = index;
+        }
       } else {
         if (hasOptional) {
           String message = messages.getString("illegal_optional_parameter");
-          warning(message, mixinDefinition, LessPackage.eINSTANCE.getMixinDefinition_Parameter(), index);
+          warning(message, mixinDefinition, LessPackage.eINSTANCE.getMixinDefinition_Parameter(), firstOptionalIndex);
         }
       }
       ++index;
+    }
+    if (lastOptional && mixinDefinition.isVarArgs()) {
+      String message = messages.getString("illegal_optional_parameter_var_args");
+      error(message, mixinDefinition, LessPackage.eINSTANCE.getMixinDefinition_Parameter(), index - 1);      
     }
   }
   
@@ -159,15 +169,22 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
       Pair<Integer, Integer> expected = getNumberOfParametersForMixin(hashOrClass);
       int provided = mixinCall.getParameter().size();
       if (provided < expected.getFirst() || provided > expected.getSecond()) {
-        String message = 
-            (expected.getFirst() == expected.getSecond() ?
-                String.format(messages.getString("illegal_number_of_parameters_for_mixin"),
-                    hashOrClass.getIdent(), expected.getFirst(), provided) :
-                String.format(messages.getString("illegal_number_of_parameters_for_mixin_range"),
-                    hashOrClass.getIdent(), expected.getFirst(), expected.getSecond(), provided));
-        warning(message, mixinCall, LessPackage.eINSTANCE.getMixinCall_Selector(), 0);
+        warning(
+            getErrorMessageForCheckMixinCallParameters(hashOrClass.getIdent(), expected.getFirst(), expected.getSecond(), provided),
+            mixinCall, LessPackage.eINSTANCE.getMixinCall_Selector(), 0);
       }
     }
+  }
+  
+  private String getErrorMessageForCheckMixinCallParameters(String ident, int expectedMin, int expectedMax, int provided) {
+    if (expectedMin == expectedMax)
+        return String.format(messages.getString("illegal_number_of_parameters_for_mixin"),
+            ident, expectedMin, provided);
+    if (expectedMax == Integer.MAX_VALUE)
+      return String.format(messages.getString("illegal_number_of_parameters_for_mixin_min"),
+          ident, expectedMin, provided); 
+    return String.format(messages.getString("illegal_number_of_parameters_for_mixin_range"),
+        ident, expectedMin, expectedMax, provided);
   }
   
   /** Compute the expected number of parameters for a mixin call.
@@ -176,21 +193,22 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
    */
   private Pair<Integer, Integer> getNumberOfParametersForMixin(HashOrClass hashOrClass) {
     EObject container = hashOrClass.eContainer();
-    int required = 0;
-    int optional = 0;
+    int min = 0;
+    int max = 0;
     if ((container instanceof MixinDefinition)) {
       MixinDefinition mixinDefinition = (MixinDefinition) container;
       EList<MixinDefinitionParameter> parameters = mixinDefinition.getParameter();
       for (MixinDefinitionParameter parameter: parameters) {
-        if (parameter instanceof MixinDefinitionVariable &&
-            ((MixinDefinitionVariable) parameter).getDefault_value().size() > 0) {
-          ++optional;
-        } else {
-          ++required;
+        ++max;
+        if (!(parameter instanceof MixinDefinitionVariable &&
+            ((MixinDefinitionVariable) parameter).getDefault_value().size() > 0)) {
+          min = max;
         }
       }
+      if (mixinDefinition.isVarArgs()) 
+        max = Integer.MAX_VALUE;
     }
-    return Tuples.pair(required, required + optional);
+    return Tuples.pair(min, max);
   }
   
   // Report error for IncompleteToplevelStatement

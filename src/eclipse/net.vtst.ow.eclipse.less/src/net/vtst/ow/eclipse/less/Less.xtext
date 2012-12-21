@@ -172,10 +172,10 @@ VariableDefinitionIdent:
 /* Note this only consider mixins with arguments, mixins without arguments are like normal blocks */
 MixinDefinition:
   selector=HashOrClass OPT_SPACE
-  '(' OPT_SPACE 
+  '(' OPT_SPACE
   (parameter+=MixinDefinitionParameter 
     (',' OPT_SPACE parameter+=MixinDefinitionParameter)*
-  )? ')' OPT_SPACE guards=MixinDefinitionGuards?
+  )? (varArgs?='...' OPT_SPACE)? ')' OPT_SPACE guards=MixinDefinitionGuards?
   block=Block
 ;
 
@@ -264,18 +264,15 @@ MixinCallCombinator returns Combinator:
 // This rule does not end with OPT_SPACE, because of combinators
 SimpleSelector:
   {SimpleSelectorWithRoot} root=(IDENT_OR_KEYWORD | '*' | AMPERSAND_IDENT)
-  (criteria+=HashOrClass | criteria+=VariableSelector | criteria+=Attrib | criteria+=Pseudo)*
-  | {SimpleSelectorWithoutRoot} (
-      criteria+=HashOrClass | criteria+=VariableSelector | criteria+=Attrib | criteria+=Pseudo
-    )+
+  (criteria+=CommonSelector | criteria+=Pseudo)*
+  | {SimpleSelectorWithoutRoot} (criteria+=CommonSelector | criteria+=Pseudo)+
 ;
 SimpleSelectorInNot:
   {SimpleSelectorInNotWithRoot} root=(IDENT_OR_KEYWORD | '*' | AMPERSAND_IDENT)
-  (criteria+=HashOrClass | criteria+=VariableSelector | criteria+=Attrib | criteria+=PseudoWithoutNot)*
-  | {SimpleSelectorInNotWithoutRoot} (
-      criteria+=HashOrClass | criteria+=VariableSelector | criteria+=Attrib | criteria+=PseudoWithoutNot
-    )+
+  (criteria+=CommonSelector | criteria+=PseudoWithoutNot)*
+  | {SimpleSelectorInNotWithoutRoot} (criteria+=CommonSelector | criteria+=PseudoWithoutNot)+
 ;
+CommonSelector: HashOrClass | VariableSelector | Attrib;
 AMPERSAND_IDENT returns ecore::EString: '&' IDENT_OR_KEYWORD?;
 
 // This terminal is a hack in order to have a custom value converter which prepend a '@'.  See
