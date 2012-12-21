@@ -4,11 +4,11 @@
 package net.vtst.ow.eclipse.less;
 
 import net.vtst.eclipse.easyxtext.guice.EasyXtextModule;
+import net.vtst.ow.eclipse.less.formatting.LessHiddenTokenHelper;
 import net.vtst.ow.eclipse.less.parser.LessValueConverterService;
 import net.vtst.ow.eclipse.less.resource.LessLocationInFileProvider;
 import net.vtst.ow.eclipse.less.resource.LessResourceDescriptionStrategy;
 import net.vtst.ow.eclipse.less.scoping.LessQualifiedNameProvider;
-import net.vtst.ow.eclipse.less.formatting.LessHiddenTokenHelper;
 
 import org.eclipse.xtext.conversion.IValueConverterService;
 import org.eclipse.xtext.linking.ILinkingDiagnosticMessageProvider;
