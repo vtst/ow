@@ -18,6 +18,7 @@ Export-Package: net.vtst.eclipse.easyxtext.ui.folding,
  net.vtst.eclipse.easyxtext.ui.launching,
  net.vtst.eclipse.easyxtext.ui.launching.attributes,
  net.vtst.eclipse.easyxtext.ui.launching.tab,
- net.vtst.eclipse.easyxtext.ui.syntaxcoloring
+ net.vtst.eclipse.easyxtext.ui.syntaxcoloring,
+ net.vtst.eclipse.easyxtext.ui.validation
 Import-Package: org.eclipse.jdt.core,
  org.eclipse.jdt.launching
