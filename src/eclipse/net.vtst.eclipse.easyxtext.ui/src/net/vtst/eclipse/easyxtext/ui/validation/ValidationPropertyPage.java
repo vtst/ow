@@ -41,6 +41,7 @@ public abstract class ValidationPropertyPage extends PropertyPage {
 
   protected abstract AbstractDeclarativeValidator getValidator();
   protected abstract String getPropertyQualifier();
+  protected abstract String getGroupLabel(String name);
 
   /**
    * Initialize the private static fields.
@@ -99,12 +100,19 @@ public abstract class ValidationPropertyPage extends PropertyPage {
     boolean isCustomized = false;
     for (Group group : groups) {
       TableItem item = new TableItem(list, SWT.NONE);
-      item.setText(new String[] {group.name});
+      item.setText(new String[] {getGroupLabel(group)});
       QualifiedName qualifiedName = getQualifiedName(group);
       if (!isCustomized && resource.getPersistentProperty(qualifiedName) != null) isCustomized = true;
       item.setChecked(getProperty(qualifiedName, group.enabledByDefault));
     }
     setCheckbox(isCustomized);
+  }
+  
+  private String getGroupLabel(Group group) {
+    if (group.label != null) return group.label;
+    String label = getGroupLabel(group.name);
+    if (label != null) return label;
+    return group.name;
   }
 
   // **************************************************************************
