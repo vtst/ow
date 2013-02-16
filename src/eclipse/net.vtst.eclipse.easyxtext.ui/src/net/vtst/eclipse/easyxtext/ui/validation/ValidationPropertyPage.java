@@ -24,15 +24,41 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.dialogs.PropertyPage;
 import org.eclipse.xtext.validation.AbstractDeclarativeValidator;
 
+/**
+ * This is an abstract class for implementing a property page for an
+ * AbstractDeclarativeValidator.
+ * 
+ * @author Vincent Simonet
+ */
 public abstract class ValidationPropertyPage extends PropertyPage {
 
-  private ConfigurableAbstractDeclarativeValidator configurableValidator;
+  private ArrayList<Group> groups;
   private String propertyQualifier;
+  private IResource resource;
+
   private Table list;
   private Button checkbox;
-  private ArrayList<Group> groups;
-  private IResource resource;
+
+  protected abstract AbstractDeclarativeValidator getValidator();
+  protected abstract String getPropertyQualifier();
+
+  /**
+   * Initialize the private static fields.
+   */
+  private void init() {
+    ConfigurableAbstractDeclarativeValidator configurableValidator = 
+        new ConfigurableAbstractDeclarativeValidator(getValidator());
+    groups = configurableValidator.getGroups(); 
+    propertyQualifier = getPropertyQualifier();
+    resource = getResource();
+  }
+
+  // **************************************************************************
+  // User interface
   
+  /* (non-Javadoc)
+   * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
+   */
   @Override
   protected Control createContents(Composite parent) {
     init();
@@ -42,11 +68,9 @@ public abstract class ValidationPropertyPage extends PropertyPage {
         1);
     checkbox.addSelectionListener(new SelectionListener() {
       @Override
-      public void widgetDefaultSelected(SelectionEvent arg0) {}
+      public void widgetDefaultSelected(SelectionEvent _) {}
       @Override
-      public void widgetSelected(SelectionEvent arg0) {
-        updateListStatus();
-      }
+      public void widgetSelected(SelectionEvent _) { updateListStatus(); }
     });
     list = new Table(composite, SWT.V_SCROLL | SWT.CHECK | SWT.BORDER);
     GridData gd = new GridData(GridData.FILL_BOTH);
@@ -56,23 +80,42 @@ public abstract class ValidationPropertyPage extends PropertyPage {
     try {
       fillList();
     } catch (CoreException e) {
-      e.printStackTrace();
+      this.setErrorMessage(e.toString());
     }
     column1.pack();
     return composite;
+  }
+  
+  private void setCheckbox(boolean selected) {
+    checkbox.setSelection(selected);
+    updateListStatus();
   }
   
   private void updateListStatus() {
     list.setEnabled(checkbox.getSelection());
   }
 
+  private void fillList() throws CoreException {
+    boolean isCustomized = false;
+    for (Group group : groups) {
+      TableItem item = new TableItem(list, SWT.NONE);
+      item.setText(new String[] {group.name});
+      QualifiedName qualifiedName = getQualifiedName(group);
+      if (!isCustomized && resource.getPersistentProperty(qualifiedName) != null) isCustomized = true;
+      item.setChecked(getProperty(qualifiedName, group.enabledByDefault));
+    }
+    setCheckbox(isCustomized);
+  }
+
+  // **************************************************************************
+  // Properties
+
   @Override
   protected void performDefaults() {
-    checkbox.setSelection(false);
+    setCheckbox(false);
     for (int i = 0; i < groups.size(); ++i) {
       list.getItem(i).setChecked(groups.get(i).enabledByDefault);
     }
-    updateListStatus();
     super.performDefaults();
   }
   
@@ -114,33 +157,7 @@ public abstract class ValidationPropertyPage extends PropertyPage {
   private QualifiedName getQualifiedName(Group group) {
     return new QualifiedName(propertyQualifier, group.name);
   }
-
-  protected void fillList() throws CoreException {
-    boolean isCustomized = false;
-    for (Group group : groups) {
-      TableItem item = new TableItem(list, SWT.NONE);
-      item.setText(new String[] {group.name});
-      QualifiedName qualifiedName = getQualifiedName(group);
-      if (!isCustomized && resource.getPersistentProperty(qualifiedName) != null) isCustomized = true;
-      item.setChecked(getProperty(qualifiedName, group.enabledByDefault));
-    }
-    checkbox.setSelection(isCustomized);
-    updateListStatus();
-  }
   
-  private void init() {
-    configurableValidator = new ConfigurableAbstractDeclarativeValidator(getValidator());
-    groups = configurableValidator.getGroups(); 
-    propertyQualifier = getPropertyQualifier();
-    resource = getResource();
-  }
-  
-  protected abstract AbstractDeclarativeValidator getValidator();
-  protected abstract String getPropertyQualifier();
-
-  /**
-   * @return  The project resource edited by this page.
-   */
   protected IResource getResource() {
     IAdaptable element = getElement();
     if (element instanceof IResource) return (IResource) element;

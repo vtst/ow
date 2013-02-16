@@ -12,8 +12,17 @@ import java.util.Map;
 
 import org.eclipse.xtext.validation.AbstractDeclarativeValidator;
 
+/**
+ * A wrapper around AbstractDeclarativeValidator for accessing configuration
+ * options.
+ * 
+ * @author Vincent Simonet
+ */
 public class ConfigurableAbstractDeclarativeValidator {
   
+  /**
+   * Information about a configuration group.
+   */
   public static class Group {
     public String name;
     public String label = null;
@@ -24,13 +33,25 @@ public class ConfigurableAbstractDeclarativeValidator {
   private boolean enabledByDefault = true;
   private boolean makeConfigurableByDefault = true;
   private Map<String, Group> groups = new HashMap<String, Group>();
+  private ArrayList<Group> groupsList = new ArrayList<Group>();
 
+  /**
+   * Creates a new wrapper.
+   * @param validator
+   */
   public ConfigurableAbstractDeclarativeValidator(AbstractDeclarativeValidator validator) {
     this.validator = validator;
     parseValidatorAnnotation();
     addMethods(getCheckMethods());
   }
-  
+
+  /**
+   * @return The list of configuration groups for the validator.
+   */
+  public ArrayList<Group> getGroups() {
+    return groupsList;
+  }
+
   private boolean stateToBoolean(CheckState state) {
     switch (state) {
     case ENABLED: return true;
@@ -49,6 +70,8 @@ public class ConfigurableAbstractDeclarativeValidator {
   private void addMethods(Collection<Method> methods) {
     for (Method method : methods)
       addMethod(method);
+    groupsList = new ArrayList<Group>(groups.size());
+    groupsList.addAll(groups.values());
   }
   
   private void addMethod(Method method) {
@@ -72,14 +95,12 @@ public class ConfigurableAbstractDeclarativeValidator {
       if (!annotation.label().isEmpty()) group.label = annotation.label();
     }
   }
-
-  public ArrayList<Group> getGroups() {
-    ArrayList<Group> result = new ArrayList<Group>(groups.size());
-    result.addAll(groups.values());
-    return result;
-  }
   
-  // This is an unsafe method which access private methods and fields from AbstractDeclarativeValidator.
+  /**
+   * This is an unsafe method which access private methods and fields from AbstractDeclarativeValidator.
+   * @return The collection of the methods of the validator that are annotated
+   * as checks.
+   */
   private Collection<Method> getCheckMethods() {
     try {
       Method collectMethodsMethod = AbstractDeclarativeValidator.class.getDeclaredMethod("collectMethods", Class.class);
