@@ -47,10 +47,6 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   @Inject
   LessImportStatementResolver importStatementResolver;
   
-  public LessJavaValidator() {
-    super();
-  }
-  
   private boolean isConfigured = false;
   
   protected boolean isResponsible(Map<Object, Object> context, EObject eObject) {
