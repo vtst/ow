@@ -15,6 +15,11 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD})
 public @interface ConfigurableCheck {
   /**
+   * @return true if the check is configurable.
+   */
+  boolean configurable() default true;
+  
+  /**
    * @return The default state of the check.  DEFAULT means that the default
    * for the validator (as defined by ConfigurableValidator) is used.
    */

@@ -15,11 +15,6 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 public @interface ConfigurableValidator {
   /**
-   * @return If true, all checks are made configurable by default in the property page.
-   */
-  boolean makeConfigurableByDefault() default true;
-  
-  /**
    * @return The default state for a check in the property page.  DEFAULT or ENABLED
    * mean that the check is enabled by default.  DISABLED means that the check is
    * disabled by default.  This value can be overridden on a per check basis via the

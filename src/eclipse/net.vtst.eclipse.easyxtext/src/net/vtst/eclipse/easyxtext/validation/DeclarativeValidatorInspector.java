@@ -35,7 +35,6 @@ public class DeclarativeValidatorInspector {
   
   private String propertyNameQualifier;
   private boolean enabledByDefault = true;
-  private boolean makeConfigurableByDefault = true;
   private Map<String, Group> groupByName = new HashMap<String, Group>();
   private ArrayList<Group> groupList = new ArrayList<Group>();
 
@@ -73,7 +72,6 @@ public class DeclarativeValidatorInspector {
   private void inspectTypeAnnotation(AbstractDeclarativeValidator validator) {
     ConfigurableValidator annotation = validator.getClass().getAnnotation(ConfigurableValidator.class);
     if (annotation == null) return;
-    makeConfigurableByDefault = annotation.makeConfigurableByDefault();
     enabledByDefault = stateToBoolean(annotation.defaultState());
   }
   
@@ -84,8 +82,8 @@ public class DeclarativeValidatorInspector {
   
   private void addMethod(Method method) {
     ConfigurableCheck annotation = method.getAnnotation(ConfigurableCheck.class);
-    if (annotation == null && !makeConfigurableByDefault) return;
     String groupName = method.getName();
+    if (annotation != null && !annotation.configurable()) return;
     if (annotation != null && !annotation.group().isEmpty()) {
       groupName = annotation.group();
     }
