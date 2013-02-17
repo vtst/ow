@@ -3,9 +3,11 @@ package net.vtst.eclipse.easyxtext.ui.validation;
 import java.util.ArrayList;
 import java.util.Map;
 
+import net.vtst.eclipse.easyxtext.validation.ConfigurableValidationMessageAcceptor;
 import net.vtst.eclipse.easyxtext.validation.DeclarativeValidatorInspector;
 import net.vtst.eclipse.easyxtext.validation.DeclarativeValidatorInspector.Group;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -23,6 +25,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.dialogs.PropertyPage;
 import org.eclipse.xtext.validation.AbstractDeclarativeValidator;
+import org.eclipse.xtext.validation.ValidationMessageAcceptor;
 
 /**
  * This is an abstract class for implementing a property page for an
@@ -132,6 +135,7 @@ public abstract class ValidationPropertyPage extends PropertyPage {
     } catch (CoreException e) {
       e.printStackTrace();
     }
+    resetValidatorCache();
     return super.performOk();
   }
     
@@ -142,4 +146,13 @@ public abstract class ValidationPropertyPage extends PropertyPage {
     if (resource instanceof IResource) return (IResource) resource;
     return null;
   }
+  
+  private void resetValidatorCache() {
+    ValidationMessageAcceptor messageAcceptor = getValidator().getMessageAcceptor();
+    if (!(messageAcceptor instanceof ConfigurableValidationMessageAcceptor)) return;
+    ConfigurableValidationMessageAcceptor configurableMessageAcceptor = (ConfigurableValidationMessageAcceptor) messageAcceptor;
+    configurableMessageAcceptor.resetCache(resource.getProject());
+  }
+
+
 }
