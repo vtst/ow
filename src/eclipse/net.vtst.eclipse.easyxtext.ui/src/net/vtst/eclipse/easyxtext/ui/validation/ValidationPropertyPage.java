@@ -3,8 +3,8 @@ package net.vtst.eclipse.easyxtext.ui.validation;
 import java.util.ArrayList;
 import java.util.Map;
 
-import net.vtst.eclipse.easyxtext.validation.ConfigurableAbstractDeclarativeValidator;
-import net.vtst.eclipse.easyxtext.validation.ConfigurableAbstractDeclarativeValidator.Group;
+import net.vtst.eclipse.easyxtext.validation.DeclarativeValidatorInspector;
+import net.vtst.eclipse.easyxtext.validation.DeclarativeValidatorInspector.Group;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -32,26 +32,21 @@ import org.eclipse.xtext.validation.AbstractDeclarativeValidator;
  */
 public abstract class ValidationPropertyPage extends PropertyPage {
 
-  private ArrayList<Group> groups;
-  private String propertyQualifier;
+  private DeclarativeValidatorInspector inspector;
   private IResource resource;
 
   private Table list;
   private Button checkbox;
 
   protected abstract AbstractDeclarativeValidator getValidator();
-  protected abstract String getPropertyQualifier();
   protected abstract String getGroupLabel(String name);
 
   /**
    * Initialize the private static fields.
    */
   private void init() {
-    ConfigurableAbstractDeclarativeValidator configurableValidator = 
-        new ConfigurableAbstractDeclarativeValidator(getValidator());
-    groups = configurableValidator.getGroups(); 
-    propertyQualifier = getPropertyQualifier();
-    resource = getResource();
+    this.inspector = new DeclarativeValidatorInspector(getValidator());
+    this.resource = getResource();
   }
 
   // **************************************************************************
@@ -97,15 +92,12 @@ public abstract class ValidationPropertyPage extends PropertyPage {
   }
 
   private void fillList() throws CoreException {
-    boolean isCustomized = false;
-    for (Group group : groups) {
+    for (Group group : inspector.getGroups()) {
       TableItem item = new TableItem(list, SWT.NONE);
       item.setText(new String[] {getGroupLabel(group)});
-      QualifiedName qualifiedName = getQualifiedName(group);
-      if (!isCustomized && resource.getPersistentProperty(qualifiedName) != null) isCustomized = true;
-      item.setChecked(getProperty(qualifiedName, group.enabledByDefault));
+      item.setChecked(inspector.getEnabled(resource, group));
     }
-    setCheckbox(isCustomized);
+    setCheckbox(inspector.hasProperty(resource));
   }
   
   private String getGroupLabel(Group group) {
@@ -121,8 +113,8 @@ public abstract class ValidationPropertyPage extends PropertyPage {
   @Override
   protected void performDefaults() {
     setCheckbox(false);
-    for (int i = 0; i < groups.size(); ++i) {
-      list.getItem(i).setChecked(groups.get(i).enabledByDefault);
+    for (int i = 0; i < inspector.getGroups().size(); ++i) {
+      list.getItem(i).setChecked(inspector.getGroups().get(i).enabledByDefault);
     }
     super.performDefaults();
   }
@@ -131,41 +123,18 @@ public abstract class ValidationPropertyPage extends PropertyPage {
   public boolean performOk() {
     try {
       if (checkbox.getSelection()) {
-        for (int i = 0; i < groups.size(); ++i) {
-          setProperty(getQualifiedName(groups.get(i)), list.getItem(i).getChecked());
+        for (int i = 0; i < inspector.getGroups().size(); ++i) {
+          inspector.setEnabled(resource, inspector.getGroups().get(i), list.getItem(i).getChecked());
         }
       } else {
-        clearAllProperties();
+        inspector.clearAllProperties(resource);
       }
     } catch (CoreException e) {
       e.printStackTrace();
     }
     return super.performOk();
   }
-  
-  private boolean getProperty(QualifiedName name, boolean defaultValue) throws CoreException {
-    String value = resource.getPersistentProperty(name);
-    if (value == null) return defaultValue;
-    return Boolean.parseBoolean(value);
-  }
-  
-  private void setProperty(QualifiedName name, boolean value) throws CoreException {
-    resource.setPersistentProperty(name, Boolean.toString(value));
-  }
-  
-  private void clearAllProperties() throws CoreException {
-    Map<QualifiedName, String> properties = resource.getPersistentProperties();
-    for (QualifiedName propertyName : properties.keySet()) {
-      if (propertyQualifier.equals(propertyName.getQualifier())) {
-        resource.setPersistentProperty(propertyName, null);
-      }
-    }
-  }
-  
-  private QualifiedName getQualifiedName(Group group) {
-    return new QualifiedName(propertyQualifier, group.name);
-  }
-  
+    
   protected IResource getResource() {
     IAdaptable element = getElement();
     if (element instanceof IResource) return (IResource) element;

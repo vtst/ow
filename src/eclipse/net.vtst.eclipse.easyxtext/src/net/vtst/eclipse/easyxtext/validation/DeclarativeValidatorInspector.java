@@ -10,15 +10,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.xtext.validation.AbstractDeclarativeValidator;
 
 /**
- * A wrapper around AbstractDeclarativeValidator for accessing configuration
- * options.
+ * A class for inspecting the annotations of an AbstractDeclarativeValidator, and
+ * accessing the corresponding project properties.
  * 
  * @author Vincent Simonet
  */
-public class ConfigurableAbstractDeclarativeValidator {
+public class DeclarativeValidatorInspector {
   
   /**
    * Information about a configuration group.
@@ -27,31 +30,35 @@ public class ConfigurableAbstractDeclarativeValidator {
     public String name;
     public String label = null;
     public boolean enabledByDefault;
+    public List<Method> methods = new ArrayList<Method>(1);
   }
   
-  private AbstractDeclarativeValidator validator;
+  private String propertyNameQualifier;
   private boolean enabledByDefault = true;
   private boolean makeConfigurableByDefault = true;
-  private Map<String, Group> groups = new HashMap<String, Group>();
-  private ArrayList<Group> groupsList = new ArrayList<Group>();
+  private Map<String, Group> groupByName = new HashMap<String, Group>();
+  private ArrayList<Group> groupList = new ArrayList<Group>();
 
   /**
-   * Creates a new wrapper.
+   * Creates a new inspector from a validator.
    * @param validator
    */
-  public ConfigurableAbstractDeclarativeValidator(AbstractDeclarativeValidator validator) {
-    this.validator = validator;
-    parseValidatorAnnotation();
-    addMethods(getCheckMethods());
+  public DeclarativeValidatorInspector(AbstractDeclarativeValidator validator) {
+    inspectTypeAnnotation(validator);
+    addMethods(getCheckMethods(validator));
+    propertyNameQualifier = validator.getClass().getName();
   }
 
   /**
    * @return The list of configuration groups for the validator.
    */
   public ArrayList<Group> getGroups() {
-    return groupsList;
+    return groupList;
   }
-
+  
+  // **************************************************************************
+  // Inspecting annotations
+  
   private boolean stateToBoolean(CheckState state) {
     switch (state) {
     case ENABLED: return true;
@@ -60,7 +67,10 @@ public class ConfigurableAbstractDeclarativeValidator {
     }
   }
   
-  private void parseValidatorAnnotation() {
+  /**
+   * Inspect the type annotation of the validator class (if any).
+   */
+  private void inspectTypeAnnotation(AbstractDeclarativeValidator validator) {
     ConfigurableValidator annotation = validator.getClass().getAnnotation(ConfigurableValidator.class);
     if (annotation == null) return;
     makeConfigurableByDefault = annotation.makeConfigurableByDefault();
@@ -70,8 +80,6 @@ public class ConfigurableAbstractDeclarativeValidator {
   private void addMethods(Collection<Method> methods) {
     for (Method method : methods)
       addMethod(method);
-    groupsList = new ArrayList<Group>(groups.size());
-    groupsList.addAll(groups.values());
   }
   
   private void addMethod(Method method) {
@@ -81,13 +89,15 @@ public class ConfigurableAbstractDeclarativeValidator {
     if (annotation != null && !annotation.group().isEmpty()) {
       groupName = annotation.group();
     }
-    Group group = groups.get(groupName);
+    Group group = groupByName.get(groupName);
     if (group == null) {
       group = new Group();
       group.name = groupName;
       group.enabledByDefault = enabledByDefault;
-      groups.put(groupName, group);
+      groupByName.put(groupName, group);
+      groupList.add(group);
     }
+    group.methods.add(method);
     if (annotation != null) {
       if (annotation.defaultState() != CheckState.DEFAULT)
         group.enabledByDefault = stateToBoolean(annotation.defaultState());
@@ -101,7 +111,7 @@ public class ConfigurableAbstractDeclarativeValidator {
    * @return The collection of the methods of the validator that are annotated
    * as checks.
    */
-  private Collection<Method> getCheckMethods() {
+  private Collection<Method> getCheckMethods(AbstractDeclarativeValidator validator) {
     try {
       Method collectMethodsMethod = AbstractDeclarativeValidator.class.getDeclaredMethod("collectMethods", Class.class);
       collectMethodsMethod.setAccessible(true);
@@ -137,6 +147,38 @@ public class ConfigurableAbstractDeclarativeValidator {
       e.printStackTrace();
     }
     return Collections.emptyList();
+  }
+
+  // **************************************************************************
+  // Project properties
+  
+  private QualifiedName getQualifiedName(Group group) {
+    return new QualifiedName(propertyNameQualifier, group.name);
+  }
+  
+  public boolean getEnabled(IResource resource, Group group) throws CoreException {
+    String value = resource.getPersistentProperty(getQualifiedName(group));
+    if (value == null) return group.enabledByDefault;
+    return Boolean.parseBoolean(value);
+  }
+  
+  public void setEnabled(IResource resource, Group group, boolean enabled) throws CoreException {
+    resource.setPersistentProperty(getQualifiedName(group), Boolean.toString(enabled));
+  }
+  
+  public boolean hasProperty(IResource resource) throws CoreException {
+    for (QualifiedName name : resource.getPersistentProperties().keySet()) {
+      if (name.getQualifier().equals(propertyNameQualifier))
+        return true;
+    }
+    return false;
+  }
+  
+  public void clearAllProperties(IResource resource) throws CoreException {
+    for (QualifiedName name : resource.getPersistentProperties().keySet()) {
+      if (name.getQualifier().equals(propertyNameQualifier))
+        resource.setPersistentProperty(name, null);
+    }
   }
 
 }
