@@ -5,9 +5,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import net.vtst.eclipse.easyxtext.util.Misc;
+import net.vtst.eclipse.easyxtext.validation.ConfigurableCheck;
+import net.vtst.eclipse.easyxtext.validation.ConfigurableDeclarativeValidator;
 import net.vtst.ow.eclipse.soy.SoyMessages;
 import net.vtst.ow.eclipse.soy.scoping.SoyScopeProvider;
 import net.vtst.ow.eclipse.soy.soy.CallCommand;
@@ -55,6 +58,11 @@ public class SoyJavaValidator extends AbstractSoyJavaValidator {
   @Inject
   SoyMessages messages;
   
+  protected boolean isResponsible(Map<Object, Object> context, EObject eObject) {
+    ConfigurableDeclarativeValidator.makeConfigurable(this);
+    return super.isResponsible(context, eObject);
+  }
+  
   // **************************************************************************
   // Patches for the parser
   
@@ -62,6 +70,7 @@ public class SoyJavaValidator extends AbstractSoyJavaValidator {
    * Check that all elements of a list-or-map are either list elements or map elements.
    */
   @Check
+  @ConfigurableCheck(configurable = false)
   public void checkListOrMapLiteral(ListOrMapLiteral listOrMap) {
     EList<ListOrMapLiteralItem> items = listOrMap.getItem();
     boolean isMap = false;
@@ -83,6 +92,7 @@ public class SoyJavaValidator extends AbstractSoyJavaValidator {
    * Check that there are no nested msg commands.
    */
   @Check
+  @ConfigurableCheck(configurable = false)
   public void checkNestedMsgCommand(MsgCommand msgCommand) {
     TreeIterator<EObject> treeIterator = msgCommand.eAllContents();
     while (treeIterator.hasNext()) {
@@ -100,6 +110,7 @@ public class SoyJavaValidator extends AbstractSoyJavaValidator {
    * Check there is no whitespace before or after the '=' sign in command attributes
    */
   @Check
+  @ConfigurableCheck(configurable = false)
   public void checkWhiteSpaceInCommandAttributes(CommandAttribute commandAttribute) {
     doCheckNoHiddenLeafNode(commandAttribute, "command_attribute_whitespace", true);
   }
@@ -131,6 +142,7 @@ public class SoyJavaValidator extends AbstractSoyJavaValidator {
    * Check the attributes of namespace commands.
    */
   @Check
+  @ConfigurableCheck(configurable = false)
   public void checkNamespaceCommandAttributes(Namespace namespace) {
     doCheckCommandAttributes(namespace, namespace.getAttribute(), namespaceRequiredAttributes, namespaceOptionalAttributes);
   }
@@ -143,6 +155,7 @@ public class SoyJavaValidator extends AbstractSoyJavaValidator {
    * Check the attributes of template commands.
    */
   @Check
+  @ConfigurableCheck(configurable = false)
   public void checkTemplateCommandAttributes(Template template) {
     doCheckCommandAttributes(template, template.getAttribute(), templateRequiredAttributes, templateOptionalAttributes);
   }
@@ -155,6 +168,7 @@ public class SoyJavaValidator extends AbstractSoyJavaValidator {
    * Check the attributes of msg commands.
    */
   @Check
+  @ConfigurableCheck(configurable = false)
   public void checkMsgCommandAttributes(MsgCommand msgCommand) {
     doCheckCommandAttributes(msgCommand, msgCommand.getAttribute(), msgRequiredAttributes, msgOptionalAttributes);
   }
@@ -167,6 +181,7 @@ public class SoyJavaValidator extends AbstractSoyJavaValidator {
    * Check the attributes of call commands (regular and del ones).
    */
   @Check
+  @ConfigurableCheck(configurable = false)
   // This works for regular and del call commands
   public void checkCallCommandAttributes(CallCommand callCommand) {
     doCheckCommandAttributes(callCommand, callCommand.getAttribute(), callRequiredAttributes, callOptionalAttributes);
@@ -226,6 +241,7 @@ public class SoyJavaValidator extends AbstractSoyJavaValidator {
    * Check that the template commands are at the beginning of their lines.
    */
   @Check
+  @ConfigurableCheck(configurable = false)
   public void checkTemplateNewLine(Template template) {
     doCheckNewLineKeywords(template);
   }
@@ -234,6 +250,7 @@ public class SoyJavaValidator extends AbstractSoyJavaValidator {
    * Check that the template commands are at the beginning of their lines.
    */
   @Check
+  @ConfigurableCheck(configurable = false)
   public void checkTemplateNewLine(DelTemplate template) {
     doCheckNewLineKeywords(template);
   }
