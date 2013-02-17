@@ -4,8 +4,11 @@
 package net.vtst.ow.eclipse.less.validation;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
+import net.vtst.eclipse.easyxtext.validation.ConfigurableCheck;
+import net.vtst.eclipse.easyxtext.validation.ConfigurableDeclarativeValidator;
 import net.vtst.ow.eclipse.less.LessMessages;
 import net.vtst.ow.eclipse.less.less.Block;
 import net.vtst.ow.eclipse.less.less.BlockUtils;
@@ -25,7 +28,9 @@ import net.vtst.ow.eclipse.less.less.StyleSheet;
 import net.vtst.ow.eclipse.less.less.VariableDefinition;
 import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver;
 
+import org.eclipse.emf.common.util.DiagnosticChain;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.util.Pair;
 import org.eclipse.xtext.util.Tuples;
@@ -33,7 +38,6 @@ import org.eclipse.xtext.validation.Check;
 
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
- 
 
 public class LessJavaValidator extends AbstractLessJavaValidator {
   
@@ -43,6 +47,20 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   @Inject
   LessImportStatementResolver importStatementResolver;
   
+  public LessJavaValidator() {
+    super();
+  }
+  
+  private boolean isConfigured = false;
+  
+  protected boolean isResponsible(Map<Object, Object> context, EObject eObject) {
+    if (!isConfigured) {
+      isConfigured = true;
+      ConfigurableDeclarativeValidator.makeConfigurable(this);      
+    }
+    return super.isResponsible(context, eObject);
+  }
+
   // Check import statements
   @Check
   public void checkImportStatement(ImportStatement importStatement) {
@@ -83,12 +101,14 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   
   // Check for multiple variables in block
   @Check
+  @ConfigurableCheck(group = "checkUniqueVariables")
   public void checkBlockUniqueVariables(Block block) {
     checkUniqueVariables(BlockUtils.iterator(block));
   }
   
   // Check for multiple variables in stylesheet
   @Check
+  @ConfigurableCheck(group = "checkUniqueVariables")
   public void checkStyleSheetUniqueVariables(StyleSheet styleSheet) {
     checkUniqueVariables(styleSheet.eContents());
   }
@@ -124,6 +144,7 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   
   // Check that optional parameters are at the end in mixin definitions
   @Check
+  @ConfigurableCheck(configurable = false)
   public void checkMixinDefinitionParameters(MixinDefinition mixinDefinition) {
     boolean hasOptional = false;
     boolean lastOptional = false;
@@ -213,12 +234,14 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   
   // Report error for IncompleteToplevelStatement
   @Check
+  @ConfigurableCheck(configurable = false)
   public void checkIncompleteToplevelStatement(IncompleteToplevelStatement statement) {
     error(messages.getString("incomplete_toplevel_statement"), statement, null, 0);
   }
   
   
   @Check
+  @ConfigurableCheck(configurable = false)
   public void checkPseudoClassNthSpecialCase(PseudoClassNthSpecialCase pseudo) {
     if (!doCheckPseudoClassNthSpecialCase(pseudo.getSpecial())) {
       error(messages.getString("illegal_pseudo_class_argument"), pseudo, null, 0);
@@ -265,6 +288,7 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
       "dpi", "dpcm", "dppx");
   
   @Check
+  @ConfigurableCheck(configurable = false)
   public void checkNumberWithUnitTerm(NumberWithUnitTerm term) {
     String unit = term.getUnit();
     if (unit != null && !CSS_UNITS.contains(unit.toLowerCase())) {
