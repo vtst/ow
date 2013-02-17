@@ -49,7 +49,7 @@ public class ConfigurableValidationMessageAcceptor implements ValidationMessageA
   }
   
   public class Cache {
-    WeakHashMap<IProject, ProjectConfiguration> configurations;
+    WeakHashMap<IProject, ProjectConfiguration> configurations = new WeakHashMap<IProject, ProjectConfiguration>();
     private Resource lastResource;
     private ProjectConfiguration lastConfiguration;
     
@@ -94,7 +94,10 @@ public class ConfigurableValidationMessageAcceptor implements ValidationMessageA
 
   private boolean isDisabled() {
     State state = stateAccess.getState();
-    return cache.get(state.currentObject.eResource()).disabledCheckMethods.contains(state.currentMethod);
+    if (state.currentObject == null) return false;
+    ProjectConfiguration configuration = cache.get(state.currentObject.eResource());
+    if (configuration == null) return false;
+    return configuration.disabledCheckMethods.contains(state.currentMethod);
   }
 
   @Override
