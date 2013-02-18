@@ -1,17 +1,12 @@
 package net.vtst.eclipse.easyxtext.ui.validation;
 
-import java.util.ArrayList;
-import java.util.Map;
-
 import net.vtst.eclipse.easyxtext.validation.config.ConfigurableValidationMessageAcceptor;
 import net.vtst.eclipse.easyxtext.validation.config.DeclarativeValidatorInspector;
 import net.vtst.eclipse.easyxtext.validation.config.DeclarativeValidatorInspector.Group;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.debug.internal.ui.SWTFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;

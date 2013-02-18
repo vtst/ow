@@ -5,7 +5,6 @@ package net.vtst.eclipse.easyxtext.ui.launching.tab;
 
 import java.util.ArrayList;
 
-import net.vtst.eclipse.easyxtext.ui.launching.EasyLaunchConfigurationHelper;
 import net.vtst.eclipse.easyxtext.util.IEasyMessages;
 
 import org.eclipse.debug.core.ILaunchConfiguration;
