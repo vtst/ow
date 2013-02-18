@@ -1,8 +1,5 @@
 package net.vtst.eclipse.easyxtext.validation.config;
 
-import java.util.Map;
-
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.validation.AbstractDeclarativeValidator;
 
 /**
