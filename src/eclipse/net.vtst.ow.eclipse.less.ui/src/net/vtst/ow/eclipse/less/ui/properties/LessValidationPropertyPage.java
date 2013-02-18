@@ -8,8 +8,8 @@ import org.eclipse.xtext.validation.ValidationMessageAcceptor;
 import com.google.inject.Inject;
 
 import net.vtst.eclipse.easyxtext.ui.validation.ValidationPropertyPage;
-import net.vtst.eclipse.easyxtext.validation.ConfigurableDeclarativeValidator;
-import net.vtst.eclipse.easyxtext.validation.ConfigurableValidationMessageAcceptor;
+import net.vtst.eclipse.easyxtext.validation.config.ConfigurableDeclarativeValidator;
+import net.vtst.eclipse.easyxtext.validation.config.ConfigurableValidationMessageAcceptor;
 import net.vtst.ow.eclipse.less.ui.LessUiMessages;
 import net.vtst.ow.eclipse.less.validation.LessJavaValidator;
 

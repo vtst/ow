@@ -1,4 +1,4 @@
-package net.vtst.eclipse.easyxtext.validation;
+package net.vtst.eclipse.easyxtext.validation.config;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,4 +1,4 @@
-package net.vtst.eclipse.easyxtext.validation;
+package net.vtst.eclipse.easyxtext.validation.config;
 
 import org.eclipse.xtext.validation.AbstractDeclarativeValidator;
 

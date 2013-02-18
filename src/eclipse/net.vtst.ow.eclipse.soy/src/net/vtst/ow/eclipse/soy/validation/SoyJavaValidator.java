@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.Set;
 
 import net.vtst.eclipse.easyxtext.util.Misc;
-import net.vtst.eclipse.easyxtext.validation.ConfigurableCheck;
-import net.vtst.eclipse.easyxtext.validation.ConfigurableDeclarativeValidator;
+import net.vtst.eclipse.easyxtext.validation.config.ConfigurableCheck;
+import net.vtst.eclipse.easyxtext.validation.config.ConfigurableDeclarativeValidator;
 import net.vtst.ow.eclipse.soy.SoyMessages;
 import net.vtst.ow.eclipse.soy.scoping.SoyScopeProvider;
 import net.vtst.ow.eclipse.soy.soy.CallCommand;
