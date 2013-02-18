@@ -3,9 +3,9 @@ package net.vtst.eclipse.easyxtext.ui.validation;
 import java.util.ArrayList;
 import java.util.Map;
 
-import net.vtst.eclipse.easyxtext.validation.ConfigurableValidationMessageAcceptor;
-import net.vtst.eclipse.easyxtext.validation.DeclarativeValidatorInspector;
-import net.vtst.eclipse.easyxtext.validation.DeclarativeValidatorInspector.Group;
+import net.vtst.eclipse.easyxtext.validation.config.ConfigurableValidationMessageAcceptor;
+import net.vtst.eclipse.easyxtext.validation.config.DeclarativeValidatorInspector;
+import net.vtst.eclipse.easyxtext.validation.config.DeclarativeValidatorInspector.Group;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -29,7 +29,8 @@ import org.eclipse.xtext.validation.ValidationMessageAcceptor;
 
 /**
  * This is an abstract class for implementing a property page for an
- * AbstractDeclarativeValidator.
+ * {@code AbstractDeclarativeValidator}.  See
+ * {@code ConfigurableDeclarativeValidator} for more information. 
  * 
  * @author Vincent Simonet
  */
@@ -41,7 +42,18 @@ public abstract class ValidationPropertyPage extends PropertyPage {
   private Table list;
   private Button checkbox;
 
+  /**
+   * @return The validator configured by the property page.
+   */
   protected abstract AbstractDeclarativeValidator getValidator();
+  
+  
+  /**
+   * Get the label displayed to the user for a group of checks.
+   * @param name  The name of the group of check.
+   * @return  The label displayed to the user for this group.  If null,
+   *   the name given in the {@code ConfigurableCheck} annotation is used.
+   */
   protected abstract String getGroupLabel(String name);
 
   /**

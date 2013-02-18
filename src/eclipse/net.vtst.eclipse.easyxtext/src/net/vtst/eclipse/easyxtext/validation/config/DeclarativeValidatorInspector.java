@@ -44,7 +44,7 @@ public class DeclarativeValidatorInspector {
    */
   public DeclarativeValidatorInspector(AbstractDeclarativeValidator validator) {
     inspectTypeAnnotation(validator);
-    addMethods(getCheckMethods(validator));
+    inspectMethods(getCheckMethods(validator));
     propertyNameQualifier = validator.getClass().getName();
   }
 
@@ -58,6 +58,9 @@ public class DeclarativeValidatorInspector {
   // **************************************************************************
   // Inspecting annotations
   
+  /**
+   * Converts a state into a boolean.
+   */
   private boolean stateToBoolean(CheckState state) {
     switch (state) {
     case ENABLED: return true;
@@ -68,6 +71,7 @@ public class DeclarativeValidatorInspector {
   
   /**
    * Inspect the type annotation of the validator class (if any).
+   * @param validator
    */
   private void inspectTypeAnnotation(AbstractDeclarativeValidator validator) {
     ConfigurableValidator annotation = validator.getClass().getAnnotation(ConfigurableValidator.class);
@@ -75,12 +79,20 @@ public class DeclarativeValidatorInspector {
     enabledByDefault = stateToBoolean(annotation.defaultState());
   }
   
-  private void addMethods(Collection<Method> methods) {
+  /**
+   * Inspect all methods from a collection.
+   * @param methods
+   */
+  private void inspectMethods(Collection<Method> methods) {
     for (Method method : methods)
-      addMethod(method);
+      inspectMethod(method);
   }
   
-  private void addMethod(Method method) {
+  /**
+   * Inspect a method and its annotation.
+   * @param method
+   */
+  private void inspectMethod(Method method) {
     ConfigurableCheck annotation = method.getAnnotation(ConfigurableCheck.class);
     String groupName = method.getName();
     if (annotation != null && !annotation.configurable()) return;
@@ -150,20 +162,45 @@ public class DeclarativeValidatorInspector {
   // **************************************************************************
   // Project properties
   
+  /**
+   * Get the qualified name for the resource property for a given group.
+   * @param group
+   * @return
+   */
   private QualifiedName getQualifiedName(Group group) {
     return new QualifiedName(propertyNameQualifier, group.name);
   }
   
+  /**
+   * Lookup the properties of a resource, and determine whether the group is enabled.
+   * @param resource
+   * @param group
+   * @return
+   * @throws CoreException
+   */
   public boolean getEnabled(IResource resource, Group group) throws CoreException {
     String value = resource.getPersistentProperty(getQualifiedName(group));
     if (value == null) return group.enabledByDefault;
     return Boolean.parseBoolean(value);
   }
   
+  /**
+   * Set the property of a resource for a group.
+   * @param resource
+   * @param group
+   * @param enabled
+   * @throws CoreException
+   */
   public void setEnabled(IResource resource, Group group, boolean enabled) throws CoreException {
     resource.setPersistentProperty(getQualifiedName(group), Boolean.toString(enabled));
   }
   
+  /**
+   * @param resource
+   * @return true if {@code resource} has one or several properties for
+   * configuring the validator.
+   * @throws CoreException
+   */
   public boolean hasProperty(IResource resource) throws CoreException {
     for (QualifiedName name : resource.getPersistentProperties().keySet()) {
       if (name.getQualifier().equals(propertyNameQualifier))
@@ -172,11 +209,15 @@ public class DeclarativeValidatorInspector {
     return false;
   }
   
+  /**
+   * Deletes all properties configuring the validator for the validator.
+   * @param resource
+   * @throws CoreException
+   */
   public void clearAllProperties(IResource resource) throws CoreException {
     for (QualifiedName name : resource.getPersistentProperties().keySet()) {
       if (name.getQualifier().equals(propertyNameQualifier))
         resource.setPersistentProperty(name, null);
     }
   }
-
 }

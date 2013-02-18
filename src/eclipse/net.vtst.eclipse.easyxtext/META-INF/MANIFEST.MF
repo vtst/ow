@@ -16,4 +16,4 @@ Export-Package: net.vtst.eclipse.easyxtext.guice,
  net.vtst.eclipse.easyxtext.resource,
  net.vtst.eclipse.easyxtext.scoping,
  net.vtst.eclipse.easyxtext.util,
- net.vtst.eclipse.easyxtext.validation
+ net.vtst.eclipse.easyxtext.validation.config

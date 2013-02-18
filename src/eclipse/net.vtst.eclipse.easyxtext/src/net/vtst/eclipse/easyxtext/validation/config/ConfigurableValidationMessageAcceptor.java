@@ -18,6 +18,13 @@ import org.eclipse.xtext.validation.AbstractDeclarativeValidator.State;
 import org.eclipse.xtext.validation.AbstractDeclarativeValidator.StateAccess;
 import org.eclipse.xtext.validation.ValidationMessageAcceptor;
 
+/**
+ * Replacement for the default ValidationMessageAcceptor implemented by
+ * AbstractDeclarativeValidator.  This replacement reports errors/warnings/infos
+ * only for those checks which are not disabled.
+ * 
+ * @author Vincent Simonet
+ */
 public class ConfigurableValidationMessageAcceptor implements ValidationMessageAcceptor {
   
   private DeclarativeValidatorInspector inspector;
@@ -32,8 +39,13 @@ public class ConfigurableValidationMessageAcceptor implements ValidationMessageA
   // **************************************************************************
   // Configuration cache
   
+  /**
+   * An instance of this class represents the configuration state for a project
+   * at a given time (i.e. the combination of the information provided from
+   * the annotations and from the project properties.
+   */
   public class ProjectConfiguration {
-    public Set<Method> disabledCheckMethods = new HashSet<Method>();
+    private Set<Method> disabledCheckMethods = new HashSet<Method>();
     
     public ProjectConfiguration(IProject project) {
       try {
@@ -46,10 +58,18 @@ public class ConfigurableValidationMessageAcceptor implements ValidationMessageA
         e.printStackTrace();
       }
     }
+    
+    public boolean isDisabled(Method method) {
+      return disabledCheckMethods.contains(method);
+    }
   }
   
+  /**
+   * Cache for the current configurations of projects.
+   * It avoids re-computing the configuration every time a validator is run.
+   */
   public class Cache {
-    WeakHashMap<IProject, ProjectConfiguration> configurations = new WeakHashMap<IProject, ProjectConfiguration>();
+    private WeakHashMap<IProject, ProjectConfiguration> configurations = new WeakHashMap<IProject, ProjectConfiguration>();
     private Resource lastResource;
     private ProjectConfiguration lastConfiguration;
     
@@ -92,12 +112,17 @@ public class ConfigurableValidationMessageAcceptor implements ValidationMessageA
   // **************************************************************************
   // implements ValidationMessageAcceptor
 
+  /**
+   * This function is called by every error(), warning(), info() method to check
+   * whether the current check is disabled.
+   * @return true if the current check is disabled.
+   */
   private boolean isDisabled() {
     State state = stateAccess.getState();
     if (state.currentObject == null) return false;
     ProjectConfiguration configuration = cache.get(state.currentObject.eResource());
     if (configuration == null) return false;
-    return configuration.disabledCheckMethods.contains(state.currentMethod);
+    return configuration.isDisabled(state.currentMethod);
   }
 
   @Override
@@ -141,5 +166,4 @@ public class ConfigurableValidationMessageAcceptor implements ValidationMessageA
     if (isDisabled()) return;
     delegate.acceptInfo(message, object, offset, length, code, issueData);
   }
-
 }
