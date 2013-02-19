@@ -1,6 +1,6 @@
 package net.vtst.ow.eclipse.soy.ui.properties;
 
-import net.vtst.eclipse.easyxtext.ui.validation.ValidationPropertyPage;
+import net.vtst.eclipse.easyxtext.ui.validation.config.ValidationPropertyPage;
 import net.vtst.ow.eclipse.soy.ui.SoyUiMessages;
 import net.vtst.ow.eclipse.soy.validation.SoyJavaValidator;
 
