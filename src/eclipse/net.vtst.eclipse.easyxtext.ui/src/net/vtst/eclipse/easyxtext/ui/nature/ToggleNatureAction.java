@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import net.vtst.eclipse.easyxtext.nature.IEasyProjectNature;
 import net.vtst.eclipse.easyxtext.nature.ProjectNatureUtil;
+import net.vtst.eclipse.easyxtext.ui.EasyXtextUiMessages;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -24,11 +25,11 @@ import com.google.inject.Inject;
 public class ToggleNatureAction implements IObjectActionDelegate {
   
   @Inject
-  IEasyProjectNature projectNature;
+  private EasyXtextUiMessages messages;
   
-  // TODO: Could we re-use the constant from XText?
-  private static String XTEXT_NATURE_ID = "org.eclipse.xtext.ui.shared.xtextNature";
-  
+  @Inject
+  private IEasyProjectNature projectNature;
+    
   private static class Break extends Exception {
     private static final long serialVersionUID = 1L;
   }
@@ -36,8 +37,8 @@ public class ToggleNatureAction implements IObjectActionDelegate {
   private ISelection selection;
   private IWorkbenchPart part;
 
-  protected String getNatureId() {
-    return projectNature.getId();
+  protected IEasyProjectNature getNature() {
+    return projectNature;
   }
   
   @Override
@@ -76,23 +77,18 @@ public class ToggleNatureAction implements IObjectActionDelegate {
     if (projects.isEmpty()) return;
     // Only the first project is tested, as all selected projects are assumed to be
     // in the same state for the handled nature.
-    Collection<String> natureIds = new ArrayList<String>(2);
-    natureIds.add(getNatureId());
-    if (ProjectNatureUtil.hasNature(getNatureId(), projects.get(0))) {
+    if (ProjectNatureUtil.hasNature(getNature().getId(), projects.get(0))) {
       // Remove the nature
       try {
-        if (alsoRemoveXTextNature()) {
-          natureIds.add(XTEXT_NATURE_ID);
-        }
+        boolean alsoRemoveXtextNature = alsoRemoveXtextNature();
         for (IProject project : projects) {
-          ProjectNatureUtil.removeNatures(natureIds, project);
+          ProjectNatureUtil.removeNatureRequiringXtext(getNature().getId(), alsoRemoveXtextNature, project);
         }      
       } catch (Break e) {}
     } else {
       // Add the nature
-      natureIds.add(XTEXT_NATURE_ID);
       for (IProject project : projects) {
-        ProjectNatureUtil.addNatures(natureIds, project);
+        ProjectNatureUtil.addNatureRequiringXtext(getNature().getId(), project);
       }
     }
   }
@@ -101,15 +97,22 @@ public class ToggleNatureAction implements IObjectActionDelegate {
     return part.getSite().getShell();
   }
     
-  private boolean alsoRemoveXTextNature() throws Break {
-    // TODO: Messages should be customizable
+  private boolean alsoRemoveXtextNature() throws Break {
     MessageDialog dialog = new MessageDialog(
-        getShell(), "Remove nature", null, "Also remove the XText nature?", MessageDialog.QUESTION, 
-        new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL, IDialogConstants.CANCEL_LABEL }, 0);
+        getShell(),
+        messages.format("remove_project_nature_dialog_title", getNature().getName()), 
+        null, 
+        messages.getString("remove_project_nature_dialog_message"), 
+        MessageDialog.QUESTION, 
+        new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL, IDialogConstants.CANCEL_LABEL }, 
+        0);
     switch (dialog.open()) {
-    case 0: return true;
-    case 1: return false;
-    default /* 2 */: throw new Break();
+    case 0:  // Yes
+      return true;
+    case 1:  // No
+      return false;
+    default:  // Cancel (== 2)
+      throw new Break();
     }
   }
 

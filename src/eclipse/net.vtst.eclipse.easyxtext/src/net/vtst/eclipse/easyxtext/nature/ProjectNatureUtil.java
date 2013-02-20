@@ -1,5 +1,6 @@
 package net.vtst.eclipse.easyxtext.nature;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -37,28 +38,21 @@ public class ProjectNatureUtil {
     description.setNatureIds(newNatureIds.toArray(new String[0]));
     project.setDescription(description, null);    
   }
-  
-  public static void toggleNature(String natureId, IProject project) throws CoreException {
-    IProjectDescription description = project.getDescription();
-    String[] natures = description.getNatureIds();
 
-    for (int i = 0; i < natures.length; ++i) {
-      if (natureId.equals(natures[i])) {
-        // Remove the nature
-        String[] newNatures = new String[natures.length - 1];
-        System.arraycopy(natures, 0, newNatures, 0, i);
-        System.arraycopy(natures, i + 1, newNatures, i, natures.length - i - 1);
-        description.setNatureIds(newNatures);
-        project.setDescription(description, null);
-        return;
-      }
-    }
+  // TODO: Could we re-use the constant from XText?
+  private static String XTEXT_NATURE_ID = "org.eclipse.xtext.ui.shared.xtextNature";
 
-    // Add the nature
-    String[] newNatures = new String[natures.length + 1];
-    System.arraycopy(natures, 0, newNatures, 0, natures.length);
-    newNatures[natures.length] = natureId;
-    description.setNatureIds(newNatures);
-    project.setDescription(description, null);
+  public static void addNatureRequiringXtext(String natureId, IProject project) throws CoreException {
+    Collection<String> natureIds = new ArrayList<String>(2);
+    natureIds.add(XTEXT_NATURE_ID);
+    natureIds.add(natureId);
+    addNatures(natureIds, project);
+  }
+
+  public static void removeNatureRequiringXtext(String natureId, boolean alsoRemoveXtextNature, IProject project) throws CoreException {
+    Collection<String> natureIds = new ArrayList<String>(2);
+    if (alsoRemoveXtextNature) natureIds.add(XTEXT_NATURE_ID);
+    natureIds.add(natureId);
+    removeNatures(natureIds, project);
   }
 }
