@@ -4,6 +4,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
 
+/**
+ * An implementation of {@code IProjectNature} which does nothing.
+ * This is useful for project natures which are used as pure markers.
+ * @author Vincent Simonet
+ */
 public class NullProjectNature implements IProjectNature {
 
   private IProject project;
