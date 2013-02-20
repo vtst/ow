@@ -20,7 +20,7 @@
     id="nature"
     name="%less_nature">
     <runtime>
-      <run class="net.vtst.eclipse.easyxtext.nature.NullProjectNature"/>
+      <run class="net.vtst.ow.eclipse.less.nature.LessProjectNature"/>
     </runtime>
     <requires-nature id="org.eclipse.xtext.ui.shared.xtextNature"/>
   </extension>

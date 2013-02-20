@@ -4,7 +4,9 @@
 package net.vtst.ow.eclipse.less;
 
 import net.vtst.eclipse.easyxtext.guice.EasyXtextModule;
+import net.vtst.eclipse.easyxtext.nature.IEasyProjectNature;
 import net.vtst.ow.eclipse.less.formatting.LessHiddenTokenHelper;
+import net.vtst.ow.eclipse.less.nature.LessProjectNature;
 import net.vtst.ow.eclipse.less.parser.LessValueConverterService;
 import net.vtst.ow.eclipse.less.resource.LessLocationInFileProvider;
 import net.vtst.ow.eclipse.less.resource.LessResourceDescriptionStrategy;
@@ -42,7 +44,6 @@ public class LessRuntimeModule extends net.vtst.ow.eclipse.less.AbstractLessRunt
   public Class<? extends IValueConverterService> bindIValueConverterService() {
     return LessValueConverterService.class;
   }
-
   
   public Class<? extends org.eclipse.xtext.naming.IQualifiedNameProvider> bindIQualifiedNameProvider() {
     return LessQualifiedNameProvider.class;
@@ -59,11 +60,12 @@ public class LessRuntimeModule extends net.vtst.ow.eclipse.less.AbstractLessRunt
   public Class<? extends IHiddenTokenHelper> bindIHiddenTokenHelper() {
     return LessHiddenTokenHelper.class;
   }
-
-  // Scoping
   
   public Class<? extends IDefaultResourceDescriptionStrategy> bindIDefaultResourceDescriptionStrategy() {
     return LessResourceDescriptionStrategy.class;
   }
 
+  public Class<? extends IEasyProjectNature> bindIEasyProjectNature() {
+    return LessProjectNature.class;
+  }
 }

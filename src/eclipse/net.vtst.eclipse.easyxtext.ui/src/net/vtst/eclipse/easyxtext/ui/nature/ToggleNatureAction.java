@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import net.vtst.eclipse.easyxtext.nature.IEasyProjectNature;
 import net.vtst.eclipse.easyxtext.nature.ProjectNatureUtil;
 
 import org.eclipse.core.resources.IProject;
@@ -18,7 +19,12 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
-public abstract class ToggleNatureAction implements IObjectActionDelegate {
+import com.google.inject.Inject;
+
+public class ToggleNatureAction implements IObjectActionDelegate {
+  
+  @Inject
+  IEasyProjectNature projectNature;
   
   // TODO: Could we re-use the constant from XText?
   private static String XTEXT_NATURE_ID = "org.eclipse.xtext.ui.shared.xtextNature";
@@ -30,8 +36,10 @@ public abstract class ToggleNatureAction implements IObjectActionDelegate {
   private ISelection selection;
   private IWorkbenchPart part;
 
-  protected abstract String getNatureId();
-    
+  protected String getNatureId() {
+    return projectNature.getId();
+  }
+  
   @Override
   public void run(IAction action) {
     try {

@@ -33,6 +33,10 @@ public class LessUiModule extends net.vtst.ow.eclipse.less.ui.AbstractLessUiModu
   public Class<? extends IEasyMessages> bindIEasyMessages() {
     return LessUiMessages.class;
   }
+  
+  public Class<? extends org.eclipse.xtext.ui.editor.IXtextEditorCallback> bindIXtextEditorCallback() {
+    return net.vtst.eclipse.easyxtext.ui.nature.NatureAddingEditorCallback.class;
+  }
     
   // Image helper
 

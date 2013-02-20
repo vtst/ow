@@ -78,7 +78,7 @@
         id="net.vtst.ow.eclipse.less.ui.nature.add"
         objectClass="org.eclipse.core.resources.IProject">
       <action
-          class="net.vtst.ow.eclipse.less.ui.nature.ToggleLessNatureAction"
+          class="net.vtst.ow.eclipse.less.ui.LessExecutableExtensionFactory:net.vtst.eclipse.easyxtext.ui.nature.ToggleNatureAction"
           id="net.vtst.ow.eclipse.less.ui.nature.addAction"
           label="%less_nature_add"
           menubarPath="org.eclipse.ui.projectConfigure/additions"/>
@@ -93,7 +93,7 @@
         id="net.vtst.ow.eclipse.less.ui.nature.remove"
         objectClass="org.eclipse.core.resources.IProject">
       <action
-          class="net.vtst.ow.eclipse.less.ui.nature.ToggleLessNatureAction"
+          class="net.vtst.ow.eclipse.less.ui.LessExecutableExtensionFactory:net.vtst.eclipse.easyxtext.ui.nature.ToggleNatureAction"
           id="net.vtst.ow.eclipse.less.ui.nature.removeAction"
           label="%less_nature_remove"
           menubarPath="org.eclipse.ui.projectConfigure/additions"/>
