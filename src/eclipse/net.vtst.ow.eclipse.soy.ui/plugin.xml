@@ -70,20 +70,52 @@
      </shortcut>
   </extension>
   
+  <!-- Project nature -->
+  
+  <extension point="org.eclipse.ui.popupMenus">
+    <objectContribution
+        adaptable="true"
+        id="net.vtst.ow.eclipse.soy.ui.nature.add"
+        objectClass="org.eclipse.core.resources.IProject">
+      <action
+          class="net.vtst.ow.eclipse.soy.ui.SoyExecutableExtensionFactory:net.vtst.eclipse.easyxtext.ui.nature.ToggleNatureAction"
+          id="net.vtst.ow.eclipse.soy.ui.nature.addAction"
+          label="%soy_nature_add"
+          menubarPath="org.eclipse.ui.projectConfigure/additions"/>
+      <visibility>
+        <not>
+          <objectState name="nature" value="net.vtst.ow.eclipse.soy.nature"/>
+        </not>
+      </visibility>
+    </objectContribution>
+    <objectContribution
+        adaptable="true"
+        id="net.vtst.ow.eclipse.soy.ui.nature.remove"
+        objectClass="org.eclipse.core.resources.IProject">
+      <action
+          class="net.vtst.ow.eclipse.soy.ui.SoyExecutableExtensionFactory:net.vtst.eclipse.easyxtext.ui.nature.ToggleNatureAction"
+          id="net.vtst.ow.eclipse.soy.ui.nature.removeAction"
+          label="%soy_nature_remove"
+          menubarPath="org.eclipse.ui.projectConfigure/additions"/>
+      <visibility>
+        <objectState name="nature" value="net.vtst.ow.eclipse.soy.nature"/>
+      </visibility>
+    </objectContribution>
+   </extension>
+
   <!-- Property page -->
 
   <extension point="org.eclipse.ui.propertyPages">
     <page
-      class="net.vtst.ow.eclipse.soy.ui.SoyExecutableExtensionFactory:net.vtst.ow.eclipse.soy.ui.properties.SoyValidationPropertyPage"
-      category="org.eclipse.wst.jsdt.internal.ui.preferences.JavaScriptMainPage"
-      id="net.vtst.ow.eclipse.less.ui.properties.SoyValidationPropertyPage"
+      class="net.vtst.ow.eclipse.soy.ui.SoyExecutableExtensionFactory:net.vtst.eclipse.easyxtext.ui.validation.config.ValidatorPropertyPage"
+      id="net.vtst.ow.eclipse.soy.ui.properties.SoyValidationPropertyPage"
       name="%soy_validation_property_page"
       nameFilter="*">
       <!-- The property page is enabled for all projects having the jsNature, because
            it is used to enable or disable the closure nature. -->
       <enabledWhen>
         <adapt type="org.eclipse.core.resources.IProject">
-          <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.wst.jsdt.core.jsNature"/>
+          <test property="org.eclipse.core.resources.projectNature" value="net.vtst.ow.eclipse.soy.nature"/>
         </adapt>
       </enabledWhen>
     </page>

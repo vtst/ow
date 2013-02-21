@@ -33,6 +33,10 @@ public class SoyUiModule extends net.vtst.ow.eclipse.soy.ui.AbstractSoyUiModule 
   public Class<? extends IEasyMessages> bindIEasyMessages() {
     return SoyUiMessages.class;
   }
+  
+  public Class<? extends org.eclipse.xtext.ui.editor.IXtextEditorCallback> bindIXtextEditorCallback() {
+    return net.vtst.eclipse.easyxtext.ui.nature.NatureAddingEditorCallback.class;
+  }
 	
   // This is to replace the default generated parser, by the customized version.
 	

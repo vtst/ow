@@ -4,7 +4,8 @@
 package net.vtst.ow.eclipse.soy;
 
 import net.vtst.eclipse.easyxtext.guice.EasyXtextModule;
-import net.vtst.ow.eclipse.soy.parser.CustomizedSoyLexer;
+import net.vtst.eclipse.easyxtext.nature.IEasyProjectNature;
+import net.vtst.ow.eclipse.soy.nature.SoyProjectNature;
 import net.vtst.ow.eclipse.soy.parser.CustomizedSoyLexer;
 import net.vtst.ow.eclipse.soy.parser.SoyValueConverterService;
 import net.vtst.ow.eclipse.soy.parser.antlr.internal.InternalSoyLexer;
@@ -12,7 +13,9 @@ import net.vtst.ow.eclipse.soy.resource.SoyLocationInFileProvider;
 import net.vtst.ow.eclipse.soy.resource.SoyResourceDescriptionStrategy;
 import net.vtst.ow.eclipse.soy.scoping.SoyBuiltinGlobalScopeProvider;
 import net.vtst.ow.eclipse.soy.scoping.SoyScopeProvider;
+import net.vtst.ow.eclipse.soy.soy.SoyPackage;
 
+import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.xtext.conversion.IValueConverterService;
 import org.eclipse.xtext.resource.IContainer;
 import org.eclipse.xtext.resource.IDefaultResourceDescriptionStrategy;
@@ -33,6 +36,10 @@ public class SoyRuntimeModule extends net.vtst.ow.eclipse.soy.AbstractSoyRuntime
     super.configure(binder);
     binder.install(new EasyXtextModule());
     binder.requestStaticInjection(CustomizedSoyLexer.class);
+  }
+  
+  public EPackage bindEPackage() {
+    return SoyPackage.eINSTANCE;
   }
   
   // Parsing
@@ -77,5 +84,7 @@ public class SoyRuntimeModule extends net.vtst.ow.eclipse.soy.AbstractSoyRuntime
         SoyScopeProvider.GLOBAL_SCOPE_PROVIDER_WITH_BUILTINS
     )).to(SoyBuiltinGlobalScopeProvider.class);}
 
-
+  public Class<? extends IEasyProjectNature> bindIEasyProjectNature() {
+    return SoyProjectNature.class;
+  }
 }
