@@ -12,6 +12,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
@@ -46,8 +47,11 @@ public class ToggleNatureAction implements IObjectActionDelegate {
     try {
       runInternal();
     } catch (CoreException e) {
-      // TODO Report properly the exception.
-      e.printStackTrace();
+      ErrorDialog.openError(
+          getShell(),
+          messages.format("project_nature_error_title", getNature().getName()),
+          messages.getString("project_nature_error_message"),
+          e.getStatus());
     }
   }
 

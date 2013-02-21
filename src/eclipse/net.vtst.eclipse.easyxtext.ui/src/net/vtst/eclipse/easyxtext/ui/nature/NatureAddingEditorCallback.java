@@ -1,5 +1,6 @@
 package net.vtst.eclipse.easyxtext.ui.nature;
 
+import net.vtst.eclipse.easyxtext.guice.EasyXtextModule;
 import net.vtst.eclipse.easyxtext.nature.IEasyProjectNature;
 import net.vtst.eclipse.easyxtext.nature.ProjectNatureUtil;
 import net.vtst.eclipse.easyxtext.ui.EasyXtextUiMessages;
@@ -7,8 +8,11 @@ import net.vtst.eclipse.easyxtext.ui.EasyXtextUiMessages;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.xtext.ui.editor.AbstractDirtyStateAwareEditorCallback;
 import org.eclipse.xtext.ui.editor.XtextEditor;
 
@@ -47,8 +51,11 @@ public class NatureAddingEditorCallback extends AbstractDirtyStateAwareEditorCal
         }
       }
     } catch (CoreException e) {
-      // TODO: Make proper reporting.
-      e.printStackTrace();
+      ErrorDialog.openError(
+          getShell(),
+          messages.format("add_nature_to_project_title", getNature().getName()),
+          messages.getString("add_nature_to_project_error"),
+          e.getStatus());
     }
   }
 }
