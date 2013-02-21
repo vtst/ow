@@ -1,5 +1,6 @@
 package net.vtst.eclipse.easyxtext.validation.config;
 
+import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.xtext.validation.AbstractDeclarativeValidator;
 
 /**
@@ -21,7 +22,17 @@ import org.eclipse.xtext.validation.AbstractDeclarativeValidator;
  *   and {@code ConfigurableCheck} into your validator class.
  * </li>
  *    
- * <li>Creates a subclass of {@code ValidationPropertyPage}.</li>
+ * <li>Add the following binding to the RuntimeModule:
+ *   <pre>
+ *     public EPackage bindEPackage() {
+ *       return <your-package-name>Package.eINSTANCE;
+ *     }
+ *   </pre>
+ * </li>
+ * 
+ * <li>Bind an instance of your IEasyMessages in your UiModule which shall define
+ * display labels for the various checks.
+ * </li>
  *    
  * @author Vincent Simonet
  *

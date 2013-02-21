@@ -1,5 +1,11 @@
 package net.vtst.eclipse.easyxtext.ui.validation.config;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
+import net.vtst.eclipse.easyxtext.ui.util.MiscUi;
+import net.vtst.eclipse.easyxtext.util.IEasyMessages;
+import net.vtst.eclipse.easyxtext.util.Misc;
 import net.vtst.eclipse.easyxtext.validation.config.ConfigurableValidationMessageAcceptor;
 import net.vtst.eclipse.easyxtext.validation.config.DeclarativeValidatorInspector;
 import net.vtst.eclipse.easyxtext.validation.config.DeclarativeValidatorInspector.Group;
@@ -7,7 +13,10 @@ import net.vtst.eclipse.easyxtext.validation.config.DeclarativeValidatorInspecto
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.internal.ui.SWTFactory;
+import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.ecore.EValidator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -20,7 +29,10 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.dialogs.PropertyPage;
 import org.eclipse.xtext.validation.AbstractDeclarativeValidator;
+import org.eclipse.xtext.validation.CompositeEValidator;
 import org.eclipse.xtext.validation.ValidationMessageAcceptor;
+
+import com.google.inject.Inject;
 
 /**
  * This is an abstract class for implementing a property page for an
@@ -29,8 +41,10 @@ import org.eclipse.xtext.validation.ValidationMessageAcceptor;
  * 
  * @author Vincent Simonet
  */
-public abstract class ValidationPropertyPage extends PropertyPage {
+public class ValidatorPropertyPage extends PropertyPage {
 
+  private AbstractDeclarativeValidator validator;
+  private String validatorClassName;
   private DeclarativeValidatorInspector inspector;
   private IResource resource;
 
@@ -38,10 +52,63 @@ public abstract class ValidationPropertyPage extends PropertyPage {
   private Button checkbox;
 
   /**
-   * @return The validator configured by the property page.
+   * Initialize the private static fields.
    */
-  protected abstract AbstractDeclarativeValidator getValidator();
+  private boolean init() {
+    validator = getValidator();
+    if (validator == null) return false;
+    validatorClassName = MiscUi.getBaseName(validator.getClass());
+    inspector = new DeclarativeValidatorInspector(validator);
+    resource = getResource();
+    return true;
+  }
+
+  // **************************************************************************
+  // Configuration
+
+  @Inject
+  private EValidator.Registry eValidatorRegistry;
   
+  @Inject(optional=true)
+  private EPackage ePackage;
+
+  /**
+   * @return The validator configured by the property page.
+   * The default package looks for an AbstractDeclarativeValidator associated with the package.
+   */
+  protected AbstractDeclarativeValidator getValidator() {
+    if (ePackage == null) {
+      System.out.println("EPackage not injected");
+      return null;
+    }
+    EValidator validator = eValidatorRegistry.getEValidator(ePackage);
+    if (validator == null) {
+      System.out.println("No validator found for the current package");
+      return null;
+    }
+    ArrayList<AbstractDeclarativeValidator> declarativeValidators = new ArrayList<AbstractDeclarativeValidator>(1);
+    getValidatorRec(validator, declarativeValidators);
+    if (declarativeValidators.size() != 1) {
+      System.out.println("Found the following declarative validators: ");
+      for (AbstractDeclarativeValidator v : declarativeValidators)
+        System.out.println(v.getClass().getName());
+      return null;
+    }
+    return declarativeValidators.get(0);
+  }
+  
+  private void getValidatorRec(EValidator validator, Collection<AbstractDeclarativeValidator> declarativeValidators) {
+    if (validator instanceof AbstractDeclarativeValidator) {
+      declarativeValidators.add((AbstractDeclarativeValidator) validator);
+    } else if (validator instanceof CompositeEValidator) {
+      for (CompositeEValidator.EValidatorEqualitySupport equalitySupport : ((CompositeEValidator) validator).getContents()) {
+        getValidatorRec(equalitySupport.getDelegate(), declarativeValidators);
+      }      
+    }
+  }
+
+  @Inject(optional=true)
+  private IEasyMessages messages;
   
   /**
    * Get the label displayed to the user for a group of checks.
@@ -49,25 +116,20 @@ public abstract class ValidationPropertyPage extends PropertyPage {
    * @return  The label displayed to the user for this group.  If null,
    *   the name given in the {@code ConfigurableCheck} annotation is used.
    */
-  protected abstract String getGroupLabel(String name);
-
-  /**
-   * Initialize the private static fields.
-   */
-  private void init() {
-    this.inspector = new DeclarativeValidatorInspector(getValidator());
-    this.resource = getResource();
+  protected String getGroupLabel(String name) {
+    if (messages == null) return null;
+    return messages.getString(validatorClassName + "_" + name);
   }
-
+  
   // **************************************************************************
   // User interface
-  
+      
   /* (non-Javadoc)
    * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
    */
   @Override
   protected Control createContents(Composite parent) {
-    init();
+    if (!init()) return null;
     Composite composite = SWTFactory.createComposite(parent, 1, 1, GridData.FILL_BOTH);
     checkbox = SWTFactory.createCheckButton(
         composite, "Customize errors and warnings:", null, false, 
@@ -122,6 +184,7 @@ public abstract class ValidationPropertyPage extends PropertyPage {
 
   @Override
   protected void performDefaults() {
+    if (validator == null) return;
     setCheckbox(false);
     for (int i = 0; i < inspector.getGroups().size(); ++i) {
       list.getItem(i).setChecked(inspector.getGroups().get(i).enabledByDefault);
@@ -131,6 +194,7 @@ public abstract class ValidationPropertyPage extends PropertyPage {
   
   @Override
   public boolean performOk() {
+    if (validator == null) return false;
     try {
       if (checkbox.getSelection()) {
         for (int i = 0; i < inspector.getGroups().size(); ++i) {
@@ -160,6 +224,4 @@ public abstract class ValidationPropertyPage extends PropertyPage {
     ConfigurableValidationMessageAcceptor configurableMessageAcceptor = (ConfigurableValidationMessageAcceptor) messageAcceptor;
     configurableMessageAcceptor.resetCache(resource.getProject());
   }
-
-
 }

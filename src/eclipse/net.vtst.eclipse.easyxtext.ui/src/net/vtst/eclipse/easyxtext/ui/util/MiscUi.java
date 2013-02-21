@@ -34,6 +34,12 @@ public class MiscUi {
     return null;
   }
   
+  public static String getBaseName(Class<?> clazz) {
+    String name = clazz.getName();
+    int i = name.lastIndexOf('.');
+    return name.substring(i + 1);
+  }
+  
   // TODO: This is duplicated in EasyUI. Should we keep?
   /**
    * Render a command line given as a string array into a single string with proper escaping
