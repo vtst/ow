@@ -108,7 +108,7 @@
 
   <extension point="org.eclipse.ui.propertyPages">
     <page
-      class="net.vtst.ow.eclipse.less.ui.LessExecutableExtensionFactory:net.vtst.ow.eclipse.less.ui.properties.LessValidationPropertyPage"
+      class="net.vtst.ow.eclipse.less.ui.LessExecutableExtensionFactory:net.vtst.eclipse.easyxtext.ui.validation.config.ValidatorPropertyPage"
       id="net.vtst.ow.eclipse.less.ui.properties.LessValidationPropertyPage"
       name="%less_validation_property_page"
       nameFilter="*">
