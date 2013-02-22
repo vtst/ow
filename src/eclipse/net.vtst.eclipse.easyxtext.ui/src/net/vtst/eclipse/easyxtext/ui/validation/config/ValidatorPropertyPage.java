@@ -3,6 +3,7 @@ package net.vtst.eclipse.easyxtext.ui.validation.config;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import net.vtst.eclipse.easyxtext.ui.EasyXtextUiPlugin;
 import net.vtst.eclipse.easyxtext.ui.util.MiscUi;
 import net.vtst.eclipse.easyxtext.util.IEasyMessages;
 import net.vtst.eclipse.easyxtext.util.Misc;
@@ -17,6 +18,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.internal.ui.SWTFactory;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EValidator;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -78,20 +80,20 @@ public class ValidatorPropertyPage extends PropertyPage {
    */
   protected AbstractDeclarativeValidator getValidator() {
     if (ePackage == null) {
-      System.out.println("EPackage not injected");
+      showErrorMessage("EPackage not injected");
       return null;
     }
     EValidator validator = eValidatorRegistry.getEValidator(ePackage);
     if (validator == null) {
-      System.out.println("No validator found for the current package");
+      showErrorMessage("No validator found for the current package");
       return null;
     }
     ArrayList<AbstractDeclarativeValidator> declarativeValidators = new ArrayList<AbstractDeclarativeValidator>(1);
     getValidatorRec(validator, declarativeValidators);
     if (declarativeValidators.size() != 1) {
-      System.out.println("Found the following declarative validators: ");
+      showErrorMessage("Found the following declarative validators: ");
       for (AbstractDeclarativeValidator v : declarativeValidators)
-        System.out.println(v.getClass().getName());
+        showErrorMessage(v.getClass().getName());
       return null;
     }
     return declarativeValidators.get(0);
@@ -177,6 +179,12 @@ public class ValidatorPropertyPage extends PropertyPage {
     String label = getGroupLabel(group.name);
     if (label != null) return label;
     return group.name;
+  }
+  
+  private void showErrorMessage(String message) {
+    ErrorDialog.openError(
+        getShell(), this.getClass().getName(), "Cannot initialize the property page", 
+        new Status(Status.ERROR, EasyXtextUiPlugin.PLUGIN_ID, message));
   }
 
   // **************************************************************************
