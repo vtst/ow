@@ -14,6 +14,7 @@ import net.vtst.eclipse.easyxtext.validation.config.DeclarativeValidatorInspecto
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.internal.ui.SWTFactory;
 import org.eclipse.emf.ecore.EPackage;
@@ -80,20 +81,20 @@ public class ValidatorPropertyPage extends PropertyPage {
    */
   protected AbstractDeclarativeValidator getValidator() {
     if (ePackage == null) {
-      showErrorMessage("EPackage not injected");
+      showErrorMessageDuringInit("EPackage not injected");
       return null;
     }
     EValidator validator = eValidatorRegistry.getEValidator(ePackage);
     if (validator == null) {
-      showErrorMessage("No validator found for the current package");
+      showErrorMessageDuringInit("No validator found for the current package");
       return null;
     }
     ArrayList<AbstractDeclarativeValidator> declarativeValidators = new ArrayList<AbstractDeclarativeValidator>(1);
     getValidatorRec(validator, declarativeValidators);
     if (declarativeValidators.size() != 1) {
-      showErrorMessage("Found the following declarative validators: ");
+      showErrorMessageDuringInit("Found the following declarative validators: ");
       for (AbstractDeclarativeValidator v : declarativeValidators)
-        showErrorMessage(v.getClass().getName());
+        showErrorMessageDuringInit(v.getClass().getName());
       return null;
     }
     return declarativeValidators.get(0);
@@ -150,7 +151,7 @@ public class ValidatorPropertyPage extends PropertyPage {
     try {
       fillList();
     } catch (CoreException e) {
-      this.setErrorMessage(e.toString());
+      showErrorMessage("Cannot read properties from the current project", e);
     }
     column1.pack();
     return composite;
@@ -180,11 +181,30 @@ public class ValidatorPropertyPage extends PropertyPage {
     if (label != null) return label;
     return group.name;
   }
+
+  // **************************************************************************
+  // Error messages
   
-  private void showErrorMessage(String message) {
+  private void showErrorMessage(String message, CoreException exn) {
+    if (exn.getStatus() != null) {
+      showErrorMessage(message, exn.getStatus());
+    } else {
+      showErrorMessage(message, exn.getMessage());
+    }
+  }
+  
+  private void showErrorMessage(String message, IStatus status) {
+    ErrorDialog.openError(getShell(), this.getClass().getName(), message, status); 
+  }
+  
+  private void showErrorMessage(String message, String cause) {
     ErrorDialog.openError(
-        getShell(), this.getClass().getName(), "Cannot initialize the property page", 
-        new Status(Status.ERROR, EasyXtextUiPlugin.PLUGIN_ID, message));
+        getShell(), this.getClass().getName(), message, 
+        new Status(Status.ERROR, EasyXtextUiPlugin.PLUGIN_ID, cause));
+  }
+  
+  private void showErrorMessageDuringInit(String cause) {
+    showErrorMessage("Cannot initialize the property page", cause);
   }
 
   // **************************************************************************
@@ -212,7 +232,7 @@ public class ValidatorPropertyPage extends PropertyPage {
         inspector.clearAllProperties(resource);
       }
     } catch (CoreException e) {
-      e.printStackTrace();
+      showErrorMessage("Cannot apply changes to project", e);
     }
     resetValidatorCache();
     return super.performOk();
