@@ -17,7 +17,7 @@
   <extension
     point="org.eclipse.core.resources.natures"
     id="closureNature"
-    name="Closure JavaScript Nature">
+    name="%closure_nature">
     <runtime>
       <run class="net.vtst.ow.eclipse.js.closure.builder.ClosureNature"/>
     </runtime>
