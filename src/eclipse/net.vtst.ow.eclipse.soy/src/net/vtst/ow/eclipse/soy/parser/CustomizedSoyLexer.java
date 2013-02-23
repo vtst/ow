@@ -5,7 +5,6 @@ import net.vtst.ow.eclipse.soy.parser.antlr.internal.InternalSoyParser;
 
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.IntStream;
-import org.antlr.runtime.MismatchedTokenException;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
 

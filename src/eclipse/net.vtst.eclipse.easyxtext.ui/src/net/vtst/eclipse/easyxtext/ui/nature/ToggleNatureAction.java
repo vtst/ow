@@ -1,7 +1,6 @@
 package net.vtst.eclipse.easyxtext.ui.nature;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 
 import net.vtst.eclipse.easyxtext.nature.IEasyProjectNature;

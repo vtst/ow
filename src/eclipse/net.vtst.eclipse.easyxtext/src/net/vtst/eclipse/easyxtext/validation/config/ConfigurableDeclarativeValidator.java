@@ -1,6 +1,5 @@
 package net.vtst.eclipse.easyxtext.validation.config;
 
-import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.xtext.validation.AbstractDeclarativeValidator;
 
 /**

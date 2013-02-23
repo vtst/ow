@@ -1,10 +1,10 @@
 package net.vtst.ow.eclipse.soy.nature;
 
-import com.google.inject.Inject;
-
 import net.vtst.eclipse.easyxtext.nature.IEasyProjectNature;
 import net.vtst.eclipse.easyxtext.nature.NullProjectNature;
 import net.vtst.ow.eclipse.soy.SoyMessages;
+
+import com.google.inject.Inject;
 
 public class SoyProjectNature extends NullProjectNature implements IEasyProjectNature {
 

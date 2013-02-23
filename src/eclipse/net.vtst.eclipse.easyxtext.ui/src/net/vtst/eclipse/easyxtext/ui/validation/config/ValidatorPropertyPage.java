@@ -6,7 +6,6 @@ import java.util.Collection;
 import net.vtst.eclipse.easyxtext.ui.EasyXtextUiPlugin;
 import net.vtst.eclipse.easyxtext.ui.util.MiscUi;
 import net.vtst.eclipse.easyxtext.util.IEasyMessages;
-import net.vtst.eclipse.easyxtext.util.Misc;
 import net.vtst.eclipse.easyxtext.validation.config.ConfigurableValidationMessageAcceptor;
 import net.vtst.eclipse.easyxtext.validation.config.DeclarativeValidatorInspector;
 import net.vtst.eclipse.easyxtext.validation.config.DeclarativeValidatorInspector.Group;
