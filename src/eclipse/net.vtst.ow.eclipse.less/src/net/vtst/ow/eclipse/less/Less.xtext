@@ -210,6 +210,7 @@ MixinCall:
   selector+=HashOrClassCrossReference
   (combinator+=MixinCallCombinator selector+=HashOrClassCrossReference)* OPT_SPACE 
   ('(' OPT_SPACE (parameter+=MixinCallParameter OPT_SPACE (',' OPT_SPACE parameter+=MixinCallParameter OPT_SPACE)*)? ')' OPT_SPACE)?
+  priority=Priority
 ;
 
 MixinCallParameter:
@@ -338,7 +339,11 @@ PseudoClassNthSpecialCaseString returns ecore::EString:
 
 Declaration:
   star_property_hack?='*'? property=Property OPT_SPACE ':' OPT_SPACE expr=Expr 
-  ('!' OPT_SPACE important?='important' OPT_SPACE)?
+  priority=Priority
+;
+
+Priority:
+  {Priority} ('!' OPT_SPACE important?='important' OPT_SPACE)?
 ;
 
 Property: IDENT_OR_KEYWORD;
