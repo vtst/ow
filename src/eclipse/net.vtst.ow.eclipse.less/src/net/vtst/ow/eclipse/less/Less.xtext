@@ -197,7 +197,7 @@ MixinDefinitionGuard:
 ;
 
 MixinDefinitionGuardExpr:
-  term+=MixinDefinitionGuardTerm OPT_SPACE (('>' | '>=' | '=' '=<' '<') OPT_SPACE term+=MixinDefinitionGuardTerm OPT_SPACE)? 
+  term+=MixinDefinitionGuardTerm OPT_SPACE (('>' | '>=' | '=' | '=<' | '<') OPT_SPACE term+=MixinDefinitionGuardTerm OPT_SPACE)? 
 ;
 
 MixinDefinitionGuardTerm: 
