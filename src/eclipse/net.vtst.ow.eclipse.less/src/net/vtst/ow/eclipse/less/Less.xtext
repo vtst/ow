@@ -131,6 +131,7 @@ MediaQueryList:
 MediaQuery:
   (keyword=('only' | 'not') OPT_SPACE)? media_type=IDENT OPT_SPACE ('and' OPT_SPACE expr+=MediaExpression)*
   | expr+=MediaExpression ('and' OPT_SPACE expr+=MediaExpression)*
+  | var=AtVariableTerm OPT_SPACE
 ;
 
 MediaExpression:
