@@ -329,11 +329,12 @@ PseudoClassNth:
 ;
 
 PseudoClassNthSpecialCaseString returns ecore::EString:
-  IDENT '+' NUMBER  // -n+1
+  IDENT OPT_SPACE ('+' | '-') OPT_SPACE NUMBER  // -n+1
   | NUMBER IDENT  // 1n-1
   | '+' NUMBER IDENT  // +1n-1
   | '-' NUMBER IDENT // -1n-1
   | '+' IDENT  // +n-1
+  | IDENT NUMBER  // -n- 1
 ;
 
 // Declarations

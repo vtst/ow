@@ -30,6 +30,10 @@ import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.xtext.nodemodel.BidiTreeIterator;
+import org.eclipse.xtext.nodemodel.ICompositeNode;
+import org.eclipse.xtext.nodemodel.INode;
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import org.eclipse.xtext.util.Pair;
 import org.eclipse.xtext.util.Tuples;
 import org.eclipse.xtext.validation.Check;
@@ -49,7 +53,7 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     ConfigurableDeclarativeValidator.makeConfigurable(this);
     return super.isResponsible(context, eObject);
   }
-
+  
   // Check import statements
   @Check
   public void checkImportStatement(ImportStatement importStatement) {
@@ -249,8 +253,14 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     }
     if (c != 'n') return false;
     ++i; if (i == n) return false; else c = special.charAt(i);
+    while (c == ' ') {
+      ++i; if (i == n) return false; else c = special.charAt(i);      
+    }
     if (c != '+' && c != '-') return false;
     ++i; if (i == n) return false; else c = special.charAt(i);
+    while (c == ' ') {
+      ++i; if (i == n) return false; else c = special.charAt(i);      
+    }
     if (c < '0' && c > '9') return false;
     while (c >= '0' && c <= '9' && i < n) {
       ++i; if (i == n) return true; else c = special.charAt(i);
