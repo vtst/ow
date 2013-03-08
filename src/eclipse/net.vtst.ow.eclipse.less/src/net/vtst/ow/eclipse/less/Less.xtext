@@ -317,6 +317,7 @@ PseudoWithoutNot:
 PseudoClassFunctionArgument:
   ident=IDENT
   | nth=PseudoClassNth  //  This includes NUMBER
+  | var=AtVariableTerm
 ;
 
 /* TODO: odd, even and n as keywords */
@@ -403,11 +404,15 @@ VariableCrossReference:
 // This rule does not end with OPT_SPACE, because of operators in Expr
 SimpleTerm:
   NumericLiteral
-  | {AtVariableTerm} var=[VariableCrossReference|AT_IDENT]
-  | {At2VariableTerm} var=AT2_IDENT
+  | AtVariableTerm
   | FunctionTerm
   | {ParenthesizedTerm} '(' OPT_SPACE term=ExtendedTerm11 OPT_SPACE ')'
   | {UnaryTerm} operator='-' term=SimpleTerm
+;
+
+AtVariableTerm:
+  {At1VariableTerm} var=[VariableCrossReference|AT_IDENT]
+  | {At2VariableTerm} var=AT2_IDENT
 ;
 
 // This rule does not end with OPT_SPACE, because of operators in Expr
