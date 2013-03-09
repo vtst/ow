@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import net.vtst.ow.eclipse.less.LessRuntimeModule;
 import net.vtst.ow.eclipse.less.less.ImportStatement;
@@ -114,6 +115,8 @@ public class LessImportStatementResolver {
   // **************************************************************************
   // Getting imported style sheets
 
+  private static Pattern URI_WITH_LESS_EXTENSION = Pattern.compile("(.*[.][a-z]*)|(.*[?;].*)");
+  
   /**
    * Converts an import statement into an URI.
    * @param importStatement  The import statement to convert.
@@ -121,8 +124,9 @@ public class LessImportStatementResolver {
    */
   public URI getURI(ImportStatement importStatement) {
     URI uri = URI.createURI(LessValueConverterService.getStringValue(importStatement.getUri()));
-    String fileExtension = uri.fileExtension();
-    if (fileExtension == null) uri = uri.appendFileExtension(LessRuntimeModule.LESS_EXTENSION);
+    // LESS implements a weird test for file extensions.
+    // See https://github.com/vtst/ow/issues/113
+    if (!URI_WITH_LESS_EXTENSION.matcher(uri.toString()).matches()) uri = uri.appendFileExtension(LessRuntimeModule.LESS_EXTENSION);
     if (!uri.isFile() || EcoreUtil2.isValidUri(importStatement, uri)) {
       return uri;
     } else {
