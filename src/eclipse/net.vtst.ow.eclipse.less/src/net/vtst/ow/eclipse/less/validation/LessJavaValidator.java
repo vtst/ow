@@ -30,10 +30,6 @@ import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.xtext.nodemodel.BidiTreeIterator;
-import org.eclipse.xtext.nodemodel.ICompositeNode;
-import org.eclipse.xtext.nodemodel.INode;
-import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import org.eclipse.xtext.util.Pair;
 import org.eclipse.xtext.util.Tuples;
 import org.eclipse.xtext.validation.Check;
@@ -63,6 +59,8 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
       break;
     case LOOP:
       warning(messages.getString("import_loop"), importStatement, LessPackage.eINSTANCE.getImportStatement_Uri(), 0);
+      break;
+    default:
       break;
     }
   }
@@ -135,6 +133,10 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     }
   }
   
+  private boolean isMixinDefinitionVarArgs(MixinDefinition mixinDefinition) {
+    return (mixinDefinition.isVarArgsAnonymous() || mixinDefinition.isVarArgsLastVar());
+  }
+  
   // Check that optional parameters are at the end in mixin definitions
   @Check
   @ConfigurableCheck(configurable = false)
@@ -159,7 +161,7 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
       }
       ++index;
     }
-    if (lastOptional && mixinDefinition.isVarArgs()) {
+    if (lastOptional && mixinDefinition.isVarArgsLastVar()) {
       String message = messages.getString("illegal_optional_parameter_var_args");
       error(message, mixinDefinition, LessPackage.eINSTANCE.getMixinDefinition_Parameter(), index - 1);      
     }
@@ -219,7 +221,7 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
           min = max;
         }
       }
-      if (mixinDefinition.isVarArgs()) 
+      if (isMixinDefinitionVarArgs(mixinDefinition)) 
         max = Integer.MAX_VALUE;
     }
     return Tuples.pair(min, max);

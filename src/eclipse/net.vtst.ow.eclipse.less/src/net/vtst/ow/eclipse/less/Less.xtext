@@ -174,9 +174,12 @@ VariableDefinitionIdent:
 MixinDefinition:
   selector=HashOrClass OPT_SPACE
   '(' OPT_SPACE
-  (parameter+=MixinDefinitionParameter 
-    (',' OPT_SPACE parameter+=MixinDefinitionParameter)*
-  )? (varArgs?='...' OPT_SPACE)? ')' OPT_SPACE guards=MixinDefinitionGuards?
+  (
+    (parameter+=MixinDefinitionParameter 
+      (',' OPT_SPACE parameter+=MixinDefinitionParameter)*
+      (varArgsLastVar?='...' OPT_SPACE | ',' OPT_SPACE varArgsAnonymous?='...' OPT_SPACE)?
+    ) | varArgsAnonymous?='...' OPT_SPACE 
+  )? ')' OPT_SPACE guards=MixinDefinitionGuards?
   block=Block
 ;
 
