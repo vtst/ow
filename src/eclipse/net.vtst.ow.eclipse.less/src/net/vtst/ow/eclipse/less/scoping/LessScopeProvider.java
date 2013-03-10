@@ -6,6 +6,7 @@ package net.vtst.ow.eclipse.less.scoping;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.vtst.ow.eclipse.less.less.AtVariableDef;
 import net.vtst.ow.eclipse.less.less.Block;
 import net.vtst.ow.eclipse.less.less.BlockUtils;
 import net.vtst.ow.eclipse.less.less.HashOrClass;
@@ -62,10 +63,18 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
 
   // **************************************************************************
   // Scoping of variables
-  
+
   /** Entry point for the calculation of the scope of a cross-reference to
    * a VariableDefinitionIdent.
    */
+  IScope scope_AtVariableRefTarget(EObject context, EReference ref) {
+    return computeVariableScope(context, ref);
+  }
+
+  /** Entry point for the calculation of the scope of a cross-reference to
+   * a VariableDefinitionIdent.
+   */
+  // TODO: Delete
   IScope scope_VariableCrossReference(EObject context, EReference ref) {
     return computeVariableScope(context, ref);
   }
@@ -148,6 +157,12 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
    */
   private IEObjectDescription getEObjectDescriptionFor(VariableDefinitionIdent variableDefinitionIdent) {
     return EObjectDescription.create(QualifiedName.create(variableDefinitionIdent.getIdent()), variableDefinitionIdent);
+  }
+
+  /** Create the object description for a variable definition ident.
+   */
+  private IEObjectDescription getEObjectDescriptionFor(AtVariableDef atVariable) {
+    return EObjectDescription.create(QualifiedName.create(atVariable.getIdent()), atVariable);
   }
 
   

@@ -32,7 +32,7 @@ public class LessSemanticHighlightingCalculator extends EasySemanticHighlighting
     bindRule(grammar.getHashOrClassCrossReferenceRule(), highlightingConfig.MIXIN_CALL);
     bindRule(grammar.getHashOrClassCrossReferenceRule(), highlightingConfig.MIXIN_CALL);
     bindRule(grammar.getPropertyRule(), highlightingConfig.PROPERTY);
-    bindRule(grammar.getVariableDefinitionIdentRule(), highlightingConfig.VARIABLE_DEFINITION);
+    bindRule(grammar.getAtVariableDefRule(), highlightingConfig.VARIABLE_DEFINITION);
     bindRule(grammar.getNumericLiteralRule(), NumericLiteral.class, highlightingConfig.NUMERIC_LITERAL);
     bindKeyword(":", Declaration.class, highlightingConfig.PROPERTY);
     bindRule(grammar.getMediaFeatureRule(), highlightingConfig.MEDIA_FEATURE);

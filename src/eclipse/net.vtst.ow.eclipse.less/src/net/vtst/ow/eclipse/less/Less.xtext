@@ -145,12 +145,16 @@ CharsetStatement:
 // @ variables
 
 // Implicit variables can be defined by mixin definitions. 
-AtVariableReference:
-  Mixin | AtVariable
+AtVariableRefTarget:
+  Mixin | AtVariableRef | AtVariableDef
 ;
 
-AtVariable:
-  variable=[AtVariableReference|AT_IDENT]
+AtVariableDef:
+  ident=AT_IDENT
+;
+
+AtVariableRef:
+  variable=[AtVariableRefTarget|AT_IDENT]
 ;
 
 VariableCrossReference:
@@ -158,9 +162,24 @@ VariableCrossReference:
 ;
 
 AtVariableTerm:
-  {At1VariableTerm} var=[VariableCrossReference|AT_IDENT]
-  | {At2VariableTerm} var=AT2_IDENT
+    AtVariableRef
+  | {At2Variable} ident=AT2_IDENT
 ;
+
+
+// ----------------------------------------------------------------------------
+// @ variable definitions
+
+// There is a trailing OPT_SPACE in this rule, because there is no in Term
+VariableDefinition:
+  variable=AtVariableDef OPT_SPACE ':' OPT_SPACE expr=Expr
+;
+
+// TODO: Delete
+VariableDefinitionIdent:
+  ident=AT_IDENT 
+;
+
 
 // ----------------------------------------------------------------------------
 // Mixins (new)
@@ -205,20 +224,10 @@ MixinVarParameter:
 ;
 
 MixinParameter:
-    ident=AtVariable OPT_SPACE ':' OPT_SPACE term+=Term (SPACE term+=Term)* OPT_SPACE
+    ident=AtVariableRef OPT_SPACE ':' OPT_SPACE term+=Term (SPACE term+=Term)* OPT_SPACE
   | term+=Term (SPACE term+=Term)* OPT_SPACE
 ;
 
-// LESS-specific statements
-
-// There is a trailing OPT_SPACE in this rule, because there is no in Term
-VariableDefinition:
-  variable=VariableDefinitionIdent OPT_SPACE ':' OPT_SPACE expr=Expr
-;
-
-VariableDefinitionIdent:
-  ident=AT_IDENT 
-;
 
 // ----------------------------------------------------------------------------
 // Mixins (old)
