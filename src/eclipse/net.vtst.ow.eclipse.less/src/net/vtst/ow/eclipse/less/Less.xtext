@@ -142,7 +142,7 @@ CharsetStatement:
 ;
 
 // ----------------------------------------------------------------------------
-// @-variables
+// @ variables
 
 // Implicit variables can be defined by mixin definitions. 
 AtVariableReference:
@@ -151,6 +151,10 @@ AtVariableReference:
 
 AtVariable:
   variable=[AtVariableReference|AT_IDENT]
+;
+
+VariableCrossReference:
+  VariableDefinitionIdent | MixinDefinition
 ;
 
 AtVariableTerm:
@@ -457,10 +461,6 @@ ExtendedTerm11 returns ExtendedTerm:
 ExtendedTerm2 returns ExtendedTerm:
   term+=SimpleTerm
   (OPT_SPACE operator+=('*' | '/') OPT_SPACE term+=SimpleTerm)*
-;
-
-VariableCrossReference:
-  VariableDefinitionIdent | MixinDefinition
 ;
 
 // This rule does not end with OPT_SPACE, because of operators in Expr
