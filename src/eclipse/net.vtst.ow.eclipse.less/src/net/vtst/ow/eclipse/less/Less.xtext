@@ -30,23 +30,12 @@ generate less "http://www.vtst.net/ow/eclipse/less/Less"
 // ****************************************************************************
 // Parser
 
+// ----------------------------------------------------------------------------
+// Stylesheet and blocks
+
 StyleSheet:
   {StyleSheet} OPT_SPACE statements+=ToplevelStatement*
 ;
-
-// This is WS*, not WS?, because whjte-spaces may be split by comments.
-OPT_SPACE returns ecore::EString:
-  WS*
-;
-
-// This is WS+, not WS, because whjte-spaces may be split by comments.
-SPACE returns ecore::EString:
-  WS+
-;
-
-
-// ----------------------------------------------------------------------------
-// Statements
 
 ToplevelOrInnerStatement:
   '_mixin_' TerminatedMixin
@@ -110,6 +99,7 @@ BlockContents:
   | item=InnerStatement next=BlockContents?
 ;
 
+// ----------------------------------------------------------------------------
 // @ statements
 
 ImportStatement:
@@ -151,14 +141,29 @@ CharsetStatement:
   '@charset' OPT_SPACE charset=STRING OPT_SPACE ';' OPT_SPACE
 ;
 
-// Mixins
+// ----------------------------------------------------------------------------
+// @-variables
+
+// Implicit variables can be defined by mixin definitions. 
+AtVariableReference:
+  Mixin | AtVariable
+;
+
+AtVariable:
+  variable=[AtVariableReference|AT_IDENT]
+;
+
+AtVariableTerm:
+  {At1VariableTerm} var=[VariableCrossReference|AT_IDENT]
+  | {At2VariableTerm} var=AT2_IDENT
+;
+
+// ----------------------------------------------------------------------------
+// Mixins (new)
+
 // The same set of rules parses mixin definitions and mixin calls.  This is to make the
 // grammar LL(*) despite the recursive Term rule.
 // TODO: Mixin with arguments.
-
-AtVariable:
-  variable=[AtVariable|AT_IDENT]
-;
 
 // This is the super class for Mixins.  It is not use in the grammar only in the code.
 Mixin:
@@ -211,6 +216,9 @@ VariableDefinitionIdent:
   ident=AT_IDENT 
 ;
 
+// ----------------------------------------------------------------------------
+// Mixins (old)
+
 /* Note this only consider mixins with arguments, mixins without arguments are like normal blocks */
 MixinDefinition:
   selector=HashOrClass OPT_SPACE
@@ -262,6 +270,8 @@ MixinCallParameter:
   term+=Term (SPACE term+=Term)*
 ;
 
+
+// ----------------------------------------------------------------------------
 // RuleSets
 
 ToplevelRuleSet:
@@ -274,6 +284,8 @@ InnerRuleSet:
   block=Block
 ;
 
+
+// ----------------------------------------------------------------------------
 // Selectors
 
 // There is a trailing OPT_SPACE in this rule, because there is no in SimpleSelector
@@ -382,6 +394,7 @@ PseudoClassNthSpecialCaseString returns ecore::EString:
   | IDENT NUMBER  // -n- 1
 ;
 
+// ----------------------------------------------------------------------------
 // Declarations
 
 Declaration:
@@ -405,6 +418,9 @@ Operator:
   {SpaceOperator} SPACE
   | {ComaOperator} ',' OPT_SPACE
 ;
+
+// ----------------------------------------------------------------------------
+// Terms
 
 // This rule does not end with OPT_SPACE, because of operators in Expr
 Term:
@@ -456,11 +472,6 @@ SimpleTerm:
   | {UnaryTerm} operator='-' term=SimpleTerm
 ;
 
-AtVariableTerm:
-  {At1VariableTerm} var=[VariableCrossReference|AT_IDENT]
-  | {At2VariableTerm} var=AT2_IDENT
-;
-
 // This rule does not end with OPT_SPACE, because of operators in Expr
 FunctionTerm:
   function=(IDENT_OR_KEYWORD | PERCENT) 
@@ -481,6 +492,18 @@ Uri:
   | URL
 ;
 
+// ****************************************************************************
+// Pseudo-terminals
+
+// This is WS*, not WS?, because whjte-spaces may be split by comments.
+OPT_SPACE returns ecore::EString:
+  WS*
+;
+
+// This is WS+, not WS, because whjte-spaces may be split by comments.
+SPACE returns ecore::EString:
+  WS+
+;
 
 // ****************************************************************************
 // Lexer
@@ -512,18 +535,6 @@ terminal HASH_COLOR : '#' ('0'..'9'|'a'..'f'|'A'..'F')('0'..'9'|'a'..'f'|'A'..'F
 terminal HASH_OTHER : '#' ('_'|'a'..'z'|'A'..'Z'|'0'..'9'|'-')+;
 terminal NUMBER :  (('0' .. '9')+) | (('0' .. '9')* '.' ('0' .. '9')+);
 terminal PERCENTAGE : NUMBER '%';
-// http://www.w3.org/TR/css3-values/
-// TODO: Units should be case insensitive.
-/*
-terminal fragment FONT_RELATIVE_LENGTH_UNITS : 'em' | 'ex' | 'ch' | 'rem';
-terminal fragment VIEWPORT_PERCENTAGE_LENGTH_UNITS : 'vw' | 'vh' | 'vmin' | 'vmax';
-terminal fragment ABSOLUTE_LENGTH_UNITS : 'cm' | 'mm' | 'in' | 'pt' | 'pc' | 'px';
-terminal fragment RESOLUTION_UNIT : 'dpi' | 'dpcm' | 'dppx';
-terminal LENGTH : NUMBER ('px' | 'cm' | 'mm' | 'in' | 'pt' | 'pc' | 'em' | 'ex' | 'ch' | 'rem'  | 'vw' | 'vh');
-terminal ANGLE : NUMBER ('deg' | 'grad' | 'rad' | 'turn');
-terminal TIME : NUMBER ('s' | 'ms');
-terminal FREQ : NUMBER ('hz' | 'khz');
-*/
 terminal ML_COMMENT : '/*' -> '*/';
 terminal SL_COMMENT   : '//' !('\n'|'\r')* ('\r'? '\n')?;
 terminal WS : (' ' | '\t' | '\r' | '\n' /*| '\f'*/)+;
