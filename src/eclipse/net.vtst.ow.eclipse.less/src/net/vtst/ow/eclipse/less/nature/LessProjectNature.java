@@ -13,12 +13,10 @@ public class LessProjectNature extends NullProjectNature implements IEasyProject
   @Inject
   LessMessages messages;
 
-  @Override
   public String getId() {
     return NATURE_ID;
   }
 
-  @Override
   public String getName() {
     return messages.getString("less_project_nature");
   }

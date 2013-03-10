@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: EasyXtext UI
 Bundle-SymbolicName: net.vtst.eclipse.easyxtext.ui
-Bundle-Version: 1.0.7
+Bundle-Version: 1.0.8
 Bundle-Activator: net.vtst.eclipse.easyxtext.ui.Activator
 Bundle-Vendor: Vincent Simonet
 Require-Bundle: org.eclipse.ui,
@@ -11,7 +11,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.debug.core;bundle-version="3.7.0",
  org.eclipse.debug.ui;bundle-version="3.7.0",
  org.eclipse.ui.console;bundle-version="3.5.100",
- net.vtst.eclipse.easyxtext;bundle-version="1.0.7"
+ net.vtst.eclipse.easyxtext;bundle-version="1.0.8"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: net.vtst.eclipse.easyxtext.ui.folding,

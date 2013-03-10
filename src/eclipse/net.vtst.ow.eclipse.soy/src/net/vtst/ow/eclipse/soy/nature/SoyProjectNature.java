@@ -13,12 +13,10 @@ public class SoyProjectNature extends NullProjectNature implements IEasyProjectN
   @Inject
   SoyMessages messages;
 
-  @Override
   public String getId() {
     return NATURE_ID;
   }
 
-  @Override
   public String getName() {
     return messages.getString("soy_project_nature");
   }
