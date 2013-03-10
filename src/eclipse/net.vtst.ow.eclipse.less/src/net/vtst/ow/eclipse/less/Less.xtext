@@ -142,11 +142,6 @@ MediaFeature:
   IDENT
 ;
 
-// TODO: Delete!
-MediaList:
-  media+=IDENT OPT_SPACE (',' OPT_SPACE media+=IDENT OPT_SPACE)*
-;
-
 PageStatement:
   '@page' OPT_SPACE (':' pseudo_page=IDENT OPT_SPACE)? block=Block
 ;
