@@ -271,7 +271,7 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     MixinParameters parameters = helper.getParameters();
     if (parameters != null) checkMixinDefinitionParameters(parameters);
     MixinSelectors selectors = helper.getSelectors();
-    if (selectors.getSelector().size() != 0) {
+    if (selectors.getSelector().size() > 1) {
       error(messages.getString("unexpected_selector"), selectors, LessPackage.eINSTANCE.getMixinSelectors_Selector(), 1);      
     }
   }
