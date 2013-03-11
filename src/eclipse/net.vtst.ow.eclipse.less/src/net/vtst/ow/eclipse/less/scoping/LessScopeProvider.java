@@ -69,7 +69,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
    * a VariableDefinitionIdent.
    */
   IScope scope_AtVariableRefTarget(EObject context, EReference ref) {
-    if (MixinUtils.isMixinParameterName(context)) return IScope.NULLSCOPE;
+    if (MixinUtils.isBoundByMixinDefinitionParameter(context)) return IScope.NULLSCOPE;
     return computeVariableScope(context, ref);
   }
 
@@ -196,6 +196,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
    * a HashOrClass.
    */
   IScope scope_HashOrClass(EObject context, EReference ref) {
+    if (MixinUtils.isBoundByMixinDefinitionSelector(context)) return IScope.NULLSCOPE;
     // First step is to get the prefix, i.e. the class and hash selectors which appear before
     // the current hash or class in the mixin call.
     ArrayList<String> pattern = null;

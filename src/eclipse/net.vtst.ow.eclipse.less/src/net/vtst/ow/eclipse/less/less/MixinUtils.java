@@ -110,7 +110,7 @@ public class MixinUtils {
    * @return true if obj is a variable reference which is in fact the name of a mixin parameter in a
    *   mixin definition.
    */
-  public static boolean isMixinParameterName(EObject obj) {
+  public static boolean isBoundByMixinDefinitionParameter(EObject obj) {
     EObject container = MixinUtils.getFirstNonTermAncestor(obj);
     if (container instanceof MixinParameter) {
       MixinParameter parameter = (MixinParameter) container;
@@ -122,6 +122,18 @@ public class MixinUtils {
             return true;
           }
         }
+      }
+    }
+    return false;
+  }
+  
+  public static boolean isBoundByMixinDefinitionSelector(EObject obj) {
+    EObject container = obj.eContainer();
+    if (container instanceof MixinSelectors) {
+      EObject mixin = container.eContainer();
+      if (mixin instanceof Mixin) {
+        MixinUtils.Helper helper = MixinUtils.newHelper((Mixin) mixin);
+        if (helper.isDefinition()) return true;
       }
     }
     return false;
