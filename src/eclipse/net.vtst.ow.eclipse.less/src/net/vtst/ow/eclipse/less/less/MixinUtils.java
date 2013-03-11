@@ -98,5 +98,33 @@ public class MixinUtils {
     }
     return null;
   }
+  
+  public static EObject getFirstNonTermAncestor(EObject obj) {
+    EObject result = obj.eContainer();
+    while (result instanceof Term) result = result.eContainer();
+    return result;
+  }
+  
+  /**
+   * @param obj
+   * @return true if obj is a variable reference which is in fact the name of a mixin parameter in a
+   *   mixin definition.
+   */
+  public static boolean isMixinParameterName(EObject obj) {
+    EObject container = MixinUtils.getFirstNonTermAncestor(obj);
+    if (container instanceof MixinParameter) {
+      MixinParameter parameter = (MixinParameter) container;
+      if (!parameter.isHasDefaultValue()) {
+        EObject mixin = container.eContainer().eContainer();
+        if (mixin instanceof Mixin) {
+          MixinUtils.Helper helper = MixinUtils.newHelper((Mixin) mixin);
+          if (helper.isDefinition()) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
 
 }

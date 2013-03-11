@@ -5,6 +5,7 @@ package net.vtst.ow.eclipse.less.scoping;
 
 import net.vtst.ow.eclipse.less.LessMessages;
 import net.vtst.ow.eclipse.less.less.LessPackage;
+import net.vtst.ow.eclipse.less.less.MixinUtils;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.xtext.diagnostics.Diagnostic;
@@ -27,6 +28,8 @@ public class LessLinkingDiagnosticMessageProvider extends LinkingDiagnosticMessa
     } else if (referenceType.getClassifierID() == LessPackage.HASH_OR_CLASS) {
       String message = String.format(messages.getString("unresolved_mixin"), context.getLinkText());
       return new DiagnosticMessage(message, Severity.ERROR, Diagnostic.LINKING_DIAGNOSTIC);            
+    } else if (referenceType.getClassifierID() == LessPackage.AT_VARIABLE_REF_TARGET) {
+      if (MixinUtils.isMixinParameterName(context.getContext())) return null;
     }
     return super.getUnresolvedProxyMessage(context);
   }

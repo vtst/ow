@@ -222,7 +222,7 @@ MixinVarParameter:
 ;
 
 MixinParameter:
-    ident=AtVariableRef OPT_SPACE hasDefaultValue?=':' OPT_SPACE term+=Term (SPACE term+=Term)* OPT_SPACE
+    ident=AtVariableDef OPT_SPACE hasDefaultValue?=':' OPT_SPACE term+=Term (SPACE term+=Term)* OPT_SPACE
   | term+=Term (SPACE term+=Term)* OPT_SPACE
 ;
 

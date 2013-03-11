@@ -19,6 +19,7 @@ import net.vtst.ow.eclipse.less.less.MixinCall;
 import net.vtst.ow.eclipse.less.less.MixinDefinition;
 import net.vtst.ow.eclipse.less.less.MixinDefinitionParameter;
 import net.vtst.ow.eclipse.less.less.MixinDefinitionVariable;
+import net.vtst.ow.eclipse.less.less.MixinUtils;
 import net.vtst.ow.eclipse.less.less.SimpleSelector;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
 import net.vtst.ow.eclipse.less.less.ToplevelRuleSet;
@@ -68,6 +69,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
    * a VariableDefinitionIdent.
    */
   IScope scope_AtVariableRefTarget(EObject context, EReference ref) {
+    if (MixinUtils.isMixinParameterName(context)) return IScope.NULLSCOPE;
     return computeVariableScope(context, ref);
   }
 
