@@ -38,7 +38,7 @@ StyleSheet:
 ;
 
 ToplevelOrInnerStatement:
-  '_mixin_' TerminatedMixin
+  '_mixin_' OPT_SPACE TerminatedMixin
   | MixinDefinition
   // LESS accepts @media, @page, @font-face and @charset statements within other
   // blocks, and move them at top level.
@@ -50,7 +50,7 @@ ToplevelOrInnerStatement:
 
 UnterminatedToplevelOrInnerStatement:
   VariableDefinition
-  | '_mixin_' UnterminatedMixin
+  | '_mixin_' OPT_SPACE UnterminatedMixin
   | MixinCall
 ;
   
@@ -186,6 +186,7 @@ VariableDefinitionIdent:
 
 // The same set of rules parses mixin definitions and mixin calls.  This is to make the
 // grammar LL(*) despite the recursive Term rule.
+// See LessJavaValidator.checkMixin
 // TODO: Mixin with arguments.
 
 // This is the super class for Mixins.  It is not use in the grammar only in the code.
@@ -194,22 +195,20 @@ Mixin:
 ;
 
 // The final ';' is made optional so that it can be omitted for final statements.
-// TODO: Check that ';' are put when required.
+// See LessJavaValidator.checkFinalSemicolonOfTerminatedMixin
 TerminatedMixin:
-  selectors=MixinSelectors parameters=MixinParameters (';' OPT_SPACE | guards=MixinDefinitionGuards? body=Block)?
+  selectors=MixinSelectors parameters=MixinParameters (hasFinalSemicolon?=';' OPT_SPACE | guards=MixinDefinitionGuards? body=Block)?
 ;
 
 UnterminatedMixin:
   selectors=MixinSelectors
 ;
 
-// TODO: Check that when it is a definition there is only one selector.
 MixinSelectors:
   selector+=HashOrClassCrossReference
   (combinator+=MixinCallCombinator selector+=HashOrClassCrossReference)* OPT_SPACE 
 ;
 
-// TODO: Check correct use of , and ;
 MixinParameters:
   {MixinParameters}
   '(' OPT_SPACE
@@ -218,13 +217,12 @@ MixinParameters:
   ')' OPT_SPACE 
 ;
 
-// TODO: Check there is no var parameter on an argument with a default value
 MixinVarParameter:
   {MixinVarParameter} (sep=(',' | ';') OPT_SPACE)? '...' OPT_SPACE
 ;
 
 MixinParameter:
-    ident=AtVariableRef OPT_SPACE ':' OPT_SPACE term+=Term (SPACE term+=Term)* OPT_SPACE
+    ident=AtVariableRef OPT_SPACE hasDefaultValue?=':' OPT_SPACE term+=Term (SPACE term+=Term)* OPT_SPACE
   | term+=Term (SPACE term+=Term)* OPT_SPACE
 ;
 

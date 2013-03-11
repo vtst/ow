@@ -1,22 +1,28 @@
 package net.vtst.ow.eclipse.less.less;
 
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
+
 /**
  * Helper class for manipulating Mixins.
  */
 public class MixinUtils {
   
+  // **************************************************************************
+  // Helper class for accessing Mixin objects
+  
   public static abstract class Helper {
     public abstract MixinSelectors getSelectors();
     public abstract MixinParameters getParameters();
     public abstract MixinDefinitionGuards getGuard();
-    public abstract Block getBody();   
+    public abstract Block getBody();
     
     public boolean isDefinition() {
-      return this.getBody() == null;
+      return this.getBody() != null;
     }
     
     public boolean isCall() {
-      return this.getBody() != null;
+      return this.getBody() == null;
     }
   }
   
@@ -54,4 +60,43 @@ public class MixinUtils {
     if (mixin instanceof TerminatedMixin) return newHelper((TerminatedMixin) mixin);
     throw new RuntimeException("Unknown sub-class of Mixin");
   }
+
+
+  // **************************************************************************
+  // Other utility functions
+  
+  /**
+   * @param term
+   * @return true if term is a single variable.
+   */
+  public static boolean isVariableRef(Term term) {
+    if (term instanceof ExtendedTerm) {
+      ExtendedTerm extendedTerm = (ExtendedTerm) term;
+      EList<EObject> subTerms = extendedTerm.getTerm();
+      if (subTerms.size() != 1) return false;
+      EObject subTerm = subTerms.get(0);
+      if (subTerm instanceof AtVariableRef) return true;
+      else if (subTerm instanceof Term) return isVariableRef((Term) subTerm);
+      else return false;
+    }
+    return false;
+  }
+  
+  /**
+   * @param term
+   * @return the single variable contained in term, or null.
+   */
+  public static AtVariableRef getVariableRef(Term term) {
+    if (term instanceof ExtendedTerm) {
+      ExtendedTerm extendedTerm = (ExtendedTerm) term;
+      EList<EObject> subTerms = extendedTerm.getTerm();
+      if (subTerms.size() != 1) return null;
+      EObject subTerm = subTerms.get(0);
+      if (subTerm instanceof AtVariableRef) return (AtVariableRef) subTerm;
+      else if (subTerm instanceof Term) return getVariableRef((Term) subTerm);
+      else return null;
+    }
+    return null;
+  }
+
 }

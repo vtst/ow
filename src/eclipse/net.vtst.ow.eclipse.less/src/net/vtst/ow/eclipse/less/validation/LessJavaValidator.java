@@ -10,21 +10,35 @@ import java.util.Set;
 import net.vtst.eclipse.easyxtext.validation.config.ConfigurableCheck;
 import net.vtst.eclipse.easyxtext.validation.config.ConfigurableDeclarativeValidator;
 import net.vtst.ow.eclipse.less.LessMessages;
+import net.vtst.ow.eclipse.less.less.AtVariableRef;
 import net.vtst.ow.eclipse.less.less.Block;
+import net.vtst.ow.eclipse.less.less.BlockContents;
 import net.vtst.ow.eclipse.less.less.BlockUtils;
 import net.vtst.ow.eclipse.less.less.Declaration;
 import net.vtst.ow.eclipse.less.less.HashOrClass;
 import net.vtst.ow.eclipse.less.less.HashOrClassCrossReference;
+import net.vtst.ow.eclipse.less.less.IdentTerm;
 import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.less.IncompleteToplevelStatement;
 import net.vtst.ow.eclipse.less.less.LessPackage;
+import net.vtst.ow.eclipse.less.less.Mixin;
 import net.vtst.ow.eclipse.less.less.MixinCall;
 import net.vtst.ow.eclipse.less.less.MixinDefinition;
+import net.vtst.ow.eclipse.less.less.MixinDefinitionGuards;
 import net.vtst.ow.eclipse.less.less.MixinDefinitionParameter;
 import net.vtst.ow.eclipse.less.less.MixinDefinitionVariable;
+import net.vtst.ow.eclipse.less.less.MixinParameter;
+import net.vtst.ow.eclipse.less.less.MixinParameters;
+import net.vtst.ow.eclipse.less.less.MixinSelectors;
+import net.vtst.ow.eclipse.less.less.MixinUtils;
+import net.vtst.ow.eclipse.less.less.MixinVarParameter;
 import net.vtst.ow.eclipse.less.less.NumberWithUnitTerm;
+import net.vtst.ow.eclipse.less.less.NumericLiteral;
 import net.vtst.ow.eclipse.less.less.PseudoClassNthSpecialCase;
+import net.vtst.ow.eclipse.less.less.StringTerm;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
+import net.vtst.ow.eclipse.less.less.Term;
+import net.vtst.ow.eclipse.less.less.TerminatedMixin;
 import net.vtst.ow.eclipse.less.less.VariableDefinition;
 import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver;
 
@@ -227,13 +241,107 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     return Tuples.pair(min, max);
   }
   
+  @Check
+  public void checkFinalSemicolonOfTerminatedMixin(TerminatedMixin mixin) {
+    if (mixin.getBody() != null || mixin.isHasFinalSemicolon()) return;
+    EObject parent = mixin.eContainer();
+    if (parent instanceof BlockContents) {
+      if (((BlockContents) parent).getNext() != null) {
+        error(messages.getString("missing_semicolon_after_mixin_call"), mixin, LessPackage.eINSTANCE.getTerminatedMixin_Parameters(), 0);
+      }
+    } else if (parent instanceof StyleSheet) {
+      StyleSheet styleSheet = (StyleSheet) parent;
+      if (!mixin.equals(styleSheet.getStatements().get(styleSheet.getStatements().size() - 1))) {
+        error(messages.getString("missing_semicolon_after_mixin_call"), mixin, LessPackage.eINSTANCE.getTerminatedMixin_Parameters(), 0);        
+      }
+    } else {
+      throw new RuntimeException("Unknown class for a parent of a TerminatedMixin");
+    }
+  }
+  
+  @Check
+  @ConfigurableCheck(configurable = false)
+  public void checkMixin(Mixin mixin) {
+    System.out.println("VTST checkMixin");
+    MixinUtils.Helper helper = MixinUtils.newHelper(mixin);
+    if (helper.isDefinition()) checkMixinDefinition(helper);
+    if (helper.isCall()) checkMixinCall(helper);
+  }
+  
+  private void checkMixinDefinition(MixinUtils.Helper helper) {
+    MixinParameters parameters = helper.getParameters();
+    if (parameters != null) checkMixinDefinitionParameters(parameters);
+    MixinSelectors selectors = helper.getSelectors();
+    if (selectors.getSelector().size() != 0) {
+      error(messages.getString("unexpected_selector"), selectors, LessPackage.eINSTANCE.getMixinSelectors_Selector(), 1);      
+    }
+  }
+  
+  private void checkMixinDefinitionParameters(MixinParameters parameters) {
+    EList<MixinParameter> parameterList = parameters.getParameter();
+    // Check that separators are the same
+    EList<String> separators = parameters.getSep();
+    if (separators.size() > 1) {
+      String firstSeparator = separators.get(0);
+      for (int i = 1; i < separators.size(); ++i) {
+        if (!separators.get(i).equals(firstSeparator))
+          error(messages.getString("unexpected_separator"), parameters, LessPackage.eINSTANCE.getMixinParameters_Sep(), i);
+      }
+    }
+    
+    // Check that only one variable term is provided when there is no default value
+    for (MixinParameter parameter : parameterList) {
+      if (!parameter.isHasDefaultValue()) {
+        if (parameter.getTerm().size() > 1) {
+          error(messages.getString("unexpected_term"), parameter, LessPackage.eINSTANCE.getMixinParameter_Term(), 1);
+        } else {
+          Term term = parameter.getTerm().get(0);
+          if (!(term instanceof IdentTerm || term instanceof StringTerm || 
+              term instanceof NumericLiteral || MixinUtils.isVariableRef(term))) {
+            error(messages.getString("unexpected_term"), parameter, LessPackage.eINSTANCE.getMixinParameter_Term(), 0);              
+          }
+        }
+      }
+    }
+    
+    // Check the var parameter:
+    // - Has the same separator as the rest, if any,
+    // - Has no default value
+    MixinVarParameter varParameter = parameters.getVarArg();
+    if (varParameter != null) {
+      if (varParameter.getSep() != null) {
+        if (parameters.getParameter().size() == 0 ||
+            separators.size() > 0 && !separators.get(0).equals(varParameter.getSep())) {
+          error(messages.getString("unexpected_separator"), varParameter, LessPackage.eINSTANCE.getMixinVarParameter_Sep(), 0);
+        }
+      }
+      if (varParameter.getSep() == null && parameterList.size() > 0 && parameterList.get(parameterList.size() - 1).isHasDefaultValue()) {
+        error(messages.getString(
+            "illegal_optional_parameter_var_args"), parameterList.get(parameterList.size() - 1),
+            LessPackage.eINSTANCE.getMixinParameter_Term(), 0);
+      }
+    }
+  }
+  
+  private void checkMixinCall(MixinUtils.Helper helper) {
+    MixinParameters parameters = helper.getParameters();
+    if (parameters != null) checkMixinCallParameters(parameters);
+  }
+  
+  private void checkMixinCallParameters(MixinParameters parameters) {
+    if (parameters.getVarArg() != null) {
+      error(messages.getString("unexpected_token"), parameters.getVarArg(), null, 0);
+    }
+  }
+  
+  
+  
   // Report error for IncompleteToplevelStatement
   @Check
   @ConfigurableCheck(configurable = false)
   public void checkIncompleteToplevelStatement(IncompleteToplevelStatement statement) {
     error(messages.getString("incomplete_toplevel_statement"), statement, null, 0);
   }
-  
   
   @Check
   @ConfigurableCheck(configurable = false)
