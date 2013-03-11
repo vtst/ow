@@ -262,7 +262,6 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   @Check
   @ConfigurableCheck(configurable = false)
   public void checkMixin(Mixin mixin) {
-    System.out.println("VTST checkMixin");
     MixinUtils.Helper helper = MixinUtils.newHelper(mixin);
     if (helper.isDefinition()) checkMixinDefinition(helper);
     if (helper.isCall()) checkMixinCall(helper);
