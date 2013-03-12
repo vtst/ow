@@ -149,6 +149,7 @@ AtVariableRefTarget:
   Mixin | AtVariableRef | AtVariableDef
 ;
 
+// TODO: Rename into AtVariable?
 AtVariableDef:
   ident=AT_IDENT
 ;
@@ -352,7 +353,9 @@ VariableSelector:
 ;
 
 HashOrClass: Hash | Class;
-HashOrClassCrossReference: ident=[HashOrClass|HASH_OR_CLASS_IDENT];
+// TODO: Rename into HashOrClassRef
+HashOrClassCrossReference: ident=[HashOrClassRefTarget|HASH_OR_CLASS_IDENT];
+HashOrClassRefTarget: HashOrClass | HashOrClassCrossReference;
 HASH_OR_CLASS_IDENT returns ecore::EString: HASH_IDENT | CLASS_IDENT;
 
 // This rule does not end with OPT_SPACE, because of combinators

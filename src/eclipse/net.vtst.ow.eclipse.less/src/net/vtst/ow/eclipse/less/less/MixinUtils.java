@@ -2,6 +2,7 @@ package net.vtst.ow.eclipse.less.less;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 
 /**
  * Helper class for manipulating Mixins.
@@ -137,6 +138,11 @@ public class MixinUtils {
       }
     }
     return false;
+  }
+  public static String getIdent(HashOrClassRefTarget obj) {
+    if (obj instanceof HashOrClass) return ((HashOrClass) obj).getIdent();
+    if (obj instanceof HashOrClassCrossReference) return NodeModelUtils.getNode(obj).getText();
+    throw new RuntimeException("Unknown subclass of HashOrClassRefTarget");
   }
 
 }

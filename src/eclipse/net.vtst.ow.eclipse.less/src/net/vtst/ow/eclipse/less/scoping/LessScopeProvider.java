@@ -11,14 +11,16 @@ import net.vtst.ow.eclipse.less.less.Block;
 import net.vtst.ow.eclipse.less.less.BlockUtils;
 import net.vtst.ow.eclipse.less.less.HashOrClass;
 import net.vtst.ow.eclipse.less.less.HashOrClassCrossReference;
+import net.vtst.ow.eclipse.less.less.HashOrClassRefTarget;
 import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.less.InnerRuleSet;
 import net.vtst.ow.eclipse.less.less.InnerSelector;
 import net.vtst.ow.eclipse.less.less.LessPackage;
-import net.vtst.ow.eclipse.less.less.MixinCall;
+import net.vtst.ow.eclipse.less.less.Mixin;
 import net.vtst.ow.eclipse.less.less.MixinDefinition;
 import net.vtst.ow.eclipse.less.less.MixinDefinitionParameter;
 import net.vtst.ow.eclipse.less.less.MixinDefinitionVariable;
+import net.vtst.ow.eclipse.less.less.MixinSelectors;
 import net.vtst.ow.eclipse.less.less.MixinUtils;
 import net.vtst.ow.eclipse.less.less.SimpleSelector;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
@@ -186,16 +188,10 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
   //    of these matches require walking up and then down in the tree of contexts.
   // 3. We deduce from this the scope for one of the cross-references.
   
-  // TODO: I'm unsure whether this is useful?
-  // If this is useful, there is probably a problem in LessGlobalScopeProvider.createLazyResourceScope
-  IScope scope_Class(EObject context, EReference ref) {
-    return scope_HashOrClass(context, ref);
-  }
-  
   /** Entry point for the calculation of the scope of a cross-reference to
    * a HashOrClass.
    */
-  IScope scope_HashOrClass(EObject context, EReference ref) {
+  IScope scope_HashOrClassRefTarget(EObject context, EReference ref) {
     if (MixinUtils.isBoundByMixinDefinitionSelector(context)) return IScope.NULLSCOPE;
     // First step is to get the prefix, i.e. the class and hash selectors which appear before
     // the current hash or class in the mixin call.
@@ -206,7 +202,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
       if (result == null) return IScope.NULLSCOPE;
       pattern = result.getFirst();
       index = result.getSecond().intValue();
-    } else if (context instanceof MixinCall) {
+    } else if (context instanceof Mixin) {
       pattern = new ArrayList<String>(1);
       pattern.add("");
     }
@@ -214,15 +210,15 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
   }
   
   /** Return the pattern (i.e. the preceding hashes and classes) of a cross-reference (current) in a
-   * context (which should be a MixinCall, otherwise an empty context is returned).
+   * context (which should be a Mixin call, otherwise an empty context is returned).
    */
   private Pair<ArrayList<String>, Integer> getMixinCallPattern(EObject context, HashOrClassCrossReference current) {
     int index = 0;
-    if (!(context instanceof MixinCall)) return null;
-    MixinCall mixinCall = (MixinCall) context;
-    ArrayList<String> pattern = new ArrayList<String>(mixinCall.getSelector().size());
+    if (!(context instanceof MixinSelectors)) return null;
+    MixinSelectors selectors = (MixinSelectors) context;
+    ArrayList<String> pattern = new ArrayList<String>(selectors.getSelector().size());
     int i = 0;
-    for (HashOrClassCrossReference item: mixinCall.getSelector()) {
+    for (HashOrClassCrossReference item: selectors.getSelector()) {
       if (item == current) index = i;
       pattern.add(NodeModelUtils.getNode(item).getText());
       ++i;
@@ -233,13 +229,24 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
   /** Test whether a pattern matches a HashOrClass.
    * @return
    */
-  private boolean isMatching(String pattern, HashOrClass obj) {
-    return pattern.isEmpty() || pattern.equals(obj.getIdent());
+  private boolean isMatching(String pattern, HashOrClassRefTarget obj) {
+    return pattern.isEmpty() || pattern.equals(MixinUtils.getIdent(obj));
   }
+  
+  private static class Match extends ArrayList<HashOrClassRefTarget> {
+    private static final long serialVersionUID = 1L;
+
+    public Match cloneAndAdd(HashOrClassRefTarget element) {
+      Match clonedList = (Match) this.clone();
+      clonedList.add(element);
+      return clonedList;
+    }
+
+  };
 
   private class Matches {
-    private ArrayList<ArrayList<HashOrClass>> matches = new ArrayList<ArrayList<HashOrClass>>(); 
-    public void add(ArrayList<HashOrClass> match) { matches.add(match); }
+    private ArrayList<Match> matches = new ArrayList<Match>(); 
+    public void add(Match match) { matches.add(match); }
     public void addAll(Matches other) { matches.addAll(other.matches); }
     private QualifiedName getQualifiedName(String ident) {
       if (ident.startsWith(".")) {
@@ -253,21 +260,14 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
     }
     public IScope getScope(int index) { 
       List<IEObjectDescription> scopeItems = new ArrayList<IEObjectDescription>();
-      for (ArrayList<HashOrClass> match: matches) {
+      for (Match match: matches) {
         if (match.size() > index) {
-          HashOrClass hashOrClass = match.get(index);
-          scopeItems.add(EObjectDescription.create(getQualifiedName(hashOrClass.getIdent()), hashOrClass));
+          HashOrClassRefTarget hashOrClass = match.get(index);
+          scopeItems.add(EObjectDescription.create(getQualifiedName(MixinUtils.getIdent(hashOrClass)), hashOrClass));
         }
       }
       return MapBasedScope.createScope(IScope.NULLSCOPE, scopeItems);
     }
-  }
-  
-  private ArrayList<HashOrClass> cloneAndAdd(ArrayList<HashOrClass> list, HashOrClass element) {
-    @SuppressWarnings("unchecked")
-    ArrayList<HashOrClass> clonedList = (ArrayList<HashOrClass>) list.clone();
-    clonedList.add(element);
-    return clonedList;
   }
   
   /** Collect the set of matches for a given context and pattern.  match is the list of the HashOrClass which have
@@ -277,7 +277,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
    * @param match  The HashOrClass which have already been matched against the pattern
    * @param matches  Where to add the matches.
    */
-  private void computeMixinMatchesDown(EObject context, ArrayList<String> pattern, ArrayList<HashOrClass> match, Matches matches) {
+  private void computeMixinMatchesDown(EObject context, ArrayList<String> pattern, Match match, Matches matches) {
     if (context instanceof Block) {
       computeMixinMatchesDown(BlockUtils.iterator((Block) context), pattern, match, matches);
     } else if (context instanceof StyleSheet) {
@@ -285,7 +285,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
     }  // else do nothing
   }
   
-  private void computeMixinMatchesDown(Iterable<? extends EObject> statements, ArrayList<String> pattern, ArrayList<HashOrClass> match, Matches matches) {
+  private void computeMixinMatchesDown(Iterable<? extends EObject> statements, ArrayList<String> pattern, Match match, Matches matches) {
     if (pattern.size() == match.size()) {
       matches.add(match);
       return;
@@ -295,25 +295,30 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
       if (obj instanceof ImportStatement) {
         Iterable<ToplevelStatement> importedStatements = importStatementResolver.getAllStatements((ImportStatement) obj);
         computeMixinMatchesDown(importedStatements, pattern, match, matches);
-      } else if (obj instanceof MixinDefinition) {
-        MixinDefinition mixinDefinition = (MixinDefinition) obj;
-        if (isMatching(pattern.get(match.size()), mixinDefinition.getSelector())) {
-          hasMatch = true;
-          computeMixinMatchesDown(mixinDefinition.getBlock(), pattern, cloneAndAdd(match, mixinDefinition.getSelector()), matches);
+      } else if (obj instanceof Mixin) {
+        MixinUtils.Helper mixinHelper = MixinUtils.newHelper((Mixin) obj);
+        if (mixinHelper.isDefinition() && mixinHelper.getSelectors().getSelector().size() == 1) {
+          HashOrClassCrossReference selector = mixinHelper.getSelectors().getSelector().get(0);
+          if (isMatching(pattern.get(match.size()), selector)) {
+            hasMatch = true;
+            computeMixinMatchesDown(mixinHelper.getBody(), pattern, match.cloneAndAdd(selector), matches);
+          }
         }
       } else if (obj instanceof ToplevelRuleSet) {
         ToplevelRuleSet toplevelRuleSet = (ToplevelRuleSet) obj;
         for (ToplevelSelector toplevelSelector: toplevelRuleSet.getSelector()) {
-          ArrayList<HashOrClass> extMatch = matchSelector(toplevelSelector.getSelector(), pattern, match);
+          Match extMatch = matchSelector(toplevelSelector.getSelector(), pattern, match);
           if (extMatch != null) {
             hasMatch = true;
             computeMixinMatchesDown(toplevelRuleSet.getBlock(), pattern, extMatch, matches);
           }
         }
       } else if (obj instanceof InnerRuleSet) {
+        // This is the same code as for ToplevelRuleSet above.  It is duplicated because there is no commun super class
+        // for ToplevelSelector and InnerSelector.
         InnerRuleSet innerRuleSet = (InnerRuleSet) obj;
         for (InnerSelector innerSelector: innerRuleSet.getSelector()) {
-          ArrayList<HashOrClass> extMatch = matchSelector(innerSelector.getSelector(), pattern, match);
+          Match extMatch = matchSelector(innerSelector.getSelector(), pattern, match);
           if (extMatch != null) {
             hasMatch = true;
             computeMixinMatchesDown(innerRuleSet.getBlock(), pattern, extMatch, matches);
@@ -330,12 +335,12 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
    * @param match  The already performed matches
    * @return null if no match, or the new match
    */
-  private ArrayList<HashOrClass> matchSelector(EList<SimpleSelector> selectors, ArrayList<String> pattern, ArrayList<HashOrClass> match) {
+  private Match matchSelector(EList<SimpleSelector> selectors, ArrayList<String> pattern, Match match) {
     if (selectors.size() == 1 && selectors.get(0).getCriteria().size() == 1) {
       // Only one piece of selector, partial match is possible
       EObject criteria = selectors.get(0).getCriteria().get(0);
       if (criteria instanceof HashOrClass && isMatching(pattern.get(match.size()), (HashOrClass) criteria)) {
-        return cloneAndAdd(match, (HashOrClass) criteria);
+        return match.cloneAndAdd((HashOrClass) criteria);
       } else {
         return null;
       }
@@ -343,8 +348,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
       // Several pieces of selector, only complete match is possible
       int i = match.size();
       int pattern_size = pattern.size();
-      @SuppressWarnings("unchecked")
-      ArrayList<HashOrClass> extMatch = (ArrayList<HashOrClass>) match.clone();
+      Match extMatch = (Match) match.clone();
       for (SimpleSelector selector: selectors) {
         for (EObject criteria: selector.getCriteria()) {
           if (!(criteria instanceof HashOrClass)) return null;
@@ -370,7 +374,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
           EObject container = context.eContainer();
           Matches matches = new Matches();
           if (container != null) matches.addAll(computeMixinMatches(container, pattern, reference));
-          computeMixinMatchesDown(context, pattern, new ArrayList<HashOrClass>(), matches);
+          computeMixinMatchesDown(context, pattern, new Match(), matches);
           return matches;
         }
       });
