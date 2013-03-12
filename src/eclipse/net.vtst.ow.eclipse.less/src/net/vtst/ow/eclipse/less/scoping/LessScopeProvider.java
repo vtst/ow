@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.vtst.ow.eclipse.less.less.AtVariableDef;
+import net.vtst.ow.eclipse.less.less.AtVariableRefTarget;
 import net.vtst.ow.eclipse.less.less.Block;
 import net.vtst.ow.eclipse.less.less.BlockUtils;
 import net.vtst.ow.eclipse.less.less.HashOrClass;
@@ -17,13 +18,12 @@ import net.vtst.ow.eclipse.less.less.InnerRuleSet;
 import net.vtst.ow.eclipse.less.less.InnerSelector;
 import net.vtst.ow.eclipse.less.less.LessPackage;
 import net.vtst.ow.eclipse.less.less.Mixin;
-import net.vtst.ow.eclipse.less.less.MixinDefinition;
-import net.vtst.ow.eclipse.less.less.MixinDefinitionParameter;
-import net.vtst.ow.eclipse.less.less.MixinDefinitionVariable;
+import net.vtst.ow.eclipse.less.less.MixinParameter;
 import net.vtst.ow.eclipse.less.less.MixinSelectors;
 import net.vtst.ow.eclipse.less.less.MixinUtils;
 import net.vtst.ow.eclipse.less.less.SimpleSelector;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
+import net.vtst.ow.eclipse.less.less.TerminatedMixin;
 import net.vtst.ow.eclipse.less.less.ToplevelRuleSet;
 import net.vtst.ow.eclipse.less.less.ToplevelSelector;
 import net.vtst.ow.eclipse.less.less.ToplevelStatement;
@@ -96,11 +96,11 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
       return computeVariableScopeOfStatements(container, BlockUtils.iterator((Block) container), ref);
     } else if (container instanceof StyleSheet) {
       return computeVariableScopeOfStatements(container, getStyleSheetStatements((StyleSheet) container), ref);
-    } else if (container instanceof MixinDefinition) {
+    } else if (container instanceof TerminatedMixin) {
       EStructuralFeature containingFeature = context.eContainingFeature();
-      if (containingFeature.equals(LessPackage.eINSTANCE.getMixinDefinition_Guards()) ||
-          containingFeature.equals(LessPackage.eINSTANCE.getMixinDefinition_Block())) {
-        return computeVariableScopeOfMixinDefinition((MixinDefinition) container, ref);
+      if (containingFeature.equals(LessPackage.eINSTANCE.getTerminatedMixin_Guards()) ||
+          containingFeature.equals(LessPackage.eINSTANCE.getTerminatedMixin_Body())) {
+        return computeVariableScopeOfMixinDefinition((TerminatedMixin) container, ref);
       }
     }
     return computeVariableScope(container, ref);
@@ -122,7 +122,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
   /**
    * Compute the scope of a mixin definition, binding the parameters of the definition.
    */
-  public IScope computeVariableScopeOfMixinDefinition(final MixinDefinition context, final EReference ref) {
+  public IScope computeVariableScopeOfMixinDefinition(final TerminatedMixin context, final EReference ref) {
     return cache.get(Tuples.pair(LessScopeProvider.class, context), context.eResource(), new Provider<IScope>() {
       public IScope get() {
         List<IEObjectDescription> variableDefinitions = new ArrayList<IEObjectDescription>();
@@ -148,19 +148,18 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
   
   /** Add the variables defined by a mixin.
    */
-  private void addVariableDefinitions(MixinDefinition mixinDefinition, List<IEObjectDescription> variableDefinitions) {
-    for (MixinDefinitionParameter parameter: mixinDefinition.getParameter()) {
-      if (parameter instanceof MixinDefinitionVariable) {
-        variableDefinitions.add(getEObjectDescriptionFor(((MixinDefinitionVariable) parameter).getVariable()));
-      }
+  private void addVariableDefinitions(TerminatedMixin mixinDefinition, List<IEObjectDescription> variableDefinitions) {
+    for (MixinParameter parameter: mixinDefinition.getParameters().getParameter()) {
+      AtVariableRefTarget variable = MixinUtils.getVariableBoundByMixinParameter(parameter);
+      if (variable != null) variableDefinitions.add(getEObjectDescriptionFor(variable));
     }
     variableDefinitions.add(EObjectDescription.create(QualifiedName.create(ARGUMENTS_VARIABLE_NAME), mixinDefinition));
   }
   
   /** Create the object description for a variable definition ident.
    */
-  private IEObjectDescription getEObjectDescriptionFor(VariableDefinitionIdent variableDefinitionIdent) {
-    return EObjectDescription.create(QualifiedName.create(variableDefinitionIdent.getIdent()), variableDefinitionIdent);
+  private IEObjectDescription getEObjectDescriptionFor(AtVariableRefTarget atVariable) {
+    return EObjectDescription.create(QualifiedName.create(MixinUtils.getIdent(atVariable)), atVariable);
   }
 
   /** Create the object description for a variable definition ident.

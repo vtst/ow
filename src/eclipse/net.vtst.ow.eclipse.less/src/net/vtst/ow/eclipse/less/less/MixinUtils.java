@@ -100,6 +100,12 @@ public class MixinUtils {
     return null;
   }
   
+  public static AtVariableRefTarget getVariableBoundByMixinParameter(MixinParameter parameter) {
+    if (parameter.getIdent() != null) return parameter.getIdent();
+    // We are sure that parameter.getTerm() has at least 1 element.
+    return getVariableRef(parameter.getTerm().get(0));
+  }
+  
   public static EObject getFirstNonTermAncestor(EObject obj) {
     EObject result = obj.eContainer();
     while (result instanceof Term) result = result.eContainer();
@@ -139,6 +145,13 @@ public class MixinUtils {
     }
     return false;
   }
+  
+  public static String getIdent(AtVariableRefTarget obj) {
+    if (obj instanceof AtVariableDef) return ((AtVariableDef) obj).getIdent();
+    if (obj instanceof AtVariableRef) return NodeModelUtils.getNode(obj).getText();
+    throw new RuntimeException("Should not be called with a Mixin");
+  }
+  
   public static String getIdent(HashOrClassRefTarget obj) {
     if (obj instanceof HashOrClass) return ((HashOrClass) obj).getIdent();
     if (obj instanceof HashOrClassCrossReference) return NodeModelUtils.getNode(obj).getText();
