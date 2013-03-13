@@ -18,6 +18,7 @@ import net.vtst.ow.eclipse.less.less.BlockUtils;
 import net.vtst.ow.eclipse.less.less.Declaration;
 import net.vtst.ow.eclipse.less.less.HashOrClass;
 import net.vtst.ow.eclipse.less.less.HashOrClassCrossReference;
+import net.vtst.ow.eclipse.less.less.HashOrClassRefTarget;
 import net.vtst.ow.eclipse.less.less.IdentTerm;
 import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.less.IncompleteToplevelStatement;
@@ -137,7 +138,7 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   }
   
   // Check the number of parameters of mixin calls
-  // TODO: Adapt to new mixins
+  // ADAPTED
   @Check
   public void checkMixinCallParameters(MixinCall mixinCall) {
     // Get the last selector, if any
@@ -296,7 +297,7 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     // Check uniqueness of variable names
     Set<String> names = new HashSet<String>();
     for (MixinParameter parameter : parameters.getParameter()) {
-      String variable = getVariableName(parameter);
+      String variable = MixinUtils.getVariableName(parameter);
       if (variable != null && !names.add(variable)) {
         String message = String.format(messages.getString("duplicated_variable_mixin"), variable);
         if (parameter.isHasDefaultValue())
@@ -334,32 +335,92 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     }
   }
   
-  // TODO: Should this be moved to MixinUtils?
-  private String getVariableName(MixinParameter parameter) {
-    if (parameter.isHasDefaultValue()) {
-      AtVariableDef variable = parameter.getIdent();
-      if (variable != null) return variable.getIdent();
-      else return null;
-    } else if (parameter.getTerm().size() > 0) {
-      AtVariableRef variable = MixinUtils.getVariableRef(parameter.getTerm().get(0));
-      if (variable != null) return MixinUtils.getIdent(variable);
-      else return null;
+  private void checkMixinCall(MixinUtils.Helper helper) {
+    MixinParameters parameters = helper.getParameters();
+    if (parameters != null) checkMixinCallParameters_Syntax(parameters);
+    checkMixinCall_Prototype(helper);
+  }
+  
+  private void checkMixinCallParameters_Syntax(MixinParameters parameters) {
+    if (parameters.getVarArg() != null) {
+      error(messages.getString("unexpected_token"), parameters.getVarArg(), null, 0);
+    }
+  }
+
+  private void checkMixinCall_Prototype(MixinUtils.Helper helper) {
+    // Get the last selector, if any
+    EList<HashOrClassCrossReference> selectors = helper.getSelectors().getSelector();
+    if (selectors.size() == 0) return;
+    HashOrClassCrossReference hashOrClassCrossReference = selectors.get(selectors.size() - 1);
+    // Get the reference, if any
+    EList<EObject> crossReferences = hashOrClassCrossReference.eCrossReferences();
+    if (crossReferences.size() == 0) return;
+    EObject crossReference = crossReferences.get(0);
+    if (!(crossReference instanceof HashOrClassRefTarget)) return;
+    HashOrClassRefTarget hashOrClass = (HashOrClassRefTarget) crossReference;
+    // We do not check the arguments if the called mixin is undefined, in order to avoid multiple error messages.
+    // TODO: Fix this test!
+    //if (hashOrClass.getIdent() != null) {
+      MixinPrototype prototype = getPrototypeForMixinDefinition(hashOrClass);
+      if (prototype != null) {
+        int provided = getNumberOfParametersOfMixinCall(helper);
+        if (provided < prototype.minNumberOfParameters || provided > prototype.maxNumberOfParameters) {
+          warning(
+              getErrorMessageForCheckMixinCallParameters(MixinUtils.getIdent(hashOrClass), prototype.minNumberOfParameters, prototype.maxNumberOfParameters, provided),
+              helper.getSelectors(), null, 0);
+        }
+        for (MixinParameter parameter : helper.getParameters().getParameter()) {
+          if (parameter.getIdent() != null && !prototype.parameterNames.contains(parameter.getIdent().getIdent())) {
+            warning(messages.format("illegal_parameter_label", parameter.getIdent().getIdent()), parameter, LessPackage.eINSTANCE.getMixinParameter_Ident(), 0);
+          }
+        }
+      }
+    //}
+  }
+  
+  // TODO: Should we try to cache prototypes?
+  private static class MixinPrototype {
+    public int minNumberOfParameters = 0;
+    public int maxNumberOfParameters = 0;
+    public Set<String> parameterNames = new HashSet<String>();
+    
+    MixinPrototype(TerminatedMixin mixinDefinition) {
+      EList<MixinParameter> parameters = mixinDefinition.getParameters().getParameter();
+      for (MixinParameter parameter: parameters) {
+        ++maxNumberOfParameters;
+        if (!parameter.isHasDefaultValue()) minNumberOfParameters = maxNumberOfParameters;
+        String variable = MixinUtils.getVariableName(parameter);
+        if (variable != null) parameterNames.add(variable);
+      }
+      if (mixinDefinition.getParameters().getVarArg() != null) 
+        maxNumberOfParameters = Integer.MAX_VALUE;
+    }
+    
+  }
+  
+  /** Compute the expected number of parameters for a mixin call.
+   * @param hashOrClass
+   * @return a pair (min, max)
+   */
+  private MixinPrototype getPrototypeForMixinDefinition(HashOrClassRefTarget hashOrClass) {
+    EObject container = hashOrClass.eContainer().eContainer();
+    int min = 0;
+    int max = 0;
+    if ((container instanceof TerminatedMixin)) {
+      return new MixinPrototype((TerminatedMixin) container);
     } else {
       return null;
     }
   }
 
-  private void checkMixinCall(MixinUtils.Helper helper) {
-    MixinParameters parameters = helper.getParameters();
-    if (parameters != null) checkMixinCallParameters(parameters);
-  }
-  
-  private void checkMixinCallParameters(MixinParameters parameters) {
-    if (parameters.getVarArg() != null) {
-      error(messages.getString("unexpected_token"), parameters.getVarArg(), null, 0);
+  private int getNumberOfParametersOfMixinCall(MixinUtils.Helper helper) {
+    int numberOfSemicolons = 0;
+    for (String separator : helper.getParameters().getSep()) {
+      if (";".equals(separator)) ++numberOfSemicolons;
     }
+    if (numberOfSemicolons > 0) return numberOfSemicolons + 1;
+    else return helper.getParameters().getParameter().size();
   }
-  
   
   
   // Report error for IncompleteToplevelStatement

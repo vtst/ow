@@ -109,7 +109,21 @@ public class MixinUtils {
       return null;
     }
   }
-  
+ 
+  public static String getVariableName(MixinParameter parameter) {
+    if (parameter.isHasDefaultValue()) {
+      AtVariableDef variable = parameter.getIdent();
+      if (variable != null) return variable.getIdent();
+      else return null;
+    } else if (parameter.getTerm().size() > 0) {
+      AtVariableRef variable = MixinUtils.getVariableRef(parameter.getTerm().get(0));
+      if (variable != null) return MixinUtils.getIdent(variable);
+      else return null;
+    } else {
+      return null;
+    }
+  }
+
   public static EObject getFirstNonTermAncestor(EObject obj) {
     EObject result = obj.eContainer();
     while (result instanceof Term) result = result.eContainer();
@@ -162,4 +176,5 @@ public class MixinUtils {
     throw new RuntimeException("Unknown subclass of HashOrClassRefTarget");
   }
 
+ 
 }
