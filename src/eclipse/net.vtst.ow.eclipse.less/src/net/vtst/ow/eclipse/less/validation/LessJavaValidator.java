@@ -10,13 +10,10 @@ import java.util.Set;
 import net.vtst.eclipse.easyxtext.validation.config.ConfigurableCheck;
 import net.vtst.eclipse.easyxtext.validation.config.ConfigurableDeclarativeValidator;
 import net.vtst.ow.eclipse.less.LessMessages;
-import net.vtst.ow.eclipse.less.less.AtVariableDef;
-import net.vtst.ow.eclipse.less.less.AtVariableRef;
 import net.vtst.ow.eclipse.less.less.Block;
 import net.vtst.ow.eclipse.less.less.BlockContents;
 import net.vtst.ow.eclipse.less.less.BlockUtils;
 import net.vtst.ow.eclipse.less.less.Declaration;
-import net.vtst.ow.eclipse.less.less.HashOrClass;
 import net.vtst.ow.eclipse.less.less.HashOrClassCrossReference;
 import net.vtst.ow.eclipse.less.less.HashOrClassRefTarget;
 import net.vtst.ow.eclipse.less.less.IdentTerm;
@@ -24,10 +21,6 @@ import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.less.IncompleteToplevelStatement;
 import net.vtst.ow.eclipse.less.less.LessPackage;
 import net.vtst.ow.eclipse.less.less.Mixin;
-import net.vtst.ow.eclipse.less.less.MixinCall;
-import net.vtst.ow.eclipse.less.less.MixinDefinition;
-import net.vtst.ow.eclipse.less.less.MixinDefinitionParameter;
-import net.vtst.ow.eclipse.less.less.MixinDefinitionVariable;
 import net.vtst.ow.eclipse.less.less.MixinParameter;
 import net.vtst.ow.eclipse.less.less.MixinParameters;
 import net.vtst.ow.eclipse.less.less.MixinSelectors;
@@ -45,8 +38,6 @@ import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.xtext.util.Pair;
-import org.eclipse.xtext.util.Tuples;
 import org.eclipse.xtext.validation.Check;
 
 import com.google.common.collect.Sets;
@@ -133,36 +124,6 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     }
   }
   
-  private boolean isMixinDefinitionVarArgs(MixinDefinition mixinDefinition) {
-    return (mixinDefinition.isVarArgsAnonymous() || mixinDefinition.isVarArgsLastVar());
-  }
-  
-  // Check the number of parameters of mixin calls
-  // ADAPTED
-  @Check
-  public void checkMixinCallParameters(MixinCall mixinCall) {
-    // Get the last selector, if any
-    EList<HashOrClassCrossReference> selectors = mixinCall.getSelector();
-    if (selectors.size() == 0) return;
-    HashOrClassCrossReference hashOrClassCrossReference = selectors.get(selectors.size() - 1);
-    // Get the reference, if any   
-    EList<EObject> crossReferences = hashOrClassCrossReference.eCrossReferences();
-    if (crossReferences.size() == 0) return;
-    EObject crossReference = crossReferences.get(0);
-    if (!(crossReference instanceof HashOrClass)) return;
-    HashOrClass hashOrClass = (HashOrClass) crossReference;
-    // We do not check the arguments if the called mixin is undefined, in order to avoid multiple error messages.
-    if (hashOrClass.getIdent() != null) {
-      Pair<Integer, Integer> expected = getNumberOfParametersForMixin(hashOrClass);
-      int provided = mixinCall.getParameter().size();
-      if (provided < expected.getFirst() || provided > expected.getSecond()) {
-        warning(
-            getErrorMessageForCheckMixinCallParameters(hashOrClass.getIdent(), expected.getFirst(), expected.getSecond(), provided),
-            mixinCall, LessPackage.eINSTANCE.getMixinCall_Selector(), 0);
-      }
-    }
-  }
-  
   private String getErrorMessageForCheckMixinCallParameters(String ident, int expectedMin, int expectedMax, int provided) {
     if (expectedMin == expectedMax)
         return String.format(messages.getString("illegal_number_of_parameters_for_mixin"),
@@ -172,30 +133,6 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
           ident, expectedMin, provided); 
     return String.format(messages.getString("illegal_number_of_parameters_for_mixin_range"),
         ident, expectedMin, expectedMax, provided);
-  }
-  
-  /** Compute the expected number of parameters for a mixin call.
-   * @param hashOrClass
-   * @return a pair (min, max)
-   */
-  private Pair<Integer, Integer> getNumberOfParametersForMixin(HashOrClass hashOrClass) {
-    EObject container = hashOrClass.eContainer();
-    int min = 0;
-    int max = 0;
-    if ((container instanceof MixinDefinition)) {
-      MixinDefinition mixinDefinition = (MixinDefinition) container;
-      EList<MixinDefinitionParameter> parameters = mixinDefinition.getParameter();
-      for (MixinDefinitionParameter parameter: parameters) {
-        ++max;
-        if (!(parameter instanceof MixinDefinitionVariable &&
-            ((MixinDefinitionVariable) parameter).getDefault_value().size() > 0)) {
-          min = max;
-        }
-      }
-      if (isMixinDefinitionVarArgs(mixinDefinition)) 
-        max = Integer.MAX_VALUE;
-    }
-    return Tuples.pair(min, max);
   }
   
   @Check
@@ -404,8 +341,6 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
    */
   private MixinPrototype getPrototypeForMixinDefinition(HashOrClassRefTarget hashOrClass) {
     EObject container = hashOrClass.eContainer().eContainer();
-    int min = 0;
-    int max = 0;
     if ((container instanceof TerminatedMixin)) {
       return new MixinPrototype((TerminatedMixin) container);
     } else {
