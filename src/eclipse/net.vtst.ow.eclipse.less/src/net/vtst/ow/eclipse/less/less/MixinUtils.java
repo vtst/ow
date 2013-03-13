@@ -101,9 +101,13 @@ public class MixinUtils {
   }
   
   public static AtVariableRefTarget getVariableBoundByMixinParameter(MixinParameter parameter) {
-    if (parameter.getIdent() != null) return parameter.getIdent();
-    // We are sure that parameter.getTerm() has at least 1 element.
-    return getVariableRef(parameter.getTerm().get(0));
+    if (parameter.isHasDefaultValue()) {
+      return parameter.getIdent();
+    } else if (parameter.getTerm().size() > 0) {
+        return getVariableRef(parameter.getTerm().get(0));
+    } else {
+      return null;
+    }
   }
   
   public static EObject getFirstNonTermAncestor(EObject obj) {

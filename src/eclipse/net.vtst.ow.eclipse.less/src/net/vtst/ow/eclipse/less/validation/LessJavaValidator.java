@@ -10,6 +10,7 @@ import java.util.Set;
 import net.vtst.eclipse.easyxtext.validation.config.ConfigurableCheck;
 import net.vtst.eclipse.easyxtext.validation.config.ConfigurableDeclarativeValidator;
 import net.vtst.ow.eclipse.less.LessMessages;
+import net.vtst.ow.eclipse.less.less.AtVariableDef;
 import net.vtst.ow.eclipse.less.less.AtVariableRef;
 import net.vtst.ow.eclipse.less.less.Block;
 import net.vtst.ow.eclipse.less.less.BlockContents;
@@ -24,7 +25,6 @@ import net.vtst.ow.eclipse.less.less.LessPackage;
 import net.vtst.ow.eclipse.less.less.Mixin;
 import net.vtst.ow.eclipse.less.less.MixinCall;
 import net.vtst.ow.eclipse.less.less.MixinDefinition;
-import net.vtst.ow.eclipse.less.less.MixinDefinitionGuards;
 import net.vtst.ow.eclipse.less.less.MixinDefinitionParameter;
 import net.vtst.ow.eclipse.less.less.MixinDefinitionVariable;
 import net.vtst.ow.eclipse.less.less.MixinParameter;
@@ -132,56 +132,12 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     }
   }
   
-  // Check for multiple variables in mixin definitions
-  @Check
-  public void checkMixinDefinitionUniqueVariables(MixinDefinition mixinDefinition) {
-    Set<String> names = new HashSet<String>();
-    for (MixinDefinitionParameter parameter: mixinDefinition.getParameter()) {
-      if (parameter instanceof MixinDefinitionVariable) {
-        String ident = ((MixinDefinitionVariable) parameter).getVariable().getIdent();
-        if (!names.add(ident)) {
-          String message = String.format(messages.getString("duplicated_variable_mixin"), ident);
-          warning(message, parameter, LessPackage.eINSTANCE.getMixinDefinitionVariable_Variable(), 0);
-        }
-      }
-    }
-  }
-  
   private boolean isMixinDefinitionVarArgs(MixinDefinition mixinDefinition) {
     return (mixinDefinition.isVarArgsAnonymous() || mixinDefinition.isVarArgsLastVar());
   }
   
-  // Check that optional parameters are at the end in mixin definitions
-  @Check
-  @ConfigurableCheck(configurable = false)
-  public void checkMixinDefinitionParameters(MixinDefinition mixinDefinition) {
-    boolean hasOptional = false;
-    boolean lastOptional = false;
-    int index = 0;
-    int firstOptionalIndex = 0;
-    for (MixinDefinitionParameter parameter: mixinDefinition.getParameter()) {
-      lastOptional = parameter instanceof MixinDefinitionVariable &&
-          ((MixinDefinitionVariable) parameter).getDefault_value().size() > 0;
-      if (lastOptional) {
-        if (!hasOptional) {
-          hasOptional = true;
-          firstOptionalIndex = index;
-        }
-      } else {
-        if (hasOptional) {
-          String message = messages.getString("illegal_optional_parameter");
-          warning(message, mixinDefinition, LessPackage.eINSTANCE.getMixinDefinition_Parameter(), firstOptionalIndex);
-        }
-      }
-      ++index;
-    }
-    if (lastOptional && mixinDefinition.isVarArgsLastVar()) {
-      String message = messages.getString("illegal_optional_parameter_var_args");
-      error(message, mixinDefinition, LessPackage.eINSTANCE.getMixinDefinition_Parameter(), index - 1);      
-    }
-  }
-  
   // Check the number of parameters of mixin calls
+  // TODO: Adapt to new mixins
   @Check
   public void checkMixinCallParameters(MixinCall mixinCall) {
     // Get the last selector, if any
@@ -277,7 +233,14 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   }
   
   private void checkMixinDefinitionParameters(MixinParameters parameters) {
-    EList<MixinParameter> parameterList = parameters.getParameter();
+    checkMixinDefinitionParameters_SameSeparators(parameters);
+    checkMixinDefinitionParameters_SingleTermsAreVariables(parameters);
+    checkMixinDefinitionParameters_VarArgSyntax(parameters);
+    checkMixinDefinitionParameters_UniqueVariableNames(parameters);
+    checkMixinDefinitionParameters_OptionalParametersAtTheEnd(parameters);
+  }
+  
+  private void checkMixinDefinitionParameters_SameSeparators(MixinParameters parameters) {
     // Check that separators are the same
     EList<String> separators = parameters.getSep();
     if (separators.size() > 1) {
@@ -286,10 +249,12 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
         if (!separators.get(i).equals(firstSeparator))
           error(messages.getString("unexpected_separator"), parameters, LessPackage.eINSTANCE.getMixinParameters_Sep(), i);
       }
-    }
-    
+    }    
+  }
+
+  private void checkMixinDefinitionParameters_SingleTermsAreVariables(MixinParameters parameters) {
     // Check that only one variable term is provided when there is no default value
-    for (MixinParameter parameter : parameterList) {
+    for (MixinParameter parameter : parameters.getParameter()) {
       if (!parameter.isHasDefaultValue()) {
         if (parameter.getTerm().size() > 1) {
           error(messages.getString("unexpected_term"), parameter, LessPackage.eINSTANCE.getMixinParameter_Term(), 1);
@@ -303,10 +268,15 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
       }
     }
     
+  }
+
+  private void checkMixinDefinitionParameters_VarArgSyntax(MixinParameters parameters) {
     // Check the var parameter:
     // - Has the same separator as the rest, if any,
     // - Has no default value
     MixinVarParameter varParameter = parameters.getVarArg();
+    EList<String> separators = parameters.getSep();
+    EList<MixinParameter> parameterList = parameters.getParameter();
     if (varParameter != null) {
       if (varParameter.getSep() != null) {
         if (parameters.getParameter().size() == 0 ||
@@ -319,9 +289,66 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
             "illegal_optional_parameter_var_args"), parameterList.get(parameterList.size() - 1),
             LessPackage.eINSTANCE.getMixinParameter_Term(), 0);
       }
+    }    
+  }
+
+  private void checkMixinDefinitionParameters_UniqueVariableNames(MixinParameters parameters) {
+    // Check uniqueness of variable names
+    Set<String> names = new HashSet<String>();
+    for (MixinParameter parameter : parameters.getParameter()) {
+      String variable = getVariableName(parameter);
+      if (variable != null && !names.add(variable)) {
+        String message = String.format(messages.getString("duplicated_variable_mixin"), variable);
+        if (parameter.isHasDefaultValue())
+          warning(message, parameter, LessPackage.eINSTANCE.getMixinParameter_Ident(), 0);
+        else
+          warning(message, parameter, LessPackage.eINSTANCE.getMixinParameter_Term(), 0);
+      }
+    }    
+  }
+
+  private void checkMixinDefinitionParameters_OptionalParametersAtTheEnd(MixinParameters parameters) {
+    // Check that optional parameters are at the end in mixin definitions
+    boolean hasOptional = false;
+    boolean lastOptional = false;
+    int index = 0;
+    int firstOptionalIndex = 0;
+    for (MixinParameter parameter : parameters.getParameter()) {
+      lastOptional = parameter.isHasDefaultValue();
+      if (lastOptional) {
+        if (!hasOptional) {
+          hasOptional = true;
+          firstOptionalIndex = index;
+        }
+      } else {
+        if (hasOptional) {
+          String message = messages.getString("illegal_optional_parameter");
+          warning(message, parameters.getParameter().get(firstOptionalIndex), null, 0);
+        }
+      }
+      ++index;
+    }
+    if (lastOptional && parameters.getVarArg() != null && parameters.getVarArg().getSep() == null) {
+      String message = messages.getString("illegal_optional_parameter_var_args");
+      error(message, parameters.getVarArg(), null, 0);      
     }
   }
   
+  // TODO: Should this be moved to MixinUtils?
+  private String getVariableName(MixinParameter parameter) {
+    if (parameter.isHasDefaultValue()) {
+      AtVariableDef variable = parameter.getIdent();
+      if (variable != null) return variable.getIdent();
+      else return null;
+    } else if (parameter.getTerm().size() > 0) {
+      AtVariableRef variable = MixinUtils.getVariableRef(parameter.getTerm().get(0));
+      if (variable != null) return MixinUtils.getIdent(variable);
+      else return null;
+    } else {
+      return null;
+    }
+  }
+
   private void checkMixinCall(MixinUtils.Helper helper) {
     MixinParameters parameters = helper.getParameters();
     if (parameters != null) checkMixinCallParameters(parameters);
