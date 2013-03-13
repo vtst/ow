@@ -38,6 +38,7 @@ import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import org.eclipse.xtext.validation.Check;
 
 import com.google.common.collect.Sets;
@@ -287,32 +288,34 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   private void checkMixinCall_Prototype(MixinUtils.Helper helper) {
     // Get the last selector, if any
     EList<HashOrClassCrossReference> selectors = helper.getSelectors().getSelector();
+    System.out.print("VTST: ");
+    System.out.println(NodeModelUtils.getNode(helper.getSelectors()).getText());
+    System.out.println(selectors.size());
     if (selectors.size() == 0) return;
     HashOrClassCrossReference hashOrClassCrossReference = selectors.get(selectors.size() - 1);
     // Get the reference, if any
     EList<EObject> crossReferences = hashOrClassCrossReference.eCrossReferences();
+    System.out.println(crossReferences.size());
     if (crossReferences.size() == 0) return;
     EObject crossReference = crossReferences.get(0);
+    System.out.println(crossReferences.get(0));
     if (!(crossReference instanceof HashOrClassRefTarget)) return;
     HashOrClassRefTarget hashOrClass = (HashOrClassRefTarget) crossReference;
-    // We do not check the arguments if the called mixin is undefined, in order to avoid multiple error messages.
-    // TODO: Fix this test!
-    //if (hashOrClass.getIdent() != null) {
-      MixinPrototype prototype = getPrototypeForMixinDefinition(hashOrClass);
-      if (prototype != null) {
-        int provided = getNumberOfParametersOfMixinCall(helper);
-        if (provided < prototype.minNumberOfParameters || provided > prototype.maxNumberOfParameters) {
-          warning(
-              getErrorMessageForCheckMixinCallParameters(MixinUtils.getIdent(hashOrClass), prototype.minNumberOfParameters, prototype.maxNumberOfParameters, provided),
-              helper.getSelectors(), null, 0);
-        }
-        for (MixinParameter parameter : helper.getParameters().getParameter()) {
-          if (parameter.getIdent() != null && !prototype.parameterNames.contains(parameter.getIdent().getIdent())) {
-            warning(messages.format("illegal_parameter_label", parameter.getIdent().getIdent()), parameter, LessPackage.eINSTANCE.getMixinParameter_Ident(), 0);
-          }
+    MixinPrototype prototype = getPrototypeForMixinDefinition(hashOrClass);
+    System.out.println(prototype);
+    if (prototype != null) {
+      int provided = getNumberOfParametersOfMixinCall(helper);
+      if (provided < prototype.minNumberOfParameters || provided > prototype.maxNumberOfParameters) {
+        warning(
+            getErrorMessageForCheckMixinCallParameters(MixinUtils.getIdent(hashOrClass), prototype.minNumberOfParameters, prototype.maxNumberOfParameters, provided),
+            helper.getSelectors(), null, 0);
+      }
+      for (MixinParameter parameter : helper.getParameters().getParameter()) {
+        if (parameter.getIdent() != null && !prototype.parameterNames.contains(parameter.getIdent().getIdent())) {
+          warning(messages.format("illegal_parameter_label", parameter.getIdent().getIdent()), parameter, LessPackage.eINSTANCE.getMixinParameter_Ident(), 0);
         }
       }
-    //}
+    }
   }
   
   // TODO: Should we try to cache prototypes?
@@ -340,9 +343,11 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
    * @return a pair (min, max)
    */
   private MixinPrototype getPrototypeForMixinDefinition(HashOrClassRefTarget hashOrClass) {
-    EObject container = hashOrClass.eContainer().eContainer();
-    if ((container instanceof TerminatedMixin)) {
-      return new MixinPrototype((TerminatedMixin) container);
+    EObject container1 = hashOrClass.eContainer();
+    if (container1 == null) return null;
+    EObject container2 = container1.eContainer();
+    if ((container2 instanceof TerminatedMixin)) {
+      return new MixinPrototype((TerminatedMixin) container2);
     } else {
       return null;
     }
