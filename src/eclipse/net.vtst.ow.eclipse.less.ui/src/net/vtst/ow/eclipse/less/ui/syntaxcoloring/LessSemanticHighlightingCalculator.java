@@ -58,7 +58,6 @@ public class LessSemanticHighlightingCalculator extends EasySemanticHighlighting
     bindRule(grammar.getMediaFeatureRule(), highlightingConfig.MEDIA_FEATURE);
     bindKeyword(":", MediaExpression.class, highlightingConfig.MEDIA_FEATURE);
     bindKeyword("not", MediaQuery.class, highlightingConfig.PROPERTY);
-    // TODO Is this useful once the mixin definitions are correctly colored?
     bindKeyword("when", MixinDefinitionGuards.class, highlightingConfig.SELECTOR);
     bindKeyword("not", MixinDefinitionGuard.class, highlightingConfig.SELECTOR);
   }
