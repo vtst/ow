@@ -105,7 +105,7 @@ public class LessLabelProvider extends DefaultEObjectLabelProvider {
 	}
 	
 	String text(VariableDefinition obj) {
-	  return obj.getVariable().getIdent();
+	  return obj.getLhs().getVariable().getIdent();
 	}
 	
 	String text(ToplevelRuleSet obj) {

@@ -137,7 +137,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
   private void addVariableDefinitions(Iterable<? extends EObject> statements, List<IEObjectDescription> variableDefinitions) {
     for (EObject statement: statements) {
       if (statement instanceof VariableDefinition) {
-        variableDefinitions.add(getEObjectDescriptionFor(((VariableDefinition) statement).getVariable()));
+        variableDefinitions.add(getEObjectDescriptionFor(((VariableDefinition) statement).getLhs().getVariable()));
       } else if (statement instanceof ImportStatement) {
         Iterable<ToplevelStatement> importedStatements = importStatementResolver.getAllStatements((ImportStatement) statement);
         addVariableDefinitions(importedStatements, variableDefinitions);

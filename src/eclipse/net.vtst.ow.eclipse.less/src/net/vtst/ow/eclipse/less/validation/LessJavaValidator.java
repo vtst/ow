@@ -116,10 +116,10 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     for (EObject obj: iterable) {
       if (obj instanceof VariableDefinition) {
         VariableDefinition variableDefinition = (VariableDefinition) obj;
-        if (!names.add(variableDefinition.getVariable().getIdent())) {
+        if (!names.add(variableDefinition.getLhs().getVariable().getIdent())) {
           String message = String.format(messages.getString("duplicated_variable"),
-              variableDefinition.getVariable().getIdent());
-          warning(message, variableDefinition, LessPackage.eINSTANCE.getVariableDefinition_Variable(), 0);
+              variableDefinition.getLhs().getVariable().getIdent());
+          warning(message, variableDefinition, LessPackage.eINSTANCE.getVariableDefinition_Lhs(), 0);
         }
       }
     }

@@ -149,7 +149,7 @@ AtVariableRefTarget:
   Mixin | AtVariableRef | AtVariableDef
 ;
 
-// TODO: Rename into AtVariable?
+// This is the same as AtVariable, made different only for syntax highlighting purpose.
 AtVariableDef:
   ident=AT_IDENT
 ;
@@ -173,7 +173,12 @@ AtVariableTerm:
 
 // There is a trailing OPT_SPACE in this rule, because there is no in Term
 VariableDefinition:
-  variable=AtVariableDef OPT_SPACE ':' OPT_SPACE expr=Expr
+  lhs=VariableDefinitionLhs OPT_SPACE ':' OPT_SPACE expr=Expr
+;
+
+// This intermediate class is useful only for syntax highlighting purpose
+VariableDefinitionLhs:
+  variable=AtVariableDef
 ;
 
 // TODO: Delete

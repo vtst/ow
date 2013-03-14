@@ -15,7 +15,7 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 public class LessLocationInFileProvider extends EasyLocationInFileProvider {
 
   protected EStructuralFeature _getIdentifierFeature(VariableDefinition obj) {
-    return LessPackage.eINSTANCE.getVariableDefinition_Variable();
+    return LessPackage.eINSTANCE.getVariableDefinition_Lhs();
   }
 
   protected EStructuralFeature _getIdentifierFeature(MixinDefinition obj) {
