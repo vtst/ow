@@ -178,6 +178,16 @@ public abstract class EasySemanticHighlightingCalculator implements ISemanticHig
   // **************************************************************************
   // Implementation of ISemanticHighlightingCalculator
   
+  /**
+   * Hook that sub-classes may use to implement special cases.
+   * @param node
+   * @param acceptor
+   * @return
+   */
+  protected boolean provideCustomHighlightingFor(INode node, IHighlightedPositionAcceptor acceptor) {
+    return false;
+  }
+  
   /* (non-Javadoc)
    * @see org.eclipse.xtext.ui.editor.syntaxcoloring.ISemanticHighlightingCalculator#provideHighlightingFor(org.eclipse.xtext.resource.XtextResource, org.eclipse.xtext.ui.editor.syntaxcoloring.IHighlightedPositionAcceptor)
    */
@@ -186,15 +196,17 @@ public abstract class EasySemanticHighlightingCalculator implements ISemanticHig
     if (resource == null || resource.getParseResult() == null) return;
     INode root = resource.getParseResult().getRootNode();
     for (INode node : root.getAsTreeIterable()) {
-      EObject grammarElement = node.getGrammarElement();
-      if (grammarElement instanceof RuleCall) {
-        ruleToAttributes.provideHighlightingFor(
-            ((RuleCall) grammarElement).getRule(), node, acceptor);
-      } else if (grammarElement instanceof Keyword) {
-        keywordsToAttributes.provideHighlightingFor(
-            ((Keyword) grammarElement).getValue(), node, acceptor);
+      if (!provideCustomHighlightingFor(node, acceptor)) {
+        EObject grammarElement = node.getGrammarElement();
+        if (grammarElement instanceof RuleCall) {
+          ruleToAttributes.provideHighlightingFor(
+              ((RuleCall) grammarElement).getRule(), node, acceptor);
+        } else if (grammarElement instanceof Keyword) {
+          keywordsToAttributes.provideHighlightingFor(
+              ((Keyword) grammarElement).getValue(), node, acceptor);
+        }
+        if (debug) printDebugInformation(node);
       }
-      if (debug) printDebugInformation(node);
     }
   }
 
