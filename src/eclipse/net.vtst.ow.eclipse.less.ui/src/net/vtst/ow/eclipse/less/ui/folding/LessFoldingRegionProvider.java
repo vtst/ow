@@ -6,8 +6,9 @@ package net.vtst.ow.eclipse.less.ui.folding;
 import net.vtst.eclipse.easyxtext.ui.folding.EasyFoldingRegionProvider;
 import net.vtst.ow.eclipse.less.less.Block;
 import net.vtst.ow.eclipse.less.less.Declaration;
-import net.vtst.ow.eclipse.less.less.MixinCall;
-import net.vtst.ow.eclipse.less.less.MixinDefinitionParameter;
+import net.vtst.ow.eclipse.less.less.MixinParameter;
+import net.vtst.ow.eclipse.less.less.TerminatedMixin;
+import net.vtst.ow.eclipse.less.less.UnterminatedMixin;
 
 public class LessFoldingRegionProvider extends EasyFoldingRegionProvider {
 
@@ -24,11 +25,16 @@ public class LessFoldingRegionProvider extends EasyFoldingRegionProvider {
     return Boolean.FALSE;
   }
   
-  protected Boolean _shouldProcessContent(MixinDefinitionParameter obj) {
+  protected Boolean _shouldProcessContent(MixinParameter obj) {
     return Boolean.FALSE;
   }
   
-  protected Boolean _shouldProcessContent(MixinCall obj) {
+  protected Boolean _shouldProcessContent(TerminatedMixin obj) {
+    if (obj.getBody() == null) return Boolean.FALSE;
+    else return Boolean.TRUE;
+  }
+
+  protected Boolean _shouldProcessContent(UnterminatedMixin obj) {
     return Boolean.FALSE;
   }
 

@@ -4,13 +4,13 @@
 package net.vtst.ow.eclipse.less.scoping;
 
 import net.vtst.eclipse.easyxtext.scoping.EasyQualifiedNameProvider;
-import net.vtst.ow.eclipse.less.less.VariableDefinitionIdent;
+import net.vtst.ow.eclipse.less.less.AtVariableRefTarget;
 
 import org.eclipse.xtext.naming.QualifiedName;
 
 public class LessQualifiedNameProvider extends EasyQualifiedNameProvider {
 
-  public QualifiedName _getFullyQualifiedName(VariableDefinitionIdent obj) {
+  public QualifiedName _getFullyQualifiedName(AtVariableRefTarget obj) {
     // We return null, otherwise errors are reported for duplicated names
     return null;
   }

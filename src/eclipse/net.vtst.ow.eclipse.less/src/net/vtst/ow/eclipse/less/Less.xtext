@@ -38,8 +38,7 @@ StyleSheet:
 ;
 
 ToplevelOrInnerStatement:
-  '_mixin_' OPT_SPACE TerminatedMixin
-  | MixinDefinition
+  TerminatedMixin
   // LESS accepts @media, @page, @font-face and @charset statements within other
   // blocks, and move them at top level.
   | MediaStatement
@@ -50,8 +49,7 @@ ToplevelOrInnerStatement:
 
 UnterminatedToplevelOrInnerStatement:
   VariableDefinition
-  | '_mixin_' OPT_SPACE UnterminatedMixin
-  | MixinCall
+  | UnterminatedMixin
 ;
   
 ToplevelStatement:
@@ -158,10 +156,6 @@ AtVariableRef:
   variable=[AtVariableRefTarget|AT_IDENT]
 ;
 
-VariableCrossReference:
-  VariableDefinitionIdent | MixinDefinition
-;
-
 AtVariableTerm:
     AtVariableRef
   | {At2Variable} ident=AT2_IDENT
@@ -181,19 +175,12 @@ VariableDefinitionLhs:
   variable=AtVariableDef
 ;
 
-// TODO: Delete
-VariableDefinitionIdent:
-  ident=AT_IDENT 
-;
-
-
 // ----------------------------------------------------------------------------
-// Mixins (new)
+// Mixins
 
 // The same set of rules parses mixin definitions and mixin calls.  This is to make the
 // grammar LL(*) despite the recursive Term rule.
 // See LessJavaValidator.checkMixin
-// TODO: Mixin with arguments.
 
 // This is the super class for Mixins.  It is not use in the grammar only in the code.
 Mixin:
@@ -232,32 +219,7 @@ MixinParameter:
   | term+=Term (SPACE term+=Term)* OPT_SPACE
 ;
 
-
-// ----------------------------------------------------------------------------
-// Mixins (old)
-
-/* Note this only consider mixins with arguments, mixins without arguments are like normal blocks */
-MixinDefinition:
-  selector=HashOrClass OPT_SPACE
-  '(' OPT_SPACE
-  (
-    (parameter+=MixinDefinitionParameter 
-      (',' OPT_SPACE parameter+=MixinDefinitionParameter)*
-      (varArgsLastVar?='...' OPT_SPACE | ',' OPT_SPACE varArgsAnonymous?='...' OPT_SPACE)?
-    ) | varArgsAnonymous?='...' OPT_SPACE 
-  )? ')' OPT_SPACE guards=MixinDefinitionGuards?
-  block=Block
-;
-
-// There is a trailing OPT_SPACE in this rule, because there is no in Term
-MixinDefinitionParameter: 
-  {MixinDefinitionVariable} variable=VariableDefinitionIdent OPT_SPACE
-    (':' OPT_SPACE default_value+=Term (SPACE default_value+=Term)* OPT_SPACE)?
-  | {MixinDefinitionPattern} ident=IDENT_OR_KEYWORD OPT_SPACE
-  | {MixinDefinitionPattern} string=STRING OPT_SPACE
-  | {MixinDefinitionPattern} number=NumericLiteral OPT_SPACE
-;
-
+// TODO: Rename
 MixinDefinitionGuards:
   'when' OPT_SPACE guard+=MixinDefinitionGuard (',' OPT_SPACE guard+=MixinDefinitionGuard)*
 ;
@@ -273,20 +235,6 @@ MixinDefinitionGuardExpr:
 MixinDefinitionGuardTerm: 
   {MixinDefinitionGuardTerm} 'true' | Term
 ;
-
-// There are trailing OPT_SPACE after Hash/Class, because there is no in
-// Hash/Class.
-MixinCall:
-  selector+=HashOrClassCrossReference
-  (combinator+=MixinCallCombinator selector+=HashOrClassCrossReference)* OPT_SPACE 
-  ('(' OPT_SPACE (parameter+=MixinCallParameter OPT_SPACE (',' OPT_SPACE parameter+=MixinCallParameter OPT_SPACE)*)? ')' OPT_SPACE)?
-  priority=Priority
-;
-
-MixinCallParameter:
-  term+=Term (SPACE term+=Term)*
-;
-
 
 // ----------------------------------------------------------------------------
 // RuleSets
@@ -354,7 +302,7 @@ AMPERSAND_IDENT returns ecore::EString: '&' IDENT_OR_KEYWORD?;
 // the code of org.eclipse.xtext.linking.impl.LinkingHelper.
 IDENT_OR_KEYWORD_PREPEND_AT returns ecore::EString: IDENT_OR_KEYWORD;
 VariableSelector:
-  '.' '@' '{' ident=[VariableCrossReference|IDENT_OR_KEYWORD_PREPEND_AT] '}'
+  '.' '@' '{' ident=[AtVariableRefTarget|IDENT_OR_KEYWORD_PREPEND_AT] '}'
 ;
 
 HashOrClass: Hash | Class;

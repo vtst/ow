@@ -10,9 +10,9 @@ import net.vtst.ow.eclipse.less.less.InnerRuleSet;
 import net.vtst.ow.eclipse.less.less.InnerSelector;
 import net.vtst.ow.eclipse.less.less.MediaQuery;
 import net.vtst.ow.eclipse.less.less.MediaStatement;
-import net.vtst.ow.eclipse.less.less.MixinDefinition;
 import net.vtst.ow.eclipse.less.less.PageStatement;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
+import net.vtst.ow.eclipse.less.less.TerminatedMixin;
 import net.vtst.ow.eclipse.less.less.ToplevelRuleSet;
 import net.vtst.ow.eclipse.less.less.ToplevelSelector;
 import net.vtst.ow.eclipse.less.less.VariableDefinition;
@@ -123,7 +123,7 @@ public class LessLabelProvider extends DefaultEObjectLabelProvider {
 	}
 	
 	String image(StyleSheet obj) { return LessImageHelper.STYLESHEET;	}
-  String image(MixinDefinition obj) { return LessImageHelper.MIXIN_DEFINITION; }
+  String image(TerminatedMixin obj) { return LessImageHelper.MIXIN_DEFINITION; }
   String image(VariableDefinition obj) { return LessImageHelper.VARIABLE_DEFINITION; }
   String image(ToplevelRuleSet obj) { return LessImageHelper.RULE_SET; }
   String image(ImportStatement obj) { return LessImageHelper.IMPORT_STATEMENT; }
@@ -147,8 +147,9 @@ public class LessLabelProvider extends DefaultEObjectLabelProvider {
     return stripString(buf.toString());    
   }
 
-  StyledString text(MixinDefinition obj) {
-    ICompositeNode parserNode = NodeModelUtils.getNode(obj.getSelector());
+  StyledString text(TerminatedMixin obj) {
+    if (obj.getBody() == null) return null;
+    ICompositeNode parserNode = NodeModelUtils.getNode(obj.getSelectors());
     if (parserNode == null) return null;
     return new StyledString(stripString(parserNode.getText()), italicStyler);
 	}

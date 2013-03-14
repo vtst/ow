@@ -22,15 +22,14 @@ public class LessLinkingDiagnosticMessageProvider extends LinkingDiagnosticMessa
 
   public DiagnosticMessage getUnresolvedProxyMessage(ILinkingDiagnosticContext context) {
     EClass referenceType = context.getReference().getEReferenceType();
-    if (referenceType.getClassifierID() == LessPackage.VARIABLE_DEFINITION_IDENT) {
-      String message = String.format(messages.getString("unresolved_variable"), context.getLinkText());
-      return new DiagnosticMessage(message, Severity.ERROR, Diagnostic.LINKING_DIAGNOSTIC);      
-    } else if (referenceType.getClassifierID() == LessPackage.HASH_OR_CLASS_REF_TARGET) {
+    if (referenceType.getClassifierID() == LessPackage.HASH_OR_CLASS_REF_TARGET) {
       if (MixinUtils.isBoundByMixinDefinitionSelector(context.getContext())) return null;
       String message = String.format(messages.getString("unresolved_mixin"), context.getLinkText());
       return new DiagnosticMessage(message, Severity.ERROR, Diagnostic.LINKING_DIAGNOSTIC);            
     } else if (referenceType.getClassifierID() == LessPackage.AT_VARIABLE_REF_TARGET) {
       if (MixinUtils.isBoundByMixinDefinitionParameter(context.getContext())) return null;
+      String message = String.format(messages.getString("unresolved_variable"), context.getLinkText());
+      return new DiagnosticMessage(message, Severity.ERROR, Diagnostic.LINKING_DIAGNOSTIC);      
     }
     return super.getUnresolvedProxyMessage(context);
   }

@@ -9,10 +9,9 @@ import net.vtst.ow.eclipse.less.less.Declaration;
 import net.vtst.ow.eclipse.less.less.FontFaceStatement;
 import net.vtst.ow.eclipse.less.less.InnerRuleSet;
 import net.vtst.ow.eclipse.less.less.MediaStatement;
-import net.vtst.ow.eclipse.less.less.MixinCall;
-import net.vtst.ow.eclipse.less.less.MixinDefinition;
 import net.vtst.ow.eclipse.less.less.PageStatement;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
+import net.vtst.ow.eclipse.less.less.TerminatedMixin;
 import net.vtst.ow.eclipse.less.less.ToplevelRuleSet;
 import net.vtst.ow.eclipse.less.less.ToplevelStatement;
 
@@ -43,11 +42,11 @@ public class LessOutlineTreeProvider extends DefaultOutlineTreeProvider {
   }
   
   // Elements containing blocks
-  protected void _createChildren(IOutlineNode parentNode, MixinDefinition obj) {
-    createChildrenForBlock(parentNode, obj.getBlock());
+  protected void _createChildren(IOutlineNode parentNode, TerminatedMixin obj) {
+    createChildrenForBlock(parentNode, obj.getBody());
   }
-  protected boolean _isLeaf(MixinDefinition obj) {
-    return isLeafForBlock(obj.getBlock());
+  protected boolean _isLeaf(TerminatedMixin obj) {
+    return isLeafForBlock(obj.getBody());
   }
   protected void _createChildren(IOutlineNode parentNode, ToplevelRuleSet obj) {
     createChildrenForBlock(parentNode, obj.getBlock());
@@ -99,9 +98,9 @@ public class LessOutlineTreeProvider extends DefaultOutlineTreeProvider {
     return true;
   }
   protected boolean BlockItemHasNode(EObject item) {
-    return (
-        !(item instanceof Declaration) && 
-        !(item instanceof MixinCall));
+    if (item instanceof Declaration) return false;
+    if (item instanceof TerminatedMixin) return (((TerminatedMixin) item).getBody() != null);
+    return true;
   }
   
   // By default, elements are leafs.

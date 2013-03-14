@@ -7,7 +7,6 @@ import net.vtst.eclipse.easyxtext.ui.syntaxcoloring.EasySemanticHighlightingCalc
 import net.vtst.ow.eclipse.less.less.Declaration;
 import net.vtst.ow.eclipse.less.less.MediaExpression;
 import net.vtst.ow.eclipse.less.less.MediaQuery;
-import net.vtst.ow.eclipse.less.less.MixinDefinition;
 import net.vtst.ow.eclipse.less.less.MixinDefinitionGuard;
 import net.vtst.ow.eclipse.less.less.MixinDefinitionGuards;
 import net.vtst.ow.eclipse.less.less.MixinSelectors;
@@ -47,8 +46,6 @@ public class LessSemanticHighlightingCalculator extends EasySemanticHighlighting
   protected void configure() {
     bindRule(grammar.getInnerSelectorRule(), highlightingConfig.SELECTOR);
     bindRule(grammar.getToplevelSelectorRule(), highlightingConfig.SELECTOR);
-    bindRule(grammar.getHashOrClassRule(), MixinDefinition.class, highlightingConfig.SELECTOR);
-    bindRule(grammar.getVariableSelectorRule(), MixinDefinition.class, highlightingConfig.SELECTOR);
     bindRule(grammar.getHashOrClassCrossReferenceRule(), highlightingConfig.MIXIN_CALL);
     bindRule(grammar.getHashOrClassCrossReferenceRule(), highlightingConfig.MIXIN_CALL);
     bindRule(grammar.getPropertyRule(), highlightingConfig.PROPERTY);
