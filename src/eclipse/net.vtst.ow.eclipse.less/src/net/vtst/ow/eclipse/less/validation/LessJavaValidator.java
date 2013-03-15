@@ -304,9 +304,12 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
             getErrorMessageForCheckMixinCallParameters(MixinUtils.getIdent(hashOrClass), prototype.minNumberOfParameters, prototype.maxNumberOfParameters, provided),
             helper.getSelectors(), null, 0);
       }
-      for (MixinParameter parameter : helper.getParameters().getParameter()) {
-        if (parameter.getIdent() != null && !prototype.parameterNames.contains(parameter.getIdent().getIdent())) {
-          warning(messages.format("illegal_parameter_label", parameter.getIdent().getIdent()), parameter, LessPackage.eINSTANCE.getMixinParameter_Ident(), 0);
+      MixinParameters parameters = helper.getParameters();
+      if (parameters != null) {
+        for (MixinParameter parameter : parameters.getParameter()) {
+          if (parameter.getIdent() != null && !prototype.parameterNames.contains(parameter.getIdent().getIdent())) {
+            warning(messages.format("illegal_parameter_label", parameter.getIdent().getIdent()), parameter, LessPackage.eINSTANCE.getMixinParameter_Ident(), 0);
+          }
         }
       }
     }
@@ -348,12 +351,14 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   }
 
   private int getNumberOfParametersOfMixinCall(MixinUtils.Helper helper) {
+    MixinParameters parameters = helper.getParameters();
+    if (parameters == null) return 0;
     int numberOfSemicolons = 0;
-    for (String separator : helper.getParameters().getSep()) {
+    for (String separator : parameters.getSep()) {
       if (";".equals(separator)) ++numberOfSemicolons;
     }
     if (numberOfSemicolons > 0) return numberOfSemicolons + 1;
-    else return helper.getParameters().getParameter().size();
+    else return parameters.getParameter().size();
   }
   
   
