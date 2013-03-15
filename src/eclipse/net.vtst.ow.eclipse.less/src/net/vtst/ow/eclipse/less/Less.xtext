@@ -233,7 +233,7 @@ MixinDefinitionGuardExpr:
 ;
 
 MixinDefinitionGuardTerm: 
-  {MixinDefinitionGuardTerm} 'true' | Term
+  Term
 ;
 
 // ----------------------------------------------------------------------------
@@ -317,7 +317,7 @@ HASH_IDENT returns ecore::EString: HASH_COLOR | HASH_OTHER;
 // This rule does not end with OPT_SPACE, because of combinators
 Class: ident=CLASS_IDENT;
 CLASS_IDENT returns ecore::EString: '.' IDENT_OR_KEYWORD;
-IDENT_OR_KEYWORD returns ecore::EString: IDENT | 'and' | 'even' | 'n' | 'not' | 'odd' | 'only' | 'when';
+IDENT_OR_KEYWORD returns ecore::EString: IDENT | 'and' | 'even' | 'important' | 'n' | 'not' | 'odd' | 'only' | 'when';
 
 // This rule does not end with OPT_SPACE, because of combinators
 Attrib:
