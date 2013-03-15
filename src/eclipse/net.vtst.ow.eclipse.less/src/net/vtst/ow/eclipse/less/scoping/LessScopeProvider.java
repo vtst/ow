@@ -11,7 +11,7 @@ import net.vtst.ow.eclipse.less.less.AtVariableRefTarget;
 import net.vtst.ow.eclipse.less.less.Block;
 import net.vtst.ow.eclipse.less.less.BlockUtils;
 import net.vtst.ow.eclipse.less.less.HashOrClass;
-import net.vtst.ow.eclipse.less.less.HashOrClassCrossReference;
+import net.vtst.ow.eclipse.less.less.HashOrClassRef;
 import net.vtst.ow.eclipse.less.less.HashOrClassRefTarget;
 import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.less.InnerRuleSet;
@@ -195,8 +195,8 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
     // the current hash or class in the mixin call.
     ArrayList<String> pattern = null;
     int index = 0;
-    if (context instanceof HashOrClassCrossReference) {
-      Pair<ArrayList<String>, Integer> result = getMixinCallPattern(context.eContainer(), (HashOrClassCrossReference) context);
+    if (context instanceof HashOrClassRef) {
+      Pair<ArrayList<String>, Integer> result = getMixinCallPattern(context.eContainer(), (HashOrClassRef) context);
       if (result == null) return IScope.NULLSCOPE;
       pattern = result.getFirst();
       index = result.getSecond().intValue();
@@ -210,13 +210,13 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
   /** Return the pattern (i.e. the preceding hashes and classes) of a cross-reference (current) in a
    * context (which should be a Mixin call, otherwise an empty context is returned).
    */
-  private Pair<ArrayList<String>, Integer> getMixinCallPattern(EObject context, HashOrClassCrossReference current) {
+  private Pair<ArrayList<String>, Integer> getMixinCallPattern(EObject context, HashOrClassRef current) {
     int index = 0;
     if (!(context instanceof MixinSelectors)) return null;
     MixinSelectors selectors = (MixinSelectors) context;
     ArrayList<String> pattern = new ArrayList<String>(selectors.getSelector().size());
     int i = 0;
-    for (HashOrClassCrossReference item: selectors.getSelector()) {
+    for (HashOrClassRef item: selectors.getSelector()) {
       if (item == current) index = i;
       pattern.add(NodeModelUtils.getNode(item).getText());
       ++i;
@@ -296,7 +296,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
       } else if (obj instanceof Mixin) {
         MixinUtils.Helper mixinHelper = MixinUtils.newHelper((Mixin) obj);
         if (mixinHelper.isDefinition() && mixinHelper.getSelectors().getSelector().size() == 1) {
-          HashOrClassCrossReference selector = mixinHelper.getSelectors().getSelector().get(0);
+          HashOrClassRef selector = mixinHelper.getSelectors().getSelector().get(0);
           if (isMatching(pattern.get(match.size()), selector)) {
             hasMatch = true;
             computeMixinMatchesDown(mixinHelper.getBody(), pattern, match.cloneAndAdd(selector), matches);

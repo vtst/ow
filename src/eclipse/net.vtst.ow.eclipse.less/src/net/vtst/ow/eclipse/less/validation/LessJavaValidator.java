@@ -14,7 +14,7 @@ import net.vtst.ow.eclipse.less.less.Block;
 import net.vtst.ow.eclipse.less.less.BlockContents;
 import net.vtst.ow.eclipse.less.less.BlockUtils;
 import net.vtst.ow.eclipse.less.less.Declaration;
-import net.vtst.ow.eclipse.less.less.HashOrClassCrossReference;
+import net.vtst.ow.eclipse.less.less.HashOrClassRef;
 import net.vtst.ow.eclipse.less.less.HashOrClassRefTarget;
 import net.vtst.ow.eclipse.less.less.IdentTerm;
 import net.vtst.ow.eclipse.less.less.ImportStatement;
@@ -286,9 +286,9 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
 
   private void checkMixinCall_Prototype(MixinUtils.Helper helper) {
     // Get the last selector, if any
-    EList<HashOrClassCrossReference> selectors = helper.getSelectors().getSelector();
+    EList<HashOrClassRef> selectors = helper.getSelectors().getSelector();
     if (selectors.size() == 0) return;
-    HashOrClassCrossReference hashOrClassCrossReference = selectors.get(selectors.size() - 1);
+    HashOrClassRef hashOrClassCrossReference = selectors.get(selectors.size() - 1);
     // Get the reference, if any
     EList<EObject> crossReferences = hashOrClassCrossReference.eCrossReferences();
     if (crossReferences.size() == 0) return;

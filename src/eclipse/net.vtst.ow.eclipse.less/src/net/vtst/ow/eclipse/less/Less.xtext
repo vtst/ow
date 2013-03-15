@@ -199,8 +199,8 @@ UnterminatedMixin:
 ;
 
 MixinSelectors:
-  selector+=HashOrClassCrossReference
-  (combinator+=MixinCallCombinator selector+=HashOrClassCrossReference)* OPT_SPACE 
+  selector+=HashOrClassRef
+  (combinator+=MixinCallCombinator selector+=HashOrClassRef)* OPT_SPACE 
 ;
 
 MixinParameters:
@@ -220,7 +220,6 @@ MixinParameter:
   | term+=Term (SPACE term+=Term)* OPT_SPACE
 ;
 
-// TODO: Rename
 MixinDefinitionGuards:
   'when' OPT_SPACE guard+=MixinDefinitionGuard (',' OPT_SPACE guard+=MixinDefinitionGuard)*
 ;
@@ -307,9 +306,8 @@ VariableSelector:
 ;
 
 HashOrClass: Hash | Class;
-// TODO: Rename into HashOrClassRef
-HashOrClassCrossReference: ident=[HashOrClassRefTarget|HASH_OR_CLASS_IDENT];
-HashOrClassRefTarget: HashOrClass | HashOrClassCrossReference;
+HashOrClassRef: ident=[HashOrClassRefTarget|HASH_OR_CLASS_IDENT];
+HashOrClassRefTarget: HashOrClass | HashOrClassRef;
 HASH_OR_CLASS_IDENT returns ecore::EString: HASH_IDENT | CLASS_IDENT;
 
 // This rule does not end with OPT_SPACE, because of combinators

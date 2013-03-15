@@ -172,7 +172,7 @@ public class MixinUtils {
   
   public static String getIdent(HashOrClassRefTarget obj) {
     if (obj instanceof HashOrClass) return ((HashOrClass) obj).getIdent();
-    if (obj instanceof HashOrClassCrossReference) return NodeModelUtils.getNode(obj).getText();
+    if (obj instanceof HashOrClassRef) return NodeModelUtils.getNode(obj).getText();
     throw new RuntimeException("Unknown subclass of HashOrClassRefTarget");
   }
 
