@@ -38,7 +38,6 @@ import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import org.eclipse.xtext.validation.Check;
 
 import com.google.common.collect.Sets;
