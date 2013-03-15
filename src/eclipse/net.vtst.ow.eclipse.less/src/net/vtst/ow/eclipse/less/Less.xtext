@@ -343,7 +343,6 @@ PseudoClassFunctionArgument:
   | var=AtVariableTerm
 ;
 
-/* TODO: odd, even and n as keywords */
 PseudoClassNth:
   {PseudoClassNth} ('+' | '-')? NUMBER? 'n' (OPT_SPACE ('+' | '-') OPT_SPACE NUMBER)?
   | {PseudoClassNth} ('+' | '-')? NUMBER
