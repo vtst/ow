@@ -221,7 +221,7 @@ MixinParameter:
 ;
 
 MixinDefinitionGuards:
-  'when' OPT_SPACE guard+=MixinDefinitionGuard (',' OPT_SPACE guard+=MixinDefinitionGuard)*
+  'when' OPT_SPACE guard+=MixinDefinitionGuard (('and' | ',') OPT_SPACE guard+=MixinDefinitionGuard)*
 ;
 
 MixinDefinitionGuard:
