@@ -288,21 +288,15 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   private void checkMixinCall_Prototype(MixinUtils.Helper helper) {
     // Get the last selector, if any
     EList<HashOrClassCrossReference> selectors = helper.getSelectors().getSelector();
-    System.out.print("VTST: ");
-    System.out.println(NodeModelUtils.getNode(helper.getSelectors()).getText());
-    System.out.println(selectors.size());
     if (selectors.size() == 0) return;
     HashOrClassCrossReference hashOrClassCrossReference = selectors.get(selectors.size() - 1);
     // Get the reference, if any
     EList<EObject> crossReferences = hashOrClassCrossReference.eCrossReferences();
-    System.out.println(crossReferences.size());
     if (crossReferences.size() == 0) return;
     EObject crossReference = crossReferences.get(0);
-    System.out.println(crossReferences.get(0));
     if (!(crossReference instanceof HashOrClassRefTarget)) return;
     HashOrClassRefTarget hashOrClass = (HashOrClassRefTarget) crossReference;
     MixinPrototype prototype = getPrototypeForMixinDefinition(hashOrClass);
-    System.out.println(prototype);
     if (prototype != null) {
       int provided = getNumberOfParametersOfMixinCall(helper);
       if (provided < prototype.minNumberOfParameters || provided > prototype.maxNumberOfParameters) {
