@@ -328,8 +328,12 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
         String variable = MixinUtils.getVariableName(parameter);
         if (variable != null) parameterNames.add(variable);
       }
-      if (mixinDefinition.getParameters().getVarArg() != null) 
+      MixinVarParameter varArg = mixinDefinition.getParameters().getVarArg();
+      if (varArg != null) {
         maxNumberOfParameters = Integer.MAX_VALUE;
+        if (varArg.getSep() != null)
+          --minNumberOfParameters;
+      }
     }
     
   }
