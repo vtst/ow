@@ -136,6 +136,7 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   }
   
   @Check
+  @ConfigurableCheck(configurable = false)
   public void checkFinalSemicolonOfTerminatedMixin(TerminatedMixin mixin) {
     if (mixin.getBody() != null || mixin.isHasFinalSemicolon()) return;
     EObject parent = mixin.eContainer();
