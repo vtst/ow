@@ -302,7 +302,7 @@ AMPERSAND_IDENT returns ecore::EString: '&' IDENT_OR_KEYWORD?;
 // the code of org.eclipse.xtext.linking.impl.LinkingHelper.
 IDENT_OR_KEYWORD_PREPEND_AT returns ecore::EString: IDENT_OR_KEYWORD;
 VariableSelector:
-  '.' '@' '{' ident=[AtVariableRefTarget|IDENT_OR_KEYWORD_PREPEND_AT] '}'
+  '.' IDENT_OR_KEYWORD? ('@' '{' variable+=[AtVariableRefTarget|IDENT_OR_KEYWORD_PREPEND_AT] '}' IDENT_OR_KEYWORD?)+
 ;
 
 HashOrClass: Hash | Class;
