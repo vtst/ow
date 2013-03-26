@@ -225,7 +225,7 @@ MixinDefinitionGuards:
 ;
 
 MixinDefinitionGuard:
-  ('not' OPT_SPACE)? '(' expr=MixinDefinitionGuardExpr ')' OPT_SPACE
+  ('not' OPT_SPACE)? '(' OPT_SPACE expr=MixinDefinitionGuardExpr ')' OPT_SPACE
 ;
 
 MixinDefinitionGuardExpr:
