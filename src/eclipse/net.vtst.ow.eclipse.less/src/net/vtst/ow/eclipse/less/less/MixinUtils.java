@@ -179,6 +179,11 @@ public class MixinUtils {
     if (obj instanceof AtVariableRef) return getIdentText(obj);
     throw new RuntimeException("Should not be called with a Mixin");
   }
+
+  // Keep in sync with the above version
+  public static String getIdent(AtVariableRef obj) {
+    return getIdentText(obj);
+  }
   
   public static String getIdent(HashOrClassRefTarget obj) {
     if (obj instanceof HashOrClass) return ((HashOrClass) obj).getIdent();
@@ -186,5 +191,9 @@ public class MixinUtils {
     throw new RuntimeException("Unknown subclass of HashOrClassRefTarget");
   }
 
- 
+  // Keep in sync with the above version
+  public static String getIdent(HashOrClassRef obj) {
+    return getIdentText(obj);
+  }
+
 }
