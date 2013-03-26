@@ -2,6 +2,8 @@ package net.vtst.ow.eclipse.less.less;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.xtext.nodemodel.ILeafNode;
+import org.eclipse.xtext.nodemodel.INode;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 
 /**
@@ -164,15 +166,23 @@ public class MixinUtils {
     return false;
   }
   
+  private static String getIdentText(EObject obj) {
+    INode node = NodeModelUtils.getNode(obj);
+    for (ILeafNode leafNode : node.getLeafNodes()) {
+      if (!leafNode.isHidden()) return leafNode.getText();
+    }
+    return "";
+  }
+  
   public static String getIdent(AtVariableRefTarget obj) {
     if (obj instanceof AtVariableDef) return ((AtVariableDef) obj).getIdent();
-    if (obj instanceof AtVariableRef) return NodeModelUtils.getNode(obj).getText();
+    if (obj instanceof AtVariableRef) return getIdentText(obj);
     throw new RuntimeException("Should not be called with a Mixin");
   }
   
   public static String getIdent(HashOrClassRefTarget obj) {
     if (obj instanceof HashOrClass) return ((HashOrClass) obj).getIdent();
-    if (obj instanceof HashOrClassRef) return NodeModelUtils.getNode(obj).getText();
+    if (obj instanceof HashOrClassRef) return getIdentText(obj);
     throw new RuntimeException("Unknown subclass of HashOrClassRefTarget");
   }
 

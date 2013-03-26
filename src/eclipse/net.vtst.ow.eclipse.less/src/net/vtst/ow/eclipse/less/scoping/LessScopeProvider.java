@@ -218,7 +218,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
     int i = 0;
     for (HashOrClassRef item: selectors.getSelector()) {
       if (item == current) index = i;
-      pattern.add(NodeModelUtils.getNode(item).getText());
+      pattern.add(MixinUtils.getIdent(item));
       ++i;
     }
     return Tuples.pair(pattern, index);
