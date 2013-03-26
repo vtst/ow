@@ -200,7 +200,7 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
         } else {
           Term term = parameter.getTerm().get(0);
           if (!(term instanceof IdentTerm || term instanceof StringTerm || 
-              term instanceof NumericLiteral || MixinUtils.isVariableRef(term))) {
+              term instanceof NumericLiteral || MixinUtils.isVariableRefOrNumericLiteral(term))) {
             error(messages.getString("unexpected_term"), parameter, LessPackage.eINSTANCE.getMixinParameter_Term(), 0);              
           }
         }
