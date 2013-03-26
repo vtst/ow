@@ -168,10 +168,11 @@ public class MixinUtils {
   
   private static String getIdentText(EObject obj) {
     INode node = NodeModelUtils.getNode(obj);
+    StringBuffer buf = new StringBuffer(node.getLength());
     for (ILeafNode leafNode : node.getLeafNodes()) {
-      if (!leafNode.isHidden()) return leafNode.getText();
+      if (!leafNode.isHidden()) buf.append(leafNode.getText());
     }
-    return "";
+    return buf.toString();
   }
   
   public static String getIdent(AtVariableRefTarget obj) {
