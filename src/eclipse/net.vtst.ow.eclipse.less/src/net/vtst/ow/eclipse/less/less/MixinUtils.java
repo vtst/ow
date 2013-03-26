@@ -72,14 +72,14 @@ public class MixinUtils {
    * @param term
    * @return true if term is a single variable.
    */
-  public static boolean isVariableRef(Term term) {
+  public static boolean isVariableRefOrNumericLiteral(Term term) {
     if (term instanceof ExtendedTerm) {
       ExtendedTerm extendedTerm = (ExtendedTerm) term;
       EList<EObject> subTerms = extendedTerm.getTerm();
       if (subTerms.size() != 1) return false;
       EObject subTerm = subTerms.get(0);
-      if (subTerm instanceof AtVariableRef) return true;
-      else if (subTerm instanceof Term) return isVariableRef((Term) subTerm);
+      if (subTerm instanceof AtVariableRef  || subTerm instanceof NumericLiteral) return true;
+      else if (subTerm instanceof Term) return isVariableRefOrNumericLiteral((Term) subTerm);
       else return false;
     }
     return false;
