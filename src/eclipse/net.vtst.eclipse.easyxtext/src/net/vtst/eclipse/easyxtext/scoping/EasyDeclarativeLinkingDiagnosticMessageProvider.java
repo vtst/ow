@@ -23,23 +23,17 @@ public class EasyDeclarativeLinkingDiagnosticMessageProvider extends LinkingDiag
     String methodName = "getUnresolvedProxyMessage_" + context.getReference().getEType().getName();
     return PolymorphicDispatcher.Predicates.forName(methodName, 1);
   }
-
-  protected DiagnosticMessage polymorphicGetUnresolvedProxyMessage(ILinkingDiagnosticContext context) {
+  
+  public DiagnosticMessage getUnresolvedProxyMessage(final ILinkingDiagnosticContext context) {
     Predicate<Method> predicate = getPredicate(context);
     PolymorphicDispatcher<DiagnosticMessage> dispatcher = new PolymorphicDispatcher<DiagnosticMessage>(
         Collections.singletonList(this), predicate, errorHandler) {
       @Override
       protected DiagnosticMessage handleNoSuchMethod(Object... params) {
-        return null;
+        return EasyDeclarativeLinkingDiagnosticMessageProvider.super.getUnresolvedProxyMessage(context);
       }
     };
     return dispatcher.invoke(context);
-  }
-  
-  public DiagnosticMessage getUnresolvedProxyMessage(ILinkingDiagnosticContext context) {
-    DiagnosticMessage message = polymorphicGetUnresolvedProxyMessage(context);
-    if (message == null) message = super.getUnresolvedProxyMessage(context);
-    return message;
   }
 
 }
