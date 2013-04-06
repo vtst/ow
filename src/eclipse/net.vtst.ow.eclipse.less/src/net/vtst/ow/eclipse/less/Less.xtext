@@ -286,15 +286,17 @@ MixinCallCombinator returns Combinator:
 
 // This rule does not end with OPT_SPACE, because of combinators
 SimpleSelector:
-  {SimpleSelectorWithRoot} root=(IDENT_OR_KEYWORD | '*' | AMPERSAND_IDENT)
+  {SimpleSelectorWithRoot} root=RootSelector
   (criteria+=CommonSelector | criteria+=Pseudo)*
   | {SimpleSelectorWithoutRoot} (criteria+=CommonSelector | criteria+=Pseudo)+
 ;
 SimpleSelectorInNot:
-  {SimpleSelectorInNotWithRoot} root=(IDENT_OR_KEYWORD | '*' | AMPERSAND_IDENT)
+  {SimpleSelectorInNotWithRoot} root=RootSelector
   (criteria+=CommonSelector | criteria+=PseudoWithoutNot)*
   | {SimpleSelectorInNotWithoutRoot} (criteria+=CommonSelector | criteria+=PseudoWithoutNot)+
 ;
+
+RootSelector: IDENT_OR_KEYWORD | '*' | AMPERSAND_IDENT;
 CommonSelector: HashOrClass | VariableSelector | Attrib;
 AMPERSAND_IDENT returns ecore::EString: '&' IDENT_OR_KEYWORD?;
 
