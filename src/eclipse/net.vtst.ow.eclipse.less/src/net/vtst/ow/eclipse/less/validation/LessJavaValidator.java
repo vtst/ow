@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import net.vtst.eclipse.easyxtext.validation.config.AdditionalBooleanOption;
 import net.vtst.eclipse.easyxtext.validation.config.ConfigurableCheck;
 import net.vtst.eclipse.easyxtext.validation.config.ConfigurableDeclarativeValidator;
 import net.vtst.ow.eclipse.less.LessMessages;
@@ -50,6 +51,9 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   
   @Inject
   LessImportStatementResolver importStatementResolver;
+  
+  public AdditionalBooleanOption checkMixinLinking;
+  public AdditionalBooleanOption checkVariableLinking;
     
   protected boolean isResponsible(Map<Object, Object> context, EObject eObject) {
     ConfigurableDeclarativeValidator.makeConfigurable(this);
