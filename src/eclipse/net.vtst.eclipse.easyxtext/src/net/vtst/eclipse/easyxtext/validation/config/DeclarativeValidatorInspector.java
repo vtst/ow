@@ -99,7 +99,6 @@ public class DeclarativeValidatorInspector {
    */
   private void inspectField(Field field) {
     ConfigurableCheck annotation = field.getAnnotation(ConfigurableCheck.class);
-    if (annotation == null) return;
     Group group = inspectAnnotation(annotation, field.getName());
     if (group != null) group.fields.add(field);
   }
