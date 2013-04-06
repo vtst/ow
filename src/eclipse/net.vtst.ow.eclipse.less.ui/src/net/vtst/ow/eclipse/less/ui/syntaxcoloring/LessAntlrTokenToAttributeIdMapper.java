@@ -28,6 +28,11 @@ public class LessAntlrTokenToAttributeIdMapper extends EasyAntlrTokenToAttribute
     bindKeyword("@import-multiple", highlightingConfig.AT_KEYWORD);
     bindKeyword("@import-once", highlightingConfig.AT_KEYWORD);
     bindKeyword("@import", highlightingConfig.AT_KEYWORD);
+    bindKeyword("@keyframes", highlightingConfig.AT_KEYWORD);
+    bindKeyword("@-webkit-keyframes", highlightingConfig.AT_KEYWORD);
+    bindKeyword("@-moz-keyframes", highlightingConfig.AT_KEYWORD);
+    bindKeyword("@-ms-keyframes", highlightingConfig.AT_KEYWORD);
+    bindKeyword("@-o-keyframes", highlightingConfig.AT_KEYWORD);
     bindKeyword("@media", highlightingConfig.AT_KEYWORD);
     bindKeyword("@page", highlightingConfig.AT_KEYWORD);
     bindKeyword("@font-face", highlightingConfig.AT_KEYWORD);

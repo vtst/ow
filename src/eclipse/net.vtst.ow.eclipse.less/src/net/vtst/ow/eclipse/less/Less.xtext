@@ -39,8 +39,9 @@ StyleSheet:
 
 ToplevelOrInnerStatement:
   TerminatedMixin
-  // LESS accepts @media, @page, @font-face and @charset statements within other
+  // LESS accepts @keyframes, @media, @page, @font-face and @charset statements within other
   // blocks, and move them at top level.
+  | KeyframesStatement
   | MediaStatement
   | PageStatement
   | FontFaceStatement
@@ -137,6 +138,32 @@ FontFaceStatement:
 
 CharsetStatement:
   '@charset' OPT_SPACE charset=STRING OPT_SPACE ';' OPT_SPACE
+;
+
+// ----------------------------------------------------------------------------
+// @keyframes
+// See http://www.w3.org/TR/css3-animations/#keyframes
+
+KeyframesStatement:
+  {KeyframesStatement} KeyframesSymbol SPACE ident=IDENT OPT_SPACE '{' OPT_SPACE blocks+=KeyframesBlock* '}' OPT_SPACE
+;
+
+KeyframesSymbol:
+  '@keyframes'
+  | '@-webkit-keyframes'
+  | '@-moz-keyframes'
+  | '@-ms-keyframes'
+  | '@-o-keyframes'
+;
+
+KeyframesBlock:
+  selector=KeyframesSelector block=Block
+;
+
+KeyframesSelector:
+  'from' OPT_SPACE
+  | 'to' OPT_SPACE
+  | PERCENTAGE OPT_SPACE
 ;
 
 // ----------------------------------------------------------------------------
@@ -319,7 +346,7 @@ HASH_IDENT returns ecore::EString: HASH_COLOR | HASH_OTHER;
 // This rule does not end with OPT_SPACE, because of combinators
 Class: ident=CLASS_IDENT;
 CLASS_IDENT returns ecore::EString: '.' IDENT_OR_KEYWORD;
-IDENT_OR_KEYWORD returns ecore::EString: IDENT | 'and' | 'even' | 'important' | 'n' | 'not' | 'odd' | 'only' | 'when';
+IDENT_OR_KEYWORD returns ecore::EString: IDENT | 'and' | 'even' | 'from' | 'important' | 'n' | 'not' | 'odd' | 'only' | 'to' | 'when';
 
 // This rule does not end with OPT_SPACE, because of combinators
 Attrib:
