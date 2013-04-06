@@ -23,7 +23,6 @@ public class LessLinkingDiagnosticMessageProvider extends EasyDeclarativeLinking
   private LessJavaValidator validator;
   
   public DiagnosticMessage getUnresolvedProxyMessage_AtVariableRefTarget(ILinkingDiagnosticContext context) {
-    System.out.println(validator.checkVariableLinking.get(context.getContext()));
     if (!validator.checkVariableLinking.get(context.getContext())) return null;
     if (MixinUtils.isBoundByMixinDefinitionParameter(context.getContext())) return null;
     String message = String.format(messages.getString("unresolved_variable"), context.getLinkText());
