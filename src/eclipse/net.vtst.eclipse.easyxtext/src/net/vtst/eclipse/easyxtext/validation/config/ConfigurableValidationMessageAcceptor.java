@@ -1,5 +1,6 @@
 package net.vtst.eclipse.easyxtext.validation.config;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
@@ -46,11 +47,14 @@ public class ConfigurableValidationMessageAcceptor implements ValidationMessageA
    */
   public class ProjectConfiguration {
     private Set<Method> disabledCheckMethods = new HashSet<Method>();
+    private Set<Field> setFields = new HashSet<Field>();
     
     public ProjectConfiguration(IProject project) {
       try {
         for (DeclarativeValidatorInspector.Group group : inspector.getGroups()) {
-          if (!inspector.getEnabled(project, group)) {
+          if (inspector.getEnabled(project, group)) {
+            setFields.addAll(group.fields);
+          } else {
             disabledCheckMethods.addAll(group.methods);
           }
         }
@@ -61,6 +65,10 @@ public class ConfigurableValidationMessageAcceptor implements ValidationMessageA
     
     public boolean isDisabled(Method method) {
       return disabledCheckMethods.contains(method);
+    }
+    
+    public boolean getFieldValue(Field field) {
+      return setFields.contains(field);
     }
   }
   
@@ -107,6 +115,12 @@ public class ConfigurableValidationMessageAcceptor implements ValidationMessageA
 
   public void resetCache(IProject project) {
     cache.reset(project);
+  }
+  
+  public boolean getFieldValue(Resource resource, Field field) {
+    ProjectConfiguration configuration = cache.get(resource);
+    if (configuration == null) return false;
+    return configuration.getFieldValue(field);
   }
 
   // **************************************************************************

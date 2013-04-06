@@ -31,20 +31,24 @@ public class DeclarativeValidatorInspector {
     public String label = null;
     public boolean enabledByDefault;
     public List<Method> methods = new ArrayList<Method>(1);
+    public List<Field> fields = new ArrayList<Field>(1);
   }
   
   private String propertyNameQualifier;
   private boolean enabledByDefault = true;
   private Map<String, Group> groupByName = new HashMap<String, Group>();
   private ArrayList<Group> groupList = new ArrayList<Group>();
-
+  private Collection<Field> additionalOptionFields;
+  
   /**
    * Creates a new inspector from a validator.
    * @param validator
    */
   public DeclarativeValidatorInspector(AbstractDeclarativeValidator validator) {
     inspectTypeAnnotation(validator);
-    inspectMethods(getCheckMethods(validator));
+    for (Method method : getCheckMethods(validator)) inspectMethod(method);
+    this.additionalOptionFields = getAdditionalOptionFields(validator);
+    for (Field field : this.additionalOptionFields) inspectField(field);
     propertyNameQualifier = validator.getClass().getName();
   }
 
@@ -80,22 +84,29 @@ public class DeclarativeValidatorInspector {
   }
   
   /**
-   * Inspect all methods from a collection.
-   * @param methods
-   */
-  private void inspectMethods(Collection<Method> methods) {
-    for (Method method : methods)
-      inspectMethod(method);
-  }
-  
-  /**
    * Inspect a method and its annotation.
    * @param method
    */
   private void inspectMethod(Method method) {
     ConfigurableCheck annotation = method.getAnnotation(ConfigurableCheck.class);
-    String groupName = method.getName();
-    if (annotation != null && !annotation.configurable()) return;
+    Group group = inspectAnnotation(annotation, method.getName());
+    if (group != null) group.methods.add(method);
+  }
+  
+  /**
+   * Inspect a field and its annotation.
+   * @param field
+   */
+  private void inspectField(Field field) {
+    ConfigurableCheck annotation = field.getAnnotation(ConfigurableCheck.class);
+    if (annotation == null) return;
+    Group group = inspectAnnotation(annotation, field.getName());
+    if (group != null) group.fields.add(field);
+  }
+  
+  private Group inspectAnnotation(ConfigurableCheck annotation, String name) {
+    String groupName = name;
+    if (annotation != null && !annotation.configurable()) return null;
     if (annotation != null && !annotation.group().isEmpty()) {
       groupName = annotation.group();
     }
@@ -107,13 +118,13 @@ public class DeclarativeValidatorInspector {
       groupByName.put(groupName, group);
       groupList.add(group);
     }
-    group.methods.add(method);
     if (annotation != null) {
       if (annotation.defaultState() != CheckState.DEFAULT)
         group.enabledByDefault = stateToBoolean(annotation.defaultState());
       if (!annotation.group().isEmpty()) group.name = annotation.group();
       if (!annotation.label().isEmpty()) group.label = annotation.label();
     }
+    return group;
   }
   
   /**
@@ -157,6 +168,21 @@ public class DeclarativeValidatorInspector {
       e.printStackTrace();
     }
     return Collections.emptyList();
+  }
+  
+  private Collection<Field> getAdditionalOptionFields(AbstractDeclarativeValidator validator) {
+    ArrayList<Field> result = new ArrayList<Field>();
+    for (Field field : validator.getClass().getFields()) {
+      if (field.getType().equals(AdditionalBooleanOption.class)) {
+        field.setAccessible(true);
+        result.add(field);
+      }
+    }
+    return result;
+  }
+  
+  public Collection<Field> getAdditionalOptionFields() {
+    return additionalOptionFields;
   }
 
   // **************************************************************************

@@ -1,5 +1,7 @@
 package net.vtst.eclipse.easyxtext.validation.config;
 
+import java.lang.reflect.Field;
+
 import org.eclipse.xtext.validation.AbstractDeclarativeValidator;
 
 /**
@@ -46,9 +48,18 @@ public class ConfigurableDeclarativeValidator {
     if (isConfigured(validator)) return;
     synchronized (validator) {
       if (isConfigured(validator)) return;
+      DeclarativeValidatorInspector inspector = new DeclarativeValidatorInspector(validator);
       ConfigurableValidationMessageAcceptor acceptor =
-          new ConfigurableValidationMessageAcceptor(new DeclarativeValidatorInspector(validator), validator.getMessageAcceptor());
+          new ConfigurableValidationMessageAcceptor(inspector, validator.getMessageAcceptor());
       acceptor.stateAccess = validator.setMessageAcceptor(acceptor);
+      // Set the additional option fields.
+      for (Field field : inspector.getAdditionalOptionFields()) {
+        try {
+          field.set(validator, new AdditionalBooleanOption(field, acceptor));
+        } catch (IllegalArgumentException e) {
+        } catch (IllegalAccessException e) {
+        }
+      }
     }
   }
 

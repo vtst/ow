@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  * @author Vincent Simonet
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target({ElementType.METHOD, ElementType.FIELD})
 public @interface ConfigurableCheck {
   /**
    * @return true if the check is configurable.
