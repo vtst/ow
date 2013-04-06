@@ -39,9 +39,9 @@ StyleSheet:
 
 ToplevelOrInnerStatement:
   TerminatedMixin
-  // LESS accepts @keyframes, @media, @page, @font-face and @charset statements within other
-  // blocks, and move them at top level.
+  // LESS accepts @ statements within other blocks, and move them at top level.
   | KeyframesStatement
+  | ViewportStatement
   | MediaStatement
   | PageStatement
   | FontFaceStatement
@@ -138,6 +138,19 @@ FontFaceStatement:
 
 CharsetStatement:
   '@charset' OPT_SPACE charset=STRING OPT_SPACE ';' OPT_SPACE
+;
+
+// http://dev.w3.org/csswg/css-device-adapt/
+ViewportStatement:
+  ViewportSymbol OPT_SPACE block=Block
+;
+
+ViewportSymbol:
+  '@viewport'
+  | '@-webkit-viewport'
+  | '@-moz-viewport'
+  | '@-ms-viewport'
+  | '@-o-viewport'
 ;
 
 // ----------------------------------------------------------------------------
