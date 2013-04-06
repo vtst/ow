@@ -110,6 +110,7 @@
       class="net.vtst.ow.eclipse.less.ui.LessExecutableExtensionFactory:net.vtst.eclipse.easyxtext.ui.validation.config.ValidatorPropertyPage"
       id="net.vtst.ow.eclipse.less.ui.properties.LessValidationPropertyPage"
       name="%less_validation_property_page"
+      category="ValidationPropertiesPage"
       nameFilter="*">
       <enabledWhen>
         <adapt type="org.eclipse.core.resources.IProject">

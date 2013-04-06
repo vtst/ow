@@ -110,6 +110,7 @@
       class="net.vtst.ow.eclipse.soy.ui.SoyExecutableExtensionFactory:net.vtst.eclipse.easyxtext.ui.validation.config.ValidatorPropertyPage"
       id="net.vtst.ow.eclipse.soy.ui.properties.SoyValidationPropertyPage"
       name="%soy_validation_property_page"
+      category="ValidationPropertiesPage"
       nameFilter="*">
       <!-- The property page is enabled for all projects having the jsNature, because
            it is used to enable or disable the closure nature. -->
