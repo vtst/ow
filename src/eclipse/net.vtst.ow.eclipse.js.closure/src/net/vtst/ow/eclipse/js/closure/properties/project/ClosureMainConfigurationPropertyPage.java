@@ -7,7 +7,6 @@ import net.vtst.ow.eclipse.js.closure.builder.ClosureNature;
 import net.vtst.ow.eclipse.js.closure.util.Utils;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.swt.events.SelectionEvent;

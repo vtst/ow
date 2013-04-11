@@ -4,7 +4,6 @@ import java.util.List;
 
 import net.vtst.eclipse.easy.ui.util.Utils;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;

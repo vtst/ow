@@ -2,8 +2,6 @@ package net.vtst.ow.closure.compiler.deps;
 
 import java.util.Collection;
 
-import javax.management.modelmbean.RequiredModelMBean;
-
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.CodingConvention;
 import com.google.javascript.jscomp.NodeTraversal;

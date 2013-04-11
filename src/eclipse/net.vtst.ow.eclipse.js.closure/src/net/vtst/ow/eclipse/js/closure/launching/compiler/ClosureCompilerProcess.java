@@ -1,6 +1,5 @@
 package net.vtst.ow.eclipse.js.closure.launching.compiler;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -9,7 +8,6 @@ import java.util.Set;
 import net.vtst.ow.eclipse.js.closure.compiler.ClosureCompiler;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.IStreamListener;

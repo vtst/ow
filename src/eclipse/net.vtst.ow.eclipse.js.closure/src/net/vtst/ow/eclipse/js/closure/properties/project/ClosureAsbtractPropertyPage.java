@@ -8,11 +8,9 @@ import net.vtst.ow.eclipse.js.closure.builder.ClosureNature;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.preference.IPreferencePageContainer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.wst.jsdt.internal.core.JavaProject;
 
 public abstract class ClosureAsbtractPropertyPage extends EasyResourcePropertyPage {
 
