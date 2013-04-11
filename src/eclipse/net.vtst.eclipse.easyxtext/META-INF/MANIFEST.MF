@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: EasyXtext
 Bundle-SymbolicName: net.vtst.eclipse.easyxtext
-Bundle-Version: 1.0.9
+Bundle-Version: 1.0.10
 Bundle-Activator: net.vtst.eclipse.easyxtext.Activator
 Bundle-Vendor: Vincent Simonet
 Require-Bundle: org.eclipse.ui,
