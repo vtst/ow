@@ -2,6 +2,7 @@ package net.vtst.ow.closure.compiler.deps;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import com.google.javascript.jscomp.AbstractCompiler;
 import com.google.javascript.jscomp.NodeTraversal;
@@ -16,9 +17,9 @@ public class GetImplicitDependenciesNodeTraversal extends NodeTraversal {
     private static class ImplicitRequiresCallback extends AbstractShallowCallback {
 
         
-        private List<String> implicitDeps;
+        private Set<String> implicitDeps;
 
-        public ImplicitRequiresCallback(List<String> implicitDeps) {
+        public ImplicitRequiresCallback(Set<String> implicitDeps) {
             this.implicitDeps = implicitDeps;
         }
 
@@ -41,7 +42,7 @@ public class GetImplicitDependenciesNodeTraversal extends NodeTraversal {
         super(compiler, callback);
     }
      
-    public static boolean run(AbstractCompiler compiler, Node root, List<String> implicitDeps) {
+    public static boolean run(AbstractCompiler compiler, Node root, Set<String> implicitDeps) {
         try {
             
             

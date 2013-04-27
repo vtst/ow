@@ -5,7 +5,9 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -85,7 +87,7 @@ public class GetImplicitDependenciesFromNodeTest {
         
         Node root = TestCompiler.getNodeForTest(js);
         
-        List<String> implicitDeps = new ArrayList<String>();
+        Set<String> implicitDeps = new HashSet<String>();
         assertTrue(GetImplicitDependenciesNodeTraversal.run(TestCompiler.getCompiler(), root, implicitDeps));
         
         assertTrue(implicitDeps.size() == 1);
