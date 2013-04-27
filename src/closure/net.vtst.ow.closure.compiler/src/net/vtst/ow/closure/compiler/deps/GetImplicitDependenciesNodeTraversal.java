@@ -13,20 +13,42 @@ import com.google.javascript.rhino.Node;
 
 public class GetImplicitDependenciesNodeTraversal extends NodeTraversal {
 
-    private GetImplicitDependenciesNodeTraversal(AbstractCompiler compiler, ReferenceCollectingCallback callback) {
+    private static class ImplicitRequiresCallback extends AbstractShallowCallback {
+
+        
+        private List<String> implicitDeps;
+
+        public ImplicitRequiresCallback(List<String> implicitDeps) {
+            this.implicitDeps = implicitDeps;
+        }
+
+        @Override
+        public void visit(NodeTraversal t, Node n, Node parent) {
+            JSDocInfo info = n.getJSDocInfo();
+            
+            if (info != null) {
+                for (Node node : info.getTypeNodes()) {
+                    if (! node.isString()) {
+                        throw new RuntimeException("we expected to always get strings.");
+                    }
+                    implicitDeps.add(node.getString());
+                }
+            }
+        }
+    }
+
+    private GetImplicitDependenciesNodeTraversal(AbstractCompiler compiler, Callback callback) {
         super(compiler, callback);
     }
      
     public static boolean run(AbstractCompiler compiler, Node root, List<String> implicitDeps) {
         try {
-            ReferenceCollectingCallback callback = new ReferenceCollectingCallback(
-                compiler, ReferenceCollectingCallback.DO_NOTHING_BEHAVIOR);
-            new GetImplicitDependenciesNodeTraversal(compiler, callback).traverse(root);
-            Iterator<Var> iterator = callback.getAllSymbols().iterator();
-            while(iterator.hasNext()) {
-                Var var = iterator.next();
-                System.out.println(var.toString());
-            }
+            
+            
+            ImplicitRequiresCallback callback = new ImplicitRequiresCallback(implicitDeps);
+            
+            new NodeTraversal(compiler, callback).traverse(root);
+            
         } catch(Exception e) {
             e.printStackTrace();
             return false;
