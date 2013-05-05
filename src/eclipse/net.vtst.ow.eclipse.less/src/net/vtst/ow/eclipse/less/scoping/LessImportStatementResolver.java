@@ -8,9 +8,14 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import net.vtst.ow.eclipse.less.LessRuntimeModule;
+import net.vtst.ow.eclipse.less.less.Block;
+import net.vtst.ow.eclipse.less.less.BlockUtils;
 import net.vtst.ow.eclipse.less.less.ImportStatement;
+import net.vtst.ow.eclipse.less.less.InnerRuleSet;
 import net.vtst.ow.eclipse.less.less.LessPackage;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
+import net.vtst.ow.eclipse.less.less.TerminatedMixin;
+import net.vtst.ow.eclipse.less.less.ToplevelRuleSet;
 import net.vtst.ow.eclipse.less.less.ToplevelStatement;
 import net.vtst.ow.eclipse.less.parser.LessValueConverterService;
 
@@ -105,16 +110,38 @@ public class LessImportStatementResolver {
     return format == null || LessRuntimeModule.LESS_EXTENSION.equals(format) || LessRuntimeModule.CSS_EXTENSION.equals(format);
   }
   
+  private List<ImportStatement> getImportStatements(StyleSheet styleSheet) {
+    LinkedList<ImportStatement> list = new LinkedList<ImportStatement>();
+    addImportStatements(list, styleSheet.getStatements());
+    return list;
+  }
+  
+  private void addImportStatements(List<ImportStatement> list, Iterable<? extends EObject> statements) {
+    for (EObject statement : statements) {
+      if (statement instanceof ImportStatement) {
+        list.add((ImportStatement) statement);
+      } else if (statement instanceof ToplevelRuleSet) {
+        addImportStatements(list, ((ToplevelRuleSet) statement).getBlock());
+      } else if (statement instanceof InnerRuleSet) {
+        addImportStatements(list, ((InnerRuleSet) statement).getBlock());
+      } else if (statement instanceof TerminatedMixin) {
+        addImportStatements(list, ((TerminatedMixin) statement).getBody());        
+      }
+    }    
+  }
+  
+  private void addImportStatements(List<ImportStatement> list, Block block) {
+    if (block != null) addImportStatements(list, BlockUtils.iterator(block));
+  }
+  
   private boolean isImportLoop(Resource resource, Resource rootResource, ImportInfo importInfo, Set<URI> visitedURIs) {
     if (!importInfo.isLessFile() || !importInfo.isValid() || !visitedURIs.add(importInfo.uri)) return false;
     StyleSheet importedStyleSheet = importInfo.getImportedStyleSheet();
     if (importedStyleSheet == null) return false;
     if (importedStyleSheet.eResource().equals(rootResource)) return true;
-    for (ToplevelStatement statement: importedStyleSheet.getStatements()) {
-      if (statement instanceof ImportStatement) {
-        if (isImportLoop(importedStyleSheet.eResource(), rootResource, getImportInfo((ImportStatement) statement), visitedURIs))
-          return true;
-      }
+    for (ImportStatement statement : getImportStatements(importedStyleSheet)) {
+      if (isImportLoop(importedStyleSheet.eResource(), rootResource, getImportInfo(statement), visitedURIs))
+        return true;      
     }
     return false;
   }
