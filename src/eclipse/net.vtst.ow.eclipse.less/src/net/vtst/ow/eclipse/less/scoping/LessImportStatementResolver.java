@@ -39,6 +39,11 @@ import com.google.inject.Provider;
  */
 public class LessImportStatementResolver {
   
+  // The cache contains two kinds of entries:
+  // - (LessImportStatementResolver.class, importStatement), for the set of statements imported
+  //   by an import statement,
+  // - (LessImportStatementResolver.class, stylesheet), for the set of import statements of
+  //   a stylesheet.
   @Inject
   private IResourceScopeCache cache;
   
@@ -110,10 +115,14 @@ public class LessImportStatementResolver {
     return format == null || LessRuntimeModule.LESS_EXTENSION.equals(format) || LessRuntimeModule.CSS_EXTENSION.equals(format);
   }
   
-  private List<ImportStatement> getImportStatements(StyleSheet styleSheet) {
-    LinkedList<ImportStatement> list = new LinkedList<ImportStatement>();
-    addImportStatements(list, styleSheet.getStatements());
-    return list;
+  private Iterable<ImportStatement> getImportStatements(final StyleSheet styleSheet) {
+    return cache.get(Tuples.pair(LessImportStatementResolver.class, styleSheet), styleSheet.eResource(), new Provider<Iterable<ImportStatement>>() {
+      public Iterable<ImportStatement> get() {
+        LinkedList<ImportStatement> list = new LinkedList<ImportStatement>();
+        addImportStatements(list, styleSheet.getStatements());
+        return list;
+      }
+    });
   }
   
   private void addImportStatements(List<ImportStatement> list, Iterable<? extends EObject> statements) {
