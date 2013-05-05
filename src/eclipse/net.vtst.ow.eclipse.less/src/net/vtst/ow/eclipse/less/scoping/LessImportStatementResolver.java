@@ -39,7 +39,7 @@ public class LessImportStatementResolver {
   
   @Inject
   private Provider<LoadOnDemandResourceDescriptions> loadOnDemandDescriptions;
-
+  
   // **************************************************************************
   // Retrieving imported statements (for scope computation)
   
@@ -66,9 +66,9 @@ public class LessImportStatementResolver {
    * @param visitedURIs  The imported URIs are added to this set.  This is useful to avoid loops.
    */
   private void getAllStatementsRec(ImportStatement importStatement, List<ToplevelStatement> statements, Set<URI> visitedURIs) {
-    URI uri = getURI(importStatement);
-    if (uri == null || !visitedURIs.add(uri)) return;
-    StyleSheet styleSheet = getImportedStyleSheet(importStatement);
+    ImportInfo importInfo = getImportInfo(importStatement);
+    if (!importInfo.isLessFile() || !importInfo.isValid() || !visitedURIs.add(importInfo.uri)) return;
+    StyleSheet styleSheet = importInfo.getImportedStyleSheet();
     if (styleSheet == null) return;
     for (ToplevelStatement toplevelStatement: styleSheet.getStatements()) {
       if (toplevelStatement instanceof ImportStatement) {
@@ -85,27 +85,34 @@ public class LessImportStatementResolver {
   public static enum ImportStatementCheckResult {
     OK,
     LOOP,
-    INVALID_URI
+    INVALID_URI,
+    INVALID_FORMAT
   }
   
   public ImportStatementCheckResult checkImportStatement(ImportStatement importStatement) {
     Resource resource = importStatement.eResource();
-    URI importUri = getURI(importStatement);
-    if (importUri == null) return ImportStatementCheckResult.INVALID_URI;
-    if (isImportLoop(resource, resource, importUri, new HashSet<URI>()))
+    ImportInfo importInfo = getImportInfo(importStatement);
+    if (!importInfo.isValid()) return ImportStatementCheckResult.INVALID_URI;
+    if (!checkImportStatementFormat(importStatement)) return ImportStatementCheckResult.INVALID_FORMAT;
+    if (isImportLoop(resource, resource, importInfo, new HashSet<URI>()))
       return ImportStatementCheckResult.LOOP;
     else
       return ImportStatementCheckResult.OK;
   }
   
-  private boolean isImportLoop(Resource resource, Resource rootResource, URI importUri, Set<URI> visitedURIs) {
-    if (importUri == null || !visitedURIs.add(importUri)) return false;
-    StyleSheet importedStyleSheet = getImportedStyleSheet(resource, importUri);
+  private boolean checkImportStatementFormat(ImportStatement importStatement) {
+    String format = importStatement.getFormat();
+    return format == null || LessRuntimeModule.LESS_EXTENSION.equals(format) || LessRuntimeModule.CSS_EXTENSION.equals(format);
+  }
+  
+  private boolean isImportLoop(Resource resource, Resource rootResource, ImportInfo importInfo, Set<URI> visitedURIs) {
+    if (!importInfo.isLessFile() || !importInfo.isValid() || !visitedURIs.add(importInfo.uri)) return false;
+    StyleSheet importedStyleSheet = importInfo.getImportedStyleSheet();
     if (importedStyleSheet == null) return false;
     if (importedStyleSheet.eResource().equals(rootResource)) return true;
     for (ToplevelStatement statement: importedStyleSheet.getStatements()) {
       if (statement instanceof ImportStatement) {
-        if (isImportLoop(importedStyleSheet.eResource(), rootResource, getURI((ImportStatement) statement), visitedURIs))
+        if (isImportLoop(importedStyleSheet.eResource(), rootResource, getImportInfo((ImportStatement) statement), visitedURIs))
           return true;
       }
     }
@@ -115,57 +122,51 @@ public class LessImportStatementResolver {
   // **************************************************************************
   // Getting imported style sheets
 
-  private static Pattern URI_WITH_LESS_EXTENSION = Pattern.compile("(.*[.][a-z]*)|(.*[?;].*)");
+  private static Pattern URI_WITH_EXTENSION = Pattern.compile("(.*[.][a-z]*)|(.*[?;].*)");
   
-  /**
-   * Converts an import statement into an URI.
-   * @param importStatement  The import statement to convert.
-   * @return  The imported URI, or {@code null} if the URI of the import statement is not valid.
-   */
-  public URI getURI(ImportStatement importStatement) {
-    URI uri = URI.createURI(LessValueConverterService.getStringValue(importStatement.getUri()));
-    // LESS implements a weird test for file extensions.
-    // See https://github.com/vtst/ow/issues/113
-    if (!URI_WITH_LESS_EXTENSION.matcher(uri.toString()).matches()) uri = uri.appendFileExtension(LessRuntimeModule.LESS_EXTENSION);
-    if (!uri.isFile() || EcoreUtil2.isValidUri(importStatement, uri)) {
-      return uri;
-    } else {
-      return null;
-   }
-  }
-
-  /**
-   * @param uri
-   * @return true iif uri is the URI of a LESS StyleSheet.
-   */
-  private boolean isLessStyleSheetURI(URI uri) {
-    return uri.isFile() && LessRuntimeModule.LESS_EXTENSION.equals(uri.fileExtension());
+  public ImportInfo getImportInfo(ImportStatement importStatement) {
+    return new ImportInfo(importStatement);
   }
   
-  /**
-   * Get an imported style sheet.
-   * @param resource  The resource which is importing. 
-   * @param uri  The URI of the style sheet to import.
-   * @return  The imported style sheet, or {@code null}.
-   */
-  private StyleSheet getImportedStyleSheet(Resource resource, URI uri) {
-    if (!isLessStyleSheetURI(uri)) return null;
-    LoadOnDemandResourceDescriptions resourceDescriptions = loadOnDemandDescriptions.get();
-    resourceDescriptions.initialize(new IResourceDescriptions.NullImpl(), Collections.singleton(uri), resource);
-    IResourceDescription resourceDescription = resourceDescriptions.getResourceDescription(uri);
-    for (IEObjectDescription objectDescription: resourceDescription.getExportedObjectsByType(LessPackage.eINSTANCE.getStyleSheet())) {
-      EObject object = objectDescription.getEObjectOrProxy();
-      if (object instanceof StyleSheet) return (StyleSheet) object;
+  public class ImportInfo {
+    public URI uri;
+    public String format;
+    private ImportStatement importStatement;
+    
+    ImportInfo(ImportStatement importStatement) {
+      this.importStatement = importStatement;
+      this.uri = URI.createURI(LessValueConverterService.getStringValue(importStatement.getUri()));
+      this.format = importStatement.getFormat();
+      if (this.format == null) {
+        if (!URI_WITH_EXTENSION.matcher(uri.toString()).matches())
+          uri = uri.appendFileExtension(LessRuntimeModule.LESS_EXTENSION);
+        this.format = uri.fileExtension();
+      }
     }
-    return null;
-  }
-  
-  /**
-   * Get the style sheet imported by an import statement.
-   * @param importStatement  The import statement.
-   * @return The style sheet, or {@code null}.
-   */
-  private StyleSheet getImportedStyleSheet(ImportStatement importStatement) {
-    return getImportedStyleSheet(importStatement.eResource(), getURI(importStatement));
+    
+    public boolean isValid() {
+      return !this.uri.isFile() || EcoreUtil2.isValidUri(this.importStatement, this.uri);     
+    }
+    
+    public boolean isLessFile() {
+      return LessRuntimeModule.LESS_EXTENSION.equals(this.format) && uri.isFile();
+    }
+    
+    public Resource getResource() {
+      return importStatement.eResource();
+    }
+    
+    public StyleSheet getImportedStyleSheet() {
+      if (this.isLessFile()) {
+        LoadOnDemandResourceDescriptions resourceDescriptions = loadOnDemandDescriptions.get();
+        resourceDescriptions.initialize(new IResourceDescriptions.NullImpl(), Collections.singleton(this.uri), this.getResource());
+        IResourceDescription resourceDescription = resourceDescriptions.getResourceDescription(this.uri);
+        for (IEObjectDescription objectDescription: resourceDescription.getExportedObjectsByType(LessPackage.eINSTANCE.getStyleSheet())) {
+          EObject object = objectDescription.getEObjectOrProxy();
+          if (object instanceof StyleSheet) return (StyleSheet) object;
+        }
+      }
+      return null;
+    }
   }
 }

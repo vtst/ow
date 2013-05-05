@@ -64,6 +64,9 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   @Check
   public void checkImportStatement(ImportStatement importStatement) {
     switch (importStatementResolver.checkImportStatement(importStatement)) {
+    case INVALID_FORMAT:
+      error(messages.getString("invalid_import_format"), importStatement, LessPackage.eINSTANCE.getImportStatement_Format(), 0);
+      break;
     case INVALID_URI:
       warning(messages.getString("import_invalid_uri"), importStatement, LessPackage.eINSTANCE.getImportStatement_Uri(), 0);
       break;

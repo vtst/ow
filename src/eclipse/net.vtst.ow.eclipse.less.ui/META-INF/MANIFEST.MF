@@ -27,5 +27,6 @@ Import-Package: net.vtst.eclipse.easyxtext.util,
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: net.vtst.ow.eclipse.less.ui.contentassist.antlr,
  net.vtst.ow.eclipse.less.ui.internal,
- net.vtst.ow.eclipse.less.ui.contentassist
+ net.vtst.ow.eclipse.less.ui.contentassist,
+ net.vtst.ow.eclipse.less.ui.quickfix
 Bundle-Activator: net.vtst.ow.eclipse.less.ui.internal.LessActivator
