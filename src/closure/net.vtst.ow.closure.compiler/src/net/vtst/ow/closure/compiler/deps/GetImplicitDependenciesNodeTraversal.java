@@ -14,7 +14,7 @@ import com.google.javascript.rhino.Node;
 
 public class GetImplicitDependenciesNodeTraversal extends NodeTraversal {
 
-    private static class ImplicitRequiresCallback extends AbstractShallowCallback {
+    private static class ImplicitRequiresCallback extends AbstractPostOrderCallback {
 
         
         private Set<String> implicitDeps;
