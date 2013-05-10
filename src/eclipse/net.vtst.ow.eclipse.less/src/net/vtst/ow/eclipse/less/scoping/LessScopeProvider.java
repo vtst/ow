@@ -39,6 +39,7 @@ import org.eclipse.xtext.resource.IEObjectDescription;
 import org.eclipse.xtext.scoping.IScope;
 import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider;
 import org.eclipse.xtext.scoping.impl.MapBasedScope;
+import org.eclipse.xtext.scoping.impl.MultimapBasedScope;
 import org.eclipse.xtext.util.IResourceScopeCache;
 import org.eclipse.xtext.util.Pair;
 import org.eclipse.xtext.util.Tuples;
@@ -263,7 +264,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
           scopeItems.add(EObjectDescription.create(getQualifiedName(MixinUtils.getIdent(hashOrClass)), hashOrClass));
         }
       }
-      return MapBasedScope.createScope(IScope.NULLSCOPE, scopeItems);
+      return MultimapBasedScope.createScope(IScope.NULLSCOPE, scopeItems, false);
     }
   }
   

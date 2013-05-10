@@ -11,11 +11,13 @@ import net.vtst.ow.eclipse.less.nature.LessProjectNature;
 import net.vtst.ow.eclipse.less.parser.LessValueConverterService;
 import net.vtst.ow.eclipse.less.resource.LessLocationInFileProvider;
 import net.vtst.ow.eclipse.less.resource.LessResourceDescriptionStrategy;
+import net.vtst.ow.eclipse.less.scoping.LessLinkingService;
 import net.vtst.ow.eclipse.less.scoping.LessQualifiedNameProvider;
 
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.xtext.conversion.IValueConverterService;
 import org.eclipse.xtext.linking.ILinkingDiagnosticMessageProvider;
+import org.eclipse.xtext.linking.ILinkingService;
 import org.eclipse.xtext.parsetree.reconstr.IHiddenTokenHelper;
 import org.eclipse.xtext.resource.IDefaultResourceDescriptionStrategy;
 import org.eclipse.xtext.resource.ILocationInFileProvider;
@@ -69,6 +71,10 @@ public class LessRuntimeModule extends net.vtst.ow.eclipse.less.AbstractLessRunt
   
   public Class<? extends IDefaultResourceDescriptionStrategy> bindIDefaultResourceDescriptionStrategy() {
     return LessResourceDescriptionStrategy.class;
+  }
+  
+  public Class<? extends ILinkingService> bindILinkingService() {
+    return LessLinkingService.class;
   }
 
   public Class<? extends IEasyProjectNature> bindIEasyProjectNature() {
