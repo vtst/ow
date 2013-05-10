@@ -24,8 +24,8 @@ import org.eclipse.xtext.resource.IEObjectDescription;
 import org.eclipse.xtext.scoping.IScope;
 import org.eclipse.xtext.util.IResourceScopeCache;
 import org.eclipse.xtext.util.Tuples;
-import org.eclipse.xtext.util.internal.Stopwatches;
-import org.eclipse.xtext.util.internal.Stopwatches.StoppedTask;
+// import org.eclipse.xtext.util.internal.Stopwatches;
+// import org.eclipse.xtext.util.internal.Stopwatches.StoppedTask;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -96,9 +96,9 @@ public class LessLinkingService extends DefaultLinkingService {
       if (logger.isDebugEnabled()) {
         logger.debug("before getLinkedObjects: node: '" + crossRefString + "'");
       }
-      StoppedTask task = Stopwatches.forTask("Crosslink resolution (DefaultLinkingService.getLinkedObjects)");
+      // StoppedTask task = Stopwatches.forTask("Crosslink resolution (DefaultLinkingService.getLinkedObjects)");
       try {
-        task.start();
+        // task.start();
         final IScope scope = getScope(context, ref);
         QualifiedName qualifiedLinkName =  qualifiedNameConverter.toQualifiedName(crossRefString);
         IEObjectDescription eObjectDescription = getBestMatch(context, scope.getElements(qualifiedLinkName));
@@ -108,7 +108,7 @@ public class LessLinkingService extends DefaultLinkingService {
         if (eObjectDescription != null) 
           return Collections.singletonList(eObjectDescription.getEObjectOrProxy());
       } finally {
-        task.stop();
+        // task.stop();
       }
     }
     return Collections.emptyList();
