@@ -3,11 +3,17 @@ package net.vtst.ow.eclipse.less.less;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.vtst.ow.eclipse.less.scoping.LessScopeProvider;
+
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.nodemodel.ILeafNode;
 import org.eclipse.xtext.nodemodel.INode;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
+import org.eclipse.xtext.scoping.IScope;
+import org.eclipse.xtext.util.Tuples;
+
+import com.google.inject.Provider;
 
 /**
  * Helper class for manipulating Mixins.
@@ -82,7 +88,7 @@ public class MixinUtils {
     public int maxNumberOfParameters = 0;
     public Set<String> parameterNames = new HashSet<String>();
     
-    private Prototype(TerminatedMixin mixinDefinition) {
+    public Prototype(TerminatedMixin mixinDefinition) {
       if (mixinDefinition == null) return;
       EList<MixinParameter> parameters = mixinDefinition.getParameters().getParameter();
       for (MixinParameter parameter: parameters) {
@@ -131,20 +137,6 @@ public class MixinUtils {
       return result;
     }
   }
-  
-  /**
-   * @param hashOrClass
-   * @return a pair (min, max)
-   */
-  public static Prototype getPrototypeForMixinDefinition(HashOrClassRefTarget hashOrClass) {
-    EObject mixinCall = LessUtils.getNthAncestor(hashOrClass, 2);
-    if ((mixinCall instanceof TerminatedMixin)) {
-      return new Prototype((TerminatedMixin) mixinCall);
-    } else {
-      return new Prototype(null);
-    }
-  }
-
 
   // **************************************************************************
   // Other utility functions

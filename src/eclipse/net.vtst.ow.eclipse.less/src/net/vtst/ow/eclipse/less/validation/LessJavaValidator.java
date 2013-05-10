@@ -37,6 +37,7 @@ import net.vtst.ow.eclipse.less.less.Term;
 import net.vtst.ow.eclipse.less.less.TerminatedMixin;
 import net.vtst.ow.eclipse.less.less.VariableDefinition;
 import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver;
+import net.vtst.ow.eclipse.less.scoping.LessLinkingService;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
@@ -52,6 +53,9 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   
   @Inject
   LessImportStatementResolver importStatementResolver;
+  
+  @Inject
+  LessLinkingService linkingService;
   
   public AdditionalBooleanOption checkMixinLinking;
   public AdditionalBooleanOption checkVariableLinking;
@@ -304,7 +308,7 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     EObject crossReference = crossReferences.get(0);
     if (!(crossReference instanceof HashOrClassRefTarget)) return;
     final HashOrClassRefTarget hashOrClass = (HashOrClassRefTarget) crossReference;
-    final MixinUtils.Prototype prototype = MixinUtils.getPrototypeForMixinDefinition(hashOrClass);
+    final MixinUtils.Prototype prototype = linkingService.getPrototypeForMixinDefinition(hashOrClass);
     prototype.checkMixinCall(helper, new CheckMixinCallCallback() {
       public void illegalParameterLabel(MixinParameter parameter) {
         warning(messages.format("illegal_parameter_label", parameter.getIdent().getIdent()), parameter, LessPackage.eINSTANCE.getMixinParameter_Ident(), 0);
