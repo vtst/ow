@@ -50,7 +50,8 @@ public class LessLinkingService extends DefaultLinkingService {
         } else {
           return new Prototype(null);
         }
-      }});
+      }
+    });
   }
 
   protected IEObjectDescription getBestMatchForHashOrClassRef(HashOrClassRef context, Iterable<IEObjectDescription> eObjectDescriptions) {
