@@ -26,7 +26,6 @@ import net.vtst.ow.eclipse.less.less.MixinParameter;
 import net.vtst.ow.eclipse.less.less.MixinParameters;
 import net.vtst.ow.eclipse.less.less.MixinSelectors;
 import net.vtst.ow.eclipse.less.less.MixinUtils;
-import net.vtst.ow.eclipse.less.less.MixinUtils.CheckMixinCallCallback;
 import net.vtst.ow.eclipse.less.less.MixinVarParameter;
 import net.vtst.ow.eclipse.less.less.NumberWithUnitTerm;
 import net.vtst.ow.eclipse.less.less.NumericLiteral;
@@ -36,8 +35,8 @@ import net.vtst.ow.eclipse.less.less.StyleSheet;
 import net.vtst.ow.eclipse.less.less.Term;
 import net.vtst.ow.eclipse.less.less.TerminatedMixin;
 import net.vtst.ow.eclipse.less.less.VariableDefinition;
+import net.vtst.ow.eclipse.less.linking.LessMixinLinkingHelper;
 import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver;
-import net.vtst.ow.eclipse.less.scoping.LessLinkingService;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
@@ -55,7 +54,7 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   LessImportStatementResolver importStatementResolver;
   
   @Inject
-  LessLinkingService linkingService;
+  private LessMixinLinkingHelper mixinLinkingHelper;
   
   public AdditionalBooleanOption checkMixinLinking;
   public AdditionalBooleanOption checkVariableLinking;
@@ -308,8 +307,8 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     EObject crossReference = crossReferences.get(0);
     if (!(crossReference instanceof HashOrClassRefTarget)) return;
     final HashOrClassRefTarget hashOrClass = (HashOrClassRefTarget) crossReference;
-    final MixinUtils.Prototype prototype = linkingService.getPrototypeForMixinDefinition(hashOrClass);
-    prototype.checkMixinCall(helper, new CheckMixinCallCallback() {
+    final LessMixinLinkingHelper.Prototype prototype = mixinLinkingHelper.getPrototypeForMixinDefinition(hashOrClass);
+    prototype.checkMixinCall(helper, new LessMixinLinkingHelper.CheckMixinCallCallback() {
       public void illegalParameterLabel(MixinParameter parameter) {
         warning(messages.format("illegal_parameter_label", parameter.getIdent().getIdent()), parameter, LessPackage.eINSTANCE.getMixinParameter_Ident(), 0);
       }

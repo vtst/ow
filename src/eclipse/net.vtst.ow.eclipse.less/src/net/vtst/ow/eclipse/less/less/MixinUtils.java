@@ -1,19 +1,10 @@
 package net.vtst.ow.eclipse.less.less;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import net.vtst.ow.eclipse.less.scoping.LessScopeProvider;
-
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.nodemodel.ILeafNode;
 import org.eclipse.xtext.nodemodel.INode;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
-import org.eclipse.xtext.scoping.IScope;
-import org.eclipse.xtext.util.Tuples;
-
-import com.google.inject.Provider;
 
 /**
  * Helper class for manipulating Mixins.
@@ -72,72 +63,7 @@ public class MixinUtils {
     if (mixin instanceof TerminatedMixin) return newHelper((TerminatedMixin) mixin);
     throw new RuntimeException("Unknown sub-class of Mixin");
   }
-
-  // **************************************************************************
-  // Mixin prototypes
   
-  public static interface CheckMixinCallCallback {
-    public void illegalNumberOfParameters(int provided);
-
-    public void illegalParameterLabel(MixinParameter parameter);
-  }
-  
-  // TODO: Should we try to cache prototypes?
-  public static class Prototype {
-    public int minNumberOfParameters = 0;
-    public int maxNumberOfParameters = 0;
-    public Set<String> parameterNames = new HashSet<String>();
-    
-    public Prototype(TerminatedMixin mixinDefinition) {
-      if (mixinDefinition == null) return;
-      EList<MixinParameter> parameters = mixinDefinition.getParameters().getParameter();
-      for (MixinParameter parameter: parameters) {
-        ++maxNumberOfParameters;
-        if (!parameter.isHasDefaultValue()) minNumberOfParameters = maxNumberOfParameters;
-        String variable = MixinUtils.getVariableName(parameter);
-        if (variable != null) parameterNames.add(variable);
-      }
-      MixinVarParameter varArg = mixinDefinition.getParameters().getVarArg();
-      if (varArg != null) {
-        maxNumberOfParameters = Integer.MAX_VALUE;
-        if (varArg.getSep() != null)
-          --minNumberOfParameters;
-      }
-    }
-    
-    private int getNumberOfParametersOfMixinCall(Helper helper) {
-      MixinParameters parameters = helper.getParameters();
-      if (parameters == null) return 0;
-      int numberOfSemicolons = 0;
-      for (String separator : parameters.getSep()) {
-        if (";".equals(separator)) ++numberOfSemicolons;
-      }
-      if (numberOfSemicolons > 0) return numberOfSemicolons + 1;
-      else return parameters.getParameter().size();
-    }
-
-    public boolean checkMixinCall(Helper helper, CheckMixinCallCallback callback) {
-      boolean result = true;
-      int provided = getNumberOfParametersOfMixinCall(helper);
-      if (provided < this.minNumberOfParameters || provided > this.maxNumberOfParameters) {
-        if (callback == null) return false;
-        callback.illegalNumberOfParameters(provided);
-        result = false;
-      }
-      MixinParameters parameters = helper.getParameters();
-      if (parameters != null) {
-        for (MixinParameter parameter : parameters.getParameter()) {
-          if (parameter.getIdent() != null && !this.parameterNames.contains(parameter.getIdent().getIdent())) {
-            if (callback == null) return false;
-            callback.illegalParameterLabel(parameter);
-            result = false;
-          }
-        }
-      }
-      return result;
-    }
-  }
-
   // **************************************************************************
   // Other utility functions
   

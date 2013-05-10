@@ -7,11 +7,12 @@ import net.vtst.eclipse.easyxtext.guice.EasyXtextModule;
 import net.vtst.eclipse.easyxtext.nature.IEasyProjectNature;
 import net.vtst.ow.eclipse.less.formatting.LessHiddenTokenHelper;
 import net.vtst.ow.eclipse.less.less.LessPackage;
+import net.vtst.ow.eclipse.less.linking.LessLinkingService;
+import net.vtst.ow.eclipse.less.linking.LessMixinLinkingHelper;
 import net.vtst.ow.eclipse.less.nature.LessProjectNature;
 import net.vtst.ow.eclipse.less.parser.LessValueConverterService;
 import net.vtst.ow.eclipse.less.resource.LessLocationInFileProvider;
 import net.vtst.ow.eclipse.less.resource.LessResourceDescriptionStrategy;
-import net.vtst.ow.eclipse.less.scoping.LessLinkingService;
 import net.vtst.ow.eclipse.less.scoping.LessQualifiedNameProvider;
 
 import org.eclipse.emf.ecore.EPackage;
@@ -75,6 +76,10 @@ public class LessRuntimeModule extends net.vtst.ow.eclipse.less.AbstractLessRunt
   
   public Class<? extends ILinkingService> bindILinkingService() {
     return LessLinkingService.class;
+  }
+
+  public Class<? extends LessMixinLinkingHelper> bindLessMixinLinkingHelper() {
+    return LessMixinLinkingHelper.class;
   }
 
   public Class<? extends IEasyProjectNature> bindIEasyProjectNature() {
