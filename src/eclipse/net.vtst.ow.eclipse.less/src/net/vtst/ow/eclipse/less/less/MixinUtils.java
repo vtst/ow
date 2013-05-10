@@ -187,8 +187,9 @@ public class MixinUtils {
   
   public static String getIdent(HashOrClassRefTarget obj) {
     if (obj instanceof HashOrClass) return ((HashOrClass) obj).getIdent();
-    if (obj instanceof HashOrClassRef) return getIdentText(obj);
-    throw new RuntimeException("Unknown subclass of HashOrClassRefTarget");
+    if (obj instanceof HashOrClassRef || obj instanceof HashOrClassRefTarget)
+      return getIdentText(obj);
+    throw new RuntimeException("Unknown subclass of HashOrClassRefTarget: ");
   }
 
   // Keep in sync with the above version
