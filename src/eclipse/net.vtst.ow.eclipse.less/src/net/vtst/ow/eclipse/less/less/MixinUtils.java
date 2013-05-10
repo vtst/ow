@@ -142,7 +142,7 @@ public class MixinUtils {
     if (container instanceof MixinParameter) {
       MixinParameter parameter = (MixinParameter) container;
       if (!parameter.isHasDefaultValue()) {
-        EObject mixin = container.eContainer().eContainer();
+        EObject mixin = LessUtils.getNthAncestor(container, 2);
         if (mixin instanceof Mixin) {
           MixinUtils.Helper helper = MixinUtils.newHelper((Mixin) mixin);
           if (helper.isDefinition()) {
