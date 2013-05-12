@@ -13,6 +13,7 @@ import net.vtst.ow.eclipse.less.nature.LessProjectNature;
 import net.vtst.ow.eclipse.less.parser.LessValueConverterService;
 import net.vtst.ow.eclipse.less.resource.LessLocationInFileProvider;
 import net.vtst.ow.eclipse.less.resource.LessResourceDescriptionStrategy;
+import net.vtst.ow.eclipse.less.scoping.LessMixinScopeProvider;
 import net.vtst.ow.eclipse.less.scoping.LessQualifiedNameProvider;
 
 import org.eclipse.emf.ecore.EPackage;
@@ -81,6 +82,11 @@ public class LessRuntimeModule extends net.vtst.ow.eclipse.less.AbstractLessRunt
   public Class<? extends LessMixinLinkingHelper> bindLessMixinLinkingHelper() {
     return LessMixinLinkingHelper.class;
   }
+
+  public Class<? extends LessMixinScopeProvider> bindLessMixinScopeProvider() {
+    return LessMixinScopeProvider.class;
+  }
+
 
   public Class<? extends IEasyProjectNature> bindIEasyProjectNature() {
     return LessProjectNature.class;
