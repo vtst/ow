@@ -57,5 +57,30 @@ public class MixinSelectors {
     }
     return -1;
   }
+  
+  @Override
+  public boolean equals(Object other) {
+    if (other instanceof MixinSelectors)
+      return this.list.equals(((MixinSelectors) other).list);
+    else
+      return false;
+  }
+  
+  @Override
+  public int hashCode() {
+    return this.list.hashCode();
+  }
+
+  
+  public String toString() {
+    StringBuffer buf = new StringBuffer();
+    boolean first = true;
+    for (String item : this.list) {
+      if (first) first = false;
+      else buf.append(", ");
+      buf.append(item);
+    }
+    return buf.toString();
+  }
 
 }
