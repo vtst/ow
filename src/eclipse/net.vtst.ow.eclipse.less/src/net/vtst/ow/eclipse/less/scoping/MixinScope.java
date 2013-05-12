@@ -7,11 +7,16 @@ import org.eclipse.xtext.scoping.IScope;
 import org.eclipse.xtext.scoping.impl.MultimapBasedScope;
 
 /**
- * Scope for a mixin call.  See {@code LessMixinScopeProvider}.
+ * Scope for a mixin call.  The scope is defined for a given list of selectors.  For every selector,
+ * a list of scope elements is provided.
+ * 
  * @author Vincent Simonet
  */
 public class MixinScope {
   
+  /**
+   * A list of scope elements which can be lazily converted into an {@code IScope}.
+   */
   private class LazyScope {
     private ArrayList<MixinScopeElement> elements = new ArrayList<MixinScopeElement>();
     private IScope scope = null;
@@ -54,10 +59,16 @@ public class MixinScope {
     }
   }
   
+  /**
+   * Create a root scope.
+   */
   public MixinScope(MixinSelectors selectors) {
     this(selectors, null);
   }
   
+  /**
+   * Create a sub-scope.
+   */
   public MixinScope(MixinScope parent) {
     this(parent.selectors, parent);
   }
