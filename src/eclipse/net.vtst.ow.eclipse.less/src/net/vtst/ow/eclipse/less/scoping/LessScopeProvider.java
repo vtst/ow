@@ -178,18 +178,25 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
   IScope scope_HashOrClassRefTarget(EObject context, EReference ref) {
     // if (MixinUtils.isBoundByMixinDefinitionSelector(context)) return IScope.NULLSCOPE;
     EObject container = context.eContainer();
-    if (!(container instanceof MixinSelectors)) return IScope.NULLSCOPE;
+    if (!(container instanceof MixinSelectors)) {
+      return IScope.NULLSCOPE;
+    }
     MixinSelectors mixinSelectors = (MixinSelectors) container;
     EObject container2 = mixinSelectors.eContainer();
-    if (!(container2 instanceof Mixin)) return IScope.NULLSCOPE;
+    if (!(container2 instanceof Mixin)) {
+      return IScope.NULLSCOPE;
+    }
     Mixin mixin = (Mixin) container2;
-    int position = getHashOrClsasRefTargetPosition(mixinSelectors, context);
-    if (position < 0) return IScope.NULLSCOPE;
+    int position = getHashOrClassRefTargetPosition(mixinSelectors, context);
+    if (position < 0) {
+      return IScope.NULLSCOPE;
+    }
     MixinScope scope = mixinScopeProvider.getScope(mixin);
+    if (scope == null) return IScope.NULLSCOPE;
     return scope.getScope(position);
   }
 
-  private int getHashOrClsasRefTargetPosition(MixinSelectors mixinSelectors, EObject current) {
+  private int getHashOrClassRefTargetPosition(MixinSelectors mixinSelectors, EObject current) {
     int index = 0;
     for (HashOrClassRef item: mixinSelectors.getSelector()) {
       if (item == current) return index;
