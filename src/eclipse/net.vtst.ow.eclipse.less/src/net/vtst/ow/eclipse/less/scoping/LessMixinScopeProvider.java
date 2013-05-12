@@ -48,15 +48,11 @@ public class LessMixinScopeProvider {
    * @param mixin  A mixin.
    * @return The scope for the mixin, if this is a mixin call, null if this is a mixin definition.  
    */
-  public MixinScope getScope(final Mixin mixin) {
-    return cache.get(Tuples.pair(LessMixinScopeProvider.class, mixin), mixin.eResource(), new Provider<MixinScope>() {
+  public MixinScope getScope(final MixinContext context) {
+    assert context.isValid();
+    return cache.get(Tuples.pair(LessMixinScopeProvider.class, context.getMixin()), context.getMixin().eResource(), new Provider<MixinScope>() {
       public MixinScope get() {
-        MixinUtils.Helper helper = MixinUtils.newHelper(mixin);
-        if (helper.isDefinition()) {
-          return null;
-        } else {
-          return getScopeRec(mixin.eContainer(), new MixinSelectors(helper.getSelectors().getSelector()));
-        }
+        return getScopeRec(context.getMixin().eContainer(), new MixinPath(context.getMixinHelper().getSelectors().getSelector()));
       }
     });      
   }
@@ -65,19 +61,19 @@ public class LessMixinScopeProvider {
    Ascending function.  Compute the scope of a context, and all its ancestors.
    Results are memoized for interesting contexts.
    */
-  private MixinScope getScopeRec(final EObject context, final MixinSelectors selectors) {
+  private MixinScope getScopeRec(final EObject context, final MixinPath path) {
     if (context == null) {
-      return new MixinScope(selectors);
+      return new MixinScope(path);
     } else if (context instanceof Block || context instanceof StyleSheet) {
-      return cache.get(Tuples.create(LessMixinScopeProvider.class, context, selectors), context.eResource(), new Provider<MixinScope>() {
+      return cache.get(Tuples.create(LessMixinScopeProvider.class, context, path), context.eResource(), new Provider<MixinScope>() {
         public MixinScope get() {
-          MixinScope scope = new MixinScope(getScopeRec(context.eContainer(), selectors));
+          MixinScope scope = new MixinScope(getScopeRec(context.eContainer(), path));
           fillScope(scope, context, 0, new MixinScopeElement());
           return scope;
         }
       });      
     } else {
-      return getScopeRec(context.eContainer(), selectors);
+      return getScopeRec(context.eContainer(), path);
     }
   }
   
@@ -103,7 +99,7 @@ public class LessMixinScopeProvider {
       Iterable<? extends EObject> statements, 
       int position,
       MixinScopeElement element) {
-    if (position >= scope.getSelectors().size()) return;
+    if (position >= scope.getPath().size()) return;
     for (EObject obj : statements) {
       if (obj instanceof ImportStatement) {
         Iterable<ToplevelStatement> importedStatements = importStatementResolver.getAllStatements((ImportStatement) obj);
@@ -115,7 +111,7 @@ public class LessMixinScopeProvider {
           String selectorIdent = MixinUtils.getIdent(selector);
           MixinScopeElement newElement = element.cloneAndExtends(selectorIdent, selector);
           scope.addAtPosition(position, newElement);          
-          if (scope.getSelectors().isMatching(position, selectorIdent)) {
+          if (scope.getPath().isMatching(position, selectorIdent)) {
             fillScope(scope, mixinHelper.getBody(), position + 1, newElement);
           }
         }
@@ -148,12 +144,12 @@ public class LessMixinScopeProvider {
     int i = 0;
     for (SimpleSelector simpleSelector : selector) {
       for (EObject criteria : simpleSelector.getCriteria()) {
-        if (i + position >= scope.getSelectors().size()) return;
+        if (i + position >= scope.getPath().size()) return;
         if (!(criteria instanceof HashOrClass)) return;
         String ident = MixinUtils.getIdent((HashOrClass) criteria);
         newElement = newElement.cloneAndExtends(ident, criteria);
         scope.addAtPosition(position + i, newElement);
-        if (!scope.getSelectors().isMatching(position + i, ident)) return;
+        if (!scope.getPath().isMatching(position + i, ident)) return;
         ++i;
       }
     }

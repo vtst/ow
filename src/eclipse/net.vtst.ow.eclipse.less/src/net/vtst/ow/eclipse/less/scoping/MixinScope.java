@@ -47,12 +47,12 @@ public class MixinScope {
   }
   
   private MixinScope parent;
-  private MixinSelectors selectors;
+  private MixinPath path;
   private ArrayList<LazyScope> scopes;
   
-  private MixinScope(MixinSelectors selectors, MixinScope parent) {
+  private MixinScope(MixinPath selectors, MixinScope parent) {
     this.parent = parent;
-    this.selectors = selectors;
+    this.path = selectors;
     this.scopes = new ArrayList<LazyScope>(selectors.size());
     for (int i = 0; i < selectors.size(); ++i) {
       this.scopes.add(new LazyScope(i));
@@ -62,7 +62,7 @@ public class MixinScope {
   /**
    * Create a root scope.
    */
-  public MixinScope(MixinSelectors selectors) {
+  public MixinScope(MixinPath selectors) {
     this(selectors, null);
   }
   
@@ -70,10 +70,10 @@ public class MixinScope {
    * Create a sub-scope.
    */
   public MixinScope(MixinScope parent) {
-    this(parent.selectors, parent);
+    this(parent.path, parent);
   }
 
-  public MixinSelectors getSelectors() { return selectors; }
+  public MixinPath getPath() { return path; }
 
   public void addAtPosition(int position, MixinScopeElement element) {
     this.scopes.get(position).add(element);

@@ -10,12 +10,9 @@ import net.vtst.ow.eclipse.less.less.AtVariableDef;
 import net.vtst.ow.eclipse.less.less.AtVariableRefTarget;
 import net.vtst.ow.eclipse.less.less.Block;
 import net.vtst.ow.eclipse.less.less.BlockUtils;
-import net.vtst.ow.eclipse.less.less.HashOrClassRef;
 import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.less.LessPackage;
-import net.vtst.ow.eclipse.less.less.Mixin;
 import net.vtst.ow.eclipse.less.less.MixinParameter;
-import net.vtst.ow.eclipse.less.less.MixinSelectors;
 import net.vtst.ow.eclipse.less.less.MixinUtils;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
 import net.vtst.ow.eclipse.less.less.TerminatedMixin;
@@ -176,32 +173,10 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
    * a HashOrClass.
    */
   IScope scope_HashOrClassRefTarget(EObject context, EReference ref) {
-    // if (MixinUtils.isBoundByMixinDefinitionSelector(context)) return IScope.NULLSCOPE;
-    EObject container = context.eContainer();
-    if (!(container instanceof MixinSelectors)) {
-      return IScope.NULLSCOPE;
-    }
-    MixinSelectors mixinSelectors = (MixinSelectors) container;
-    EObject container2 = mixinSelectors.eContainer();
-    if (!(container2 instanceof Mixin)) {
-      return IScope.NULLSCOPE;
-    }
-    Mixin mixin = (Mixin) container2;
-    int position = getHashOrClassRefTargetPosition(mixinSelectors, context);
-    if (position < 0) {
-      return IScope.NULLSCOPE;
-    }
-    MixinScope scope = mixinScopeProvider.getScope(mixin);
-    if (scope == null) return IScope.NULLSCOPE;
-    return scope.getScope(position);
+    MixinContext mixinContext = new MixinContext(context);
+    if (!mixinContext.isValid()) return IScope.NULLSCOPE;
+    MixinScope scope = mixinScopeProvider.getScope(mixinContext);
+    return scope.getScope(mixinContext.getSelectorIndex());
   }
 
-  private int getHashOrClassRefTargetPosition(MixinSelectors mixinSelectors, EObject current) {
-    int index = 0;
-    for (HashOrClassRef item: mixinSelectors.getSelector()) {
-      if (item == current) return index;
-      ++index;
-    }
-    return -1;
-  }
 }

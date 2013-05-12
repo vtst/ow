@@ -11,26 +11,26 @@ import net.vtst.ow.eclipse.less.less.SimpleSelector;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 
-public class MixinSelectors {
-  private ArrayList<String> list;
+public class MixinPath {
+  private ArrayList<String> path;
   
-  public MixinSelectors(EList<HashOrClassRef> selectors) {
-    this.list = new ArrayList<String>(selectors.size());
+  public MixinPath(EList<HashOrClassRef> selectors) {
+    this.path = new ArrayList<String>(selectors.size());
     for (HashOrClassRef hashOrClass : selectors) {
-      list.add(MixinUtils.getIdent(hashOrClass));
+      path.add(MixinUtils.getIdent(hashOrClass));
     }
   }
   
-  public int size() { return list.size(); }
-  public String get(int index) { return list.get(index); }
+  public int size() { return path.size(); }
+  public String get(int index) { return path.get(index); }
 
   public boolean isMatching(int position, HashOrClassRefTarget obj) {
-    String pattern = this.list.get(position);
+    String pattern = this.path.get(position);
     return pattern.isEmpty() || pattern.equals(MixinUtils.getIdent(obj));
   }
 
   public boolean isMatching(int position, String ident) {
-    String pattern = this.list.get(position);
+    String pattern = this.path.get(position);
     return pattern.isEmpty() || pattern.equals(ident);
   }
 
@@ -46,7 +46,7 @@ public class MixinSelectors {
       // Several pieces of selector, only complete match is possible
       for (SimpleSelector selector : selectors) {
         for (EObject criteria : selector.getCriteria()) {
-          if (position >= this.list.size()) return -1;
+          if (position >= this.path.size()) return -1;
           if (!(criteria instanceof HashOrClass && this.isMatching(position, (HashOrClass) criteria)))
             return -1;
           ++position;
@@ -60,22 +60,22 @@ public class MixinSelectors {
   
   @Override
   public boolean equals(Object other) {
-    if (other instanceof MixinSelectors)
-      return this.list.equals(((MixinSelectors) other).list);
+    if (other instanceof MixinPath)
+      return this.path.equals(((MixinPath) other).path);
     else
       return false;
   }
   
   @Override
   public int hashCode() {
-    return this.list.hashCode();
+    return this.path.hashCode();
   }
 
   
   public String toString() {
     StringBuffer buf = new StringBuffer();
     boolean first = true;
-    for (String item : this.list) {
+    for (String item : this.path) {
       if (first) first = false;
       else buf.append(", ");
       buf.append(item);
