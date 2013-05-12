@@ -36,7 +36,7 @@ public class LessMixinScopeProvider {
 
   // The cache contains:
   // - pairs (LessMixinScopeProvider.class, Mixin).
-  // - triples (LessMixinScopeProvider.class, EObject, selectors)
+  // - triples (LessMixinScopeProvider.class, EObject, Selectors)
   @Inject
   private IResourceScopeCache cache;
 
@@ -44,6 +44,7 @@ public class LessMixinScopeProvider {
   private LessImportStatementResolver importStatementResolver;
 
   /**
+   * Main entry point.  Results are memoized.
    * @param mixin  A mixin.
    * @return The scope for the mixin, if this is a mixin call, null if this is a mixin definition.  
    */
@@ -60,7 +61,9 @@ public class LessMixinScopeProvider {
     });      
   }
   
-  /** Ascending function.  Compute the scope of a context, and all its ancestors.
+  /**
+   Ascending function.  Compute the scope of a context, and all its ancestors.
+   Results are memoized for interesting contexts.
    */
   private MixinScope getScopeRec(final EObject context, final MixinSelectors selectors) {
     if (context == null) {
@@ -78,7 +81,8 @@ public class LessMixinScopeProvider {
     }
   }
   
-  /** Descending function.  Add elements to an existing scope.
+  /**
+   Descending function.  Add elements to an existing scope.
    */
   private void fillScope(MixinScope scope, EObject context, int position, MixinScopeElement element) {
     if (context instanceof Block) {
@@ -129,6 +133,10 @@ public class LessMixinScopeProvider {
     }
   }
 
+  /**
+   This method implements the common code for ToplevelRuleSet and InnerRuleSet in {@code fillScope}.
+   {@code selector} and {@code} must come from {@code statement}.
+   */
   private void fillScopeForRuleSet(
       MixinScope scope, 
       EObject statement,
