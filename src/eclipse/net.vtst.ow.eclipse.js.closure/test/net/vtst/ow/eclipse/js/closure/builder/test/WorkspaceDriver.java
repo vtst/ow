@@ -133,7 +133,7 @@ public class WorkspaceDriver {
         try {
             
             //add to javascript folder include path
-            IIncludePathEntry pathEntry = JavaScriptCore.newSourceEntry(folderPath);
+            IIncludePathEntry pathEntry = JavaScriptCore.newSourceEntry(folderPath.makeRelativeTo(project.getFullPath()).makeAbsolute());
             IJavaScriptProject javaScriptProject = JavaScriptCore.create(project);
             IIncludePathEntry[] oldIncludePath = javaScriptProject.getRawIncludepath();
             
