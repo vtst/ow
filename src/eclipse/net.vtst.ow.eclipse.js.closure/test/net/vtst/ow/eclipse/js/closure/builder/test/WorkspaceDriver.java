@@ -101,14 +101,36 @@ public class WorkspaceDriver {
         retriever.loadFromProjects(projects);
     }
 
+    
+    private IFolder createFolder(IPath path) {
+        assert !path.isRoot() : "root";
+
+        /* don't create folders for projects */
+        if (path.segmentCount() <= 1) {
+            return null;
+        }
+
+        IFolder folder = workspace.getRoot().getFolder(path);
+        if (!folder.exists()) {
+            /* create the parent folder if necessary */
+            createFolder(path.removeLastSegments(1));
+
+            try {
+                folder.create(true, true, null);
+            } catch (CoreException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return folder;
+    }
+    
     public void addSourceFolder(String path, String projectName) {
         IProject project = projects.get(projectName);
-        IPath folderPath = project.getLocation().append(path);
-        IWorkspaceRoot root = workspace.getRoot();
-        IFolder folder = root.getFolder(folderPath);
+        IPath folderPath = project.getFullPath().append(path);
+
+        createFolder(folderPath);
         
         try {
-            folder.create(true, true, null);
             
             //add to javascript folder include path
             IIncludePathEntry pathEntry = JavaScriptCore.newSourceEntry(folderPath);
