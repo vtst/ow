@@ -7,6 +7,7 @@ import net.vtst.eclipse.easyxtext.ui.EasyXtextUiMessages;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -16,6 +17,9 @@ import org.eclipse.xtext.ui.editor.XtextEditor;
 import com.google.inject.Inject;
 
 public class NatureAddingEditorCallback extends AbstractDirtyStateAwareEditorCallback {
+  
+  private static final String QUALIFIER = "net.vtst.eclipse.easyxtext.ui.nature.NatureAddingEditorCallback";
+  private static final String DISABLE = "DISABLE";
 
   @Inject
   private IEasyProjectNature projectNature;
@@ -34,6 +38,8 @@ public class NatureAddingEditorCallback extends AbstractDirtyStateAwareEditorCal
       IResource resource = editor.getResource();
       if (resource == null) return;
       IProject project = resource.getProject();
+      if (DISABLE.equals(project.getPersistentProperty(new QualifiedName(QUALIFIER, projectNature.getId()))))
+        return;
       if (!ProjectNatureUtil.hasNature(getNature().getId(), project) && project.isAccessible()) {
         MessageDialog dialog = new MessageDialog(
             editor.getEditorSite().getShell(),
@@ -43,8 +49,11 @@ public class NatureAddingEditorCallback extends AbstractDirtyStateAwareEditorCal
             MessageDialog.QUESTION, 
             new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL },
             0);
-        if (dialog.open() == 0) {
+        int ret = dialog.open();
+        if (ret == 0) {
           ProjectNatureUtil.addNatureRequiringXtext(getNature().getId(), project);
+        } else if (ret == 1) {
+          project.setPersistentProperty(new QualifiedName(QUALIFIER, projectNature.getId()), DISABLE);
         }
       }
     } catch (CoreException e) {
