@@ -165,6 +165,7 @@ public class MixinUtils {
     return false;
   }
   
+  // TODO: Simplify using NodeModelUtils.getTokenText
   private static String getIdentText(EObject obj) {
     INode node = NodeModelUtils.getNode(obj);
     StringBuffer buf = new StringBuffer(node.getLength());
