@@ -63,14 +63,6 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
     if (MixinUtils.isBoundByMixinDefinitionParameter(context)) return IScope.NULLSCOPE;
     return computeVariableScope(context, ref);
   }
-
-  /** Entry point for the calculation of the scope of a cross-reference to
-   * a VariableDefinitionIdent.
-   */
-  // TODO: Delete
-  IScope scope_VariableCrossReference(EObject context, EReference ref) {
-    return computeVariableScope(context, ref);
-  }
   
   /** Compute the scope of a context.  If the given context is a Block or a StyleSheet, call
    * computeVariableScopeOfStatements in order to lookup on the variables defined in this scope.
