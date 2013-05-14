@@ -36,7 +36,6 @@ public class LessMixinLinkingService implements ILinkingService {
   @Inject
   private IResourceScopeCache cache;
   
-  // TODO: This should be a singleton at some point.  There are other classes to check.
   @Inject
   private LessMixinScopeProvider mixinScopeProvider;
 

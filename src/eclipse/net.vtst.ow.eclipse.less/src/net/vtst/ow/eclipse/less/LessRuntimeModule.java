@@ -79,11 +79,11 @@ public class LessRuntimeModule extends net.vtst.ow.eclipse.less.AbstractLessRunt
     return LessLinkingService.class;
   }
 
-  public Class<? extends LessMixinLinkingService> bindLessMixinLinkingService() {
+  @org.eclipse.xtext.service.SingletonBinding(eager=true) public Class<? extends LessMixinLinkingService> bindLessMixinLinkingService() {
     return LessMixinLinkingService.class;
   }
 
-  public Class<? extends LessMixinScopeProvider> bindLessMixinScopeProvider() {
+  @org.eclipse.xtext.service.SingletonBinding(eager=true) public Class<? extends LessMixinScopeProvider> bindLessMixinScopeProvider() {
     return LessMixinScopeProvider.class;
   }
 
