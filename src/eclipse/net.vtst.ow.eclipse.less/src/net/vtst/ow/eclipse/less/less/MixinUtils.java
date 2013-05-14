@@ -2,8 +2,6 @@ package net.vtst.ow.eclipse.less.less;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.xtext.nodemodel.ILeafNode;
-import org.eclipse.xtext.nodemodel.INode;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 
 /**
@@ -165,14 +163,8 @@ public class MixinUtils {
     return false;
   }
   
-  // TODO: Simplify using NodeModelUtils.getTokenText
   private static String getIdentText(EObject obj) {
-    INode node = NodeModelUtils.getNode(obj);
-    StringBuffer buf = new StringBuffer(node.getLength());
-    for (ILeafNode leafNode : node.getLeafNodes()) {
-      if (!leafNode.isHidden()) buf.append(leafNode.getText());
-    }
-    return buf.toString();
+    return NodeModelUtils.getTokenText(NodeModelUtils.getNode(obj));
   }
   
   public static String getIdent(AtVariableRefTarget obj) {
