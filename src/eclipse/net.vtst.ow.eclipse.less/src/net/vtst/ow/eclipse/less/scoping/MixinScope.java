@@ -9,6 +9,8 @@ import org.eclipse.xtext.resource.IEObjectDescription;
 import org.eclipse.xtext.scoping.IScope;
 import org.eclipse.xtext.scoping.impl.MultimapBasedScope;
 
+import com.google.common.collect.Iterables;
+
 /**
  * Scope for a mixin call.  The scope is defined for a given list of selectors.  For every selector,
  * a list of scope elements is provided.
@@ -107,17 +109,12 @@ public class MixinScope {
     this.fullMatches.add(element);
   }
   
-  // TODO: Can we avoid creating a data structure?
-  private void fillFullMatches(List<MixinScopeElement> accu) {
-    if (parent != null) parent.fillFullMatches(accu);
-    accu.addAll(this.fullMatches);
-  }
-
   public Iterable<MixinScopeElement> getFullMatches() {
-    if (this.parent == null) return this.fullMatches;
-    List<MixinScopeElement> result = new ArrayList<MixinScopeElement>();
-    fillFullMatches(result);
-    return result;
+    if (this.parent == null) {
+      return this.fullMatches;
+    } else {
+      return Iterables.concat(parent.getFullMatches(), this.fullMatches);
+    }
   }
   
 }
