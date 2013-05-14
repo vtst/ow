@@ -19,7 +19,7 @@ public class MixinContext {
   public MixinContext(EObject hashOrClass) {
     this.isValid = initEObjects(hashOrClass) && initSelectorIndex();
   }
-  
+
   private boolean initEObjects(EObject hashOrClass) {
     if (!(hashOrClass instanceof HashOrClassRef)) return false;
     this.hashOrClass = (HashOrClassRef) hashOrClass;
@@ -43,6 +43,7 @@ public class MixinContext {
 
   public int getSelectorIndex() { return this.selectorIndex; }  
   public Mixin getMixin() { return this.mixin; }
+  public MixinSelectors getMixinSelectors() { return this.mixinSelectors; }
   public MixinUtils.Helper getMixinHelper() { return this.mixinHelper; }
   public boolean isValid() { return this.isValid; }
 

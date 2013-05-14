@@ -1,6 +1,9 @@
 package net.vtst.ow.eclipse.less.scoping;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.xtext.resource.IEObjectDescription;
 import org.eclipse.xtext.scoping.IScope;
@@ -36,6 +39,8 @@ public class MixinScope {
       }
       return result;
     }
+    
+    private List<MixinScopeElement> getElements() { return this.elements; }
     
     private IScope get() {
       if (scope == null) {
@@ -81,6 +86,20 @@ public class MixinScope {
 
   public IScope getScope(int position) {
     return scopes.get(position).get();
+  }
+  
+  private void fillCompletionProposals(Map<String, MixinScopeElement> elements, int position) {
+    if (parent != null) parent.fillCompletionProposals(elements, position);
+    for (MixinScopeElement element : scopes.get(position).getElements()) {
+      elements.put(element.getName(), element);
+    }    
+  }
+
+  public Iterable<MixinScopeElement> getCompletionProposals(int position) {
+    Map<String, MixinScopeElement> elements = new TreeMap<String, MixinScopeElement>();
+    fillCompletionProposals(elements, position);
+    // TODO: Need sorting.
+    return elements.values();
   }
   
 }
