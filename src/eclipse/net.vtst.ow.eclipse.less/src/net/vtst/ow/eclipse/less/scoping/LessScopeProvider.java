@@ -167,8 +167,6 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
   // * m = 1 and s_1 = d_1 and s_2 ... s_n matches an element of d's block
   // Combinators are not considered.
   
-  // TODO: Check that caching works.
-  // TODO: Fix auto-complete.
   /** Entry point for the calculation of the scope of a cross-reference to
    * a HashOrClass.
    */
