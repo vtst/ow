@@ -47,7 +47,13 @@ public class MixinScopeElement {
    * @return The hashOrClass at the index-th position.
    */
   public EObject getObject(int index) { return objects.get(index); }
+
   
+  public EObject getLastObject() {
+    if (objects.size() == 0) return null;
+    return objects.get(objects.size() - 1);
+  }
+
   /**
    * Create a new element, with the same list of objects + one object.
    * @param name

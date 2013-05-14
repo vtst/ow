@@ -99,31 +99,34 @@ public class LessMixinScopeProvider {
       Iterable<? extends EObject> statements, 
       int position,
       MixinScopeElement element) {
-    if (position >= scope.getPath().size()) return;
-    for (EObject obj : statements) {
-      if (obj instanceof ImportStatement) {
-        Iterable<ToplevelStatement> importedStatements = importStatementResolver.getAllStatements((ImportStatement) obj);
-        fillScope(scope, importedStatements, position, element);
-      } else if (obj instanceof Mixin) {
-        MixinUtils.Helper mixinHelper = MixinUtils.newHelper((Mixin) obj);
-        if (mixinHelper.isDefinition() && mixinHelper.getSelectors().getSelector().size() == 1) {
-          HashOrClassRef selector = mixinHelper.getSelectors().getSelector().get(0);
-          String selectorIdent = MixinUtils.getIdent(selector);
-          MixinScopeElement newElement = element.cloneAndExtends(selectorIdent, selector);
-          scope.addAtPosition(position, newElement);          
-          if (scope.getPath().isMatching(position, selectorIdent)) {
-            fillScope(scope, mixinHelper.getBody(), position + 1, newElement);
+    if (position >= scope.getPath().size()) {
+      scope.addFullMatch(element);
+    } else {
+      for (EObject obj : statements) {
+        if (obj instanceof ImportStatement) {
+          Iterable<ToplevelStatement> importedStatements = importStatementResolver.getAllStatements((ImportStatement) obj);
+          fillScope(scope, importedStatements, position, element);
+        } else if (obj instanceof Mixin) {
+          MixinUtils.Helper mixinHelper = MixinUtils.newHelper((Mixin) obj);
+          if (mixinHelper.isDefinition() && mixinHelper.getSelectors().getSelector().size() == 1) {
+            HashOrClassRef selector = mixinHelper.getSelectors().getSelector().get(0);
+            String selectorIdent = MixinUtils.getIdent(selector);
+            MixinScopeElement newElement = element.cloneAndExtends(selectorIdent, selector);
+            scope.addAtPosition(position, newElement);          
+            if (scope.getPath().isMatching(position, selectorIdent)) {
+              fillScope(scope, mixinHelper.getBody(), position + 1, newElement);
+            }
           }
-        }
-      } else if (obj instanceof ToplevelRuleSet) {
-        ToplevelRuleSet toplevelRuleSet = (ToplevelRuleSet) obj;
-        for (ToplevelSelector toplevelSelector: toplevelRuleSet.getSelector()) {
-          fillScopeForRuleSet(scope, obj, toplevelSelector.getSelector(), toplevelRuleSet.getBlock(), position, element);
-        }
-      } else if (obj instanceof InnerRuleSet) {
-        InnerRuleSet innerRuleSet = (InnerRuleSet) obj;
-        for (InnerSelector innerSelector: innerRuleSet.getSelector()) {
-          fillScopeForRuleSet(scope, obj, innerSelector.getSelector(), innerRuleSet.getBlock(), position, element);
+        } else if (obj instanceof ToplevelRuleSet) {
+          ToplevelRuleSet toplevelRuleSet = (ToplevelRuleSet) obj;
+          for (ToplevelSelector toplevelSelector: toplevelRuleSet.getSelector()) {
+            fillScopeForRuleSet(scope, obj, toplevelSelector.getSelector(), toplevelRuleSet.getBlock(), position, element);
+          }
+        } else if (obj instanceof InnerRuleSet) {
+          InnerRuleSet innerRuleSet = (InnerRuleSet) obj;
+          for (InnerSelector innerSelector: innerRuleSet.getSelector()) {
+            fillScopeForRuleSet(scope, obj, innerSelector.getSelector(), innerRuleSet.getBlock(), position, element);
+          }
         }
       }
     }

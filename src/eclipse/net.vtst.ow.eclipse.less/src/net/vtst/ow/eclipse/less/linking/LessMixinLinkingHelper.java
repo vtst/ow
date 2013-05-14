@@ -1,6 +1,8 @@
 package net.vtst.ow.eclipse.less.linking;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.vtst.ow.eclipse.less.less.HashOrClassRefTarget;
@@ -8,23 +10,35 @@ import net.vtst.ow.eclipse.less.less.LessUtils;
 import net.vtst.ow.eclipse.less.less.MixinParameter;
 import net.vtst.ow.eclipse.less.less.MixinParameters;
 import net.vtst.ow.eclipse.less.less.MixinUtils;
+import net.vtst.ow.eclipse.less.less.MixinUtils.Helper;
 import net.vtst.ow.eclipse.less.less.MixinVarParameter;
 import net.vtst.ow.eclipse.less.less.TerminatedMixin;
-import net.vtst.ow.eclipse.less.less.MixinUtils.Helper;
+import net.vtst.ow.eclipse.less.scoping.LessMixinScopeProvider;
+import net.vtst.ow.eclipse.less.scoping.MixinContext;
+import net.vtst.ow.eclipse.less.scoping.MixinScopeElement;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EReference;
+import org.eclipse.xtext.nodemodel.INode;
 import org.eclipse.xtext.util.IResourceScopeCache;
 import org.eclipse.xtext.util.Tuples;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
+// TODO: Rename into *Service
 public class LessMixinLinkingHelper {
 
-  // The cache contains pairs (LessMixinLinkingHelper.Prototype.class, HashOrClassRefTarget).
+  // The cache contains:
+  // - pairs (LessMixinLinkingHelper.Prototype.class, HashOrClassRefTarget).
+  // - pairs (LessMixinLinkingHelper.class, MixinScopeElement).
   @Inject
   private IResourceScopeCache cache;
+  
+  // TODO: This should be a singleton at some point.  There are other classes to check.
+  @Inject
+  private LessMixinScopeProvider mixinScopeProvider;
 
   // **************************************************************************
   // Mixin prototypes
@@ -93,14 +107,52 @@ public class LessMixinLinkingHelper {
   public Prototype getPrototypeForMixinDefinition(final HashOrClassRefTarget hashOrClass) {
     return cache.get(Tuples.pair(Prototype.class, hashOrClass), hashOrClass.eResource(), new Provider<Prototype>() {
       public Prototype get() {
-        EObject mixinCall = LessUtils.getNthAncestor(hashOrClass, 2);
-        if ((mixinCall instanceof TerminatedMixin)) {
-          return new Prototype((TerminatedMixin) mixinCall);
+        EObject mixinDefinition = LessUtils.getNthAncestor(hashOrClass, 2);
+        if ((mixinDefinition instanceof TerminatedMixin)) {
+          return new Prototype((TerminatedMixin) mixinDefinition);
         } else {
           return new Prototype(null);
         }
       }
     });
+  }
+  
+  // **************************************************************************
+  // Linking
+  
+  // TODO: We should implement a better strategy for error messages.
+  // TODO: Check there is no place we assume that the target of a mixin call is a mixin declaration.
+  // It could also be a simple ruleset.
+  private MixinScopeElement getBestFullMatch(MixinContext mixinContext, Iterable<MixinScopeElement> fullMatches) {
+    for (MixinScopeElement fullMatch : fullMatches) {
+      EObject eObject = fullMatch.getLastObject();
+      if (eObject instanceof HashOrClassRefTarget) {
+        LessMixinLinkingHelper.Prototype prototype = 
+            getPrototypeForMixinDefinition((HashOrClassRefTarget) eObject);
+        if (prototype.checkMixinCall(mixinContext.getMixinHelper(), null))
+          return fullMatch;
+      }
+    }
+    return null;
+  }
+
+  private MixinScopeElement getLinkedMixin(final MixinContext mixinContext) {
+    return cache.get(Tuples.pair(Prototype.class, mixinContext.getMixin()), mixinContext.getMixin().eResource(), new Provider<MixinScopeElement>() {
+      public MixinScopeElement get() {
+        return getBestFullMatch(mixinContext, mixinScopeProvider.getScope(mixinContext).getFullMatches());
+      }
+    });    
+  }
+  
+  public List<EObject> getLinkedObjects(EObject context, EReference ref, INode node) {
+    MixinContext mixinContext = new MixinContext(context);
+    if (!mixinContext.isValid()) return Collections.emptyList();
+    MixinScopeElement element = getLinkedMixin(mixinContext);
+    if (element == null) {
+      return Collections.emptyList();
+    } else {
+      return Collections.singletonList(element.getObject(mixinContext.getSelectorIndex()));
+    }
   }
 
 }

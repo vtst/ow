@@ -54,6 +54,7 @@ public class MixinScope {
   private MixinScope parent;
   private MixinPath path;
   private ArrayList<LazyScope> scopes;
+  private ArrayList<MixinScopeElement> fullMatches = new ArrayList<MixinScopeElement>();
   
   private MixinScope(MixinPath selectors, MixinScope parent) {
     this.parent = parent;
@@ -100,6 +101,23 @@ public class MixinScope {
     fillCompletionProposals(elements, position);
     // TODO: Need sorting.
     return elements.values();
+  }
+
+  public void addFullMatch(MixinScopeElement element) {
+    this.fullMatches.add(element);
+  }
+  
+  // TODO: Can we avoid creating a data structure?
+  private void fillFullMatches(List<MixinScopeElement> accu) {
+    if (parent != null) parent.fillFullMatches(accu);
+    accu.addAll(this.fullMatches);
+  }
+
+  public Iterable<MixinScopeElement> getFullMatches() {
+    if (this.parent == null) return this.fullMatches;
+    List<MixinScopeElement> result = new ArrayList<MixinScopeElement>();
+    fillFullMatches(result);
+    return result;
   }
   
 }

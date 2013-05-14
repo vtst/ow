@@ -1,34 +1,28 @@
 package net.vtst.ow.eclipse.less.linking;
 
-import java.util.Collections;
 import java.util.List;
 
 import net.vtst.ow.eclipse.less.less.HashOrClassRef;
 import net.vtst.ow.eclipse.less.less.HashOrClassRefTarget;
+import net.vtst.ow.eclipse.less.less.LessPackage;
 import net.vtst.ow.eclipse.less.less.LessUtils;
 import net.vtst.ow.eclipse.less.less.Mixin;
 import net.vtst.ow.eclipse.less.less.MixinUtils;
 
-import org.apache.log4j.Logger;
-import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.xtext.linking.impl.DefaultLinkingService;
 import org.eclipse.xtext.linking.impl.IllegalNodeException;
 import org.eclipse.xtext.naming.IQualifiedNameConverter;
-import org.eclipse.xtext.naming.QualifiedName;
 import org.eclipse.xtext.nodemodel.INode;
 import org.eclipse.xtext.resource.IEObjectDescription;
-import org.eclipse.xtext.scoping.IScope;
+
+import com.google.inject.Inject;
 // import org.eclipse.xtext.util.internal.Stopwatches;
 // import org.eclipse.xtext.util.internal.Stopwatches.StoppedTask;
 
-import com.google.inject.Inject;
-
 public class LessLinkingService extends DefaultLinkingService {
   
-  private static final Logger logger = Logger.getLogger(DefaultLinkingService.class);
-
   @Inject
   private IQualifiedNameConverter qualifiedNameConverter;
   
@@ -69,31 +63,11 @@ public class LessLinkingService extends DefaultLinkingService {
 
   public List<EObject> getLinkedObjects(EObject context, EReference ref, INode node)
       throws IllegalNodeException {
-    final EClass requiredType = ref.getEReferenceType();
-    if (requiredType == null)
-      return Collections.<EObject> emptyList();
-
-    final String crossRefString = getCrossRefNodeAsString(node);
-    if (crossRefString != null && !crossRefString.equals("")) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("before getLinkedObjects: node: '" + crossRefString + "'");
-      }
-      // StoppedTask task = Stopwatches.forTask("Crosslink resolution (DefaultLinkingService.getLinkedObjects)");
-      try {
-        // task.start();
-        final IScope scope = getScope(context, ref);
-        QualifiedName qualifiedLinkName =  qualifiedNameConverter.toQualifiedName(crossRefString);
-        IEObjectDescription eObjectDescription = getBestMatch(context, scope.getElements(qualifiedLinkName));
-        if (logger.isDebugEnabled()) {
-          logger.debug("after getLinkedObjects: node: '" + crossRefString + "' result: " + eObjectDescription);
-        }
-        if (eObjectDescription != null) 
-          return Collections.singletonList(eObjectDescription.getEObjectOrProxy());
-      } finally {
-        // task.stop();
-      }
+    if (LessPackage.eINSTANCE.getHashOrClassRefTarget().equals(ref.getEReferenceType())) {
+      return mixinLinkingHelper.getLinkedObjects(context, ref, node);
+    } else {
+      return super.getLinkedObjects(context, ref, node);
     }
-    return Collections.emptyList();
   }
 
 }
