@@ -27,7 +27,7 @@ public class LessLinkingService extends DefaultLinkingService {
   private IQualifiedNameConverter qualifiedNameConverter;
   
   @Inject
-  private LessMixinLinkingHelper mixinLinkingHelper;
+  private LessMixinLinkingService mixinLinkingService;
   
   protected IEObjectDescription getBestMatchForHashOrClassRef(HashOrClassRef context, Iterable<IEObjectDescription> eObjectDescriptions) {
     EObject mixinCall = LessUtils.getNthAncestor(context, 2);
@@ -36,8 +36,8 @@ public class LessLinkingService extends DefaultLinkingService {
       for (IEObjectDescription eObjectDescription : eObjectDescriptions) {
         EObject eObject = eObjectDescription.getEObjectOrProxy();
         if (eObject instanceof HashOrClassRefTarget) {
-          LessMixinLinkingHelper.Prototype prototype = 
-              mixinLinkingHelper.getPrototypeForMixinDefinition((HashOrClassRefTarget) eObject);
+          LessMixinLinkingService.Prototype prototype = 
+              mixinLinkingService.getPrototypeForMixinDefinition((HashOrClassRefTarget) eObject);
           if (prototype.checkMixinCall(mixinHelper, null))
             return eObjectDescription;
         }
@@ -64,7 +64,7 @@ public class LessLinkingService extends DefaultLinkingService {
   public List<EObject> getLinkedObjects(EObject context, EReference ref, INode node)
       throws IllegalNodeException {
     if (LessPackage.eINSTANCE.getHashOrClassRefTarget().equals(ref.getEReferenceType())) {
-      return mixinLinkingHelper.getLinkedObjects(context, ref, node);
+      return mixinLinkingService.getLinkedObjects(context, ref, node);
     } else {
       return super.getLinkedObjects(context, ref, node);
     }

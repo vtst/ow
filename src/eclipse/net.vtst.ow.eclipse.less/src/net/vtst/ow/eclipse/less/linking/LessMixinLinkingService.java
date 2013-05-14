@@ -20,6 +20,7 @@ import net.vtst.ow.eclipse.less.scoping.MixinScopeElement;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
+import org.eclipse.xtext.linking.ILinkingService;
 import org.eclipse.xtext.nodemodel.INode;
 import org.eclipse.xtext.util.IResourceScopeCache;
 import org.eclipse.xtext.util.Tuples;
@@ -28,7 +29,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 // TODO: Rename into *Service
-public class LessMixinLinkingHelper {
+public class LessMixinLinkingService implements ILinkingService {
 
   // The cache contains:
   // - pairs (LessMixinLinkingHelper.Prototype.class, HashOrClassRefTarget).
@@ -127,7 +128,7 @@ public class LessMixinLinkingHelper {
     for (MixinScopeElement fullMatch : fullMatches) {
       EObject eObject = fullMatch.getLastObject();
       if (eObject instanceof HashOrClassRefTarget) {
-        LessMixinLinkingHelper.Prototype prototype = 
+        LessMixinLinkingService.Prototype prototype = 
             getPrototypeForMixinDefinition((HashOrClassRefTarget) eObject);
         if (prototype.checkMixinCall(mixinContext.getMixinHelper(), null))
           return fullMatch;
