@@ -28,7 +28,6 @@ import org.eclipse.xtext.util.Tuples;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-// TODO: Rename into *Service
 public class LessMixinLinkingService implements ILinkingService {
 
   // The cache contains:
