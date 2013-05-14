@@ -71,14 +71,7 @@ public class MixinScopeElement {
    * @return The qualified name for the current element.
    */
   private QualifiedName getQualifiedName() {
-    if (this.name.startsWith(".")) {
-      // This is because of the special interpretation of '.' by xtext when doing linking.
-      // TODO A better approach would be to de-activate the special handling of . by implementing
-      // IQualifiedNameConverter.
-      return QualifiedName.create("", this.name.substring(1));
-    } else {
-      return QualifiedName.create(this.name);
-    }
+    return QualifiedName.create(this.name);
   }
   
   /**

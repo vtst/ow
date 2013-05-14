@@ -10,6 +10,7 @@ import net.vtst.ow.eclipse.less.less.LessPackage;
 import net.vtst.ow.eclipse.less.linking.LessLinkingService;
 import net.vtst.ow.eclipse.less.linking.LessMixinLinkingService;
 import net.vtst.ow.eclipse.less.nature.LessProjectNature;
+import net.vtst.ow.eclipse.less.parser.LessQualifiedNameConverter;
 import net.vtst.ow.eclipse.less.parser.LessValueConverterService;
 import net.vtst.ow.eclipse.less.resource.LessLocationInFileProvider;
 import net.vtst.ow.eclipse.less.resource.LessResourceDescriptionStrategy;
@@ -20,6 +21,9 @@ import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.xtext.conversion.IValueConverterService;
 import org.eclipse.xtext.linking.ILinkingDiagnosticMessageProvider;
 import org.eclipse.xtext.linking.ILinkingService;
+import org.eclipse.xtext.naming.IQualifiedNameConverter;
+import org.eclipse.xtext.naming.IQualifiedNameProvider;
+import org.eclipse.xtext.naming.SimpleNameProvider;
 import org.eclipse.xtext.parsetree.reconstr.IHiddenTokenHelper;
 import org.eclipse.xtext.resource.IDefaultResourceDescriptionStrategy;
 import org.eclipse.xtext.resource.ILocationInFileProvider;
@@ -53,6 +57,10 @@ public class LessRuntimeModule extends net.vtst.ow.eclipse.less.AbstractLessRunt
   @Override
   public Class<? extends IValueConverterService> bindIValueConverterService() {
     return LessValueConverterService.class;
+  }
+
+  public Class<? extends IQualifiedNameConverter> bindIQualifiedNameConverter() {
+    return LessQualifiedNameConverter.class;
   }
   
   public Class<? extends org.eclipse.xtext.naming.IQualifiedNameProvider> bindIQualifiedNameProvider() {
