@@ -101,7 +101,6 @@ public class MixinScope {
   public Iterable<MixinScopeElement> getCompletionProposals(int position) {
     Map<String, MixinScopeElement> elements = new TreeMap<String, MixinScopeElement>();
     fillCompletionProposals(elements, position);
-    // TODO: Need sorting.
     return elements.values();
   }
 
