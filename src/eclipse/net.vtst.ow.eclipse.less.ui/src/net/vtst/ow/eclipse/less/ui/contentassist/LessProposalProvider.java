@@ -13,6 +13,10 @@ import net.vtst.ow.eclipse.less.less.Declaration;
 import net.vtst.ow.eclipse.less.less.Expr;
 import net.vtst.ow.eclipse.less.less.FontFaceStatement;
 import net.vtst.ow.eclipse.less.less.PageStatement;
+import net.vtst.ow.eclipse.less.scoping.LessMixinScopeProvider;
+import net.vtst.ow.eclipse.less.scoping.MixinContext;
+import net.vtst.ow.eclipse.less.scoping.MixinScope;
+import net.vtst.ow.eclipse.less.scoping.MixinScopeElement;
 import net.vtst.ow.eclipse.less.ui.LessImageHelper;
 
 import org.eclipse.emf.ecore.EObject;
@@ -28,6 +32,9 @@ import com.google.inject.Inject;
  * see http://www.eclipse.org/Xtext/documentation/latest/xtext.html#contentAssist on how to customize content assistant
  */
 public class LessProposalProvider extends AbstractLessProposalProvider {
+  
+  @Inject
+  private LessMixinScopeProvider mixinScopeProvider;
   
   @Inject
   private IImageHelper imageHelper;  // implemented by org.eclipse.xtext.ui.PluginImageHelper
@@ -102,5 +109,21 @@ public class LessProposalProvider extends AbstractLessProposalProvider {
     CssProfile.PropertyDef propertyDef = this.cssProfile.getProperty(model.getProperty());
     addProposalsFromSet(propertyDef.keywords, LessImageHelper.PROPERTY_IDENT, context, acceptor);
     addProposalsFromSet(propertyDef.strings, LessImageHelper.PROPERTY_IDENT, context, acceptor);
+  }
+
+  // **************************************************************************
+  // Content assist for mixin calls
+
+  public void complete_MixinSelectors(EObject model, RuleCall ruleCall, ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
+  }
+  
+  public void complete_HashOrClassRef(EObject model, RuleCall ruleCall, ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
+    MixinContext mixinContext = new MixinContext(context.getPreviousModel());
+    if (!mixinContext.isValid()) return;
+    MixinScope scope = mixinScopeProvider.getScope(mixinContext.getMixinHelper());
+    for (MixinScopeElement element : scope.getCompletionProposals(mixinContext.getSelectorIndex())) {
+      Image image = imageHelper.getImage(LessImageHelper.MIXIN_DEFINITION);
+      acceptor.accept(createCompletionProposal(element.getName(), element.getName(), image, context));      
+    }
   }
 }

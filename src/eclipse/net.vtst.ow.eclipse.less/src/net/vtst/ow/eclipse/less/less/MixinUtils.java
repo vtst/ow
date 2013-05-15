@@ -13,10 +13,20 @@ public class MixinUtils {
   // Helper class for accessing Mixin objects
   
   public static abstract class Helper {
+    private Mixin mixin;
+    
+    public Helper(Mixin mixin) {
+      this.mixin = mixin;
+    }
+    
     public abstract MixinSelectors getSelectors();
     public abstract MixinParameters getParameters();
     public abstract MixinDefinitionGuards getGuard();
     public abstract Block getBody();
+    
+    public Mixin getMixin() {
+      return this.mixin;
+    }
     
     public boolean isDefinition() {
       return this.getBody() != null;
@@ -31,6 +41,7 @@ public class MixinUtils {
     private TerminatedMixin mixin;
 
     public HelperForTerminatedMixin(TerminatedMixin mixin) {
+      super(mixin);
       this.mixin = mixin;
     }
     
@@ -44,6 +55,7 @@ public class MixinUtils {
     private UnterminatedMixin mixin;
 
     public HelperForUnterminatedMixin(UnterminatedMixin mixin) {
+      super(mixin);
       this.mixin = mixin;
     }
     

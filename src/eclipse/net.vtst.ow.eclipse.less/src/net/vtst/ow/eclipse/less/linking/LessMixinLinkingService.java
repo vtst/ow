@@ -32,7 +32,7 @@ public class LessMixinLinkingService implements ILinkingService {
 
   // The cache contains:
   // - (LessMixinLinkingHelper.Prototype.class, HashOrClassRefTarget) -> Prototype
-  // - (LessMixinLinkingHelper.class, Mixin) -> MixinScopeElement
+  // - (LessMixinLinkingHelper.class, Mixin) -> LinkingResult
   @Inject
   private IResourceScopeCache cache;
   
@@ -119,10 +119,21 @@ public class LessMixinLinkingService implements ILinkingService {
   // **************************************************************************
   // Linking
   
+  public class LinkingResult {
+    private MixinScopeElement element;
+
+    public LinkingResult(MixinScopeElement element) {
+      this.element = element;
+    }
+    
+    public boolean isSuccess() { return element != null; }
+    public MixinScopeElement getElement() { return element; }
+  }
+  
   // TODO: We should implement a better strategy for error messages.
   // TODO: Check there is no place we assume that the target of a mixin call is a mixin declaration.
   // It could also be a simple ruleset.
-  private MixinScopeElement getBestFullMatch(MixinContext mixinContext, Iterable<MixinScopeElement> fullMatches) {
+  private LinkingResult getBestFullMatch(MixinContext mixinContext, Iterable<MixinScopeElement> fullMatches) {
     MixinScopeElement bestMatch = null;
     for (MixinScopeElement fullMatch : fullMatches) {
       EObject eObject = fullMatch.getLastObject();
@@ -133,13 +144,13 @@ public class LessMixinLinkingService implements ILinkingService {
           bestMatch = fullMatch;
       }
     }
-    return bestMatch;
+    return new LinkingResult(bestMatch);
   }
 
-  private MixinScopeElement getLinkedMixin(final MixinContext mixinContext) {
-    return cache.get(Tuples.pair(Prototype.class, mixinContext.getMixin()), mixinContext.getMixin().eResource(), new Provider<MixinScopeElement>() {
-      public MixinScopeElement get() {
-        return getBestFullMatch(mixinContext, mixinScopeProvider.getScope(mixinContext).getFullMatches());
+  public LinkingResult getLinkedMixin(final MixinContext mixinContext) {
+    return cache.get(Tuples.pair(Prototype.class, mixinContext.getMixin()), mixinContext.getMixin().eResource(), new Provider<LinkingResult>() {
+      public LinkingResult get() {
+        return getBestFullMatch(mixinContext, mixinScopeProvider.getScope(mixinContext.getMixinHelper()).getFullMatches());
       }
     });    
   }
@@ -147,11 +158,11 @@ public class LessMixinLinkingService implements ILinkingService {
   public List<EObject> getLinkedObjects(EObject context, EReference ref, INode node) {
     MixinContext mixinContext = new MixinContext(context);
     if (!mixinContext.isValid()) return Collections.emptyList();
-    MixinScopeElement element = getLinkedMixin(mixinContext);
-    if (element == null) {
-      return Collections.emptyList();
+    LinkingResult linkingResult = getLinkedMixin(mixinContext);
+    if (linkingResult.isSuccess()) {
+      return Collections.singletonList(linkingResult.getElement().getObject(mixinContext.getSelectorIndex()));
     } else {
-      return Collections.singletonList(element.getObject(mixinContext.getSelectorIndex()));
+      return Collections.emptyList();
     }
   }
 

@@ -41,7 +41,6 @@ public class MixinContext {
 
   public int getSelectorIndex() { return this.selectorIndex; }  
   public Mixin getMixin() { return this.mixin; }
-  public MixinSelectors getMixinSelectors() { return this.mixinHelper.getSelectors(); }
   public MixinUtils.Helper getMixinHelper() { return this.mixinHelper; }
   public boolean isValid() { return this.isValid; }
 

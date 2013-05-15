@@ -48,11 +48,11 @@ public class LessMixinScopeProvider {
    * @param mixin  A mixin.
    * @return The scope for the mixin, if this is a mixin call, null if this is a mixin definition.  
    */
-  public MixinScope getScope(final MixinContext context) {
-    assert context.isValid();
-    return cache.get(Tuples.pair(LessMixinScopeProvider.class, context.getMixin()), context.getMixin().eResource(), new Provider<MixinScope>() {
+  public MixinScope getScope(final MixinUtils.Helper mixinHelper) {
+    assert !mixinHelper.isDefinition();
+    return cache.get(Tuples.pair(LessMixinScopeProvider.class, mixinHelper.getMixin()), mixinHelper.getMixin().eResource(), new Provider<MixinScope>() {
       public MixinScope get() {
-        return getScopeRec(context.getMixin().eContainer(), new MixinPath(context.getMixinHelper().getSelectors().getSelector()));
+        return getScopeRec(mixinHelper.getMixin().eContainer(), new MixinPath(mixinHelper.getSelectors().getSelector()));
       }
     });      
   }

@@ -165,7 +165,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
   IScope scope_HashOrClassRefTarget(EObject context, EReference ref) {
     MixinContext mixinContext = new MixinContext(context);
     if (!mixinContext.isValid()) return IScope.NULLSCOPE;
-    MixinScope scope = mixinScopeProvider.getScope(mixinContext);
+    MixinScope scope = mixinScopeProvider.getScope(mixinContext.getMixinHelper());
     return scope.getScope(mixinContext.getSelectorIndex());
   }
 
