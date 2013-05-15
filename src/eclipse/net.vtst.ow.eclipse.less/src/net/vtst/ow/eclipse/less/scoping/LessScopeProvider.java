@@ -38,8 +38,8 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
   
   private static final String ARGUMENTS_VARIABLE_NAME = "@arguments";
 
-  // The cache contains pairs (LessScopeProvider.class, context) for variable scopes
-  // and triples (LessScopeProvider.HashOrClassCrossReferenceclass, context, prefix) for mixin scopes.
+  // The cache contains:
+  // (LessScopeProvider.class, context) -> LessScopeProvider.class
   @Inject
   private IResourceScopeCache cache;
   

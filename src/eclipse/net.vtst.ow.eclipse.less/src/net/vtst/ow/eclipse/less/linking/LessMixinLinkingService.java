@@ -31,8 +31,8 @@ import com.google.inject.Provider;
 public class LessMixinLinkingService implements ILinkingService {
 
   // The cache contains:
-  // - pairs (LessMixinLinkingHelper.Prototype.class, HashOrClassRefTarget).
-  // - pairs (LessMixinLinkingHelper.class, MixinScopeElement).
+  // - (LessMixinLinkingHelper.Prototype.class, HashOrClassRefTarget) -> Prototype
+  // - (LessMixinLinkingHelper.class, Mixin) -> MixinScopeElement
   @Inject
   private IResourceScopeCache cache;
   

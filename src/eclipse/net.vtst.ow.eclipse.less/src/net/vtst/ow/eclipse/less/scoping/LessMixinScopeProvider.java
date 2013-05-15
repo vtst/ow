@@ -35,8 +35,8 @@ import com.google.inject.Provider;
 public class LessMixinScopeProvider {
 
   // The cache contains:
-  // - pairs (LessMixinScopeProvider.class, Mixin).
-  // - triples (LessMixinScopeProvider.class, EObject, Selectors)
+  // (LessMixinScopeProvider.class, Mixin) -> MixinScope
+  // (LessMixinScopeProvider.class, EObject, Selectors) -> MixinScope
   @Inject
   private IResourceScopeCache cache;
 
