@@ -15,6 +15,7 @@ import net.vtst.ow.eclipse.less.less.MixinVarParameter;
 import net.vtst.ow.eclipse.less.less.TerminatedMixin;
 import net.vtst.ow.eclipse.less.scoping.LessMixinScopeProvider;
 import net.vtst.ow.eclipse.less.scoping.MixinContext;
+import net.vtst.ow.eclipse.less.scoping.MixinScope;
 import net.vtst.ow.eclipse.less.scoping.MixinScopeElement;
 
 import org.eclipse.emf.common.util.EList;
@@ -119,22 +120,38 @@ public class LessMixinLinkingService implements ILinkingService {
   // **************************************************************************
   // Linking
   
-  public class LinkingResult {
+  public static class MixinLink {
     private MixinScopeElement element;
+    private int matchLength;
+    private boolean isSuccess;
+    
+    public MixinLink() {
+      this(null, false);
+    }
 
-    public LinkingResult(MixinScopeElement element) {
+    public MixinLink(MixinScopeElement element, boolean isSuccess) {
       this.element = element;
+      this.matchLength = this.element.size();
+      this.isSuccess = isSuccess;
     }
     
-    public boolean isSuccess() { return element != null; }
-    public MixinScopeElement getElement() { return element; }
+    public MixinLink(MixinScopeElement element, int matchLength) {
+      this(element, false);
+      this.matchLength = matchLength;
+    }
+    
+    public int matchLength() { return this.matchLength; }
+    public boolean isSuccess() { return this.isSuccess; }
+    public MixinScopeElement getElement() { return this.element; }
   }
   
   // TODO: We should implement a better strategy for error messages.
   // TODO: Check there is no place we assume that the target of a mixin call is a mixin declaration.
   // It could also be a simple ruleset.
-  private LinkingResult getBestFullMatch(MixinUtils.Helper mixinHelper, Iterable<MixinScopeElement> fullMatches) {
+  private MixinLink getBestFullMatch(MixinUtils.Helper mixinHelper, MixinScope mixinScope) {
+    Iterable<MixinScopeElement> fullMatches = mixinScope.getFullMatches();
     MixinScopeElement bestMatch = null;
+    MixinScopeElement lastMatch = null;
     for (MixinScopeElement fullMatch : fullMatches) {
       EObject eObject = fullMatch.getLastObject();
       if (eObject instanceof HashOrClassRefTarget) {
@@ -142,15 +159,30 @@ public class LessMixinLinkingService implements ILinkingService {
             getPrototypeForMixinDefinition((HashOrClassRefTarget) eObject);
         if (prototype.checkMixinCall(mixinHelper, null))
           bestMatch = fullMatch;
+        lastMatch = fullMatch;
       }
     }
-    return new LinkingResult(bestMatch);
+    if (bestMatch != null) return new MixinLink(bestMatch, true);
+    else if (lastMatch != null) return new MixinLink(lastMatch, false);
+    else return null;
+  }
+  
+  private MixinLink getLongestMatch(MixinUtils.Helper mixinHelper, MixinScope mixinScope) {
+    int lastMatchingPosition = mixinScope.getLastMatchingPosition();
+    System.out.println(lastMatchingPosition);
+    if (lastMatchingPosition < 0) return new MixinLink();
+    MixinScopeElement element = mixinScope.getLastElement(lastMatchingPosition);
+    if (element == null) return new MixinLink();
+    return new MixinLink(element, lastMatchingPosition + 1);
   }
 
-  public LinkingResult getLinkedMixin(final MixinUtils.Helper mixinHelper) {
-    return cache.get(Tuples.pair(Prototype.class, mixinHelper.getMixin()), mixinHelper.getMixin().eResource(), new Provider<LinkingResult>() {
-      public LinkingResult get() {
-        return getBestFullMatch(mixinHelper, mixinScopeProvider.getScope(mixinHelper).getFullMatches());
+  public MixinLink getLinkedMixin(final MixinUtils.Helper mixinHelper) {
+    return cache.get(Tuples.pair(Prototype.class, mixinHelper.getMixin()), mixinHelper.getMixin().eResource(), new Provider<MixinLink>() {
+      public MixinLink get() {
+        MixinScope mixinScope = mixinScopeProvider.getScope(mixinHelper);
+        MixinLink fullMatch = getBestFullMatch(mixinHelper, mixinScope);
+        if (fullMatch != null) return fullMatch;
+        return getLongestMatch(mixinHelper, mixinScope);
       }
     });    
   }
@@ -158,8 +190,8 @@ public class LessMixinLinkingService implements ILinkingService {
   public List<EObject> getLinkedObjects(EObject context, EReference ref, INode node) {
     MixinContext mixinContext = new MixinContext(context);
     if (!mixinContext.isValid()) return Collections.emptyList();
-    LinkingResult linkingResult = getLinkedMixin(mixinContext.getMixinHelper());
-    if (linkingResult.isSuccess()) {
+    MixinLink linkingResult = getLinkedMixin(mixinContext.getMixinHelper());
+    if (linkingResult.matchLength() > mixinContext.getSelectorIndex()) {
       return Collections.singletonList(linkingResult.getElement().getObject(mixinContext.getSelectorIndex()));
     } else {
       return Collections.emptyList();

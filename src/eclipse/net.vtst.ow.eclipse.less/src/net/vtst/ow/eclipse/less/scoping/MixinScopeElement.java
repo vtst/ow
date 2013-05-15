@@ -42,6 +42,9 @@ public class MixinScopeElement {
    */
   public String getName() { return name; }
     
+  
+  public int size() { return objects.size(); }
+
   /**
    * @param index
    * @return The hashOrClass at the index-th position.

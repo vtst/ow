@@ -36,6 +36,7 @@ import net.vtst.ow.eclipse.less.less.Term;
 import net.vtst.ow.eclipse.less.less.TerminatedMixin;
 import net.vtst.ow.eclipse.less.less.VariableDefinition;
 import net.vtst.ow.eclipse.less.linking.LessMixinLinkingService;
+import net.vtst.ow.eclipse.less.linking.LessMixinLinkingService.MixinLink;
 import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver;
 
 import org.eclipse.emf.common.util.EList;
@@ -285,6 +286,12 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   }
   
   private void checkMixinCall(MixinUtils.Helper helper) {
+// TODO: Improve error message.
+//    MixinLink linkingResult = mixinLinkingService.getLinkedMixin(helper);
+//    if (!linkingResult.isSuccess()) {
+//      error("Linking error", helper.getSelectors(), null, 0);
+//      return;
+//    }
     MixinParameters parameters = helper.getParameters();
     if (parameters != null) checkMixinCallParameters_Syntax(parameters);
     checkMixinCall_Prototype(helper);

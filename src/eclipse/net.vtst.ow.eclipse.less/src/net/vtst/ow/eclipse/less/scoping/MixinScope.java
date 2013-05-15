@@ -82,7 +82,7 @@ public class MixinScope {
   }
 
   public MixinPath getPath() { return path; }
-
+  
   public void addAtPosition(int position, MixinScopeElement element) {
     this.scopes.get(position).add(element);
   }
@@ -113,6 +113,33 @@ public class MixinScope {
       return this.fullMatches;
     } else {
       return Iterables.concat(parent.getFullMatches(), this.fullMatches);
+    }
+  }
+
+  private int getLastMatchingPositionNoRec() {
+    if (this.fullMatches.isEmpty()) {
+      int i = this.scopes.size() - 1;
+      while (i > 0 && this.scopes.get(i).getElements().isEmpty()) --i;
+      return i - 1;
+    } else {
+      return this.scopes.size();
+    }
+  }
+
+  public int getLastMatchingPosition() {
+    return Math.max(
+        getLastMatchingPositionNoRec(),
+        parent == null ? -1 : parent.getLastMatchingPosition());
+  }
+
+  public MixinScopeElement getLastElement(int lastMatchingPosition) {
+    List<MixinScopeElement> elements = this.scopes.get(lastMatchingPosition).getElements();
+    if (!elements.isEmpty()) {
+      return elements.get(elements.size() - 1);
+    } else if (this.parent == null) {
+      return null;
+    } else {
+      return this.parent.getLastElement(lastMatchingPosition);
     }
   }
   
