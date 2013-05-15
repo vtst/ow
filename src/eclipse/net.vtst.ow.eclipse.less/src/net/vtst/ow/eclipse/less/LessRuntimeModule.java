@@ -68,7 +68,7 @@ public class LessRuntimeModule extends net.vtst.ow.eclipse.less.AbstractLessRunt
   }
   
   public Class<? extends ILinkingDiagnosticMessageProvider.Extended> bindILinkingDiagnosticMessageProvider() {
-    return net.vtst.ow.eclipse.less.scoping.LessLinkingDiagnosticMessageProvider.class;
+    return net.vtst.ow.eclipse.less.linking.LessLinkingDiagnosticMessageProvider.class;
   }
   
   public Class<? extends ILocationInFileProvider> bindILocationInFileProvider() {
