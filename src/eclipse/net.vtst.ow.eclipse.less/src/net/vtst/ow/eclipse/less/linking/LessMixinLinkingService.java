@@ -133,24 +133,24 @@ public class LessMixinLinkingService implements ILinkingService {
   // TODO: We should implement a better strategy for error messages.
   // TODO: Check there is no place we assume that the target of a mixin call is a mixin declaration.
   // It could also be a simple ruleset.
-  private LinkingResult getBestFullMatch(MixinContext mixinContext, Iterable<MixinScopeElement> fullMatches) {
+  private LinkingResult getBestFullMatch(MixinUtils.Helper mixinHelper, Iterable<MixinScopeElement> fullMatches) {
     MixinScopeElement bestMatch = null;
     for (MixinScopeElement fullMatch : fullMatches) {
       EObject eObject = fullMatch.getLastObject();
       if (eObject instanceof HashOrClassRefTarget) {
         LessMixinLinkingService.Prototype prototype = 
             getPrototypeForMixinDefinition((HashOrClassRefTarget) eObject);
-        if (prototype.checkMixinCall(mixinContext.getMixinHelper(), null))
+        if (prototype.checkMixinCall(mixinHelper, null))
           bestMatch = fullMatch;
       }
     }
     return new LinkingResult(bestMatch);
   }
 
-  public LinkingResult getLinkedMixin(final MixinContext mixinContext) {
-    return cache.get(Tuples.pair(Prototype.class, mixinContext.getMixin()), mixinContext.getMixin().eResource(), new Provider<LinkingResult>() {
+  public LinkingResult getLinkedMixin(final MixinUtils.Helper mixinHelper) {
+    return cache.get(Tuples.pair(Prototype.class, mixinHelper.getMixin()), mixinHelper.getMixin().eResource(), new Provider<LinkingResult>() {
       public LinkingResult get() {
-        return getBestFullMatch(mixinContext, mixinScopeProvider.getScope(mixinContext.getMixinHelper()).getFullMatches());
+        return getBestFullMatch(mixinHelper, mixinScopeProvider.getScope(mixinHelper).getFullMatches());
       }
     });    
   }
@@ -158,7 +158,7 @@ public class LessMixinLinkingService implements ILinkingService {
   public List<EObject> getLinkedObjects(EObject context, EReference ref, INode node) {
     MixinContext mixinContext = new MixinContext(context);
     if (!mixinContext.isValid()) return Collections.emptyList();
-    LinkingResult linkingResult = getLinkedMixin(mixinContext);
+    LinkingResult linkingResult = getLinkedMixin(mixinContext.getMixinHelper());
     if (linkingResult.isSuccess()) {
       return Collections.singletonList(linkingResult.getElement().getObject(mixinContext.getSelectorIndex()));
     } else {
