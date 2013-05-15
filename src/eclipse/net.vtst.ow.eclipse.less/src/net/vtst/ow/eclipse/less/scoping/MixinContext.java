@@ -12,7 +12,6 @@ public class MixinContext {
   private boolean isValid;
   private HashOrClassRef hashOrClass;
   private int selectorIndex = 0;
-  private MixinSelectors mixinSelectors;
   private Mixin mixin;
   private MixinUtils.Helper mixinHelper;
   
@@ -25,7 +24,6 @@ public class MixinContext {
     this.hashOrClass = (HashOrClassRef) hashOrClass;
     EObject container1 = hashOrClass.eContainer();
     if (!(container1 instanceof MixinSelectors)) return false;
-    this.mixinSelectors = (MixinSelectors) container1;
     EObject container2 = container1.eContainer();
     if (!(container2 instanceof Mixin)) return false;
     this.mixin = (Mixin) container2;
@@ -34,7 +32,7 @@ public class MixinContext {
   }
 
   private boolean initSelectorIndex() {
-    for (HashOrClassRef item: mixinSelectors.getSelector()) {
+    for (HashOrClassRef item: mixinHelper.getSelectors().getSelector()) {
       if (item == this.hashOrClass) return true;
       ++this.selectorIndex;
     }
@@ -43,7 +41,7 @@ public class MixinContext {
 
   public int getSelectorIndex() { return this.selectorIndex; }  
   public Mixin getMixin() { return this.mixin; }
-  public MixinSelectors getMixinSelectors() { return this.mixinSelectors; }
+  public MixinSelectors getMixinSelectors() { return this.mixinHelper.getSelectors(); }
   public MixinUtils.Helper getMixinHelper() { return this.mixinHelper; }
   public boolean isValid() { return this.isValid; }
 
