@@ -1,11 +1,14 @@
 package net.vtst.ow.eclipse.less.linking;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.vtst.ow.eclipse.less.LessMessages;
 import net.vtst.ow.eclipse.less.less.HashOrClassRefTarget;
+import net.vtst.ow.eclipse.less.less.LessPackage;
 import net.vtst.ow.eclipse.less.less.LessUtils;
 import net.vtst.ow.eclipse.less.less.MixinParameter;
 import net.vtst.ow.eclipse.less.less.MixinParameters;
@@ -25,6 +28,7 @@ import org.eclipse.xtext.linking.ILinkingService;
 import org.eclipse.xtext.nodemodel.INode;
 import org.eclipse.xtext.util.IResourceScopeCache;
 import org.eclipse.xtext.util.Tuples;
+import org.eclipse.xtext.validation.ValidationMessageAcceptor;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -43,13 +47,54 @@ public class LessMixinLinkingService implements ILinkingService {
   // **************************************************************************
   // Mixin prototypes
   
-  public static interface CheckMixinCallCallback {
-    public void illegalNumberOfParameters(int provided);
-
-    public void illegalParameterLabel(MixinParameter parameter);
+  public static interface ICheckMixinError {
+    public void report(LessMessages messages, ValidationMessageAcceptor acceptor);    
   }
   
-  public static class Prototype {
+  public class IllegalParameterLabel implements ICheckMixinError {
+    private MixinParameter parameter;
+    
+    public IllegalParameterLabel(MixinParameter parameter) {
+      this.parameter = parameter;
+    }
+
+    public void report(LessMessages messages, ValidationMessageAcceptor acceptor) {
+      acceptor.acceptWarning(messages.format("illegal_parameter_label", parameter.getIdent().getIdent()), parameter, LessPackage.eINSTANCE.getMixinParameter_Ident(), 0, null);      
+    }
+  }
+  
+  public class IllegalNumberOfParameters implements ICheckMixinError {
+    private MixinUtils.Helper helper;
+    private int expectedMin;
+    private int expectedMax;
+    private int provided;
+    
+    public IllegalNumberOfParameters(Helper helper, int expectedMin, int expectedMax, int provided) {
+      this.helper = helper;
+      this.expectedMin = expectedMin;
+      this.expectedMax = expectedMax;
+      this.provided = provided;
+    }
+
+    private String getErrorMessageForCheckMixinCallParameters(LessMessages messages, int expectedMin, int expectedMax, int provided) {
+      if (expectedMin == expectedMax)
+        return String.format(messages.getString("illegal_number_of_parameters_for_mixin"),
+            expectedMin, provided);
+      if (expectedMax == Integer.MAX_VALUE)
+        return String.format(messages.getString("illegal_number_of_parameters_for_mixin_min"),
+            expectedMin, provided); 
+      return String.format(messages.getString("illegal_number_of_parameters_for_mixin_range"),
+          expectedMin, expectedMax, provided);
+    }
+
+    public void report(LessMessages messages, ValidationMessageAcceptor acceptor) {
+      acceptor.acceptWarning(
+          getErrorMessageForCheckMixinCallParameters(messages, this.expectedMin, this.expectedMax, provided),
+          helper.getSelectors(), null, 0, null);
+    }
+  }
+    
+  public class Prototype {
     public int minNumberOfParameters = 0;
     public int maxNumberOfParameters = 0;
     public Set<String> parameterNames = new HashSet<String>();
@@ -82,25 +127,22 @@ public class LessMixinLinkingService implements ILinkingService {
       else return parameters.getParameter().size();
     }
 
-    public boolean checkMixinCall(Helper helper, CheckMixinCallCallback callback) {
-      boolean result = true;
+
+    public List<ICheckMixinError> checkMixinCall(Helper helper) {
+      List<ICheckMixinError> errors = new ArrayList<ICheckMixinError>();
       int provided = getNumberOfParametersOfMixinCall(helper);
       if (provided < this.minNumberOfParameters || provided > this.maxNumberOfParameters) {
-        if (callback == null) return false;
-        callback.illegalNumberOfParameters(provided);
-        result = false;
+        errors.add(new IllegalNumberOfParameters(helper, this.minNumberOfParameters, this.maxNumberOfParameters, provided));
       }
       MixinParameters parameters = helper.getParameters();
       if (parameters != null) {
         for (MixinParameter parameter : parameters.getParameter()) {
           if (parameter.getIdent() != null && !this.parameterNames.contains(parameter.getIdent().getIdent())) {
-            if (callback == null) return false;
-            callback.illegalParameterLabel(parameter);
-            result = false;
+            errors.add(new IllegalParameterLabel(parameter));
           }
         }
       }
-      return result;
+      return errors;
     }
   }
   
@@ -123,29 +165,43 @@ public class LessMixinLinkingService implements ILinkingService {
   public static class MixinLink {
     private MixinScopeElement element;
     private int matchLength;
-    private int numberOfMatches;
     private boolean isSuccess;
+    private List<ICheckMixinError> error;
     
+    // No match
     public MixinLink() {
-      this(null, false, 0);
+      this.isSuccess = false;
+      this.matchLength = 0;
     }
 
-    public MixinLink(MixinScopeElement element, boolean isSuccess, int numberOfMatches) {
+    // Full match
+    public MixinLink(MixinScopeElement element) {
       this.element = element;
       this.matchLength = this.element.size();
-      this.isSuccess = isSuccess;
-      this.numberOfMatches = numberOfMatches;
+      this.isSuccess = true;
     }
-    
+
+    // Full match with wrong prototype
+    public MixinLink(MixinScopeElement element, List<ICheckMixinError> error) {
+      this.element = element;
+      this.matchLength = this.element.size();
+      this.isSuccess = false;
+      this.error = error;
+    }
+
+    // Partial match
     public MixinLink(MixinScopeElement element, int matchLength) {
-      this(element, false, 0);
+      this.element = element;
+      this.isSuccess = false;
       this.matchLength = matchLength;
     }
     
     public int matchLength() { return this.matchLength; }
-    public int numberOfMatches() { return this.numberOfMatches; }
     public boolean isSuccess() { return this.isSuccess; }
     public MixinScopeElement getElement() { return this.element; }
+    public List<ICheckMixinError> getError() {
+      return this.error;
+    }
   }
   
   // TODO: Check there is no place we assume that the target of a mixin call is a mixin declaration.
@@ -154,20 +210,19 @@ public class LessMixinLinkingService implements ILinkingService {
     Iterable<MixinScopeElement> fullMatches = mixinScope.getFullMatches();
     MixinScopeElement bestMatch = null;
     MixinScopeElement lastMatch = null;
-    int count = 0;
+    List<ICheckMixinError> lastErrors = null;
     for (MixinScopeElement fullMatch : fullMatches) {
-      ++count;
       EObject eObject = fullMatch.getLastObject();
       if (eObject instanceof HashOrClassRefTarget) {
         LessMixinLinkingService.Prototype prototype = 
             getPrototypeForMixinDefinition((HashOrClassRefTarget) eObject);
-        if (prototype.checkMixinCall(mixinHelper, null))
-          bestMatch = fullMatch;
+        lastErrors = prototype.checkMixinCall(mixinHelper);
         lastMatch = fullMatch;
+        if (lastErrors.isEmpty()) bestMatch = fullMatch;
       }
     }
-    if (bestMatch != null) return new MixinLink(bestMatch, true, count);
-    else if (lastMatch != null) return new MixinLink(lastMatch, false, count);
+    if (bestMatch != null) return new MixinLink(bestMatch);
+    else if (lastMatch != null) return new MixinLink(lastMatch, lastErrors);
     else return null;
   }
   

@@ -4,6 +4,7 @@
 package net.vtst.ow.eclipse.less.validation;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,8 +16,6 @@ import net.vtst.ow.eclipse.less.less.Block;
 import net.vtst.ow.eclipse.less.less.BlockContents;
 import net.vtst.ow.eclipse.less.less.BlockUtils;
 import net.vtst.ow.eclipse.less.less.Declaration;
-import net.vtst.ow.eclipse.less.less.HashOrClassRef;
-import net.vtst.ow.eclipse.less.less.HashOrClassRefTarget;
 import net.vtst.ow.eclipse.less.less.IdentTerm;
 import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.less.IncompleteToplevelStatement;
@@ -36,6 +35,7 @@ import net.vtst.ow.eclipse.less.less.Term;
 import net.vtst.ow.eclipse.less.less.TerminatedMixin;
 import net.vtst.ow.eclipse.less.less.VariableDefinition;
 import net.vtst.ow.eclipse.less.linking.LessMixinLinkingService;
+import net.vtst.ow.eclipse.less.linking.LessMixinLinkingService.ICheckMixinError;
 import net.vtst.ow.eclipse.less.linking.LessMixinLinkingService.MixinLink;
 import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver;
 
@@ -49,10 +49,10 @@ import com.google.inject.Inject;
 public class LessJavaValidator extends AbstractLessJavaValidator {
   
   @Inject
-  LessMessages messages;
+  private LessMessages messages;
   
   @Inject
-  LessImportStatementResolver importStatementResolver;
+  private LessImportStatementResolver importStatementResolver;
   
   @Inject
   private LessMixinLinkingService mixinLinkingService;
@@ -134,17 +134,6 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
         }
       }
     }
-  }
-  
-  private String getErrorMessageForCheckMixinCallParameters(String ident, int expectedMin, int expectedMax, int provided) {
-    if (expectedMin == expectedMax)
-        return String.format(messages.getString("illegal_number_of_parameters_for_mixin"),
-            ident, expectedMin, provided);
-    if (expectedMax == Integer.MAX_VALUE)
-      return String.format(messages.getString("illegal_number_of_parameters_for_mixin_min"),
-          ident, expectedMin, provided); 
-    return String.format(messages.getString("illegal_number_of_parameters_for_mixin_range"),
-        ident, expectedMin, expectedMax, provided);
   }
   
   @Check
@@ -289,10 +278,14 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     MixinParameters parameters = helper.getParameters();
     if (parameters != null) checkMixinCallParameters_Syntax(parameters);
     MixinLink linkingResult = mixinLinkingService.getLinkedMixin(helper);
-    if (!linkingResult.isSuccess() && linkingResult.numberOfMatches() > 1) {
-      error(messages.getString("mixin_parameters_match_no_definition"), helper.getSelectors(), null, 0);
-    } else {
-      checkMixinCall_Prototype(helper);
+    if (!linkingResult.isSuccess()) {
+      List<ICheckMixinError> errors = linkingResult.getError();
+      if (errors == null) {
+        error(messages.getString("mixin_parameters_match_no_definition"), helper.getSelectors(), null, 0);
+      } else {
+        for (ICheckMixinError error : errors)
+          error.report(messages, getMessageAcceptor());
+      }
     }
   }
   
@@ -302,31 +295,6 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     }
   }
 
-  private void checkMixinCall_Prototype(final MixinUtils.Helper helper) {
-    // Get the last selector, if any
-    EList<HashOrClassRef> selectors = helper.getSelectors().getSelector();
-    if (selectors.size() == 0) return;
-    HashOrClassRef hashOrClassCrossReference = selectors.get(selectors.size() - 1);
-    // Get the reference, if any
-    EList<EObject> crossReferences = hashOrClassCrossReference.eCrossReferences();
-    if (crossReferences.size() == 0) return;
-    EObject crossReference = crossReferences.get(0);
-    if (!(crossReference instanceof HashOrClassRefTarget)) return;
-    final HashOrClassRefTarget hashOrClass = (HashOrClassRefTarget) crossReference;
-    final LessMixinLinkingService.Prototype prototype = mixinLinkingService.getPrototypeForMixinDefinition(hashOrClass);
-    prototype.checkMixinCall(helper, new LessMixinLinkingService.CheckMixinCallCallback() {
-      public void illegalParameterLabel(MixinParameter parameter) {
-        warning(messages.format("illegal_parameter_label", parameter.getIdent().getIdent()), parameter, LessPackage.eINSTANCE.getMixinParameter_Ident(), 0);
-      }
-      
-      public void illegalNumberOfParameters(int provided) {
-        warning(
-            getErrorMessageForCheckMixinCallParameters(MixinUtils.getIdent(hashOrClass), prototype.minNumberOfParameters, prototype.maxNumberOfParameters, provided),
-            helper.getSelectors(), null, 0);
-      }
-    });
-  }  
-  
   // Report error for IncompleteToplevelStatement
   @Check
   @ConfigurableCheck(configurable = false)
