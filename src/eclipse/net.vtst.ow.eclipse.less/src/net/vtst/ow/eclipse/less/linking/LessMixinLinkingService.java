@@ -204,6 +204,8 @@ public class LessMixinLinkingService implements ILinkingService {
     }
   }
   
+  // This code could be optimized by generating the actual error objects only for the last call.
+  // This would require two implementations of Prototype.checkMixinCall.
   // TODO: Check there is no place we assume that the target of a mixin call is a mixin declaration.
   // It could also be a simple ruleset.
   private MixinLink getBestFullMatch(MixinUtils.Helper mixinHelper, MixinScope mixinScope) {
