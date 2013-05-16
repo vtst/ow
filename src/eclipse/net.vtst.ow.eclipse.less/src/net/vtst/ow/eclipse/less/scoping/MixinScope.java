@@ -132,14 +132,14 @@ public class MixinScope {
         parent == null ? -1 : parent.getLastMatchingPosition());
   }
 
-  public MixinScopeElement getLastElement(int lastMatchingPosition) {
-    List<MixinScopeElement> elements = this.scopes.get(lastMatchingPosition).getElements();
+  public MixinScopeElement getLastElement(int position) {
+    List<MixinScopeElement> elements = this.scopes.get(position).getElements();
     if (!elements.isEmpty()) {
       return elements.get(elements.size() - 1);
     } else if (this.parent == null) {
       return null;
     } else {
-      return this.parent.getLastElement(lastMatchingPosition);
+      return this.parent.getLastElement(position);
     }
   }
   

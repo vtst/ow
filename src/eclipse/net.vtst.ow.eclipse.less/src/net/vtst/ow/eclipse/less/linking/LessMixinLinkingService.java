@@ -123,36 +123,40 @@ public class LessMixinLinkingService implements ILinkingService {
   public static class MixinLink {
     private MixinScopeElement element;
     private int matchLength;
+    private int numberOfMatches;
     private boolean isSuccess;
     
     public MixinLink() {
-      this(null, false);
+      this(null, false, 0);
     }
 
-    public MixinLink(MixinScopeElement element, boolean isSuccess) {
+    public MixinLink(MixinScopeElement element, boolean isSuccess, int numberOfMatches) {
       this.element = element;
       this.matchLength = this.element.size();
       this.isSuccess = isSuccess;
+      this.numberOfMatches = numberOfMatches;
     }
     
     public MixinLink(MixinScopeElement element, int matchLength) {
-      this(element, false);
+      this(element, false, 0);
       this.matchLength = matchLength;
     }
     
     public int matchLength() { return this.matchLength; }
+    public int numberOfMatches() { return this.numberOfMatches; }
     public boolean isSuccess() { return this.isSuccess; }
     public MixinScopeElement getElement() { return this.element; }
   }
   
-  // TODO: We should implement a better strategy for error messages.
   // TODO: Check there is no place we assume that the target of a mixin call is a mixin declaration.
   // It could also be a simple ruleset.
   private MixinLink getBestFullMatch(MixinUtils.Helper mixinHelper, MixinScope mixinScope) {
     Iterable<MixinScopeElement> fullMatches = mixinScope.getFullMatches();
     MixinScopeElement bestMatch = null;
     MixinScopeElement lastMatch = null;
+    int count = 0;
     for (MixinScopeElement fullMatch : fullMatches) {
+      ++count;
       EObject eObject = fullMatch.getLastObject();
       if (eObject instanceof HashOrClassRefTarget) {
         LessMixinLinkingService.Prototype prototype = 
@@ -162,8 +166,8 @@ public class LessMixinLinkingService implements ILinkingService {
         lastMatch = fullMatch;
       }
     }
-    if (bestMatch != null) return new MixinLink(bestMatch, true);
-    else if (lastMatch != null) return new MixinLink(lastMatch, false);
+    if (bestMatch != null) return new MixinLink(bestMatch, true, count);
+    else if (lastMatch != null) return new MixinLink(lastMatch, false, count);
     else return null;
   }
   
