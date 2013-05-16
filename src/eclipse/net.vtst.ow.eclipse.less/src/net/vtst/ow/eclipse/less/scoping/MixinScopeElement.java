@@ -2,9 +2,6 @@ package net.vtst.ow.eclipse.less.scoping;
 
 import java.util.ArrayList;
 
-import net.vtst.ow.eclipse.less.less.HashOrClassRef;
-import net.vtst.ow.eclipse.less.less.MixinUtils;
-
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.naming.QualifiedName;
 import org.eclipse.xtext.resource.EObjectDescription;
