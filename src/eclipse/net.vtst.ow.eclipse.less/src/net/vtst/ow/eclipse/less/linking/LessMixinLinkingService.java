@@ -169,7 +169,6 @@ public class LessMixinLinkingService implements ILinkingService {
   
   private MixinLink getLongestMatch(MixinUtils.Helper mixinHelper, MixinScope mixinScope) {
     int lastMatchingPosition = mixinScope.getLastMatchingPosition();
-    System.out.println(lastMatchingPosition);
     if (lastMatchingPosition < 0) return new MixinLink();
     MixinScopeElement element = mixinScope.getLastElement(lastMatchingPosition);
     if (element == null) return new MixinLink();
