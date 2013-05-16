@@ -286,14 +286,14 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   }
   
   private void checkMixinCall(MixinUtils.Helper helper) {
+    MixinParameters parameters = helper.getParameters();
+    if (parameters != null) checkMixinCallParameters_Syntax(parameters);
     MixinLink linkingResult = mixinLinkingService.getLinkedMixin(helper);
     if (!linkingResult.isSuccess() && linkingResult.numberOfMatches() > 1) {
       error(messages.getString("mixin_parameters_match_no_definition"), helper.getSelectors(), null, 0);
-      return;
+    } else {
+      checkMixinCall_Prototype(helper);
     }
-    MixinParameters parameters = helper.getParameters();
-    if (parameters != null) checkMixinCallParameters_Syntax(parameters);
-    checkMixinCall_Prototype(helper);
   }
   
   private void checkMixinCallParameters_Syntax(MixinParameters parameters) {
