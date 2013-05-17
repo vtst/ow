@@ -281,7 +281,7 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     if (!linkingResult.isSuccess()) {
       List<ICheckMixinError> errors = linkingResult.getError();
       if (errors == null) {
-        error(messages.getString("mixin_parameters_match_no_definition"), helper.getSelectors(), null, 0);
+        warning(messages.getString("mixin_parameters_match_no_definition"), helper.getSelectors(), null, 0);
       } else {
         for (ICheckMixinError error : errors)
           error.report(messages, getMessageAcceptor());

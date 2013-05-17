@@ -213,9 +213,11 @@ public class LessMixinLinkingService implements ILinkingService {
     MixinScopeElement bestMatch = null;
     MixinScopeElement lastMatch = null;
     List<ICheckMixinError> lastErrors = null;
+    int numberOfMatches = 0;
     for (MixinScopeElement fullMatch : fullMatches) {
       EObject eObject = fullMatch.getLastObject();
       if (eObject instanceof HashOrClassRefTarget) {
+        ++numberOfMatches;
         LessMixinLinkingService.Prototype prototype = 
             getPrototypeForMixinDefinition((HashOrClassRefTarget) eObject);
         lastErrors = prototype.checkMixinCall(mixinHelper);
@@ -224,7 +226,7 @@ public class LessMixinLinkingService implements ILinkingService {
       }
     }
     if (bestMatch != null) return new MixinLink(bestMatch);
-    else if (lastMatch != null) return new MixinLink(lastMatch, lastErrors);
+    else if (lastMatch != null) return new MixinLink(lastMatch, numberOfMatches == 1 ? lastErrors : null);
     else return null;
   }
   
