@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 1.0.16
+Bundle-Version: 1.0.17
 Bundle-SymbolicName: net.vtst.ow.eclipse.less.ui; singleton:=true
 Bundle-ActivationPolicy: lazy
 Require-Bundle: net.vtst.ow.eclipse.less;visibility:=reexport,
@@ -18,8 +18,8 @@ Require-Bundle: net.vtst.ow.eclipse.less;visibility:=reexport,
  org.eclipse.xtext.common.types.ui,
  org.eclipse.xtext.ui.codetemplates.ui,
  org.eclipse.compare,
- net.vtst.eclipse.easyxtext.ui;bundle-version="1.0.10",
- net.vtst.eclipse.easyxtext;bundle-version="1.0.10"
+ net.vtst.eclipse.easyxtext.ui;bundle-version="1.0.11",
+ net.vtst.eclipse.easyxtext;bundle-version="1.0.11"
 Import-Package: net.vtst.eclipse.easyxtext.util,
  org.apache.commons.logging,
  org.apache.log4j,

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 1.0.9.2
+Bundle-Version: 1.0.9.4
 Bundle-SymbolicName: net.vtst.ow.eclipse.soy.ui; singleton:=true
 Bundle-ActivationPolicy: lazy
 Require-Bundle: net.vtst.ow.eclipse.soy;visibility:=reexport,
@@ -16,8 +16,8 @@ Require-Bundle: net.vtst.ow.eclipse.soy;visibility:=reexport,
  org.eclipse.xtext.common.types.ui,
  org.eclipse.xtext.ui.codetemplates.ui,
  org.eclipse.compare,
- net.vtst.eclipse.easyxtext;bundle-version="1.0.10",
- net.vtst.eclipse.easyxtext.ui;bundle-version="1.0.10",
+ net.vtst.eclipse.easyxtext;bundle-version="1.0.11",
+ net.vtst.eclipse.easyxtext.ui;bundle-version="1.0.11",
  org.eclipse.debug.core;bundle-version="3.7.0",
  org.eclipse.debug.ui;bundle-version="3.7.0",
  org.eclipse.jdt.debug.ui,
