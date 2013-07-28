@@ -159,7 +159,21 @@ ViewportSymbol:
 // See http://www.w3.org/TR/css3-animations/#keyframes
 
 KeyframesStatement:
-  {KeyframesStatement} KeyframesSymbol SPACE ident=IDENT OPT_SPACE '{' OPT_SPACE blocks+=KeyframesBlock* '}' OPT_SPACE
+  {KeyframesStatement} KeyframesSymbol SPACE ident=IDENT OPT_SPACE '{' OPT_SPACE contents=KeyframesContents? '}' OPT_SPACE
+;
+
+KeyframesContents:
+  item=UnterminatedKeyframesStatement (';' OPT_SPACE next=KeyframesContents?)?
+  | item=TerminatedKeyframesStatement next=KeyframesContents?
+;
+
+UnterminatedKeyframesStatement:
+  UnterminatedMixin
+;
+
+TerminatedKeyframesStatement:
+  KeyframesBlock
+  | TerminatedMixin
 ;
 
 KeyframesSymbol:

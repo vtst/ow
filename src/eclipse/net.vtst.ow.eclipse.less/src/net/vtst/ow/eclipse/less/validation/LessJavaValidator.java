@@ -19,6 +19,8 @@ import net.vtst.ow.eclipse.less.less.Declaration;
 import net.vtst.ow.eclipse.less.less.IdentTerm;
 import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.less.IncompleteToplevelStatement;
+import net.vtst.ow.eclipse.less.less.KeyframesContents;
+import net.vtst.ow.eclipse.less.less.KeyframesStatement;
 import net.vtst.ow.eclipse.less.less.LessPackage;
 import net.vtst.ow.eclipse.less.less.Mixin;
 import net.vtst.ow.eclipse.less.less.MixinParameter;
@@ -292,6 +294,26 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   private void checkMixinCallParameters_Syntax(MixinParameters parameters) {
     if (parameters.getVarArg() != null) {
       error(messages.getString("unexpected_token"), parameters.getVarArg(), null, 0);
+    }
+  }
+  
+  @Check
+  @ConfigurableCheck(configurable = false)
+  public void checkTerminatedMixinsInKeyframesStatement(KeyframesStatement statement) {
+    KeyframesContents contents = statement.getContents();
+    while (contents != null) {
+      EObject item = contents.getItem();
+      if (item instanceof TerminatedMixin) {
+        TerminatedMixin mixin = (TerminatedMixin) item;
+        MixinUtils.Helper helper = MixinUtils.newHelper(mixin);
+        if (helper.isDefinition()) {
+          error(messages.getString("unexpected_token"), mixin.getBody(), null, 0);          
+        }
+        if (mixin.getPriority() != null) {
+          error(messages.getString("unexpected_token"), mixin.getPriority(), null, 0);
+        }
+      }
+      contents = contents.getNext();
     }
   }
 
