@@ -80,7 +80,8 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
     } else if (container instanceof TerminatedMixin) {
       EStructuralFeature containingFeature = context.eContainingFeature();
       if (containingFeature.equals(LessPackage.eINSTANCE.getTerminatedMixin_Guards()) ||
-          containingFeature.equals(LessPackage.eINSTANCE.getTerminatedMixin_Body())) {
+          containingFeature.equals(LessPackage.eINSTANCE.getTerminatedMixin_Body()) ||
+          containingFeature.equals(LessPackage.eINSTANCE.getTerminatedMixin_Parameters())) {
         return computeVariableScopeOfMixinDefinition((TerminatedMixin) container, ref);
       }
     }
