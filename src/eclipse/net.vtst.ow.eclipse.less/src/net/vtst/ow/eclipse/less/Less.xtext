@@ -311,20 +311,19 @@ InnerRuleSet:
 // There is a trailing OPT_SPACE in this rule, because there is no in SimpleSelector
 ToplevelSelector:
   selector+=SimpleSelector
-  (combinator+=Combinator selector+=SimpleSelector)* combinator+=TailCombinator? OPT_SPACE
+  (combinator+=Combinator selector+=SimpleSelector)* OPT_SPACE
 ;
 
 // There is a trailing OPT_SPACE in this rule, because there is no in SimpleSelector
 InnerSelector:
   combinator+=RootCombinator selector+=SimpleSelector
-  (combinator+=Combinator selector+=SimpleSelector)* combinator+=TailCombinator? OPT_SPACE
+  (combinator+=Combinator selector+=SimpleSelector)* OPT_SPACE
 ;
 
 Combinator:
   {ChildCombinator} OPT_SPACE '>' OPT_SPACE
   | {AdjacentSiblingCombinator} OPT_SPACE '+' OPT_SPACE
   | {GeneralSiblingCombinator} OPT_SPACE '~' OPT_SPACE
-  | {ParentCombinator} OPT_SPACE '&' OPT_SPACE
   | {DescendantSelector} SPACE
 ;
 
@@ -332,12 +331,7 @@ RootCombinator returns Combinator:
   {ChildCombinator} '>' OPT_SPACE
   | {AdjacentSiblingCombinator} '+' OPT_SPACE
   | {GeneralSiblingCombinator} '~' OPT_SPACE
-  | {ParentCombinator} '&' OPT_SPACE
   | {DescendantSelector}
-;
-
-TailCombinator returns Combinator:
-  {ParentCombinator} OPT_SPACE '&'
 ;
 
 MixinCallCombinator returns Combinator:
@@ -358,7 +352,7 @@ SimpleSelectorInNot:
 ;
 
 RootSelector: IDENT_OR_KEYWORD | '*';
-CommonSelector: HashOrClass | VariableSelector | Attrib;
+CommonSelector: HashOrClass | VariableSelector | Attrib | {ParentSelector} '&' IDENT_OR_KEYWORD?;
 
 // This terminal is a hack in order to have a custom value converter which prepend a '@'.  See
 // the code of org.eclipse.xtext.linking.impl.LinkingHelper.
