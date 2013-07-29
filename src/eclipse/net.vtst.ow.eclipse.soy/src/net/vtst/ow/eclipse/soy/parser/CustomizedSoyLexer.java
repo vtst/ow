@@ -340,7 +340,7 @@ public class CustomizedSoyLexer extends InternalSoyLexer {
   public static class UnterminatedLiteralException extends RecognitionException {
     private static final long serialVersionUID = 1L;
     public UnterminatedLiteralException(IntStream input) { super(input); }
-    public String toString() { return "Unterminated literal."; }
+    public String getMessage() { return "Unterminated literal."; }
   }
 
   /**
