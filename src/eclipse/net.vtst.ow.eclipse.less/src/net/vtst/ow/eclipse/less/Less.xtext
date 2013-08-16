@@ -351,15 +351,15 @@ SimpleSelectorInNot:
   | {SimpleSelectorInNotWithoutRoot} (criteria+=CommonSelector | criteria+=PseudoWithoutNot)+
 ;
 
-RootSelector: IDENT_OR_KEYWORD | '*';
+RootSelector: {RootSelector} (IDENT_OR_KEYWORD | '*') | RootVariableSelector;
 CommonSelector: HashOrClass | VariableSelector | Attrib | {ParentSelector} '&' IDENT_OR_KEYWORD?;
 
 // This terminal is a hack in order to have a custom value converter which prepend a '@'.  See
 // the code of org.eclipse.xtext.linking.impl.LinkingHelper.
 IDENT_OR_KEYWORD_PREPEND_AT returns ecore::EString: IDENT_OR_KEYWORD;
-VariableSelector:
-  (class?=('.' | CLASS_IDENT) | hash?=('#' | HASH_IDENT)) ('@' '{' variable+=[AtVariableRefTarget|IDENT_OR_KEYWORD_PREPEND_AT] '}' IDENT_OR_KEYWORD?)+
-;
+VariableSelector: (class?=('.' | CLASS_IDENT) | hash?=('#' | HASH_IDENT)) tail=VariableSelectorTail;
+RootVariableSelector: IDENT_OR_KEYWORD? tail=VariableSelectorTail;
+VariableSelectorTail: ('@' '{' variable+=[AtVariableRefTarget|IDENT_OR_KEYWORD_PREPEND_AT] '}' IDENT_OR_KEYWORD?)+;
 
 HashOrClass: Hash | Class;
 HashOrClassRef: ident=[HashOrClassRefTarget|HASH_OR_CLASS_IDENT];
