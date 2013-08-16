@@ -196,7 +196,14 @@ public class LessImportStatementResolver {
       if (this.isLessFile()) {
         LoadOnDemandResourceDescriptions resourceDescriptions = loadOnDemandDescriptions.get();
         resourceDescriptions.initialize(new IResourceDescriptions.NullImpl(), Collections.singleton(this.uri), this.getResource());
-        IResourceDescription resourceDescription = resourceDescriptions.getResourceDescription(this.uri);
+        IResourceDescription resourceDescription;
+        try {
+          resourceDescription = resourceDescriptions.getResourceDescription(this.uri);
+        } catch (IllegalStateException e) {
+          // If the imported file does not have the expected content type, it is not controlled by XText, so we cannot load its
+          // resource.
+          return null;
+        }
         for (IEObjectDescription objectDescription: resourceDescription.getExportedObjectsByType(LessPackage.eINSTANCE.getStyleSheet())) {
           EObject object = objectDescription.getEObjectOrProxy();
           if (object instanceof StyleSheet) return (StyleSheet) object;
