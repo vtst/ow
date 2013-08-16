@@ -12,6 +12,7 @@ import net.vtst.ow.eclipse.less.less.MixinDefinitionGuards;
 import net.vtst.ow.eclipse.less.less.MixinSelectors;
 import net.vtst.ow.eclipse.less.less.NumericLiteral;
 import net.vtst.ow.eclipse.less.less.TerminatedMixin;
+import net.vtst.ow.eclipse.less.less.VariableSelector;
 import net.vtst.ow.eclipse.less.services.LessGrammarAccess;
 
 import org.eclipse.emf.ecore.EObject;
@@ -37,6 +38,15 @@ public class LessSemanticHighlightingCalculator extends EasySemanticHighlighting
         acceptor.addPosition(node.getOffset(), node.getLength(), highlightingConfig.SELECTOR.getId());
       }
       return true;
+    } else if (obj instanceof VariableSelector) {
+      // This ensures that selectors with variables are highlighted in the same way as selectors without
+      // variables.  For some obscure grammar reasons, I was uable to implement this as regular rules.
+      VariableSelector selector = (VariableSelector) obj;
+      if (selector.isClass())
+        acceptor.addPosition(node.getOffset(), node.getLength(), highlightingConfig.SELECTOR_CLASS.getId());
+      if (selector.isHash())
+        acceptor.addPosition(node.getOffset(), node.getLength(), highlightingConfig.SELECTOR_HASH.getId());
+      return true;
     } else {
       return false;
     }
@@ -46,6 +56,9 @@ public class LessSemanticHighlightingCalculator extends EasySemanticHighlighting
   protected void configure() {
     bindRule(grammar.getInnerSelectorRule(), highlightingConfig.SELECTOR);
     bindRule(grammar.getToplevelSelectorRule(), highlightingConfig.SELECTOR);
+    bindRule(grammar.getRootSelectorRule(), highlightingConfig.SELECTOR_ROOT);
+    bindRule(grammar.getHashRule(), highlightingConfig.SELECTOR_HASH);
+    bindRule(grammar.getClassRule(), highlightingConfig.SELECTOR_CLASS);
     bindRule(grammar.getKeyframesSelectorRule(), highlightingConfig.SELECTOR);
     bindRule(grammar.getHashOrClassRefRule(), highlightingConfig.MIXIN_CALL);
     bindRule(grammar.getHashOrClassRefRule(), highlightingConfig.MIXIN_CALL);

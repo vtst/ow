@@ -358,7 +358,7 @@ CommonSelector: HashOrClass | VariableSelector | Attrib | {ParentSelector} '&' I
 // the code of org.eclipse.xtext.linking.impl.LinkingHelper.
 IDENT_OR_KEYWORD_PREPEND_AT returns ecore::EString: IDENT_OR_KEYWORD;
 VariableSelector:
-  ('.' | CLASS_IDENT | '#' | HASH_IDENT) ('@' '{' variable+=[AtVariableRefTarget|IDENT_OR_KEYWORD_PREPEND_AT] '}' IDENT_OR_KEYWORD?)+
+  (class?=('.' | CLASS_IDENT) | hash?=('#' | HASH_IDENT)) ('@' '{' variable+=[AtVariableRefTarget|IDENT_OR_KEYWORD_PREPEND_AT] '}' IDENT_OR_KEYWORD?)+
 ;
 
 HashOrClass: Hash | Class;
