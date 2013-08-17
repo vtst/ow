@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import net.vtst.eclipse.easyxtext.validation.config.AdditionalBooleanOption;
 import net.vtst.eclipse.easyxtext.validation.config.ConfigurableCheck;
@@ -42,6 +43,7 @@ import net.vtst.ow.eclipse.less.linking.LessMixinLinkingService.MixinLink;
 import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver;
 
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.validation.Check;
 
@@ -323,15 +325,34 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   public void checkIncompleteToplevelStatement(IncompleteToplevelStatement statement) {
     error(messages.getString("incomplete_toplevel_statement"), statement, null, 0);
   }
+
   
+  private static Pattern N_MINUS_INT = Pattern.compile("n-[0-9]+");
   @Check
   @ConfigurableCheck(configurable = false)
   public void checkPseudoClassNthSpecialCase(PseudoClassNthSpecialCase pseudo) {
-    if (!doCheckPseudoClassNthSpecialCase(pseudo.getSpecial())) {
-      error(messages.getString("illegal_pseudo_class_argument"), pseudo, null, 0);
-    }
+    doCheckPseudoClassNthSpecialCaseIdentEquals(
+        pseudo, LessPackage.eINSTANCE.getPseudoClassNthSpecialCase_Ident1(), pseudo.getIdent1(), "-n");
+    doCheckPseudoClassNthSpecialCaseIdentMatches(
+        pseudo, LessPackage.eINSTANCE.getPseudoClassNthSpecialCase_Ident2(), pseudo.getIdent2(), N_MINUS_INT);
+    doCheckPseudoClassNthSpecialCaseIdentMatches(
+        pseudo, LessPackage.eINSTANCE.getPseudoClassNthSpecialCase_Ident3(), pseudo.getIdent3(), N_MINUS_INT);
+    doCheckPseudoClassNthSpecialCaseIdentEquals(
+        pseudo, LessPackage.eINSTANCE.getPseudoClassNthSpecialCase_Ident4(), pseudo.getIdent4(), "-n-");
+    doCheckPseudoClassNthSpecialCaseIdentEquals(
+        pseudo, LessPackage.eINSTANCE.getPseudoClassNthSpecialCase_Ident5(), pseudo.getIdent5(), "n-");
   }
   
+  private void doCheckPseudoClassNthSpecialCaseIdentEquals(PseudoClassNthSpecialCase pseudo, EAttribute attribute, String provided, String expected) {
+    if (provided == null || provided.equals(expected)) return;
+    error(messages.getString("illegal_pseudo_class_argument"), pseudo, attribute, 0);
+  }
+
+  private void doCheckPseudoClassNthSpecialCaseIdentMatches(PseudoClassNthSpecialCase pseudo, EAttribute attribute, String provided, Pattern expected) {
+    if (provided == null || expected.matcher(provided).matches()) return;
+    error(messages.getString("illegal_pseudo_class_argument"), pseudo, attribute, 0);
+  }
+
   public boolean doCheckPseudoClassNthSpecialCase(String special) {
     int i = 0;
     int n = special.length();
