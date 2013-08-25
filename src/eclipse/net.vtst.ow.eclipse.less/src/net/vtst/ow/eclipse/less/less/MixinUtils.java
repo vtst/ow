@@ -1,5 +1,7 @@
 package net.vtst.ow.eclipse.less.less;
 
+import net.vtst.ow.eclipse.less.scoping.MixinPath;
+
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
@@ -34,6 +36,10 @@ public class MixinUtils {
     
     public boolean isCall() {
       return this.getBody() == null;
+    }
+
+    public MixinPath getPath() { 
+      return new MixinPath(this.getSelectors().getSelector());
     }
   }
   

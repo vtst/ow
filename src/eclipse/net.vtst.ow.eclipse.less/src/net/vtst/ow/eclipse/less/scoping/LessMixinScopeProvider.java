@@ -52,9 +52,13 @@ public class LessMixinScopeProvider {
     assert !mixinHelper.isDefinition();
     return cache.get(Tuples.pair(LessMixinScopeProvider.class, mixinHelper.getMixin()), mixinHelper.getMixin().eResource(), new Provider<MixinScope>() {
       public MixinScope get() {
-        return getScopeRec(mixinHelper.getMixin().eContainer(), new MixinPath(mixinHelper.getSelectors().getSelector()));
+        return getScopeRec(mixinHelper.getMixin().eContainer(), mixinHelper.getPath());
       }
     });      
+  }
+  
+  public MixinScope getScopeForCompletionProposal(EObject context, MixinPath path) {
+    return getScopeRec(context, path);
   }
   
   /**

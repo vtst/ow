@@ -1,6 +1,7 @@
 package net.vtst.ow.eclipse.less.scoping;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import net.vtst.ow.eclipse.less.less.HashOrClass;
 import net.vtst.ow.eclipse.less.less.HashOrClassRef;
@@ -21,6 +22,18 @@ public class MixinPath {
     }
   }
   
+  // Constructor useful for completion proposals.
+  public MixinPath(String element) {
+    this.path = new ArrayList<String>(1);
+    this.path.add(element);
+  }
+
+  // Constructor useful for completion proposals.
+  public MixinPath(Collection<String> selectors) {
+    this.path = new ArrayList<String>(selectors.size());
+    this.path.addAll(selectors);
+  }
+
   public int size() { return path.size(); }
   public String get(int index) { return path.get(index); }
 
