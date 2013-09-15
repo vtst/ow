@@ -2,8 +2,10 @@ package net.vtst.ow.eclipse.less.linking;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.vtst.ow.eclipse.less.LessMessages;
@@ -53,16 +55,32 @@ public class LessMixinLinkingService implements ILinkingService {
   
   public class IllegalParameterLabel implements ICheckMixinError {
     private MixinParameter parameter;
+    private String messageKey;
     
-    public IllegalParameterLabel(MixinParameter parameter) {
+    public IllegalParameterLabel(MixinParameter parameter, String messageKey) {
       this.parameter = parameter;
+      this.messageKey = messageKey;
     }
 
     public void report(LessMessages messages, ValidationMessageAcceptor acceptor) {
-      acceptor.acceptWarning(messages.format("illegal_parameter_label", parameter.getIdent().getIdent()), parameter, LessPackage.eINSTANCE.getMixinParameter_Ident(), 0, null);      
+      acceptor.acceptWarning(messages.format(messageKey, parameter.getIdent().getIdent()), parameter, LessPackage.eINSTANCE.getMixinParameter_Ident(), 0, null);      
     }
   }
-  
+
+  public class MissingParameter implements ICheckMixinError {
+    private MixinParameters parameters;
+    private String parameterName;
+    
+    public MissingParameter(MixinParameters parameters, String parameterName) {
+      this.parameters = parameters;
+      this.parameterName = parameterName;
+    }
+
+    public void report(LessMessages messages, ValidationMessageAcceptor acceptor) {
+      acceptor.acceptWarning(messages.format("missing_parameter_label", parameterName), parameters, null, 0, null);      
+    }
+  }
+
   public class IllegalNumberOfParameters implements ICheckMixinError {
     private MixinUtils.Helper helper;
     private int expectedMin;
@@ -97,16 +115,17 @@ public class LessMixinLinkingService implements ILinkingService {
   public class Prototype {
     public int minNumberOfParameters = 0;
     public int maxNumberOfParameters = 0;
-    public Set<String> parameterNames = new HashSet<String>();
+    public Map<String, Boolean> parameterNames = new HashMap<String, Boolean>();  // name -> required/optional
     
     private Prototype(TerminatedMixin mixinDefinition) {
       if (mixinDefinition == null) return;
       EList<MixinParameter> parameters = mixinDefinition.getParameters().getParameter();
       for (MixinParameter parameter: parameters) {
         ++maxNumberOfParameters;
-        if (!parameter.isHasDefaultValue()) minNumberOfParameters = maxNumberOfParameters;
+        boolean required = !parameter.isHasDefaultValue();
+        if (required) minNumberOfParameters = maxNumberOfParameters;
         String variable = MixinUtils.getVariableName(parameter);
-        if (variable != null) parameterNames.add(variable);
+        if (variable != null) parameterNames.put(variable, required);
       }
       MixinVarParameter varArg = mixinDefinition.getParameters().getVarArg();
       if (varArg != null) {
@@ -127,18 +146,37 @@ public class LessMixinLinkingService implements ILinkingService {
       else return parameters.getParameter().size();
     }
 
-
     public List<ICheckMixinError> checkMixinCall(Helper helper) {
       List<ICheckMixinError> errors = new ArrayList<ICheckMixinError>();
+      
+      // Check the number of parameters
       int provided = getNumberOfParametersOfMixinCall(helper);
       if (provided < this.minNumberOfParameters || provided > this.maxNumberOfParameters) {
         errors.add(new IllegalNumberOfParameters(helper, this.minNumberOfParameters, this.maxNumberOfParameters, provided));
       }
+      
       MixinParameters parameters = helper.getParameters();
       if (parameters != null) {
+        // Get the set of named of parameters.
+        // Check unicity of names.
+        // Check definition of names.
+        Set<String> providedNames = new HashSet<String>(parameters.getParameter().size());
         for (MixinParameter parameter : parameters.getParameter()) {
-          if (parameter.getIdent() != null && !this.parameterNames.contains(parameter.getIdent().getIdent())) {
-            errors.add(new IllegalParameterLabel(parameter));
+          if (parameter.getIdent() != null) {
+            String parameterName = parameter.getIdent().getIdent();
+            if (!providedNames.add(parameterName)) {
+              errors.add(new IllegalParameterLabel(parameter, "duplicated_parameter_label"));
+            }
+            if (parameterNames.get(parameterName) == null) {
+              errors.add(new IllegalParameterLabel(parameter, "illegal_parameter_label"));              
+            }
+          }
+        }
+        
+        // Check that all required names are provided.
+        for (Map.Entry<String, Boolean> entry : parameterNames.entrySet()) {
+          if (entry.getValue() && !providedNames.contains(entry.getKey())) {
+            errors.add(new MissingParameter(parameters, entry.getKey()));
           }
         }
       }
