@@ -178,6 +178,7 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   
   private void checkMixinDefinitionParameters(MixinParameters parameters) {
     checkMixinDefinitionParameters_SameSeparators(parameters);
+    checkMixinDefinitionParameters_NoDummySep(parameters);
     checkMixinDefinitionParameters_SingleTermsAreVariables(parameters);
     checkMixinDefinitionParameters_VarArgSyntax(parameters);
     checkMixinDefinitionParameters_UniqueVariableNames(parameters);
@@ -194,6 +195,12 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
           error(messages.getString("unexpected_separator"), parameters, LessPackage.eINSTANCE.getMixinParameters_Sep(), i);
       }
     }    
+  }
+  
+  private void checkMixinDefinitionParameters_NoDummySep(MixinParameters parameters) {
+    if (parameters.getDummySep() != null) {
+      error(messages.getString("unexpected_separator"), parameters, LessPackage.eINSTANCE.getMixinParameters_DummySep(), 0);      
+    }
   }
 
   private void checkMixinDefinitionParameters_SingleTermsAreVariables(MixinParameters parameters) {

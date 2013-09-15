@@ -123,7 +123,7 @@ public class LessMixinLinkingService implements ILinkingService {
       for (String separator : parameters.getSep()) {
         if (";".equals(separator)) ++numberOfSemicolons;
       }
-      if (numberOfSemicolons > 0) return numberOfSemicolons + 1;
+      if (numberOfSemicolons > 0 || parameters.getDummySep() != null) return numberOfSemicolons + 1;
       else return parameters.getParameter().size();
     }
 

@@ -262,7 +262,7 @@ MixinParameters:
   {MixinParameters}
   '(' OPT_SPACE
   (parameter+=MixinParameter (sep+=(',' | ';') OPT_SPACE parameter+=MixinParameter)*)?
-  varArg=MixinVarParameter? 
+  varArg=MixinVarParameter? dummySep=';'?
   ')' OPT_SPACE 
 ;
 
