@@ -14,7 +14,6 @@ import net.vtst.ow.eclipse.less.less.Expr;
 import net.vtst.ow.eclipse.less.less.FontFaceStatement;
 import net.vtst.ow.eclipse.less.less.PageStatement;
 import net.vtst.ow.eclipse.less.scoping.LessMixinScopeProvider;
-import net.vtst.ow.eclipse.less.scoping.MixinContext;
 import net.vtst.ow.eclipse.less.scoping.MixinScope;
 import net.vtst.ow.eclipse.less.scoping.MixinScopeElement;
 import net.vtst.ow.eclipse.less.ui.LessImageHelper;
@@ -117,13 +116,29 @@ public class LessProposalProvider extends AbstractLessProposalProvider {
   public void complete_MixinSelectors(EObject model, RuleCall ruleCall, ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
   }
   
-  public void complete_HashOrClassRef(EObject model, RuleCall ruleCall, ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
-    MixinContext mixinContext = new MixinContext(context.getPreviousModel());
+  public void complete_HashOrClassRef(EObject model, RuleCall ruleCall, ContentAssistContext context, ICompletionProposalAcceptor acceptor) {    
+    IMixinContentAssistContext mixinContext = MixinContentAssistContext.create(context.getPreviousModel());
     if (!mixinContext.isValid()) return;
-    MixinScope scope = mixinScopeProvider.getScope(mixinContext.getMixinHelper());
-    for (MixinScopeElement element : scope.getCompletionProposals(mixinContext.getSelectorIndex())) {
+    MixinScope scope = mixinScopeProvider.getScopeForCompletionProposal(model, mixinContext.getPath());
+    for (MixinScopeElement element : scope.getCompletionProposals(mixinContext.getIndex())) {
       Image image = imageHelper.getImage(LessImageHelper.MIXIN_DEFINITION);
       acceptor.accept(createCompletionProposal(element.getName(), element.getName(), image, context));      
     }
   }
+  
+  // **************************************************************************
+
+//  private void printAncestors(String label, EObject obj) {
+//    System.out.println(label);
+//    while (obj != null) {
+//      System.out.println(obj);
+//      obj = obj.eContainer();
+//    }
+//  }
+
+  @Override
+  public void createProposals(ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
+    super.createProposals(context, acceptor);
+  }
+
 }
