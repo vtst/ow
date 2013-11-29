@@ -16,11 +16,14 @@ public class NamespaceProvidersPass implements HotSwapCompilerPass {
   private AbstractCompiler compiler;
   private NamespaceProvidersMap map;
   private CodingConvention codingConvention;
+  private NodeTraversal traversal;
 
   public NamespaceProvidersPass(AbstractCompiler compiler, NamespaceProvidersMap map) {
     this.compiler = compiler;
     this.codingConvention = compiler.getCodingConvention();
     this.map = map;
+    this.traversal = new NodeTraversal(compiler, new NamespaceProvidersPassCallback());
+
   }
 
   @Override
@@ -37,7 +40,7 @@ public class NamespaceProvidersPass implements HotSwapCompilerPass {
   /**
    * The node traversal used by the compiler pass.
    */
-  private NodeTraversal traversal = new NodeTraversal(compiler, new NodeTraversal.Callback() {
+  private class NamespaceProvidersPassCallback implements NodeTraversal.Callback {
     
     private Node currentScript;
 
@@ -60,6 +63,6 @@ public class NamespaceProvidersPass implements HotSwapCompilerPass {
     @Override
     public void visit(NodeTraversal traversal, Node node, Node parent) {}
 
-  });
+  }
 
 }

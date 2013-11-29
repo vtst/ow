@@ -46,10 +46,12 @@ public class StripCompilerPass implements CompilerPass {
   private Compiler compiler;
   private Writer writer;
   private IOException exception = null;
+  private NodeTraversal traversal;
   
   public StripCompilerPass(Compiler compiler, Writer writer) {
     this.compiler = compiler;
     this.writer = writer;
+    this.traversal = new NodeTraversal(compiler, new StripCompilerPassCallback());
   }
   
   /**
@@ -64,7 +66,7 @@ public class StripCompilerPass implements CompilerPass {
   /**
    * The node traversal used by the compiler pass.
    */
-  private NodeTraversal traversal = new NodeTraversal(compiler, new StripNodeTraversalCallback() {
+  private class StripCompilerPassCallback extends StripNodeTraversalCallback {
     
     /**
      * Get the original JSDoc comment string for a node representing a top-level statement in
@@ -117,7 +119,7 @@ public class StripCompilerPass implements CompilerPass {
       }
     }
 
-  });
+  }
   
   private void printSemiColonAndNewLineIfRequired(String code) throws IOException {
     int length = code.length();
