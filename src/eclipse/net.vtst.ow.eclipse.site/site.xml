@@ -132,5 +132,11 @@
    <feature url="features/net.vtst.ow.eclipse.soy.feature_1.0.9.4.jar" id="net.vtst.ow.eclipse.soy.feature" version="1.0.9.4">
       <category name="net.vtst.ow"/>
    </feature>
+   <feature url="features/net.vtst.ow.eclipse.less.feature_1.0.18.jar" id="net.vtst.ow.eclipse.less.feature" version="1.0.18">
+      <category name="net.vtst.ow"/>
+   </feature>
+   <feature url="features/net.vtst.ow.eclipse.js.closure.feature_0.3.0.jar" id="net.vtst.ow.eclipse.js.closure.feature" version="0.3.0">
+      <category name="net.vtst.ow"/>
+   </feature>
    <category-def name="net.vtst.ow" label="net.vtst.ow"/>
 </site>
