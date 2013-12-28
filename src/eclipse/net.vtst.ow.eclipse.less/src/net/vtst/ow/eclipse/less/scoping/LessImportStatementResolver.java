@@ -1,5 +1,6 @@
 package net.vtst.ow.eclipse.less.scoping;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -110,9 +111,15 @@ public class LessImportStatementResolver {
       return ImportStatementCheckResult.OK;
   }
   
+  private static String FORMAT_INLINE = "inline";
+  private static String FORMAT_REFERENCE = "reference";
+  
+  private static Set<String> importFormats = new HashSet<String>(
+      Arrays.asList(new String[]{LessRuntimeModule.LESS_EXTENSION, LessRuntimeModule.CSS_EXTENSION, FORMAT_INLINE, FORMAT_REFERENCE}));
+  
   private boolean checkImportStatementFormat(ImportStatement importStatement) {
     String format = importStatement.getFormat();
-    return format == null || LessRuntimeModule.LESS_EXTENSION.equals(format) || LessRuntimeModule.CSS_EXTENSION.equals(format);
+    return format == null || importFormats.contains(format);
   }
   
   private Iterable<ImportStatement> getImportStatements(final StyleSheet styleSheet) {
@@ -185,7 +192,9 @@ public class LessImportStatementResolver {
     }
     
     public boolean isLessFile() {
-      return LessRuntimeModule.LESS_EXTENSION.equals(this.format) && uri.isFile();
+      return (LessRuntimeModule.LESS_EXTENSION.equals(this.format) ||
+          LessImportStatementResolver.FORMAT_REFERENCE.equals(this.format)) &&
+          uri.isFile();
     }
     
     public Resource getResource() {
