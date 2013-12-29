@@ -3,6 +3,7 @@
 
 package net.vtst.ow.eclipse.less.validation;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -90,14 +91,16 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   // Check for multiple properties in block
   @Check
   public void checkBlockUniqueProperties(Block block) {
-    Set<String> propertyNames = new HashSet<String>();
+    Map<String, Boolean> properties = new HashMap<String, Boolean>();  // Property name -> isMerged
     for(EObject item: BlockUtils.iterator(block)) {
       if (!(item instanceof Declaration)) continue;
       Declaration declaration = (Declaration) item;
       String propertyName = declaration.getProperty();
-      if (!propertyNames.add(propertyName)) {
-        String message = String.format(messages.getString("duplicated_property"), propertyName);
-        warning(message, declaration, LessPackage.eINSTANCE.getDeclaration_Property(), 0);
+      boolean isMerge = declaration.isMerge();
+      Boolean wasMerge = properties.put(propertyName, isMerge);
+      if (wasMerge != null && (!wasMerge.booleanValue() || !isMerge)) {
+          String message = String.format(messages.getString("duplicated_property"), propertyName);
+          warning(message, declaration, LessPackage.eINSTANCE.getDeclaration_Property(), 0);
       }
     }
   }

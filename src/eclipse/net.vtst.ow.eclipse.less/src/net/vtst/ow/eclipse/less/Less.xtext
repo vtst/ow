@@ -420,7 +420,7 @@ PseudoClassNthSpecialCase:
 // Declarations
 
 Declaration:
-  star_property_hack?='*'? property=Property OPT_SPACE ':' OPT_SPACE expr=Expr 
+  star_property_hack?='*'? property=Property OPT_SPACE (merge?='+' OPT_SPACE)? ':' OPT_SPACE expr=Expr 
   priority=Priority
 ;
 
