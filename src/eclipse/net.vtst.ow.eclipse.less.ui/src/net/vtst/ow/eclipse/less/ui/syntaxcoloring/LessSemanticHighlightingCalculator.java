@@ -4,6 +4,7 @@
 package net.vtst.ow.eclipse.less.ui.syntaxcoloring;
 
 import net.vtst.eclipse.easyxtext.ui.syntaxcoloring.EasySemanticHighlightingCalculator;
+import net.vtst.ow.eclipse.less.less.Combinator;
 import net.vtst.ow.eclipse.less.less.Declaration;
 import net.vtst.ow.eclipse.less.less.MediaExpression;
 import net.vtst.ow.eclipse.less.less.MediaQuery;
@@ -11,6 +12,8 @@ import net.vtst.ow.eclipse.less.less.MixinDefinitionGuard;
 import net.vtst.ow.eclipse.less.less.MixinDefinitionGuards;
 import net.vtst.ow.eclipse.less.less.MixinSelectors;
 import net.vtst.ow.eclipse.less.less.NumericLiteral;
+import net.vtst.ow.eclipse.less.less.RootSelector;
+import net.vtst.ow.eclipse.less.less.SimpleSelector;
 import net.vtst.ow.eclipse.less.less.TerminatedMixin;
 import net.vtst.ow.eclipse.less.less.VariableSelector;
 import net.vtst.ow.eclipse.less.services.LessGrammarAccess;
@@ -54,9 +57,10 @@ public class LessSemanticHighlightingCalculator extends EasySemanticHighlighting
 
   @Override
   protected void configure() {
-    bindRule(grammar.getInnerSelectorRule(), highlightingConfig.SELECTOR);
-    bindRule(grammar.getToplevelSelectorRule(), highlightingConfig.SELECTOR);
-    bindRule(grammar.getRootSelectorRule(), highlightingConfig.SELECTOR_ROOT);
+    bindRule(grammar.getSimpleSelectorRule(), highlightingConfig.SELECTOR);
+    bindAction(SimpleSelector.class, highlightingConfig.SELECTOR);
+    bindAction(RootSelector.class, highlightingConfig.SELECTOR_ROOT);
+    bindAction(Combinator.class, highlightingConfig.SELECTOR);
     bindRule(grammar.getHashRule(), highlightingConfig.SELECTOR_HASH);
     bindRule(grammar.getClassRule(), highlightingConfig.SELECTOR_CLASS);
     bindRule(grammar.getKeyframesSelectorRule(), highlightingConfig.SELECTOR);

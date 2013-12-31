@@ -311,13 +311,15 @@ InnerRuleSet:
 // There is a trailing OPT_SPACE in this rule, because there is no in SimpleSelector
 ToplevelSelector:
   selector+=SimpleSelector
-  (combinator+=Combinator selector+=SimpleSelector)* OPT_SPACE
+  ((combinator+=Combinator selector+=SimpleSelector)* OPT_SPACE
+   | OPT_SPACE guards=MixinDefinitionGuards)
 ;
 
 // There is a trailing OPT_SPACE in this rule, because there is no in SimpleSelector
 InnerSelector:
   combinator+=RootCombinator selector+=SimpleSelector
-  (combinator+=Combinator selector+=SimpleSelector)* OPT_SPACE
+  ((combinator+=Combinator selector+=SimpleSelector)* OPT_SPACE
+   | OPT_SPACE guards=MixinDefinitionGuards)
 ;
 
 Combinator:
@@ -374,7 +376,9 @@ HASH_IDENT returns ecore::EString: HASH_COLOR | HASH_OTHER;
 // This rule does not end with OPT_SPACE, because of combinators
 Class: ident=CLASS_IDENT;
 CLASS_IDENT returns ecore::EString: '.' IDENT_OR_KEYWORD;
-IDENT_OR_KEYWORD returns ecore::EString: IDENT | 'and' | 'even' | 'from' | 'important' | 'n' | 'not' | 'odd' | 'only' | 'to' | 'when';
+// We prevent 'when' at some places, otherwise it conflicts with guards in non-mixin selectors.
+IDENT_OR_KEYWORD_BUT_WHEN returns ecore::EString: IDENT | 'and' | 'even' | 'from' | 'important' | 'n' | 'not' | 'odd' | 'only' | 'to';
+IDENT_OR_KEYWORD returns ecore::EString: IDENT_OR_KEYWORD_BUT_WHEN | 'when';
 
 // This rule does not end with OPT_SPACE, because of combinators
 Attrib:
@@ -446,7 +450,7 @@ Operator:
 
 // This rule does not end with OPT_SPACE, because of operators in Expr
 Term:
-  {IdentTerm} ident=IDENT_OR_KEYWORD
+  {IdentTerm} ident=IDENT_OR_KEYWORD_BUT_WHEN
   | {StringTerm} string=STRING
   | {UriTerm} uri=Uri
   | {EscapedStringTerm} '~' string=STRING
@@ -492,7 +496,7 @@ SimpleTerm:
 
 // This rule does not end with OPT_SPACE, because of operators in Expr
 FunctionTerm:
-  function=(IDENT_OR_KEYWORD | PERCENT) 
+  function=(IDENT_OR_KEYWORD_BUT_WHEN | PERCENT) 
   '(' OPT_SPACE (arg=IDENT_OR_KEYWORD OPT_SPACE '=' OPT_SPACE)? (expr=Expr)? ')'
 ;
 

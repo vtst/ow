@@ -21,10 +21,13 @@ import net.vtst.ow.eclipse.less.less.Declaration;
 import net.vtst.ow.eclipse.less.less.IdentTerm;
 import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.less.IncompleteToplevelStatement;
+import net.vtst.ow.eclipse.less.less.InnerRuleSet;
+import net.vtst.ow.eclipse.less.less.InnerSelector;
 import net.vtst.ow.eclipse.less.less.KeyframesContents;
 import net.vtst.ow.eclipse.less.less.KeyframesStatement;
 import net.vtst.ow.eclipse.less.less.LessPackage;
 import net.vtst.ow.eclipse.less.less.Mixin;
+import net.vtst.ow.eclipse.less.less.MixinDefinitionGuards;
 import net.vtst.ow.eclipse.less.less.MixinParameter;
 import net.vtst.ow.eclipse.less.less.MixinParameters;
 import net.vtst.ow.eclipse.less.less.MixinSelectors;
@@ -37,6 +40,8 @@ import net.vtst.ow.eclipse.less.less.StringTerm;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
 import net.vtst.ow.eclipse.less.less.Term;
 import net.vtst.ow.eclipse.less.less.TerminatedMixin;
+import net.vtst.ow.eclipse.less.less.ToplevelRuleSet;
+import net.vtst.ow.eclipse.less.less.ToplevelSelector;
 import net.vtst.ow.eclipse.less.less.VariableDefinition;
 import net.vtst.ow.eclipse.less.linking.LessMixinLinkingService;
 import net.vtst.ow.eclipse.less.linking.LessMixinLinkingService.ICheckMixinError;
@@ -143,6 +148,29 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     }
   }
   
+  // Check guards of non-mixin selectors
+  @Check
+  public void checkGuardsInToplevelRuleSet(ToplevelRuleSet ruleSet) {
+    EList<ToplevelSelector> selectors = ruleSet.getSelector();
+    for (int i = 0, n = selectors.size() - 1; i < n; ++i) {
+      checkSelectorHasNoGuard(selectors.get(i).getGuards());
+    }
+  }
+  
+  @Check
+  public void checkGuardsInInnerRuleSet(InnerRuleSet ruleSet) {
+    EList<InnerSelector> selectors = ruleSet.getSelector();
+    for (int i = 0, n = selectors.size() - 1; i < n; ++i) {
+      checkSelectorHasNoGuard(selectors.get(i).getGuards());
+    }    
+  }
+  
+  private void checkSelectorHasNoGuard(MixinDefinitionGuards guards) {
+    if (guards != null) {
+      error(messages.getString("unexpected_guard"), guards, null, 0);
+    }
+  }
+
   @Check
   @ConfigurableCheck(configurable = false)
   public void checkFinalSemicolonOfTerminatedMixin(TerminatedMixin mixin) {

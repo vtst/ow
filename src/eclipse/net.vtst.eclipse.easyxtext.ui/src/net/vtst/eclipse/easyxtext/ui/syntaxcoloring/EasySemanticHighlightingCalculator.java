@@ -5,6 +5,7 @@ package net.vtst.eclipse.easyxtext.ui.syntaxcoloring;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import net.vtst.eclipse.easyxtext.util.Pair;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.AbstractRule;
+import org.eclipse.xtext.Action;
 import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.nodemodel.INode;
@@ -79,6 +81,11 @@ public abstract class EasySemanticHighlightingCalculator implements ISemanticHig
    * Mapping from keywords to attribute IDs.
    */
   private AttributesMap<String> keywordsToAttributes = new AttributesMap<String>();
+  
+  /**
+   * Mapping for actions.
+   */
+  private AttributesMap<Void> attributesForActions = new AttributesMap<Void>();
  
   
   /**
@@ -158,6 +165,26 @@ public abstract class EasySemanticHighlightingCalculator implements ISemanticHig
     keywordsToAttributes.add(keyword, semanticClass, attributeId);
   }
 
+  /**
+   * Bind a keyword to an attribute, for occurrences appearing within a given semantic class.
+   * @param keyword
+   * @param semanticClass
+   * @param attribute
+   */
+  protected void bindAction(Class<? extends EObject> semanticClass, EasyTextAttribute attribute) {
+    bindAction(semanticClass, attribute.getId());
+  }
+ 
+  /**
+   * Bind an action to an attribute, for occurrences appearing within a given semantic class.
+   * @param rule
+   * @param semanticClass
+   * @param attributeId
+   */
+  protected void bindAction(Class<? extends EObject> semanticClass, String attributeId) {
+    attributesForActions.add(null, semanticClass, attributeId);
+  }
+
     
   /**
    * Initialize the semantic highlighting calculator.  Sub-classes must implement this method,
@@ -204,6 +231,8 @@ public abstract class EasySemanticHighlightingCalculator implements ISemanticHig
         } else if (grammarElement instanceof Keyword) {
           keywordsToAttributes.provideHighlightingFor(
               ((Keyword) grammarElement).getValue(), node, acceptor);
+        } else if (grammarElement instanceof Action) {
+          attributesForActions.provideHighlightingFor(null, node, acceptor);
         }
         if (debug) printDebugInformation(node);
       }
@@ -223,9 +252,15 @@ public abstract class EasySemanticHighlightingCalculator implements ISemanticHig
     if (node.getSemanticElement().eContainmentFeature() != null) System.out.println("SEMANTIC CONTAINMENT: " + node.getSemanticElement().eContainmentFeature().getName());
     System.out.println("SEMANTIC RESOURCE: " + node.getSemanticElement().eResource().getClass().getName());
     System.out.println("SEMANTIC: " + node.getSemanticElement().getClass().getName());
+    if (grammarElement != null)
+      System.out.println("GRAMMAR ELEMENT CLASS:" + grammarElement.getClass().getName());
     if (grammarElement instanceof RuleCall) {
       System.out.println("RULE: " + ((RuleCall) grammarElement).getRule().getName());
       System.out.println("CLASS: " + ((RuleCall) grammarElement).getRule().eClass().getName());
+    } else if (grammarElement instanceof Action) {
+      System.out.println("CARDINALITY: " + ((Action) grammarElement).getCardinality());
+      System.out.println("FEATURE: " + ((Action) grammarElement).getFeature());
+      System.out.println("OPERATOR: " + ((Action) grammarElement).getOperator());
     }
     System.out.println("");    
   }
