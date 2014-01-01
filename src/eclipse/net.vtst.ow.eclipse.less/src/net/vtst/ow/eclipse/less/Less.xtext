@@ -122,7 +122,9 @@ MediaQuery:
 ;
 
 MediaExpression:
-  '(' OPT_SPACE media_feature=MediaFeature OPT_SPACE (':' OPT_SPACE expr=Expr)? ')' OPT_SPACE
+  '(' OPT_SPACE media_feature=MediaFeature OPT_SPACE ':' OPT_SPACE expr=Expr ')' OPT_SPACE
+  // This cover '(' OPT_SPACE MediaFeature OPT_SPACE Expr ')' OPT_SPACE
+  | '(' OPT_SPACE (term=TerminalTerm | simple_term=TerminalSimpleTerm) OPT_SPACE ')' OPT_SPACE 
 ;
 
 MediaFeature:
@@ -450,13 +452,17 @@ Operator:
 
 // This rule does not end with OPT_SPACE, because of operators in Expr
 Term:
-  {IdentTerm} ident=IDENT_OR_KEYWORD_BUT_WHEN
+    TerminalTerm
+  | ExtendedTerm
+;
+
+TerminalTerm:
+    {IdentTerm} ident=IDENT_OR_KEYWORD_BUT_WHEN
   | {StringTerm} string=STRING
   | {UriTerm} uri=Uri
   | {EscapedStringTerm} '~' string=STRING
   | {JsEvaluationTerm} js=JS_EVALUATION
-  | {EscapedJsEvaluationTerm} '~' js=JS_EVALUATION
-  | ExtendedTerm
+  | {EscapedJsEvaluationTerm} '~' js=JS_EVALUATION  
 ;
 
 /*
@@ -487,11 +493,15 @@ ExtendedTerm2 returns ExtendedTerm:
 
 // This rule does not end with OPT_SPACE, because of operators in Expr
 SimpleTerm:
-  NumericLiteral
-  | AtVariableTerm
+    TerminalSimpleTerm
   | FunctionTerm
   | {ParenthesizedTerm} '(' OPT_SPACE term=ExtendedTerm11 OPT_SPACE ')'
   | {UnaryTerm} operator='-' term=SimpleTerm
+;
+
+TerminalSimpleTerm:
+    NumericLiteral
+  | AtVariableTerm
 ;
 
 // This rule does not end with OPT_SPACE, because of operators in Expr
