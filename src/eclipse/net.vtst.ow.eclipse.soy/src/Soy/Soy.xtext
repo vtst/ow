@@ -237,7 +237,7 @@ CommandAttribute:
 
 Expr: Expr1;
 // This is maybe slightly more restrictive than the Soy syntax, but I think it is ok
-Expr1 returns Expr: expr+=Expr2 ('?' expr_true+=Expr2 ':' expr_false+=Expr2)*;
+Expr1 returns Expr: expr+=Expr2 ('?' expr_true+=Expr2 =>':' expr_false+=Expr2)*;
 Expr2 returns Expr: expr+=Expr3 (operator+=('or') expr+=Expr3)*;
 Expr3 returns Expr: expr+=Expr4 (operator+=('and') expr+=Expr4)*;
 Expr4 returns Expr: expr+=Expr5 (operator+=('==' | '!=') expr+=Expr5)*;
@@ -266,7 +266,7 @@ DataReference: ((ident=[VariableDefinition|DOLLAR_IDENT] | DOLLAR_IJ) part+=Data
 DataReferencePart:
   {DataReferencePartDotIdent} ident=DataReferenceDotIdent
   | {DataReferencePartDotIndex} index=DataReferenceDotIndex
-  | {DataReferencePartBrackets} '[' expr=Expr ']'
+  | {DataReferencePartBrackets} ('?[' | '[') expr=Expr ']'
 ;
 Global: ident=GlobalDottedIdent;
 ListOrMapLiteralItem: first=Expr (':' second=Expr)?;
@@ -285,9 +285,9 @@ TemplateDefinitionDottedIdent returns ecore::EString: IDENT ('.' IDENT)*;
 
 TemplateDotIdent returns ecore::EString: '.' IDENT;
 TemplateDefinitionDotIdent returns ecore::EString: '.' IDENT;
-DataReferenceDotIdent returns ecore::EString: '.' IDENT;
+DataReferenceDotIdent returns ecore::EString: ('.' | '?.') IDENT;
 
-DataReferenceDotIndex: '.' index=DEC_DIGITS_AS_STRING | '.' index=FLOAT | '.' index=DEC_DIGITS_DOT ident=IDENT;  // DEC_INTEGER == DEC_DIGITS
+DataReferenceDotIndex: ('?.' | '.') (index=DEC_DIGITS_AS_STRING | index=FLOAT | index=DEC_DIGITS_DOT ident=IDENT);  // DEC_INTEGER == DEC_DIGITS
 
 INTEGER returns ecore::EString: DEC_DIGITS | HEX_INTEGER;
 DEC_DIGITS_AS_STRING returns ecore::EString: DEC_DIGITS;
