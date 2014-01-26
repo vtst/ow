@@ -47,13 +47,10 @@ public class MixinContentAssistContext {
 
   public static class Empty implements IMixinContentAssistContext {
     
-    @Override
     public boolean isValid() { return true; }
 
-    @Override
     public MixinPath getPath() { return new MixinPath(""); }
 
-    @Override
     public int getIndex() { return 0; }
     
   }
@@ -85,13 +82,10 @@ public class MixinContentAssistContext {
       }
     }
     
-    @Override
     public boolean isValid() { return isValid; }
     
-    @Override
     public MixinPath getPath() { return new MixinPath(this.path); }
     
-    @Override
     public int getIndex() { return this.path.size() - 1; }
     
   }
@@ -159,13 +153,10 @@ public class MixinContentAssistContext {
       this.mixinContext = mixinContext;
     }
 
-    @Override
     public boolean isValid() { return mixinContext.isValid(); }
 
-    @Override
     public MixinPath getPath() { return mixinContext.getMixinHelper().getPath(); }
 
-    @Override
     public int getIndex() { return mixinContext.getSelectorIndex(); }
   }
   
