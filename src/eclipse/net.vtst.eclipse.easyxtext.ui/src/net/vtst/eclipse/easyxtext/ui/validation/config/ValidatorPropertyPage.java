@@ -171,7 +171,7 @@ public class ValidatorPropertyPage extends PropertyPage {
       item.setText(new String[] {getGroupLabel(group)});
       item.setChecked(inspector.getEnabled(resource, group));
     }
-    setCheckbox(inspector.hasProperty(resource));
+    setCheckbox(inspector.getCustomized(resource));
   }
   
   private String getGroupLabel(Group group) {
@@ -224,11 +224,12 @@ public class ValidatorPropertyPage extends PropertyPage {
     if (validator == null) return false;
     try {
       if (checkbox.getSelection()) {
+        inspector.setCustomized(resource, true);
         for (int i = 0; i < inspector.getGroups().size(); ++i) {
           inspector.setEnabled(resource, inspector.getGroups().get(i), list.getItem(i).getChecked());
         }
       } else {
-        inspector.clearAllProperties(resource);
+        inspector.setCustomized(resource, false);
       }
     } catch (CoreException e) {
       showErrorMessage("Cannot apply changes to project", e);

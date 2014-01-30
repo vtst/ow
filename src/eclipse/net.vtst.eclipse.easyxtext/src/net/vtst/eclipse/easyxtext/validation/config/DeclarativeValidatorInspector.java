@@ -220,18 +220,16 @@ public class DeclarativeValidatorInspector {
     resource.setPersistentProperty(getQualifiedName(group), Boolean.toString(enabled));
   }
   
-  /**
-   * @param resource
-   * @return true if {@code resource} has one or several properties for
-   * configuring the validator.
-   * @throws CoreException
-   */
-  public boolean hasProperty(IResource resource) throws CoreException {
-    for (QualifiedName name : resource.getPersistentProperties().keySet()) {
-      if (name.getQualifier().equals(propertyNameQualifier))
-        return true;
-    }
-    return false;
+  private static String CUSTOMIZED = "#customized";
+  
+  public boolean getCustomized(IResource resource) throws CoreException {
+    String value = resource.getPersistentProperty(new QualifiedName(propertyNameQualifier, CUSTOMIZED));
+    return value != null;
+  }
+  
+  public void setCustomized(IResource resource, boolean customized) throws CoreException {
+    resource.setPersistentProperty(new QualifiedName(propertyNameQualifier, CUSTOMIZED), customized ? "true" : null);
+    if (!customized) clearAllProperties(resource);
   }
   
   /**
@@ -239,7 +237,7 @@ public class DeclarativeValidatorInspector {
    * @param resource
    * @throws CoreException
    */
-  public void clearAllProperties(IResource resource) throws CoreException {
+  private void clearAllProperties(IResource resource) throws CoreException {
     for (QualifiedName name : resource.getPersistentProperties().keySet()) {
       if (name.getQualifier().equals(propertyNameQualifier))
         resource.setPersistentProperty(name, null);
