@@ -197,15 +197,23 @@ public class DeclarativeValidatorInspector {
   }
 
   public boolean getEnabled(IPreferenceStore store, Group group) {
-    return store.getBoolean(getPropertyName(group));
+    String name = getPropertyName(group);
+    if (getCustomized(store) && store.contains(name))
+      return store.getBoolean(name);
+    else
+      return group.enabledByDefault;
   }
 
   public void setEnabled(IPreferenceStore store, Group group, boolean enabled) {
     store.setValue(getPropertyName(group), enabled);
   }
   
-  public boolean getCustomized(IPreferenceStore store) throws CoreException {
-    return store.getBoolean(getPropertyName(CUSTOMIZED));
+  public boolean getCustomized(IPreferenceStore store) {
+    String name = getPropertyName(CUSTOMIZED);
+    if (store.contains(name))
+      return store.getBoolean(name);
+    else
+      return false;
   }
   
   public void setCustomized(IPreferenceStore store, boolean customized) {
