@@ -3,50 +3,39 @@ package net.vtst.eclipse.easyxtext.ui.validation.config;
 import net.vtst.eclipse.easyxtext.ui.validation.config.AbstractValidatorPropertyPage.IStore;
 import net.vtst.eclipse.easyxtext.validation.config.DeclarativeValidatorInspector.Group;
 
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.dialogs.PropertyPage;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import com.google.inject.Inject;
 
-/**
- * This is an abstract class for implementing a property page for an
- * {@code AbstractDeclarativeValidator}.  See
- * {@code ConfigurableDeclarativeValidator} for more information. 
- * 
- * @author Vincent Simonet
- */
-public class ValidatorPropertyPage extends PropertyPage {
+public class ValidatorPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 
   @Inject
   private AbstractValidatorPropertyPage base;
   
-  public ValidatorPropertyPage() {
-  }
-  
   @Override
   protected Control createContents(Composite parent) {
-    final IResource resource = getResource();
-    base.init(getResource().getProject(), this.getShell(), new IStore() {
+    base.init(null, this.getShell(), new IStore() {
       public boolean getEnabled(Group group) throws CoreException {
-        return base.getInspector().getEnabled(resource, group);
+        return base.getInspector().getEnabled(getPreferenceStore(), group);
       }
 
       public void setEnabled(Group group, boolean enabled) throws CoreException {
-        base.getInspector().setEnabled(resource, group, enabled);        
+        base.getInspector().setEnabled(getPreferenceStore(), group, enabled);        
       }
 
       @Override
       public boolean getCustomized() throws CoreException {
-        return base.getInspector().getCustomized(resource);
+        return base.getInspector().getCustomized(getPreferenceStore());
       }
 
       @Override
       public void setCustomized(boolean customized) throws CoreException {
-        base.getInspector().setCustomized(resource, customized);
+        base.getInspector().setCustomized(getPreferenceStore(), customized);
       }
     });
     return this.base.createContents(parent);
@@ -60,15 +49,13 @@ public class ValidatorPropertyPage extends PropertyPage {
   
   @Override
   public boolean performOk() {
+    System.out.println(this.getPreferenceStore());
     return base.performOk() && super.performOk();
   }
-  
-  protected IResource getResource() {
-    IAdaptable element = getElement();
-    if (element instanceof IResource) return (IResource) element;
-    Object resource = element.getAdapter(IResource.class);
-    if (resource instanceof IResource) return (IResource) resource;
-    return null;
-  }
 
+  @SuppressWarnings("deprecation")
+  public void init(IWorkbench workbench) {
+    this.setPreferenceStore(workbench.getPreferenceStore());
+  }
+  
 }

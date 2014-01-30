@@ -13,6 +13,7 @@ import java.util.Map;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.xtext.validation.AbstractDeclarativeValidator;
 
 /**
@@ -185,6 +186,33 @@ public class DeclarativeValidatorInspector {
   }
 
   // **************************************************************************
+  // Preferences
+  
+  private String getPropertyName(String name) {
+    return propertyNameQualifier + ":" + name;
+  }
+
+  private String getPropertyName(Group group) {
+    return getPropertyName(group.name);
+  }
+
+  public boolean getEnabled(IPreferenceStore store, Group group) {
+    return store.getBoolean(getPropertyName(group));
+  }
+
+  public void setEnabled(IPreferenceStore store, Group group, boolean enabled) {
+    store.setValue(getPropertyName(group), enabled);
+  }
+  
+  public boolean getCustomized(IPreferenceStore store) throws CoreException {
+    return store.getBoolean(getPropertyName(CUSTOMIZED));
+  }
+  
+  public void setCustomized(IPreferenceStore store, boolean customized) {
+    store.setValue(getPropertyName(CUSTOMIZED), customized);
+  }
+  
+  // **************************************************************************
   // Project properties
   
   /**
@@ -239,7 +267,7 @@ public class DeclarativeValidatorInspector {
    */
   private void clearAllProperties(IResource resource) throws CoreException {
     for (QualifiedName name : resource.getPersistentProperties().keySet()) {
-      if (name.getQualifier().equals(propertyNameQualifier))
+      if (name.getQualifier().equals(propertyNameQualifier) && !name.getLocalName().startsWith("#"))
         resource.setPersistentProperty(name, null);
     }
   }
