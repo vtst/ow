@@ -14,6 +14,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.xtext.validation.AbstractDeclarativeValidator;
 
 /**
@@ -41,16 +42,20 @@ public class DeclarativeValidatorInspector {
   private ArrayList<Group> groupList = new ArrayList<Group>();
   private Collection<Field> additionalOptionFields;
   
+  private IPreferenceStore preferenceStore;
+  
   /**
    * Creates a new inspector from a validator.
    * @param validator
    */
+  @SuppressWarnings("deprecation")
   public DeclarativeValidatorInspector(AbstractDeclarativeValidator validator) {
     inspectTypeAnnotation(validator);
     for (Method method : getCheckMethods(validator)) inspectMethod(method);
     this.additionalOptionFields = getAdditionalOptionFields(validator);
     for (Field field : this.additionalOptionFields) inspectField(field);
     propertyNameQualifier = validator.getClass().getName();
+    this.preferenceStore = PlatformUI.getWorkbench().getPreferenceStore();
   }
 
   /**
@@ -196,28 +201,23 @@ public class DeclarativeValidatorInspector {
     return getPropertyName(group.name);
   }
 
-  public boolean getEnabled(IPreferenceStore store, Group group) {
-    String name = getPropertyName(group);
-    if (getCustomized(store) && store.contains(name))
-      return store.getBoolean(name);
+  public boolean getEnabled(Group group) {
+    if (getCustomized())
+      return preferenceStore.getBoolean(getPropertyName(group));
     else
       return group.enabledByDefault;
   }
 
-  public void setEnabled(IPreferenceStore store, Group group, boolean enabled) {
-    store.setValue(getPropertyName(group), enabled);
+  public void setEnabled(Group group, boolean enabled) {
+    preferenceStore.setValue(getPropertyName(group), enabled);
   }
   
-  public boolean getCustomized(IPreferenceStore store) {
-    String name = getPropertyName(CUSTOMIZED);
-    if (store.contains(name))
-      return store.getBoolean(name);
-    else
-      return false;
+  public boolean getCustomized() {
+    return preferenceStore.getBoolean(getPropertyName(CUSTOMIZED));
   }
   
-  public void setCustomized(IPreferenceStore store, boolean customized) {
-    store.setValue(getPropertyName(CUSTOMIZED), customized);
+  public void setCustomized(boolean customized) {
+    preferenceStore.setValue(getPropertyName(CUSTOMIZED), customized);
   }
   
   // **************************************************************************
@@ -240,9 +240,13 @@ public class DeclarativeValidatorInspector {
    * @throws CoreException
    */
   public boolean getEnabled(IResource resource, Group group) throws CoreException {
-    String value = resource.getPersistentProperty(getQualifiedName(group));
-    if (value == null) return group.enabledByDefault;
-    return Boolean.parseBoolean(value);
+    if (getCustomized(resource)) {
+      String value = resource.getPersistentProperty(getQualifiedName(group));
+      if (value == null) return group.enabledByDefault;
+      return Boolean.parseBoolean(value);
+    } else {
+      return getEnabled(group);
+    }
   }
   
   /**
