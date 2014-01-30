@@ -69,6 +69,7 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   
   public AdditionalBooleanOption checkMixinLinking;
   public AdditionalBooleanOption checkVariableLinking;
+  public AdditionalBooleanOption checkMixinCallParameters;
     
   protected boolean isResponsible(Map<Object, Object> context, EObject eObject) {
     ConfigurableDeclarativeValidator.makeConfigurable(this);
@@ -325,7 +326,8 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     if (!linkingResult.isSuccess()) {
       List<ICheckMixinError> errors = linkingResult.getError();
       if (errors == null) {
-        warning(messages.getString("mixin_parameters_match_no_definition"), helper.getSelectors(), null, 0);
+        if (checkMixinCallParameters.get(this.getCurrentObject().eResource()))
+          warning(messages.getString("mixin_parameters_match_no_definition"), helper.getSelectors(), null, 0);
       } else {
         for (ICheckMixinError error : errors)
           error.report(messages, getMessageAcceptor());
