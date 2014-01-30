@@ -103,7 +103,7 @@
     </objectContribution>
    </extension>
 
-  <!-- Property page -->
+  <!-- Property pages -->
 
   <extension point="org.eclipse.ui.propertyPages">
     <page
@@ -118,9 +118,22 @@
         </adapt>
       </enabledWhen>
     </page>
+    <page
+      class="net.vtst.ow.eclipse.less.ui.LessExecutableExtensionFactory:net.vtst.ow.eclipse.less.ui.properties.LessProjectPropertyPage"
+      id="net.vtst.ow.eclipse.less.ui.properties.LessProjectPropertyPage"
+      name="%less_project_property_page"
+      category=""
+      nameFilter="*">
+      <enabledWhen>
+        <adapt type="org.eclipse.core.resources.IProject">
+          <test property="org.eclipse.core.resources.projectNature" value="net.vtst.ow.eclipse.less.nature"/>
+        </adapt>
+      </enabledWhen>
+    </page>
   </extension>
   
   <!-- Preference page -->
+  
   <extension point="org.eclipse.ui.preferencePages">
     <page
       name="%less_validation_preference_page"

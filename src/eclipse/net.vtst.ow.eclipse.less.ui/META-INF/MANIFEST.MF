@@ -19,9 +19,10 @@ Require-Bundle: net.vtst.ow.eclipse.less;visibility:=reexport,
  org.eclipse.xtext.ui.codetemplates.ui,
  org.eclipse.compare,
  net.vtst.eclipse.easyxtext.ui;bundle-version="1.0.12",
- net.vtst.eclipse.easyxtext;bundle-version="1.0.12"
-Import-Package: net.vtst.eclipse.easyxtext.util,
- org.apache.commons.logging,
+ net.vtst.eclipse.easyxtext;bundle-version="1.0.12",
+ org.eclipse.swt,
+ org.eclipse.core.resources
+Import-Package: org.apache.commons.logging,
  org.apache.log4j,
  org.eclipse.xtext.xtext.ui.editor.syntaxcoloring
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

@@ -18,23 +18,26 @@ Require-Bundle: org.eclipse.xtext;bundle-version="2.2.1";visibility:=reexport,
  org.antlr.runtime,
  org.eclipse.xtext.common.types,
  org.eclipse.debug.core;bundle-version="3.7.0",
- net.vtst.eclipse.easyxtext;bundle-version="1.0.12"
+ net.vtst.eclipse.easyxtext;bundle-version="1.0.12",
+ org.eclipse.jface;bundle-version="3.9.1"
 Import-Package: org.apache.commons.logging,
  org.apache.log4j,
  org.eclipse.core.runtime;version="3.4.0",
+ org.eclipse.ui.dialogs,
+ org.eclipse.xtend2.lib,
  org.eclipse.xtext.xbase.lib,
- org.osgi.framework;version="1.6.0",
- org.eclipse.xtend2.lib
+ org.osgi.framework;version="1.6.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: net.vtst.ow.eclipse.less,
- net.vtst.ow.eclipse.less.services,
+ net.vtst.ow.eclipse.less.formatting,
+ net.vtst.ow.eclipse.less.generator,
  net.vtst.ow.eclipse.less.less,
  net.vtst.ow.eclipse.less.less.impl,
  net.vtst.ow.eclipse.less.less.util,
- net.vtst.ow.eclipse.less.serializer,
  net.vtst.ow.eclipse.less.parser.antlr,
  net.vtst.ow.eclipse.less.parser.antlr.internal,
- net.vtst.ow.eclipse.less.validation,
+ net.vtst.ow.eclipse.less.properties,
  net.vtst.ow.eclipse.less.scoping,
- net.vtst.ow.eclipse.less.generator,
- net.vtst.ow.eclipse.less.formatting
+ net.vtst.ow.eclipse.less.serializer,
+ net.vtst.ow.eclipse.less.services,
+ net.vtst.ow.eclipse.less.validation
