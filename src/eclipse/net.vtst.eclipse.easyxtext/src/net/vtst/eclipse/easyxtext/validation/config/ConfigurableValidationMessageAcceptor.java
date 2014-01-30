@@ -107,13 +107,17 @@ public class ConfigurableValidationMessageAcceptor implements ValidationMessageA
     }
     
     public void reset(IProject project) {
-      configurations.remove(project);
+      if (project == null) {
+        configurations.clear();
+      } else {
+        configurations.remove(project);
+      }
     }
   }
   
   private Cache cache = new Cache();
 
-  public void resetCache(IProject project) {
+  public void resetCache(IProject project) {  // If project == null, reset for all.
     cache.reset(project);
   }
   

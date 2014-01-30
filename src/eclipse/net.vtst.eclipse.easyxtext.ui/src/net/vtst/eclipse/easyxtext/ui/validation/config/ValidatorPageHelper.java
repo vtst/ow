@@ -248,7 +248,7 @@ public class ValidatorPageHelper {
     ValidationMessageAcceptor messageAcceptor = getValidator().getMessageAcceptor();
     if (!(messageAcceptor instanceof ConfigurableValidationMessageAcceptor)) return;
     ConfigurableValidationMessageAcceptor configurableMessageAcceptor = (ConfigurableValidationMessageAcceptor) messageAcceptor;
-    if (this.project != null) configurableMessageAcceptor.resetCache(this.project);
+    configurableMessageAcceptor.resetCache(this.project);
   }
 
 }
