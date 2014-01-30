@@ -150,6 +150,7 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   
   // Check guards of non-mixin selectors
   @Check
+  @ConfigurableCheck(configurable = false)
   public void checkGuardsInToplevelRuleSet(ToplevelRuleSet ruleSet) {
     EList<ToplevelSelector> selectors = ruleSet.getSelector();
     for (int i = 0, n = selectors.size() - 1; i < n; ++i) {
@@ -158,6 +159,7 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   }
   
   @Check
+  @ConfigurableCheck(configurable = false)
   public void checkGuardsInInnerRuleSet(InnerRuleSet ruleSet) {
     EList<InnerSelector> selectors = ruleSet.getSelector();
     for (int i = 0, n = selectors.size() - 1; i < n; ++i) {
