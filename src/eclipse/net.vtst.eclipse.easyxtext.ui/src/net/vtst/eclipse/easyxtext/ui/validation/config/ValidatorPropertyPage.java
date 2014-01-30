@@ -1,6 +1,6 @@
 package net.vtst.eclipse.easyxtext.ui.validation.config;
 
-import net.vtst.eclipse.easyxtext.ui.validation.config.AbstractValidatorPropertyPage.IStore;
+import net.vtst.eclipse.easyxtext.ui.validation.config.ValidatorPageHelper.IStore;
 import net.vtst.eclipse.easyxtext.validation.config.DeclarativeValidatorInspector.Group;
 
 import org.eclipse.core.resources.IResource;
@@ -22,7 +22,7 @@ import com.google.inject.Inject;
 public class ValidatorPropertyPage extends PropertyPage {
 
   @Inject
-  private AbstractValidatorPropertyPage base;
+  private ValidatorPageHelper helper;
   
   public ValidatorPropertyPage() {
   }
@@ -30,37 +30,37 @@ public class ValidatorPropertyPage extends PropertyPage {
   @Override
   protected Control createContents(Composite parent) {
     final IResource resource = getResource();
-    base.init(getResource().getProject(), this.getShell(), new IStore() {
+    helper.init(getResource().getProject(), this.getShell(), new IStore() {
       public boolean getEnabled(Group group) throws CoreException {
-        return base.getInspector().getEnabled(resource, group);
+        return helper.getInspector().getEnabled(resource, group);
       }
 
       public void setEnabled(Group group, boolean enabled) throws CoreException {
-        base.getInspector().setEnabled(resource, group, enabled);        
+        helper.getInspector().setEnabled(resource, group, enabled);        
       }
 
       @Override
       public boolean getCustomized() throws CoreException {
-        return base.getInspector().getCustomized(resource);
+        return helper.getInspector().getCustomized(resource);
       }
 
       @Override
       public void setCustomized(boolean customized) throws CoreException {
-        base.getInspector().setCustomized(resource, customized);
+        helper.getInspector().setCustomized(resource, customized);
       }
     });
-    return this.base.createContents(parent);
+    return this.helper.createContents(parent);
   }
   
   @Override
   protected void performDefaults() {
-    base.performDefaults();
+    helper.performDefaults();
     super.performDefaults();
   }
   
   @Override
   public boolean performOk() {
-    return base.performOk() && super.performOk();
+    return helper.performOk() && super.performOk();
   }
   
   protected IResource getResource() {
