@@ -19,7 +19,13 @@ import net.vtst.ow.eclipse.less.less.TerminatedMixin;
 import net.vtst.ow.eclipse.less.less.ToplevelRuleSet;
 import net.vtst.ow.eclipse.less.less.ToplevelStatement;
 import net.vtst.ow.eclipse.less.parser.LessValueConverterService;
+import net.vtst.ow.eclipse.less.properties.LessProjectProperty;
 
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -41,6 +47,7 @@ import com.google.inject.Provider;
 public class LessImportStatementResolver {
   
   // The cache contains two kinds of entries:
+  // - (ImportInfo.class, importStatement), for the import info of an import statement.
   // - (LessImportStatementResolver.class, importStatement), for the set of statements imported
   //   by an import statement,
   // - (LessImportStatementResolver.class, stylesheet), for the set of import statements of
@@ -51,6 +58,9 @@ public class LessImportStatementResolver {
   @Inject
   private Provider<LoadOnDemandResourceDescriptions> loadOnDemandDescriptions;
   
+  @Inject
+  private LessProjectProperty projectProperty;
+    
   // **************************************************************************
   // Retrieving imported statements (for scope computation)
   
@@ -167,8 +177,12 @@ public class LessImportStatementResolver {
 
   private static Pattern URI_WITH_EXTENSION = Pattern.compile("(.*[.][a-z]*)|(.*[?;].*)");
   
-  public ImportInfo getImportInfo(ImportStatement importStatement) {
-    return new ImportInfo(importStatement);
+  public ImportInfo getImportInfo(final ImportStatement importStatement) {
+    return cache.get(Tuples.pair(ImportInfo.class, importStatement), importStatement.eResource(), new Provider<ImportInfo>() {
+      public ImportInfo get() {
+        return new ImportInfo(importStatement);
+      }
+    });
   }
   
   public class ImportInfo {
@@ -178,7 +192,7 @@ public class LessImportStatementResolver {
     
     ImportInfo(ImportStatement importStatement) {
       this.importStatement = importStatement;
-      this.uri = URI.createURI(LessValueConverterService.getStringValue(importStatement.getUri()));
+      this.uri = resolveURI(LessValueConverterService.getStringValue(importStatement.getUri()));
       this.format = importStatement.getFormat();
       if (this.format == null) {
         if (!URI_WITH_EXTENSION.matcher(uri.toString()).matches())
@@ -187,8 +201,42 @@ public class LessImportStatementResolver {
       }
     }
     
+    private IProject getProject(Resource resource) {
+      URI uri = resource.getURI();
+      IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(uri.toPlatformString(true)));
+      if (file == null) return null;
+      return file.getProject();
+    }
+    
+    private URI resolveURI(String stringUri) {
+      URI uri = URI.createURI(stringUri);
+      if (uri.isFile()) {
+        if (EcoreUtil2.isValidUri(this.importStatement, uri)) {
+          return uri;
+        } else if (uri.isRelative()) {
+          // If the URI is relative, but not valid, try to resolve it with an include path.
+          IProject project = getProject(this.importStatement.eResource());
+          if (project != null) {
+            for (IContainer container: projectProperty.getIncludePaths(project)) {
+              if (container.exists()) {
+                IFile file = container.getFile(new Path(stringUri));
+                if (file.exists()) {
+                  return URI.createFileURI(file.getLocation().toString());
+                }
+              }
+            }
+          }          
+        }
+        // If all above failed, this is not a valid URI.
+        return null;
+      } else {
+        // Non-file URI are always considered as valid.
+        return uri;
+      }
+    }
+    
     public boolean isValid() {
-      return !this.uri.isFile() || EcoreUtil2.isValidUri(this.importStatement, this.uri);     
+      return this.uri != null;
     }
     
     public boolean isLessFile() {
@@ -196,29 +244,41 @@ public class LessImportStatementResolver {
           LessImportStatementResolver.FORMAT_REFERENCE.equals(this.format)) &&
           uri.isFile();
     }
-    
-    public Resource getResource() {
-      return importStatement.eResource();
+
+    private IResourceDescription getResourceDescription() {
+      LoadOnDemandResourceDescriptions resourceDescriptions = loadOnDemandDescriptions.get();
+      resourceDescriptions.initialize(new IResourceDescriptions.NullImpl(), Collections.singleton(this.uri), this.importStatement.eResource());
+      try {
+        return resourceDescriptions.getResourceDescription(this.uri);
+      } catch (IllegalStateException e) {
+        // If the imported file does not have the expected content type, it is not controlled by XText, so we cannot load its
+        // resource.
+        return null;
+      }      
     }
     
-    public StyleSheet getImportedStyleSheet() {
+    private StyleSheet getImportedStyleSheetInternal() {
       if (this.isLessFile()) {
-        LoadOnDemandResourceDescriptions resourceDescriptions = loadOnDemandDescriptions.get();
-        resourceDescriptions.initialize(new IResourceDescriptions.NullImpl(), Collections.singleton(this.uri), this.getResource());
-        IResourceDescription resourceDescription;
-        try {
-          resourceDescription = resourceDescriptions.getResourceDescription(this.uri);
-        } catch (IllegalStateException e) {
-          // If the imported file does not have the expected content type, it is not controlled by XText, so we cannot load its
-          // resource.
-          return null;
-        }
+        IResourceDescription resourceDescription = getResourceDescription();
+        if (resourceDescription == null) return null;
         for (IEObjectDescription objectDescription: resourceDescription.getExportedObjectsByType(LessPackage.eINSTANCE.getStyleSheet())) {
           EObject object = objectDescription.getEObjectOrProxy();
           if (object instanceof StyleSheet) return (StyleSheet) object;
         }
       }
       return null;
+    }
+    
+    private boolean lazyStyleSheet = true;
+    private StyleSheet styleSheet;
+    
+    public StyleSheet getImportedStyleSheet() {
+      if (lazyStyleSheet) {
+        lazyStyleSheet = false;
+        styleSheet = getImportedStyleSheetInternal();
+      }
+      return styleSheet;
+      
     }
   }
 }
