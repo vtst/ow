@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -20,15 +21,16 @@ public class LessProjectProperty {
 
   public static String QUALIFIER = "net.vtst.ow.less";
   public static String INCLUDE_PATHS = "includePaths";
+  public static String ROOTS = "roots";
   
   private Map<IProject, Iterable<IContainer>> includePaths = new HashMap<IProject, Iterable<IContainer>>();
+  private Map<IProject, Iterable<IFile>> roots = new HashMap<IProject, Iterable<IFile>>();
   
   public LessProjectProperty() {
     ResourcesPlugin.getWorkspace().addResourceChangeListener(new IResourceChangeListener(){
       public void resourceChanged(IResourceChangeEvent event) {
         IResource resource = event.getResource();
         if (resource instanceof IProject) {
-          System.out.println("*** DELETE " + resource.getName());
           includePaths.remove((IProject) resource);
         }
       }});
@@ -45,6 +47,19 @@ public class LessProjectProperty {
       includePaths.put(project, result);
     }
     return result;
+  }
+  
+  public Iterable<IFile> getRoots(IProject project) {
+    Iterable<IFile> result = roots.get(project);
+    if (result == null) {
+      try {
+        result = ResourceListProperty.<IFile>get(IFile.class, project, new QualifiedName(QUALIFIER, ROOTS));
+      } catch (CoreException e) {
+        return Collections.<IFile>emptyList();
+      }
+      roots.put(project, result);
+    }
+    return result;    
   }
   
 }

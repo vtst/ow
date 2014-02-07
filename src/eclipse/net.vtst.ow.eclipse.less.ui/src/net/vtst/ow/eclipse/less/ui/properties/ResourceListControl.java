@@ -8,6 +8,7 @@ import net.vtst.eclipse.easyxtext.ui.util.SWTFactory;
 import net.vtst.ow.eclipse.less.ui.LessUiMessages;
 import net.vtst.ow.eclipse.less.ui.LessUiModule;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -37,10 +38,29 @@ public class ResourceListControl<T extends IResource> {
   private LessUiMessages messages;
 
   public ResourceListControl() {}
-   
+
+  private ViewerFilter addFilter = new ViewerFilter() {
+    public boolean select(Viewer viewer, Object parent, Object element) {
+      return (cls.isAssignableFrom(element.getClass()) || element instanceof IContainer);
+    }
+  };
+  
+  public void setAddFilter(ViewerFilter addFilter) { this.addFilter = addFilter; }
+    
+  private ISelectionStatusValidator addValidator = new ISelectionStatusValidator() {
+    public IStatus validate(Object[] result) {
+      if (getSelectedResource(result) == null)
+        return new Status(IStatus.ERROR, LessUiModule.PLUGIN_ID, "");
+      else
+        return new Status(IStatus.OK, LessUiModule.PLUGIN_ID, "");
+    }
+  };
+
+  public void setAddValidator(ISelectionStatusValidator addValidator) { this.addValidator = addValidator; }
+
   private org.eclipse.swt.widgets.List list;
   private Button removeButton;
-  private Button addOtherLibrary;
+  private Button addButton;
   private List<T> currentValue = new ArrayList<T>();
   private Class<? extends T> cls;
 
@@ -53,8 +73,8 @@ public class ResourceListControl<T extends IResource> {
     gd.verticalSpan = 3;
     list.setLayoutData(gd);
     
-    addOtherLibrary = SWTFactory.createPushButton(composite, messages.getString("FolderListControl_add"), null);
-    addOtherLibrary.addSelectionListener(new NullSwtSelectionListener() {
+    addButton = SWTFactory.createPushButton(composite, messages.getString("FolderListControl_add"), null);
+    addButton.addSelectionListener(new NullSwtSelectionListener() {
       @Override public void widgetSelected(SelectionEvent event) {
         addResource();
       }
@@ -88,20 +108,11 @@ public class ResourceListControl<T extends IResource> {
     dialog.setTitle(messages.getString("FolderListControl_add"));
     dialog.setMessage("");
     dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
-    dialog.addFilter(new ViewerFilter() {
-      public boolean select(Viewer viewer, Object parent, Object element) {
-        return (cls.isAssignableFrom(element.getClass()) || element instanceof IProject);
-      }});
+    dialog.addFilter(this.addFilter);
     try {
       dialog.setInitialSelection(ResourcesPlugin.getWorkspace().getRoot());
     } catch (IllegalArgumentException exn) {}  // Raised by new Path(...)
-    dialog.setValidator(new ISelectionStatusValidator() {
-      public IStatus validate(Object[] result) {
-        if (getSelectedResource(result) == null)
-          return new Status(IStatus.ERROR, LessUiModule.PLUGIN_ID, "");
-        else
-          return new Status(IStatus.OK, LessUiModule.PLUGIN_ID, "");
-      }});
+    dialog.setValidator(addValidator);
     dialog.open();
     T resource = getSelectedResource(dialog.getResult());
     if (resource != null) {
