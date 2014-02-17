@@ -48,6 +48,7 @@ import net.vtst.ow.eclipse.less.linking.LessMixinLinkingService.ICheckMixinError
 import net.vtst.ow.eclipse.less.linking.LessMixinLinkingService.MixinLink;
 import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver;
 import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver2;
+import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver2.ImportStatementError;
 import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver2.ResolvedImportStatement;
 
 import org.eclipse.emf.common.util.EList;
@@ -86,8 +87,7 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   public void checkImportStatement(ImportStatement importStatement) {
     ResolvedImportStatement resolvedImportStatement = importStatementResolver2.resolve(importStatement);
     if (resolvedImportStatement.hasError()) {
-      // TODO: Put the error at the right place.
-      error(resolvedImportStatement.getError(), importStatement, null, 0);
+      resolvedImportStatement.getError().report(importStatement, this.getMessageAcceptor());
     } else if (resolvedImportStatement.isCycleRoot()) {
       warning(messages.getString("import_loop"), importStatement, LessPackage.eINSTANCE.getImportStatement_Uri(), 0);      
     }

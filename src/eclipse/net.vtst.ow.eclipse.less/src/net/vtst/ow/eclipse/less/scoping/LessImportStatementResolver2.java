@@ -22,6 +22,7 @@ import net.vtst.ow.eclipse.less.resource.LessResourceDescriptionStrategy;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.resource.IContainer;
 import org.eclipse.xtext.resource.IEObjectDescription;
@@ -30,6 +31,7 @@ import org.eclipse.xtext.resource.IResourceDescriptions;
 import org.eclipse.xtext.scoping.impl.LoadOnDemandResourceDescriptions;
 import org.eclipse.xtext.util.IResourceScopeCache;
 import org.eclipse.xtext.util.Tuples;
+import org.eclipse.xtext.validation.ValidationMessageAcceptor;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -89,12 +91,41 @@ public class LessImportStatementResolver2 {
 
   @Inject
   private LessMessages messages;
+
+  public enum ImportStatementErrorLevel { ERROR, WARNING }
+
+  public class ImportStatementError {
+    
+    private ImportStatementErrorLevel level;
+    private EStructuralFeature feature;
+    private String messageKey;
+    private String[] messageValues;
+
+    public ImportStatementError(ImportStatementErrorLevel level, EStructuralFeature feature, String messageKey, String... messageValues) {
+      this.level = level;
+      this.feature = feature;
+      this.messageKey = messageKey;
+      this.messageValues = messageValues;
+    }
+
+    public void report(ImportStatement importStatement, ValidationMessageAcceptor acceptor) {
+      switch (this.level) {
+      case ERROR:
+        acceptor.acceptError(messages.format(this.messageKey, this.messageValues), importStatement, this.feature, 0, null);
+        break;
+      case WARNING:
+        acceptor.acceptWarning(messages.format(this.messageKey, this.messageValues), importStatement, this.feature, 0, null);
+        break;
+      }
+    }
+    
+  }
     
   public class ResolvedImportStatement {
     
     private ImportStatement statement;
     private URI absoluteURI;
-    private String error;
+    private ImportStatementError error;
     private boolean isLocalAndLess;
     private StyleSheet importedStyleSheet;
 
@@ -104,7 +135,7 @@ public class LessImportStatementResolver2 {
       try {
         this.absoluteURI = createAbsoluteURI(LessValueConverterService.getStringValue(statement.getUri()), statement.eResource().getURI());
       } catch (IllegalArgumentException exn) {
-        this.error = messages.format("import_statement_error_illegal_uri", exn.getMessage());
+        this.error = new ImportStatementError(ImportStatementErrorLevel.ERROR, LessPackage.eINSTANCE.getImportStatement_Uri(), "import_statement_error_illegal_uri", exn.getMessage());
         return;
       }
       // Determine the format.
@@ -114,14 +145,14 @@ public class LessImportStatementResolver2 {
         if (SUPPORTED_FORMATS.contains(statement.getFormat())) {
           this.isLocalAndLess = LessRuntimeModule.LESS_EXTENSION.equals(statement.getFormat()) && isLocalURI(this.absoluteURI);
         } else {
-          this.error = messages.format("import_statement_error_unknown_format", statement.getFormat());
+          this.error = new ImportStatementError(ImportStatementErrorLevel.ERROR, LessPackage.eINSTANCE.getImportStatement_Format(), "import_statement_error_unknown_format", statement.getFormat());
           return;
         }
       }
       // Set the imported stylesheet.
       if (this.isLocalAndLess) {
         if (!this.setImportedStyleSheet()) {
-          this.error = messages.getString("import_statement_error_file_not_found");
+          this.error = new ImportStatementError(ImportStatementErrorLevel.ERROR, LessPackage.eINSTANCE.getImportStatement_Uri(), "import_statement_error_file_not_found", statement.getFormat());
           return;
         }
       }
@@ -161,7 +192,7 @@ public class LessImportStatementResolver2 {
     private LazyImportCycleDetector cycleDetector = new LazyImportCycleDetector(this);
     public boolean isCycleRoot() { return cycleDetector.isCycleRoot(); }
     
-    public String getError() { return this.error; }
+    public ImportStatementError getError() { return this.error; }
     public URI getURI() { return this.absoluteURI; }
     public boolean hasError() { return this.error != null; }
     public boolean isLocalAndLess() { return this.isLocalAndLess; }
