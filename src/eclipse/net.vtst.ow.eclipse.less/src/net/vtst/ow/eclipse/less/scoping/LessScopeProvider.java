@@ -122,7 +122,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
       if (statement instanceof VariableDefinition) {
         variableDefinitions.add(getEObjectDescriptionFor(((VariableDefinition) statement).getLhs().getVariable()));
       } else if (statement instanceof ImportStatement) {
-        Iterable<ToplevelStatement> importedStatements = importStatementResolver.getAllStatements((ImportStatement) statement);
+        Iterable<ToplevelStatement> importedStatements = importStatementResolver.getImportedStatements((ImportStatement) statement);
         addVariableDefinitions(importedStatements, variableDefinitions);
       }
     }    

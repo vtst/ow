@@ -72,4 +72,10 @@ public class LessUiModule extends net.vtst.ow.eclipse.less.ui.AbstractLessUiModu
     return LessHyperlinkHelper.class;
   }
   
+  // Scoping
+  
+  public com.google.inject.Provider<org.eclipse.xtext.resource.containers.IAllContainersState> provideIAllContainersState() {
+    return org.eclipse.xtext.ui.shared.Access.getWorkspaceProjectsState();
+  }
+  
 }

@@ -108,7 +108,7 @@ public class LessMixinScopeProvider {
     } else {
       for (EObject obj : statements) {
         if (obj instanceof ImportStatement) {
-          Iterable<ToplevelStatement> importedStatements = importStatementResolver.getAllStatements((ImportStatement) obj);
+          Iterable<ToplevelStatement> importedStatements = importStatementResolver.getImportedStatements((ImportStatement) obj);
           fillScope(scope, importedStatements, position, element);
         } else if (obj instanceof Mixin) {
           MixinUtils.Helper mixinHelper = MixinUtils.newHelper((Mixin) obj);

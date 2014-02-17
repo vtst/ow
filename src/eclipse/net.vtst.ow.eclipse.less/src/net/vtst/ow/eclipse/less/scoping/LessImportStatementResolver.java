@@ -48,8 +48,6 @@ public class LessImportStatementResolver {
   
   // The cache contains two kinds of entries:
   // - (ImportInfo.class, importStatement), for the import info of an import statement.
-  // - (LessImportStatementResolver.class, importStatement), for the set of statements imported
-  //   by an import statement,
   // - (LessImportStatementResolver.class, stylesheet), for the set of import statements of
   //   a stylesheet.
   @Inject
@@ -65,39 +63,16 @@ public class LessImportStatementResolver {
   // Retrieving imported statements (for scope computation)
   
   /**
-   * Compute the set of statements which are imported by an import statement.  This function manages recursive
-   * import statements.  The result is cached to ensure efficiency.
+   * Compute the set of statements which are imported by an import statement.
    * @param importStatement  The import statement to resolve.
    * @return  The list of top-level statements of the imported stylesheets.
    */
-  public Iterable<ToplevelStatement> getAllStatements(final ImportStatement importStatement) {
-    return cache.get(Tuples.pair(LessImportStatementResolver.class, importStatement), importStatement.eResource(), new Provider<Iterable<ToplevelStatement>>() {
-      public Iterable<ToplevelStatement> get() {
-        LinkedList<ToplevelStatement> statements = new LinkedList<ToplevelStatement>();
-        getAllStatementsRec(importStatement, statements, new HashSet<URI>());
-        return statements;
-      }
-    });
-  }
-  
-  /**
-   * Recursive function to compute the list of imported statements.
-   * @param importStatement  The import statement to resolve.
-   * @param statements  The found statements are added to this list.
-   * @param visitedURIs  The imported URIs are added to this set.  This is useful to avoid loops.
-   */
-  private void getAllStatementsRec(ImportStatement importStatement, List<ToplevelStatement> statements, Set<URI> visitedURIs) {
+  public Iterable<ToplevelStatement> getImportedStatements(final ImportStatement importStatement) {
     ImportInfo importInfo = getImportInfo(importStatement);
-    if (!importInfo.isLessFile() || !importInfo.isValid() || !visitedURIs.add(importInfo.uri)) return;
+    if (!importInfo.isLessFile() || !importInfo.isValid()) return Collections.emptyList();
     StyleSheet styleSheet = importInfo.getImportedStyleSheet();
-    if (styleSheet == null) return;
-    for (ToplevelStatement toplevelStatement: styleSheet.getStatements()) {
-      if (toplevelStatement instanceof ImportStatement) {
-        getAllStatementsRec((ImportStatement) toplevelStatement, statements, visitedURIs); 
-      } else {
-        statements.add(toplevelStatement);
-      }
-    }
+    if (styleSheet == null) return Collections.emptyList();
+    return styleSheet.getStatements();
   }
   
   // **************************************************************************
@@ -184,7 +159,7 @@ public class LessImportStatementResolver {
       }
     });
   }
-  
+    
   public class ImportInfo {
     public URI uri;
     public String format;

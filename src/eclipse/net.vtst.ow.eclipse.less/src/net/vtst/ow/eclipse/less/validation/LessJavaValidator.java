@@ -47,6 +47,8 @@ import net.vtst.ow.eclipse.less.linking.LessMixinLinkingService;
 import net.vtst.ow.eclipse.less.linking.LessMixinLinkingService.ICheckMixinError;
 import net.vtst.ow.eclipse.less.linking.LessMixinLinkingService.MixinLink;
 import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver;
+import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver2;
+import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver2.ResolvedImportStatement;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EAttribute;
@@ -63,7 +65,10 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   
   @Inject
   private LessImportStatementResolver importStatementResolver;
-  
+
+  @Inject
+  private LessImportStatementResolver2 importStatementResolver2;
+
   @Inject
   private LessMixinLinkingService mixinLinkingService;
   
@@ -79,19 +84,27 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   // Check import statements
   @Check
   public void checkImportStatement(ImportStatement importStatement) {
-    switch (importStatementResolver.checkImportStatement(importStatement)) {
-    case INVALID_FORMAT:
-      error(messages.getString("invalid_import_format"), importStatement, LessPackage.eINSTANCE.getImportStatement_Format(), 0);
-      break;
-    case INVALID_URI:
-      warning(messages.getString("import_invalid_uri"), importStatement, LessPackage.eINSTANCE.getImportStatement_Uri(), 0);
-      break;
-    case LOOP:
-      warning(messages.getString("import_loop"), importStatement, LessPackage.eINSTANCE.getImportStatement_Uri(), 0);
-      break;
-    default:
-      break;
+    ResolvedImportStatement resolvedImportStatement = importStatementResolver2.resolve(importStatement);
+    if (resolvedImportStatement.hasError()) {
+      // TODO: Put the error at the right place.
+      error(resolvedImportStatement.getError(), importStatement, null, 0);
+    } else if (resolvedImportStatement.isCycleRoot()) {
+      warning(messages.getString("import_loop"), importStatement, LessPackage.eINSTANCE.getImportStatement_Uri(), 0);      
     }
+    // TODO: Delete messages.
+//    switch (importStatementResolver.checkImportStatement(importStatement)) {
+//    case INVALID_FORMAT:
+//      error(messages.getString("invalid_import_format"), importStatement, LessPackage.eINSTANCE.getImportStatement_Format(), 0);
+//      break;
+//    case INVALID_URI:
+//      warning(messages.getString("import_invalid_uri"), importStatement, LessPackage.eINSTANCE.getImportStatement_Uri(), 0);
+//      break;
+//    case LOOP:
+//      warning(messages.getString("import_loop"), importStatement, LessPackage.eINSTANCE.getImportStatement_Uri(), 0);
+//      break;
+//    default:
+//      break;
+//    }
   }
   
   // Check for multiple properties in block
