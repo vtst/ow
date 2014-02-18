@@ -70,13 +70,18 @@ public class LessImportStatementResolver2 {
   private IResourceDescriptions resourceDescriptions;
 
   private IResourceDescription getResourceDescription(Resource resource, URI uri) {
+    System.out.print(uri.toString());
     LoadOnDemandResourceDescriptions lodrd = loadOnDemandDescriptions.get();
     lodrd.initialize(new IResourceDescriptions.NullImpl(), Collections.singleton(uri), resource);
     try {
-      return lodrd.getResourceDescription(uri);
+      IResourceDescription rd = lodrd.getResourceDescription(uri);
+      System.out.print(": ");
+      System.out.println(rd);
+      return rd;
     } catch (IllegalStateException e) {
       // If the imported file does not have the expected content type, it is not controlled by XText, so we cannot load its
       // resource.
+      System.out.println(": nok");
       return null;
     }      
   }
@@ -201,7 +206,7 @@ public class LessImportStatementResolver2 {
     }
     
     private void visit(Block block) {
-      visit(BlockUtils.iterator(block));
+      if (block != null) visit(BlockUtils.iterator(block));
     }
 
     private void visit(Iterable<? extends EObject> statements) {
@@ -274,7 +279,13 @@ public class LessImportStatementResolver2 {
   
   private static URI createAbsoluteURI(String string, URI base) {
     URI uri = URI.createURI(string);
-    if (uri.isRelative()) uri = uri.resolve(base);
+    if (uri.isRelative()) {
+      if (uri.hasAbsolutePath()) {
+        uri = URI.createFileURI(uri.path());
+      } else {
+        uri = uri.resolve(base);
+      }
+    }
     return uri;
   }
   
