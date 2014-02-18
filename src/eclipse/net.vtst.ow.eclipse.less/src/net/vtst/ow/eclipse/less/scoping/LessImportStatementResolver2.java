@@ -20,14 +20,17 @@ import net.vtst.ow.eclipse.less.less.ToplevelRuleSet;
 import net.vtst.ow.eclipse.less.parser.LessValueConverterService;
 import net.vtst.ow.eclipse.less.resource.LessResourceDescriptionStrategy;
 
+import org.eclipse.emf.common.CommonPlugin;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.URIConverter;
 import org.eclipse.xtext.resource.IContainer;
 import org.eclipse.xtext.resource.IEObjectDescription;
 import org.eclipse.xtext.resource.IResourceDescription;
 import org.eclipse.xtext.resource.IResourceDescriptions;
+import org.eclipse.xtext.resource.XtextResourceSet;
 import org.eclipse.xtext.scoping.impl.LoadOnDemandResourceDescriptions;
 import org.eclipse.xtext.util.IResourceScopeCache;
 import org.eclipse.xtext.util.Tuples;
@@ -67,17 +70,17 @@ public class LessImportStatementResolver2 {
   private IResourceDescriptions resourceDescriptions;
 
   private IResourceDescription getResourceDescription(Resource resource, URI uri) {
-    return resourceDescriptions.getResourceDescription(uri);
-    // TODO: Do we want to manage containers?
-    // TODO: How to manage URI which are relative to --include_paths?
-//    IResourceDescription resourceDescription = resourceDescriptions.getResourceDescription(resource.getURI());
-//    for (IContainer container : containerManager.getVisibleContainers(resourceDescription, resourceDescriptions)) {
-//      IResourceDescription desc = container.getResourceDescription(uri);
-//      if (desc != null) return desc;
-//    }
-//    return null;
+    LoadOnDemandResourceDescriptions lodrd = loadOnDemandDescriptions.get();
+    lodrd.initialize(new IResourceDescriptions.NullImpl(), Collections.singleton(uri), resource);
+    try {
+      return lodrd.getResourceDescription(uri);
+    } catch (IllegalStateException e) {
+      // If the imported file does not have the expected content type, it is not controlled by XText, so we cannot load its
+      // resource.
+      return null;
+    }      
   }
-
+  
   // **************************************************************************
   // Class ResolvedImportStatement
   
@@ -159,9 +162,7 @@ public class LessImportStatementResolver2 {
     }
     
     private boolean setImportedStyleSheet() {
-      // TODO: Can we load directly?
-      // IResourceDescription desc = getResourceDescription(this.statement.eResource(), this.absoluteURI);
-      IResourceDescription desc = loadResourceDescription();
+      IResourceDescription desc = getResourceDescription(this.statement.eResource(), this.absoluteURI);
       if (desc != null) {
         for (IEObjectDescription objectDesc : desc.getExportedObjectsByType(LessPackage.eINSTANCE.getStyleSheet())) {
           if (LessResourceDescriptionStrategy.STYLESHEET_NAME.equals(objectDesc.getQualifiedName())) {
@@ -175,19 +176,6 @@ public class LessImportStatementResolver2 {
       }
       return false;
     }
-    
-    private IResourceDescription loadResourceDescription() {
-      LoadOnDemandResourceDescriptions lodrd = loadOnDemandDescriptions.get();
-      lodrd.initialize(new IResourceDescriptions.NullImpl(), Collections.singleton(this.absoluteURI), this.statement.eResource());
-      try {
-        return lodrd.getResourceDescription(this.absoluteURI);
-      } catch (IllegalStateException e) {
-        // If the imported file does not have the expected content type, it is not controlled by XText, so we cannot load its
-        // resource.
-        return null;
-      }      
-    }
-
     
     private LazyImportCycleDetector cycleDetector = new LazyImportCycleDetector(this);
     public boolean isCycleRoot() { return cycleDetector.isCycleRoot(); }
