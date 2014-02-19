@@ -24,7 +24,6 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.xtext.resource.IContainer;
 import org.eclipse.xtext.resource.IEObjectDescription;
 import org.eclipse.xtext.resource.IResourceDescription;
 import org.eclipse.xtext.resource.IResourceDescriptions;
@@ -60,11 +59,11 @@ public class LessImportStatementResolver2 {
   // **************************************************************************
   // Containers
 
-  @Inject
-  private IContainer.Manager containerManager;
+  // @Inject
+  // private IContainer.Manager containerManager;
   
-  @Inject
-  private IResourceDescriptions resourceDescriptions;
+  // @Inject
+  // private IResourceDescriptions resourceDescriptions;
 
   private IResourceDescription getResourceDescription(Resource resource, URI uri) {
     LoadOnDemandResourceDescriptions lodrd = loadOnDemandDescriptions.get();
@@ -175,12 +174,19 @@ public class LessImportStatementResolver2 {
       return false;
     }
     
-    private LazyImportCycleDetector cycleDetector = new LazyImportCycleDetector(this);
-    public boolean isCycleRoot() { return cycleDetector.isCycleRoot(); }
+    private LazyImportCycleDetector cycleDetector = null;
+    private void checkCycle() {
+      if (this.cycleDetector == null) {
+        this.cycleDetector = new LazyImportCycleDetector(this);
+        if (this.cycleDetector.isCycleRoot() && this.error == null) {
+          this.error = new ImportStatementError(ImportStatementErrorLevel.ERROR, LessPackage.eINSTANCE.getImportStatement_Uri(), "import_loop");
+        }
+      }
+    }
     
-    public ImportStatementError getError() { return this.error; }
+    public ImportStatementError getError() { checkCycle(); return this.error; }
+    public boolean hasError() { checkCycle(); return this.error != null; }
     public URI getURI() { return this.absoluteURI; }
-    public boolean hasError() { return this.error != null; }
     public boolean isLocalAndLess() { return this.isLocalAndLess; }
     public StyleSheet getImportedStyleSheet() { return this.importedStyleSheet; }
     
@@ -239,12 +245,12 @@ public class LessImportStatementResolver2 {
   
   private class LazyImportCycleDetector {
     
-    private ResolvedImportStatement statement;
-    private Boolean isCycleRoot = null;
-    private Set<URI> visitedURIs = null;
+    private boolean isCycleRoot;
+    private Set<URI> visitedURIs = new HashSet<URI>();
 
     private LazyImportCycleDetector(ResolvedImportStatement statement) {
-      this.statement = statement;
+      visit(statement);
+      this.isCycleRoot = this.visitedURIs.contains(statement.getURI());
     }
     
     private void visit(ResolvedImportStatement statement) {
@@ -256,14 +262,7 @@ public class LessImportStatementResolver2 {
       }
     }
     
-    private boolean isCycleRoot() {
-      if (this.isCycleRoot == null) {
-        this.visitedURIs = new HashSet<URI>();
-        visit(this.statement);
-        this.isCycleRoot = this.visitedURIs.contains(this.statement.getURI());
-      }
-      return this.isCycleRoot.booleanValue();
-    }
+    private boolean isCycleRoot() { return this.isCycleRoot; }
     
   }
 

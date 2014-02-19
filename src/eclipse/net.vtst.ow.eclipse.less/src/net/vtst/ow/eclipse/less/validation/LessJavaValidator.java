@@ -46,9 +46,7 @@ import net.vtst.ow.eclipse.less.less.VariableDefinition;
 import net.vtst.ow.eclipse.less.linking.LessMixinLinkingService;
 import net.vtst.ow.eclipse.less.linking.LessMixinLinkingService.ICheckMixinError;
 import net.vtst.ow.eclipse.less.linking.LessMixinLinkingService.MixinLink;
-import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver;
 import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver2;
-import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver2.ImportStatementError;
 import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver2.ResolvedImportStatement;
 
 import org.eclipse.emf.common.util.EList;
@@ -64,9 +62,6 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   @Inject
   private LessMessages messages;
   
-  @Inject
-  private LessImportStatementResolver importStatementResolver;
-
   @Inject
   private LessImportStatementResolver2 importStatementResolver2;
 
@@ -88,23 +83,7 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     ResolvedImportStatement resolvedImportStatement = importStatementResolver2.resolve(importStatement);
     if (resolvedImportStatement.hasError()) {
       resolvedImportStatement.getError().report(importStatement, this.getMessageAcceptor());
-    } else if (resolvedImportStatement.isCycleRoot()) {
-      warning(messages.getString("import_loop"), importStatement, LessPackage.eINSTANCE.getImportStatement_Uri(), 0);      
     }
-    // TODO: Delete messages.
-//    switch (importStatementResolver.checkImportStatement(importStatement)) {
-//    case INVALID_FORMAT:
-//      error(messages.getString("invalid_import_format"), importStatement, LessPackage.eINSTANCE.getImportStatement_Format(), 0);
-//      break;
-//    case INVALID_URI:
-//      warning(messages.getString("import_invalid_uri"), importStatement, LessPackage.eINSTANCE.getImportStatement_Uri(), 0);
-//      break;
-//    case LOOP:
-//      warning(messages.getString("import_loop"), importStatement, LessPackage.eINSTANCE.getImportStatement_Uri(), 0);
-//      break;
-//    default:
-//      break;
-//    }
   }
   
   // Check for multiple properties in block
