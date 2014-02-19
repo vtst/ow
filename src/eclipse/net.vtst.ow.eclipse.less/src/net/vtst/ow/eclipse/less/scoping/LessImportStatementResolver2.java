@@ -20,17 +20,14 @@ import net.vtst.ow.eclipse.less.less.ToplevelRuleSet;
 import net.vtst.ow.eclipse.less.parser.LessValueConverterService;
 import net.vtst.ow.eclipse.less.resource.LessResourceDescriptionStrategy;
 
-import org.eclipse.emf.common.CommonPlugin;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.URIConverter;
 import org.eclipse.xtext.resource.IContainer;
 import org.eclipse.xtext.resource.IEObjectDescription;
 import org.eclipse.xtext.resource.IResourceDescription;
 import org.eclipse.xtext.resource.IResourceDescriptions;
-import org.eclipse.xtext.resource.XtextResourceSet;
 import org.eclipse.xtext.scoping.impl.LoadOnDemandResourceDescriptions;
 import org.eclipse.xtext.util.IResourceScopeCache;
 import org.eclipse.xtext.util.Tuples;
@@ -70,18 +67,14 @@ public class LessImportStatementResolver2 {
   private IResourceDescriptions resourceDescriptions;
 
   private IResourceDescription getResourceDescription(Resource resource, URI uri) {
-    System.out.print(uri.toString());
     LoadOnDemandResourceDescriptions lodrd = loadOnDemandDescriptions.get();
     lodrd.initialize(new IResourceDescriptions.NullImpl(), Collections.singleton(uri), resource);
     try {
       IResourceDescription rd = lodrd.getResourceDescription(uri);
-      System.out.print(": ");
-      System.out.println(rd);
       return rd;
     } catch (IllegalStateException e) {
       // If the imported file does not have the expected content type, it is not controlled by XText, so we cannot load its
       // resource.
-      System.out.println(": nok");
       return null;
     }      
   }
