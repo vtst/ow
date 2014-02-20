@@ -2,7 +2,7 @@ package net.vtst.ow.eclipse.less.ui.hyperlinking;
 
 import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver;
-import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver.ImportInfo;
+import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver.ResolvedImportStatement;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -28,9 +28,9 @@ public class LessHyperlinkHelper extends HyperlinkHelper {
     // Create hyper-link for import statements
     EObject object = eObjectAtOffsetHelper.resolveElementAt(resource, offset);
     if (object instanceof ImportStatement) {
-      ImportInfo importInfo = importStatementResolver.getImportInfo((ImportStatement) object);
-      if (importInfo.uri != null)
-        createHyperlinksTo(resource, importInfo.uri, acceptor);
+      ResolvedImportStatement resolvedImportStatement = importStatementResolver.resolve((ImportStatement) object);
+      if (!resolvedImportStatement.hasError())
+        createHyperlinksTo(resource, resolvedImportStatement.getURI(), acceptor);
     }
     // Create other hyper-links
     super.createHyperlinksByOffset(resource, offset, acceptor);
