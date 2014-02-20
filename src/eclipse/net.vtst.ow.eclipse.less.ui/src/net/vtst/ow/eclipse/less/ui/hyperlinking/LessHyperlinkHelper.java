@@ -30,7 +30,7 @@ public class LessHyperlinkHelper extends HyperlinkHelper {
     if (object instanceof ImportStatement) {
       ResolvedImportStatement resolvedImportStatement = importStatementResolver.resolve((ImportStatement) object);
       if (!resolvedImportStatement.hasError())
-        createHyperlinksTo(resource, resolvedImportStatement.getURI(), acceptor);
+        createHyperlinksTo(resource, resolvedImportStatement.getImportedStyleSheet().eResource().getURI(), acceptor);
     }
     // Create other hyper-links
     super.createHyperlinksByOffset(resource, offset, acceptor);

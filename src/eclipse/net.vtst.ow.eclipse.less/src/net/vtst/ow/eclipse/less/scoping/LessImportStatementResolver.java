@@ -124,7 +124,7 @@ public class LessImportStatementResolver {
   public class ResolvedImportStatement {
     
     private ImportStatement statement;
-    private URI absoluteURI;
+    private URI uri;
     private ImportStatementError error;
     private boolean isLocalAndLess;
     private StyleSheet importedStyleSheet;
@@ -133,17 +133,17 @@ public class LessImportStatementResolver {
       this.statement = statement;
       // Parse the URI argument.
       try {
-        this.absoluteURI = createAbsoluteURI(LessValueConverterService.getStringValue(statement.getUri()), statement.eResource().getURI());
+        this.uri = createURI(LessValueConverterService.getStringValue(statement.getUri()));
       } catch (IllegalArgumentException exn) {
         this.error = new ImportStatementError(ImportStatementErrorLevel.ERROR, LessPackage.eINSTANCE.getImportStatement_Uri(), "import_statement_error_illegal_uri", exn.getMessage());
         return;
       }
       // Determine the format.
       if (statement.getFormat() == null) {
-        this.isLocalAndLess = LessRuntimeModule.LESS_EXTENSION.equals(this.absoluteURI.fileExtension()) && isLocalURI(this.absoluteURI);
+        this.isLocalAndLess = LessRuntimeModule.LESS_EXTENSION.equals(this.uri.fileExtension()) && isLocalURI(this.uri);
       } else {
         if (SUPPORTED_FORMATS.contains(statement.getFormat())) {
-          this.isLocalAndLess = LessRuntimeModule.LESS_EXTENSION.equals(statement.getFormat()) && isLocalURI(this.absoluteURI);
+          this.isLocalAndLess = LessRuntimeModule.LESS_EXTENSION.equals(statement.getFormat()) && isLocalURI(this.uri);
         } else {
           this.error = new ImportStatementError(ImportStatementErrorLevel.ERROR, LessPackage.eINSTANCE.getImportStatement_Format(), "import_statement_error_unknown_format", statement.getFormat());
           return;
@@ -159,7 +159,7 @@ public class LessImportStatementResolver {
     }
     
     private boolean setImportedStyleSheet() {
-      IResourceDescription desc = getResourceDescription(this.statement.eResource(), this.absoluteURI);
+      IResourceDescription desc = getResourceDescription(this.statement.eResource(), this.uri);
       if (desc != null) {
         for (IEObjectDescription objectDesc : desc.getExportedObjectsByType(LessPackage.eINSTANCE.getStyleSheet())) {
           if (LessResourceDescriptionStrategy.STYLESHEET_NAME.equals(objectDesc.getQualifiedName())) {
@@ -186,7 +186,7 @@ public class LessImportStatementResolver {
     
     public ImportStatementError getError() { checkCycle(); return this.error; }
     public boolean hasError() { checkCycle(); return this.error != null; }
-    public URI getURI() { return this.absoluteURI; }
+    public URI getURI() { return this.uri; }
     public boolean isLocalAndLess() { return this.isLocalAndLess; }
     public StyleSheet getImportedStyleSheet() { return this.importedStyleSheet; }
     
@@ -269,18 +269,13 @@ public class LessImportStatementResolver {
   // **************************************************************************
   // Helper functions
   
-  private static URI createAbsoluteURI(String string, URI base) {
-    URI uri = URI.createURI(string);
-    if (uri.isRelative()) {
-      if (uri.hasAbsolutePath()) {
-        uri = URI.createFileURI(uri.path());
-      } else {
-        uri = uri.resolve(base);
-      }
-    }
-    return uri;
+  private static URI createURI(String string) {
+    if (string.startsWith("/"))
+      return URI.createFileURI(string);
+    else
+      return URI.createURI(string);
   }
-  
+
   private static Set<String> LOCAL_SCHEMES = new HashSet<String>(
       Arrays.asList(new String[]{"file", "platform"}));
   
