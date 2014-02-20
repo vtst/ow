@@ -67,7 +67,7 @@ public class LessImportStatementResolver {
 
   private IResourceDescription getResourceDescription(Resource resource, URI uri) {
     LoadOnDemandResourceDescriptions lodrd = loadOnDemandDescriptions.get();
-    lodrd.initialize(new IResourceDescriptions.NullImpl(), Collections.singleton(uri), resource);
+    lodrd.initialize(new IResourceDescriptions.NullImpl(), Collections.<URI>emptyList(), resource);
     try {
       IResourceDescription rd = lodrd.getResourceDescription(uri);
       return rd;
