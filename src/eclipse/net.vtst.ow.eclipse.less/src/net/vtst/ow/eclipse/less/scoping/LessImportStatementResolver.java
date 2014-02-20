@@ -1,13 +1,13 @@
 package net.vtst.ow.eclipse.less.scoping;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 
+import net.vtst.ow.eclipse.less.LessMessages;
 import net.vtst.ow.eclipse.less.LessRuntimeModule;
 import net.vtst.ow.eclipse.less.less.Block;
 import net.vtst.ow.eclipse.less.less.BlockUtils;
@@ -17,243 +17,275 @@ import net.vtst.ow.eclipse.less.less.LessPackage;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
 import net.vtst.ow.eclipse.less.less.TerminatedMixin;
 import net.vtst.ow.eclipse.less.less.ToplevelRuleSet;
-import net.vtst.ow.eclipse.less.less.ToplevelStatement;
 import net.vtst.ow.eclipse.less.parser.LessValueConverterService;
-import net.vtst.ow.eclipse.less.properties.LessProjectProperty;
+import net.vtst.ow.eclipse.less.resource.LessResourceDescriptionStrategy;
 
-import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.resource.IEObjectDescription;
 import org.eclipse.xtext.resource.IResourceDescription;
 import org.eclipse.xtext.resource.IResourceDescriptions;
 import org.eclipse.xtext.scoping.impl.LoadOnDemandResourceDescriptions;
 import org.eclipse.xtext.util.IResourceScopeCache;
 import org.eclipse.xtext.util.Tuples;
+import org.eclipse.xtext.validation.ValidationMessageAcceptor;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-/**
- * Helper class to resolve the import statements, and get the statements of the imported files.
- * @author Vincent Simonet
- */
 public class LessImportStatementResolver {
-  
-  // The cache contains two kinds of entries:
-  // - (ImportInfo.class, importStatement), for the import info of an import statement.
-  // - (LessImportStatementResolver.class, stylesheet), for the set of import statements of
-  //   a stylesheet.
+
+  // The cache contains:
+  // - (ResolvedImportStatement.class, ImportStatement) => ResolvedImportStatement
+  // - (LessImportStatementResolver2.class, StyleSheet) -> Iterable<ResolvedImportStatement>
   @Inject
   private IResourceScopeCache cache;
-  
+
   @Inject
   private Provider<LoadOnDemandResourceDescriptions> loadOnDemandDescriptions;
-  
-  @Inject
-  private LessProjectProperty projectProperty;
-    
-  // **************************************************************************
-  // Retrieving imported statements (for scope computation)
-  
-  /**
-   * Compute the set of statements which are imported by an import statement.
-   * @param importStatement  The import statement to resolve.
-   * @return  The list of top-level statements of the imported stylesheets.
-   */
-  public Iterable<ToplevelStatement> getImportedStatements(final ImportStatement importStatement) {
-    ImportInfo importInfo = getImportInfo(importStatement);
-    if (!importInfo.isLessFile() || !importInfo.isValid()) return Collections.emptyList();
-    StyleSheet styleSheet = importInfo.getImportedStyleSheet();
-    if (styleSheet == null) return Collections.emptyList();
-    return styleSheet.getStatements();
-  }
-  
-  // **************************************************************************
-  // Validating imports
 
-  public static enum ImportStatementCheckResult {
-    OK,
-    LOOP,
-    INVALID_URI,
-    INVALID_FORMAT
-  }
-  
-  public ImportStatementCheckResult checkImportStatement(ImportStatement importStatement) {
-    Resource resource = importStatement.eResource();
-    ImportInfo importInfo = getImportInfo(importStatement);
-    if (!importInfo.isValid()) return ImportStatementCheckResult.INVALID_URI;
-    if (!checkImportStatementFormat(importStatement)) return ImportStatementCheckResult.INVALID_FORMAT;
-    if (isImportLoop(resource, resource, importInfo, new HashSet<URI>()))
-      return ImportStatementCheckResult.LOOP;
-    else
-      return ImportStatementCheckResult.OK;
-  }
+  // **************************************************************************
+  // Supported import formats
   
   private static String FORMAT_INLINE = "inline";
   private static String FORMAT_REFERENCE = "reference";
   
-  private static Set<String> importFormats = new HashSet<String>(
-      Arrays.asList(new String[]{LessRuntimeModule.LESS_EXTENSION, LessRuntimeModule.CSS_EXTENSION, FORMAT_INLINE, FORMAT_REFERENCE}));
+  private static Set<String> SUPPORTED_FORMATS = new HashSet<String>(
+      Arrays.asList(new String[]{
+          LessRuntimeModule.LESS_EXTENSION, LessRuntimeModule.CSS_EXTENSION, FORMAT_INLINE, FORMAT_REFERENCE}));
   
-  private boolean checkImportStatementFormat(ImportStatement importStatement) {
-    String format = importStatement.getFormat();
-    return format == null || importFormats.contains(format);
-  }
+  // **************************************************************************
+  // Containers
+
+  // @Inject
+  // private IContainer.Manager containerManager;
   
-  private Iterable<ImportStatement> getImportStatements(final StyleSheet styleSheet) {
-    return cache.get(Tuples.pair(LessImportStatementResolver.class, styleSheet), styleSheet.eResource(), new Provider<Iterable<ImportStatement>>() {
-      public Iterable<ImportStatement> get() {
-        LinkedList<ImportStatement> list = new LinkedList<ImportStatement>();
-        addImportStatements(list, styleSheet.getStatements());
-        return list;
-      }
-    });
-  }
-  
-  private void addImportStatements(List<ImportStatement> list, Iterable<? extends EObject> statements) {
-    for (EObject statement : statements) {
-      if (statement instanceof ImportStatement) {
-        list.add((ImportStatement) statement);
-      } else if (statement instanceof ToplevelRuleSet) {
-        addImportStatements(list, ((ToplevelRuleSet) statement).getBlock());
-      } else if (statement instanceof InnerRuleSet) {
-        addImportStatements(list, ((InnerRuleSet) statement).getBlock());
-      } else if (statement instanceof TerminatedMixin) {
-        addImportStatements(list, ((TerminatedMixin) statement).getBody());        
-      }
-    }    
-  }
-  
-  private void addImportStatements(List<ImportStatement> list, Block block) {
-    if (block != null) addImportStatements(list, BlockUtils.iterator(block));
-  }
-  
-  private boolean isImportLoop(Resource resource, Resource rootResource, ImportInfo importInfo, Set<URI> visitedURIs) {
-    if (!importInfo.isLessFile() || !importInfo.isValid() || !visitedURIs.add(importInfo.uri)) return false;
-    StyleSheet importedStyleSheet = importInfo.getImportedStyleSheet();
-    if (importedStyleSheet == null) return false;
-    if (importedStyleSheet.eResource().equals(rootResource)) return true;
-    for (ImportStatement statement : getImportStatements(importedStyleSheet)) {
-      if (isImportLoop(importedStyleSheet.eResource(), rootResource, getImportInfo(statement), visitedURIs))
-        return true;      
-    }
-    return false;
+  // @Inject
+  // private IResourceDescriptions resourceDescriptions;
+
+  private IResourceDescription getResourceDescription(Resource resource, URI uri) {
+    LoadOnDemandResourceDescriptions lodrd = loadOnDemandDescriptions.get();
+    lodrd.initialize(new IResourceDescriptions.NullImpl(), Collections.singleton(uri), resource);
+    try {
+      IResourceDescription rd = lodrd.getResourceDescription(uri);
+      return rd;
+    } catch (IllegalStateException e) {
+      // If the imported file does not have the expected content type, it is not controlled by XText, so we cannot load its
+      // resource.
+      return null;
+    }      
   }
   
   // **************************************************************************
-  // Getting imported style sheets
-
-  private static Pattern URI_WITH_EXTENSION = Pattern.compile("(.*[.][a-z]*)|(.*[?;].*)");
+  // Class ResolvedImportStatement
   
-  public ImportInfo getImportInfo(final ImportStatement importStatement) {
-    return cache.get(Tuples.pair(ImportInfo.class, importStatement), importStatement.eResource(), new Provider<ImportInfo>() {
-      public ImportInfo get() {
-        return new ImportInfo(importStatement);
+  public ResolvedImportStatement resolve(final ImportStatement statement) {
+    return cache.get(Tuples.pair(ResolvedImportStatement.class, statement), statement.eResource(), new Provider<ResolvedImportStatement>() {
+      public ResolvedImportStatement get() {
+        return new ResolvedImportStatement(statement);
       }
     });
   }
+
+  @Inject
+  private LessMessages messages;
+
+  public enum ImportStatementErrorLevel { ERROR, WARNING }
+
+  public class ImportStatementError {
     
-  public class ImportInfo {
-    public URI uri;
-    public String format;
-    private ImportStatement importStatement;
-    
-    ImportInfo(ImportStatement importStatement) {
-      this.importStatement = importStatement;
-      this.uri = resolveURI(LessValueConverterService.getStringValue(importStatement.getUri()));
-      this.format = importStatement.getFormat();
-      if (this.format == null) {
-        if (!URI_WITH_EXTENSION.matcher(uri.toString()).matches())
-          uri = uri.appendFileExtension(LessRuntimeModule.LESS_EXTENSION);
-        this.format = uri.fileExtension();
-      }
-    }
-    
-    private IProject getProject(Resource resource) {
-      URI uri = resource.getURI();
-      IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(uri.toPlatformString(true)));
-      if (file == null) return null;
-      return file.getProject();
-    }
-    
-    private URI resolveURI(String stringUri) {
-      URI uri = URI.createURI(stringUri);
-      if (uri.isFile()) {
-        if (EcoreUtil2.isValidUri(this.importStatement, uri)) {
-          return uri;
-        } else if (uri.isRelative()) {
-          // If the URI is relative, but not valid, try to resolve it with an include path.
-          IProject project = getProject(this.importStatement.eResource());
-          if (project != null) {
-            for (IContainer container: projectProperty.getIncludePaths(project)) {
-              if (container.exists()) {
-                IFile file = container.getFile(new Path(stringUri));
-                if (file.exists()) {
-                  return URI.createFileURI(file.getLocation().toString());
-                }
-              }
-            }
-          }          
-        }
-        // If all above failed, this is not a valid URI.
-        return null;
-      } else {
-        // Non-file URI are always considered as valid.
-        return uri;
-      }
-    }
-    
-    public boolean isValid() {
-      return this.uri != null;
-    }
-    
-    public boolean isLessFile() {
-      return (LessRuntimeModule.LESS_EXTENSION.equals(this.format) ||
-          LessImportStatementResolver.FORMAT_REFERENCE.equals(this.format)) &&
-          uri.isFile();
+    private ImportStatementErrorLevel level;
+    private EStructuralFeature feature;
+    private String messageKey;
+    private String[] messageValues;
+
+    public ImportStatementError(ImportStatementErrorLevel level, EStructuralFeature feature, String messageKey, String... messageValues) {
+      this.level = level;
+      this.feature = feature;
+      this.messageKey = messageKey;
+      this.messageValues = messageValues;
     }
 
-    private IResourceDescription getResourceDescription() {
-      LoadOnDemandResourceDescriptions resourceDescriptions = loadOnDemandDescriptions.get();
-      resourceDescriptions.initialize(new IResourceDescriptions.NullImpl(), Collections.singleton(this.uri), this.importStatement.eResource());
-      try {
-        return resourceDescriptions.getResourceDescription(this.uri);
-      } catch (IllegalStateException e) {
-        // If the imported file does not have the expected content type, it is not controlled by XText, so we cannot load its
-        // resource.
-        return null;
-      }      
+    public void report(ImportStatement importStatement, ValidationMessageAcceptor acceptor) {
+      switch (this.level) {
+      case ERROR:
+        acceptor.acceptError(messages.format(this.messageKey, this.messageValues), importStatement, this.feature, 0, null);
+        break;
+      case WARNING:
+        acceptor.acceptWarning(messages.format(this.messageKey, this.messageValues), importStatement, this.feature, 0, null);
+        break;
+      }
     }
     
-    private StyleSheet getImportedStyleSheetInternal() {
-      if (this.isLessFile()) {
-        IResourceDescription resourceDescription = getResourceDescription();
-        if (resourceDescription == null) return null;
-        for (IEObjectDescription objectDescription: resourceDescription.getExportedObjectsByType(LessPackage.eINSTANCE.getStyleSheet())) {
-          EObject object = objectDescription.getEObjectOrProxy();
-          if (object instanceof StyleSheet) return (StyleSheet) object;
+  }
+    
+  public class ResolvedImportStatement {
+    
+    private ImportStatement statement;
+    private URI absoluteURI;
+    private ImportStatementError error;
+    private boolean isLocalAndLess;
+    private StyleSheet importedStyleSheet;
+
+    public ResolvedImportStatement(ImportStatement statement) {
+      this.statement = statement;
+      // Parse the URI argument.
+      try {
+        this.absoluteURI = createAbsoluteURI(LessValueConverterService.getStringValue(statement.getUri()), statement.eResource().getURI());
+      } catch (IllegalArgumentException exn) {
+        this.error = new ImportStatementError(ImportStatementErrorLevel.ERROR, LessPackage.eINSTANCE.getImportStatement_Uri(), "import_statement_error_illegal_uri", exn.getMessage());
+        return;
+      }
+      // Determine the format.
+      if (statement.getFormat() == null) {
+        this.isLocalAndLess = LessRuntimeModule.LESS_EXTENSION.equals(this.absoluteURI.fileExtension()) && isLocalURI(this.absoluteURI);
+      } else {
+        if (SUPPORTED_FORMATS.contains(statement.getFormat())) {
+          this.isLocalAndLess = LessRuntimeModule.LESS_EXTENSION.equals(statement.getFormat()) && isLocalURI(this.absoluteURI);
+        } else {
+          this.error = new ImportStatementError(ImportStatementErrorLevel.ERROR, LessPackage.eINSTANCE.getImportStatement_Format(), "import_statement_error_unknown_format", statement.getFormat());
+          return;
         }
       }
-      return null;
+      // Set the imported stylesheet.
+      if (this.isLocalAndLess) {
+        if (!this.setImportedStyleSheet()) {
+          this.error = new ImportStatementError(ImportStatementErrorLevel.ERROR, LessPackage.eINSTANCE.getImportStatement_Uri(), "import_statement_error_file_not_found", statement.getFormat());
+          return;
+        }
+      }
     }
     
-    private boolean lazyStyleSheet = true;
-    private StyleSheet styleSheet;
-    
-    public StyleSheet getImportedStyleSheet() {
-      if (lazyStyleSheet) {
-        lazyStyleSheet = false;
-        styleSheet = getImportedStyleSheetInternal();
+    private boolean setImportedStyleSheet() {
+      IResourceDescription desc = getResourceDescription(this.statement.eResource(), this.absoluteURI);
+      if (desc != null) {
+        for (IEObjectDescription objectDesc : desc.getExportedObjectsByType(LessPackage.eINSTANCE.getStyleSheet())) {
+          if (LessResourceDescriptionStrategy.STYLESHEET_NAME.equals(objectDesc.getQualifiedName())) {
+            EObject obj = objectDesc.getEObjectOrProxy();
+            if (obj instanceof StyleSheet) {
+              this.importedStyleSheet = (StyleSheet) obj;
+              return true;
+            }
+          }
+        }
       }
-      return styleSheet;
-      
+      return false;
+    }
+    
+    private LazyImportCycleDetector cycleDetector = null;
+    private void checkCycle() {
+      if (this.cycleDetector == null) {
+        this.cycleDetector = new LazyImportCycleDetector(this);
+        if (this.cycleDetector.isCycleRoot() && this.error == null) {
+          this.error = new ImportStatementError(ImportStatementErrorLevel.ERROR, LessPackage.eINSTANCE.getImportStatement_Uri(), "import_loop");
+        }
+      }
+    }
+    
+    public ImportStatementError getError() { checkCycle(); return this.error; }
+    public boolean hasError() { checkCycle(); return this.error != null; }
+    public URI getURI() { return this.absoluteURI; }
+    public boolean isLocalAndLess() { return this.isLocalAndLess; }
+    public StyleSheet getImportedStyleSheet() { return this.importedStyleSheet; }
+    
+  }
+  
+  // **************************************************************************
+  // Class ResolvedImportStatementsProvider
+  
+  private class ResolvedImportStatementsProvider implements Provider<Iterable<ResolvedImportStatement>> {
+    
+    private StyleSheet styleSheet;
+    private List<ResolvedImportStatement> statements;
+    
+    private ResolvedImportStatementsProvider(StyleSheet styleSheet) {
+      this.styleSheet = styleSheet;
+    }
+    
+    private void visit(Block block) {
+      if (block != null) visit(BlockUtils.iterator(block));
+    }
+
+    private void visit(Iterable<? extends EObject> statements) {
+      for (EObject statement : statements) {
+        if (statement instanceof ImportStatement) {
+          this.statements.add(resolve((ImportStatement) statement));
+        } else if (statement instanceof ToplevelRuleSet) {
+          visit(((ToplevelRuleSet) statement).getBlock());
+        } else if (statement instanceof InnerRuleSet) {
+          visit(((InnerRuleSet) statement).getBlock());
+        } else if (statement instanceof TerminatedMixin) {
+          visit(((TerminatedMixin) statement).getBody());        
+        }
+      }
+    }
+    
+    public Iterable<ResolvedImportStatement> get() { 
+      this.statements = new ArrayList<ResolvedImportStatement>();
+      try {
+        visit(this.styleSheet.getStatements());
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+      return this.statements;
     }
   }
+  
+  private Iterable<ResolvedImportStatement> getResolvedImportStatements(StyleSheet styleSheet) {
+    return cache.get(
+        Tuples.pair(LessImportStatementResolver.class, styleSheet),
+        styleSheet.eResource(),
+        new ResolvedImportStatementsProvider(styleSheet));
+  }
+
+  // **************************************************************************
+  // Class LazyImportCycleDetector
+  
+  private class LazyImportCycleDetector {
+    
+    private boolean isCycleRoot;
+    private Set<URI> visitedURIs = new HashSet<URI>();
+
+    private LazyImportCycleDetector(ResolvedImportStatement statement) {
+      visit(statement);
+      this.isCycleRoot = this.visitedURIs.contains(statement.getURI());
+    }
+    
+    private void visit(ResolvedImportStatement statement) {
+      StyleSheet styleSheet = statement.getImportedStyleSheet();
+      if (styleSheet != null) {
+        for (ResolvedImportStatement statement2 : getResolvedImportStatements(styleSheet)) {
+          if (this.visitedURIs.add(statement2.getURI())) visit(statement2);
+        }
+      }
+    }
+    
+    private boolean isCycleRoot() { return this.isCycleRoot; }
+    
+  }
+
+  // **************************************************************************
+  // Helper functions
+  
+  private static URI createAbsoluteURI(String string, URI base) {
+    URI uri = URI.createURI(string);
+    if (uri.isRelative()) {
+      if (uri.hasAbsolutePath()) {
+        uri = URI.createFileURI(uri.path());
+      } else {
+        uri = uri.resolve(base);
+      }
+    }
+    return uri;
+  }
+  
+  private static Set<String> LOCAL_SCHEMES = new HashSet<String>(
+      Arrays.asList(new String[]{"file", "platform"}));
+  
+  private static boolean isLocalURI(URI uri) {
+    return uri.isRelative() || LOCAL_SCHEMES.contains(uri.scheme());
+  }
+
 }

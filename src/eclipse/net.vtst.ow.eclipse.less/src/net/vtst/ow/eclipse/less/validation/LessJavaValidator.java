@@ -46,8 +46,8 @@ import net.vtst.ow.eclipse.less.less.VariableDefinition;
 import net.vtst.ow.eclipse.less.linking.LessMixinLinkingService;
 import net.vtst.ow.eclipse.less.linking.LessMixinLinkingService.ICheckMixinError;
 import net.vtst.ow.eclipse.less.linking.LessMixinLinkingService.MixinLink;
-import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver2;
-import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver2.ResolvedImportStatement;
+import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver;
+import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver.ResolvedImportStatement;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EAttribute;
@@ -63,7 +63,7 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   private LessMessages messages;
   
   @Inject
-  private LessImportStatementResolver2 importStatementResolver2;
+  private LessImportStatementResolver importStatementResolver2;
 
   @Inject
   private LessMixinLinkingService mixinLinkingService;

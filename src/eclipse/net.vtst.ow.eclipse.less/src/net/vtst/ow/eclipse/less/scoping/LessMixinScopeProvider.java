@@ -13,8 +13,7 @@ import net.vtst.ow.eclipse.less.less.SimpleSelector;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
 import net.vtst.ow.eclipse.less.less.ToplevelRuleSet;
 import net.vtst.ow.eclipse.less.less.ToplevelSelector;
-import net.vtst.ow.eclipse.less.less.ToplevelStatement;
-import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver2.ResolvedImportStatement;
+import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver.ResolvedImportStatement;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
@@ -43,9 +42,6 @@ public class LessMixinScopeProvider {
 
   @Inject
   private LessImportStatementResolver importStatementResolver;
-
-  @Inject
-  private LessImportStatementResolver2 importStatementResolver2;
 
   /**
    * Main entry point.  Results are memoized.
@@ -112,7 +108,7 @@ public class LessMixinScopeProvider {
     } else {
       for (EObject obj : statements) {
         if (obj instanceof ImportStatement) {
-          ResolvedImportStatement resolvedImportStatement = importStatementResolver2.resolve((ImportStatement) obj);
+          ResolvedImportStatement resolvedImportStatement = importStatementResolver.resolve((ImportStatement) obj);
           if (!resolvedImportStatement.hasError()) {
             // There is no cycle, and the imported stylesheet is not null.
             fillScope(scope, resolvedImportStatement.getImportedStyleSheet().getStatements(), position, element);

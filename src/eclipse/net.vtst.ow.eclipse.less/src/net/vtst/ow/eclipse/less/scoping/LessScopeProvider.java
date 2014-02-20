@@ -16,9 +16,8 @@ import net.vtst.ow.eclipse.less.less.MixinParameter;
 import net.vtst.ow.eclipse.less.less.MixinUtils;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
 import net.vtst.ow.eclipse.less.less.TerminatedMixin;
-import net.vtst.ow.eclipse.less.less.ToplevelStatement;
 import net.vtst.ow.eclipse.less.less.VariableDefinition;
-import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver2.ResolvedImportStatement;
+import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver.ResolvedImportStatement;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
@@ -46,9 +45,6 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
   
   @Inject
   private LessImportStatementResolver importStatementResolver;
-
-  @Inject
-  private LessImportStatementResolver2 importStatementResolver2;
 
   @Inject
   private LessMixinScopeProvider mixinScopeProvider;
@@ -126,7 +122,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
       if (statement instanceof VariableDefinition) {
         variableDefinitions.add(getEObjectDescriptionFor(((VariableDefinition) statement).getLhs().getVariable()));
       } else if (statement instanceof ImportStatement) {
-        ResolvedImportStatement resolvedImportStatement = importStatementResolver2.resolve((ImportStatement) statement);
+        ResolvedImportStatement resolvedImportStatement = importStatementResolver.resolve((ImportStatement) statement);
         if (!resolvedImportStatement.hasError()) {
           // There is no cycle, and the imported stylesheet is not null.
           addVariableDefinitions(resolvedImportStatement.getImportedStyleSheet().getStatements(), variableDefinitions);
