@@ -18,8 +18,12 @@ import net.vtst.ow.eclipse.less.less.StyleSheet;
 import net.vtst.ow.eclipse.less.less.TerminatedMixin;
 import net.vtst.ow.eclipse.less.less.ToplevelRuleSet;
 import net.vtst.ow.eclipse.less.parser.LessValueConverterService;
+import net.vtst.ow.eclipse.less.properties.LessProjectProperty;
 import net.vtst.ow.eclipse.less.resource.LessResourceDescriptionStrategy;
 
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
@@ -45,6 +49,9 @@ public class LessImportStatementResolver {
 
   @Inject
   private Provider<LoadOnDemandResourceDescriptions> loadOnDemandDescriptions;
+  
+  @Inject
+  private LessProjectProperty projectProperty;
 
   // **************************************************************************
   // Supported import formats
@@ -65,7 +72,7 @@ public class LessImportStatementResolver {
   // @Inject
   // private IResourceDescriptions resourceDescriptions;
 
-  private IResourceDescription getResourceDescription(Resource resource, URI uri) {
+  private IResourceDescription loadResourceDescription(Resource resource, URI uri) {
     LoadOnDemandResourceDescriptions lodrd = loadOnDemandDescriptions.get();
     lodrd.initialize(new IResourceDescriptions.NullImpl(), Collections.<URI>emptyList(), resource);
     try {
@@ -76,6 +83,24 @@ public class LessImportStatementResolver {
       // resource.
       return null;
     }      
+  }
+  
+  private IResourceDescription getResourceDescription(Resource resource, URI uri) {
+    IResourceDescription resourceDescription = loadResourceDescription(resource, uri);
+    if (resourceDescription == null && uri.isRelative()) {
+      IProject project = LessProjectProperty.getProject(resource);
+      if (project != null) {
+        for (IContainer container : projectProperty.getIncludePaths(project)) {
+          System.out.println("***");
+          System.out.println(container.getLocationURI().toString());
+          System.out.println(uri.toString());
+          System.out.println(uri.resolve(URI.createURI(container.getLocationURI().toString())));
+          resourceDescription = loadResourceDescription(resource, uri.resolve(URI.createURI(container.getLocationURI().toString() + "/")));
+          if (resourceDescription != null) break;
+        }
+      }
+    }
+    return resourceDescription;
   }
   
   // **************************************************************************

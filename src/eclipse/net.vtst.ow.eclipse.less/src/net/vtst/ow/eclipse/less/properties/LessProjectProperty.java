@@ -12,7 +12,10 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
 
 import com.google.inject.Singleton;
 
@@ -60,6 +63,24 @@ public class LessProjectProperty {
       roots.put(project, result);
     }
     return result;    
+  }
+  
+  /**
+   * Convert EMF URI to Eclipse file
+   */
+  public static IFile getFile(URI uri) {
+    String platformString = uri.toPlatformString(true);
+    if (platformString != null) {
+      Path path = new Path(platformString);
+      return ResourcesPlugin.getWorkspace().getRoot().getFile(path);
+    }
+    return null;
+  }
+
+  public static IProject getProject(Resource resource) {
+    IFile file = getFile(resource.getURI());
+    if (file != null) return file.getProject();
+    else return null;
   }
   
 }
