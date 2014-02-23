@@ -91,10 +91,6 @@ public class LessImportStatementResolver {
       IProject project = LessProjectProperty.getProject(resource);
       if (project != null) {
         for (IContainer container : projectProperty.getIncludePaths(project)) {
-          System.out.println("***");
-          System.out.println(container.getLocationURI().toString());
-          System.out.println(uri.toString());
-          System.out.println(uri.resolve(URI.createURI(container.getLocationURI().toString())));
           resourceDescription = loadResourceDescription(resource, uri.resolve(URI.createURI(container.getLocationURI().toString() + "/")));
           if (resourceDescription != null) break;
         }
