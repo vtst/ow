@@ -23,7 +23,6 @@ import net.vtst.ow.eclipse.less.resource.LessResourceDescriptionStrategy;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
