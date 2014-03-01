@@ -27,7 +27,6 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.xtext.resource.IEObjectDescription;
 import org.eclipse.xtext.resource.IResourceDescription;
 import org.eclipse.xtext.resource.IResourceDescriptions;
 import org.eclipse.xtext.scoping.impl.LoadOnDemandResourceDescriptions;
@@ -181,15 +180,8 @@ public class LessImportStatementResolver {
     private boolean setImportedStyleSheet() {
       IResourceDescription desc = getResourceDescription(this.statement.eResource(), this.uri);
       if (desc != null) {
-        for (IEObjectDescription objectDesc : desc.getExportedObjectsByType(LessPackage.eINSTANCE.getStyleSheet())) {
-          if (LessResourceDescriptionStrategy.STYLESHEET_NAME.equals(objectDesc.getQualifiedName())) {
-            EObject obj = objectDesc.getEObjectOrProxy();
-            if (obj instanceof StyleSheet) {
-              this.importedStyleSheet = (StyleSheet) obj;
-              return true;
-            }
-          }
-        }
+        this.importedStyleSheet = LessResourceDescriptionStrategy.getStyleSheet(desc);
+        if (this.importedStyleSheet != null) return true;
       }
       return false;
     }
@@ -209,6 +201,7 @@ public class LessImportStatementResolver {
     public URI getURI() { return this.uri; }
     public boolean isLocalAndLess() { return this.isLocalAndLess; }
     public StyleSheet getImportedStyleSheet() { return this.importedStyleSheet; }
+    public ImportStatement getStatement() { return this.statement; }
     
   }
   
@@ -253,7 +246,7 @@ public class LessImportStatementResolver {
     }
   }
   
-  private Iterable<ResolvedImportStatement> getResolvedImportStatements(StyleSheet styleSheet) {
+  public Iterable<ResolvedImportStatement> getResolvedImportStatements(StyleSheet styleSheet) {
     return cache.get(
         Tuples.pair(LessImportStatementResolver.class, styleSheet),
         styleSheet.eResource(),
