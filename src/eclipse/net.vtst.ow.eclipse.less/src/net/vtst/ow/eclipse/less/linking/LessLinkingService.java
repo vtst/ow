@@ -8,15 +8,11 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.xtext.linking.impl.DefaultLinkingService;
 import org.eclipse.xtext.linking.impl.IllegalNodeException;
-import org.eclipse.xtext.naming.IQualifiedNameConverter;
 import org.eclipse.xtext.nodemodel.INode;
 
 import com.google.inject.Inject;
 
 public class LessLinkingService extends DefaultLinkingService {
-  
-  @Inject
-  private IQualifiedNameConverter qualifiedNameConverter;
   
   @Inject
   private LessMixinLinkingService mixinLinkingService;
