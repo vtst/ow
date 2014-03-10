@@ -68,11 +68,14 @@ public class LessProjectProperty {
   /**
    * Convert EMF URI to Eclipse file
    */
+  @SuppressWarnings("deprecation")
   public static IFile getFile(URI uri) {
-    String platformString = uri.toPlatformString(true);
-    if (platformString != null) {
-      Path path = new Path(platformString);
-      return ResourcesPlugin.getWorkspace().getRoot().getFile(path);
+    if (uri.isPlatform()) {
+      return ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(uri.toPlatformString(true)));
+    } else if (uri.isFile()) {
+      for (IFile file: ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(new Path(uri.toFileString()))) {
+        return file;
+      }
     }
     return null;
   }
