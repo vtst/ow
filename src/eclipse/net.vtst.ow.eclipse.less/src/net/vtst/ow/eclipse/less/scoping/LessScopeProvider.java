@@ -9,6 +9,7 @@ import java.util.List;
 import net.vtst.ow.eclipse.less.less.AtVariableDef;
 import net.vtst.ow.eclipse.less.less.AtVariableRefTarget;
 import net.vtst.ow.eclipse.less.less.Block;
+import net.vtst.ow.eclipse.less.less.BlockContents;
 import net.vtst.ow.eclipse.less.less.BlockUtils;
 import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.less.LessPackage;
@@ -31,6 +32,8 @@ import org.eclipse.xtext.scoping.impl.MapBasedScope;
 import org.eclipse.xtext.util.IResourceScopeCache;
 import org.eclipse.xtext.util.Tuples;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
@@ -47,10 +50,20 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
   private LessImportStatementResolver importStatementResolver;
 
   @Inject
-  private LessMixinScopeProvider mixinScopeProvider;
+  private LessImportingStatementFinder importingStatementFinder;
+
+  @Inject
+  private LessMixinScopeProvider mixinScopeProvider;  
       
   private Iterable<EObject> getStyleSheetStatements(StyleSheet styleSheet) {
     return styleSheet.eContents();
+  }
+  
+  private Iterable<EObject> removeStatement(Iterable<EObject> iterable, final EObject eObject) {
+    return Iterables.filter(iterable, new Predicate<EObject>(){
+      public boolean apply(EObject input) {
+        return !eObject.equals(input);
+      }});
   }
 
   // **************************************************************************
@@ -72,7 +85,21 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
   public IScope computeVariableScope(final EObject context, EReference ref) {
     EObject container = context.eContainer();
     if (container == null) {
-      return IScope.NULLSCOPE;
+      if (context instanceof StyleSheet) {
+        ImportStatement importingStatement = importingStatementFinder.getImportingStatement((StyleSheet) context);
+        if (importingStatement != null) {
+          EObject importingContainer = importingStatement.eContainer();
+          if (importingContainer instanceof StyleSheet) {
+            return computeVariableScopeOfStatements(container, removeStatement(getStyleSheetStatements((StyleSheet) container), importingStatement), ref);            
+          } else {
+            while (importingContainer instanceof BlockContents) 
+              importingContainer = importingContainer.eContainer();
+            if (importingContainer instanceof Block) {
+              return computeVariableScopeOfStatements(container, removeStatement(BlockUtils.iterator((Block) importingContainer), importingStatement), ref);            }
+          }
+        }
+        return IScope.NULLSCOPE;
+      }
     } else if (container instanceof Block) {
       return computeVariableScopeOfStatements(container, BlockUtils.iterator((Block) container), ref);
     } else if (container instanceof StyleSheet) {

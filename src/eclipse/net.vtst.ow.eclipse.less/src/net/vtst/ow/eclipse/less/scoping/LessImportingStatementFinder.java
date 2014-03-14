@@ -49,11 +49,17 @@ public class LessImportingStatementFinder implements IResourceChangeListener {
   }
   
   public ImportStatement getImportingStatement(StyleSheet styleSheet) {
-    ResourceAdapter adapter = this.getOrCreateResourceAdapter(styleSheet);
-    if (adapter.getProjectAdapter().hasRoots())
-      return adapter.getImportingStatement();
-    else
+    try {
+      ResourceAdapter adapter = this.getOrCreateResourceAdapter(styleSheet);
+      if (adapter.getProjectAdapter().hasRoots()) {
+        return adapter.getImportingStatement();
+      } else {
+        return null;
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
       return null;
+    }
   }
       
 
@@ -91,34 +97,42 @@ public class LessImportingStatementFinder implements IResourceChangeListener {
   // **************************************************************************
   // ProjectAdapter
 
-  private ProjectAdapter getOrCreateProjectAdapter(IProject project) {
+  private ProjectAdapter getOrCreateProjectAdapter(Resource context, IProject project) {
     ProjectAdapter adapter = projectAdapters.get(project);
     if (adapter == null) {
-      adapter = new ProjectAdapter(project);
+      adapter = new ProjectAdapter(context, project);
       projectAdapters.put(project, adapter);
+      adapter.update();
     }
     return adapter;
   }
 
   private class ProjectAdapter {
 
+    // TODO: What to do if the context is deleted?
+    private Resource context;
     private IProject project;
     private boolean hasRoots;
 
-    public ProjectAdapter(IProject project) {
+    public ProjectAdapter(Resource context, IProject project) {
+      this.context = context;
       this.project = project;
-      this.update();
+    }
+    
+    private StyleSheet getStyleSheet(URI uri) {
+      // TODO: This could be simplified.  As uri is absolute, we don't need context.
+      IResourceDescription resourceDescription = importStatementResolver.loadResourceDescription(this.context, uri);
+      // IResourceDescription resourceDescription = resourceDescriptions.getResourceDescription(uri);
+      if (resourceDescription == null) return null;
+      return LessResourceDescriptionStrategy.getStyleSheet(resourceDescription);      
     }
     
     private void update() {
       this.hasRoots = false;
       for (IFile file : projectProperty.getRoots(project)) {
         this.hasRoots = true;
-        IResourceDescription resourceDescription = resourceDescriptions.getResourceDescription(URI.createURI(file.getLocationURI().toString()));
-        if (resourceDescription == null) break;
-        StyleSheet styleSheet = LessResourceDescriptionStrategy.getStyleSheet(resourceDescription);
-        if (styleSheet == null) break;
-        getOrCreateResourceAdapter(styleSheet);
+        StyleSheet styleSheet = getStyleSheet(URI.createURI(file.getLocationURI().toString()));
+        if (styleSheet != null) getOrCreateResourceAdapter(styleSheet);
       }
     }
     
@@ -133,9 +147,10 @@ public class LessImportingStatementFinder implements IResourceChangeListener {
     ResourceAdapter adapter = (ResourceAdapter) EcoreUtil.getAdapter(styleSheet.eResource().eAdapters(), ResourceAdapter.class);
     if (adapter == null) {
       IProject project = LessProjectProperty.getProject(styleSheet.eResource());
-      ProjectAdapter projectAdapter = this.getOrCreateProjectAdapter(project);
+      ProjectAdapter projectAdapter = this.getOrCreateProjectAdapter(styleSheet.eResource(), project);
       adapter = new ResourceAdapter(projectAdapter, styleSheet);
       styleSheet.eResource().eAdapters().add(adapter);
+      adapter.update();
     }
     return adapter;
   }
@@ -150,7 +165,6 @@ public class LessImportingStatementFinder implements IResourceChangeListener {
     private ResourceAdapter(ProjectAdapter projectAdapter, StyleSheet styleSheet) {
       this.projectAdapter = projectAdapter;
       this.styleSheet = styleSheet;
-      update();
     }
     
     private ProjectAdapter getProjectAdapter() {
@@ -187,6 +201,7 @@ public class LessImportingStatementFinder implements IResourceChangeListener {
     
     private void addImportingStatement(Resource resource, ImportStatement statement) {
       if (this.importingStatements.put(resource, statement) != null) {
+        // TODO: Do this handle properly the case of multiple import statements from the same or different resources?
         this.importingStatements.put(resource, null);
       }
     }
