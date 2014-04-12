@@ -1,6 +1,7 @@
 package net.vtst.ow.eclipse.less.scoping;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
 import net.vtst.ow.eclipse.less.properties.LessProjectProperty;
 import net.vtst.ow.eclipse.less.resource.LessResourceDescriptionStrategy;
+import net.vtst.ow.eclipse.less.resource.ResourceDescriptionLoader;
 import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver.ResolvedImportStatement;
 
 import org.eclipse.core.resources.IFile;
@@ -22,12 +24,15 @@ import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EContentAdapter;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.xtext.resource.IResourceDescription;
 import org.eclipse.xtext.resource.IResourceDescriptions;
+import org.eclipse.xtext.scoping.impl.LoadOnDemandResourceDescriptions;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 @Singleton
@@ -40,7 +45,7 @@ public class LessImportingStatementFinder implements IResourceChangeListener {
   private LessProjectProperty projectProperty;
   
   @Inject
-  private IResourceDescriptions resourceDescriptions;
+  private ResourceDescriptionLoader resourceDescriptionLoader;
   
   private Map<IProject, ProjectAdapter> projectAdapters = new HashMap<IProject, ProjectAdapter>();
   
@@ -61,7 +66,6 @@ public class LessImportingStatementFinder implements IResourceChangeListener {
       return null;
     }
   }
-      
 
   // **************************************************************************
   // IResourceChangeListener
@@ -97,32 +101,29 @@ public class LessImportingStatementFinder implements IResourceChangeListener {
   // **************************************************************************
   // ProjectAdapter
 
-  private ProjectAdapter getOrCreateProjectAdapter(Resource context, IProject project) {
+  private ProjectAdapter getOrCreateProjectAdapter(ResourceSet resourceSet, IProject project) {
     ProjectAdapter adapter = projectAdapters.get(project);
     if (adapter == null) {
-      adapter = new ProjectAdapter(context, project);
+      adapter = new ProjectAdapter(resourceSet, project);
       projectAdapters.put(project, adapter);
       adapter.update();
     }
     return adapter;
   }
-
+  
   private class ProjectAdapter {
 
-    // TODO: What to do if the context is deleted?
-    private Resource context;
+    private ResourceSet resourceSet;
     private IProject project;
     private boolean hasRoots;
 
-    public ProjectAdapter(Resource context, IProject project) {
-      this.context = context;
+    public ProjectAdapter(ResourceSet resourceSet, IProject project) {
+      this.resourceSet = resourceSet;
       this.project = project;
     }
-    
+        
     private StyleSheet getStyleSheet(URI uri) {
-      // TODO: This could be simplified.  As uri is absolute, we don't need context.
-      IResourceDescription resourceDescription = importStatementResolver.loadResourceDescription(this.context, uri);
-      // IResourceDescription resourceDescription = resourceDescriptions.getResourceDescription(uri);
+      IResourceDescription resourceDescription = resourceDescriptionLoader.getResourceDescription(this.resourceSet, uri);
       if (resourceDescription == null) return null;
       return LessResourceDescriptionStrategy.getStyleSheet(resourceDescription);      
     }
@@ -142,12 +143,12 @@ public class LessImportingStatementFinder implements IResourceChangeListener {
 
   // **************************************************************************
   // ResourceAdapter
-
+    
   private ResourceAdapter getOrCreateResourceAdapter(StyleSheet styleSheet) {
     ResourceAdapter adapter = (ResourceAdapter) EcoreUtil.getAdapter(styleSheet.eResource().eAdapters(), ResourceAdapter.class);
     if (adapter == null) {
       IProject project = LessProjectProperty.getProject(styleSheet.eResource());
-      ProjectAdapter projectAdapter = this.getOrCreateProjectAdapter(styleSheet.eResource(), project);
+      ProjectAdapter projectAdapter = this.getOrCreateProjectAdapter(styleSheet.eResource().getResourceSet(), project);
       adapter = new ResourceAdapter(projectAdapter, styleSheet);
       styleSheet.eResource().eAdapters().add(adapter);
       adapter.update();
@@ -224,8 +225,9 @@ public class LessImportingStatementFinder implements IResourceChangeListener {
     
     private ImportStatement getImportingStatement() {
       if (this.importingStatements.size() == 1) {
-        for (Entry<Resource, ImportStatement> entry: this.importingStatements.entrySet())
+        for (Entry<Resource, ImportStatement> entry: this.importingStatements.entrySet()) {
           return entry.getValue();
+        }
       }
       return null;
     }
