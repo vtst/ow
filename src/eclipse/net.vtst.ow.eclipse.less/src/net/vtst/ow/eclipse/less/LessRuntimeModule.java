@@ -14,10 +14,13 @@ import net.vtst.ow.eclipse.less.parser.LessQualifiedNameConverter;
 import net.vtst.ow.eclipse.less.parser.LessValueConverterService;
 import net.vtst.ow.eclipse.less.resource.LessLocationInFileProvider;
 import net.vtst.ow.eclipse.less.resource.LessResourceDescriptionStrategy;
+import net.vtst.ow.eclipse.less.resource.LessSynchronizedXtextResourceSet;
+import net.vtst.ow.eclipse.less.resource.LessXtextResourceSet;
 import net.vtst.ow.eclipse.less.scoping.LessMixinScopeProvider;
 import net.vtst.ow.eclipse.less.scoping.LessQualifiedNameProvider;
 
 import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.xtext.conversion.IValueConverterService;
 import org.eclipse.xtext.linking.ILinkingDiagnosticMessageProvider;
 import org.eclipse.xtext.linking.ILinkingService;
@@ -25,6 +28,8 @@ import org.eclipse.xtext.naming.IQualifiedNameConverter;
 import org.eclipse.xtext.parsetree.reconstr.IHiddenTokenHelper;
 import org.eclipse.xtext.resource.IDefaultResourceDescriptionStrategy;
 import org.eclipse.xtext.resource.ILocationInFileProvider;
+import org.eclipse.xtext.resource.SynchronizedXtextResourceSet;
+import org.eclipse.xtext.resource.XtextResourceSet;
 
 import com.google.inject.Binder;
 
@@ -55,6 +60,16 @@ public class LessRuntimeModule extends net.vtst.ow.eclipse.less.AbstractLessRunt
   @Override
   public Class<? extends IValueConverterService> bindIValueConverterService() {
     return LessValueConverterService.class;
+  }
+
+  @Override
+  public Class<? extends ResourceSet> bindResourceSet() {
+    return LessXtextResourceSet.class;
+  }
+  
+  @Override
+  public Class<? extends XtextResourceSet> bindXtextResourceSet() {
+    return LessSynchronizedXtextResourceSet.class;
   }
 
   public Class<? extends IQualifiedNameConverter> bindIQualifiedNameConverter() {
@@ -92,7 +107,6 @@ public class LessRuntimeModule extends net.vtst.ow.eclipse.less.AbstractLessRunt
   public Class<? extends LessMixinScopeProvider> bindLessMixinScopeProvider() {
     return LessMixinScopeProvider.class;
   }
-
 
   public Class<? extends IEasyProjectNature> bindIEasyProjectNature() {
     return LessProjectNature.class;
