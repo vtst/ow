@@ -70,8 +70,7 @@ public class LessImportStatementResolver {
   // @Inject
   // private IResourceDescriptions resourceDescriptions;
 
-  // TODO: This should probably not be public.
-  public IResourceDescription loadResourceDescription(Resource resource, URI uri) {
+  private IResourceDescription loadResourceDescription(Resource resource, URI uri) {
     LoadOnDemandResourceDescriptions lodrd = loadOnDemandDescriptions.get();
     lodrd.initialize(new IResourceDescriptions.NullImpl(), Collections.<URI>emptyList(), resource);
     try {
