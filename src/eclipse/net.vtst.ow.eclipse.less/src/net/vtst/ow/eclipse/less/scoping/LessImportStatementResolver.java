@@ -64,12 +64,6 @@ public class LessImportStatementResolver {
   // **************************************************************************
   // Containers
 
-  // @Inject
-  // private IContainer.Manager containerManager;
-  
-  // @Inject
-  // private IResourceDescriptions resourceDescriptions;
-
   private IResourceDescription loadResourceDescription(Resource resource, URI uri) {
     LoadOnDemandResourceDescriptions lodrd = loadOnDemandDescriptions.get();
     lodrd.initialize(new IResourceDescriptions.NullImpl(), Collections.<URI>emptyList(), resource);
