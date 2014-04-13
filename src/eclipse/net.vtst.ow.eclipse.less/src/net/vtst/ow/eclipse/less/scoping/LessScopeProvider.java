@@ -59,11 +59,18 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
     return styleSheet.eContents();
   }
   
-  private Iterable<EObject> removeStatement(Iterable<EObject> iterable, final EObject eObject) {
-    return Iterables.filter(iterable, new Predicate<EObject>(){
-      public boolean apply(EObject input) {
-        return !eObject.equals(input);
-      }});
+  private static <X> Iterable<X> removeElement(Iterable<X> iterable, final X element) {
+    if (element == null) {
+      return Iterables.filter(iterable, new Predicate<X>(){
+        public boolean apply(X input) {
+          return input != null;
+        }});      
+    } else {
+      return Iterables.filter(iterable, new Predicate<X>(){
+        public boolean apply(X input) {
+          return !element.equals(input);
+        }});
+    }
   }
 
   // **************************************************************************
@@ -90,20 +97,20 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
         if (importingStatement != null) {
           EObject importingContainer = importingStatement.eContainer();
           if (importingContainer instanceof StyleSheet) {
-            return computeVariableScopeOfStatements(container, removeStatement(getStyleSheetStatements((StyleSheet) container), importingStatement), ref);            
+            return computeVariableScopeOfStatements(importingContainer, getStyleSheetStatements((StyleSheet) importingContainer), importingStatement, ref);            
           } else {
             while (importingContainer instanceof BlockContents) 
               importingContainer = importingContainer.eContainer();
             if (importingContainer instanceof Block) {
-              return computeVariableScopeOfStatements(container, removeStatement(BlockUtils.iterator((Block) importingContainer), importingStatement), ref);            }
+              return computeVariableScopeOfStatements(importingContainer, BlockUtils.iterator((Block) importingContainer), importingStatement, ref);            }
           }
         }
         return IScope.NULLSCOPE;
       }
     } else if (container instanceof Block) {
-      return computeVariableScopeOfStatements(container, BlockUtils.iterator((Block) container), ref);
+      return computeVariableScopeOfStatements(container, BlockUtils.iterator((Block) container), null, ref);
     } else if (container instanceof StyleSheet) {
-      return computeVariableScopeOfStatements(container, getStyleSheetStatements((StyleSheet) container), ref);
+      return computeVariableScopeOfStatements(container, getStyleSheetStatements((StyleSheet) container), null, ref);
     } else if (container instanceof TerminatedMixin) {
       EStructuralFeature containingFeature = context.eContainingFeature();
       if (containingFeature.equals(LessPackage.eINSTANCE.getTerminatedMixin_Guards()) ||
@@ -117,12 +124,12 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
     
   /** Compute the scope of a context, which contains the statements returned by iterable.
    */
-  public IScope computeVariableScopeOfStatements(final EObject context, final Iterable<EObject> statements, final EReference ref) {
-    return cache.get(Tuples.pair(LessScopeProvider.class, context), context.eResource(), new Provider<IScope>() {
+  public IScope computeVariableScopeOfStatements(final EObject context, final Iterable<EObject> statements, final EObject statementToIgnore, final EReference ref) {
+    return cache.get(Tuples.create(LessScopeProvider.class, context, statementToIgnore), context.eResource(), new Provider<IScope>() {
       public IScope get() {
         List<IEObjectDescription> variableDefinitions = new ArrayList<IEObjectDescription>();
         // Go through the variables bound by the statements
-        addVariableDefinitions(statements, variableDefinitions);
+        addVariableDefinitions(removeElement(statements, statementToIgnore), variableDefinitions);
         return MapBasedScope.createScope(computeVariableScope(context, ref), variableDefinitions);
       }
     });
