@@ -1,7 +1,6 @@
 package net.vtst.ow.eclipse.less.scoping;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,11 +27,8 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EContentAdapter;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.xtext.resource.IResourceDescription;
-import org.eclipse.xtext.resource.IResourceDescriptions;
-import org.eclipse.xtext.scoping.impl.LoadOnDemandResourceDescriptions;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 @Singleton
@@ -161,7 +157,8 @@ public class LessImportingStatementFinder implements IResourceChangeListener {
     private ProjectAdapter projectAdapter;
     private StyleSheet styleSheet;
     private List<ResourceAdapter> importedResources = new ArrayList<ResourceAdapter>();
-    private Map<Resource, ImportStatement> importingStatements = new HashMap<Resource, ImportStatement>();
+    private Map<Resource, Integer> importingStatementCounts = new HashMap<Resource, Integer>();
+    private ImportStatement importStatement;
     
     private ResourceAdapter(ProjectAdapter projectAdapter, StyleSheet styleSheet) {
       this.projectAdapter = projectAdapter;
@@ -197,16 +194,16 @@ public class LessImportingStatementFinder implements IResourceChangeListener {
     }
     
     private void removeImportingStatement(Resource resource) {
-      this.importingStatements.remove(resource);
+      this.importingStatementCounts.remove(resource);
     }
     
-    private void addImportingStatement(Resource resource, ImportStatement statement) {
-      if (this.importingStatements.put(resource, statement) != null) {
-        // TODO: Do this handle properly the case of multiple import statements from the same or different resources?
-        this.importingStatements.put(resource, null);
-      }
+    private synchronized void addImportingStatement(Resource resource, ImportStatement statement) {
+      Integer count = this.importingStatementCounts.get(resource);
+      this.importingStatementCounts.put(resource, count == null ? 1 : count + 1);
+      this.importStatement = statement;
     }
     
+    // TODO: What happen when a resource is deleted? Is it counter removed in all resources it is importing?
     private void update() {
       // Clear the importing statements
       for (ResourceAdapter adapter: this.importedResources) {
@@ -223,13 +220,20 @@ public class LessImportingStatementFinder implements IResourceChangeListener {
       }
     }
     
-    private ImportStatement getImportingStatement() {
-      if (this.importingStatements.size() == 1) {
-        for (Entry<Resource, ImportStatement> entry: this.importingStatements.entrySet()) {
-          return entry.getValue();
-        }
+    private int getImportingStatementCountTotal() {
+      int result = 0;
+      for (Entry<?, Integer> entry: this.importingStatementCounts.entrySet()) {
+        result += entry.getValue();
       }
-      return null;
+      return result;
+    }
+    
+    private ImportStatement getImportingStatement() {
+      if (this.importStatement == null || getImportingStatementCountTotal() == 1) {
+        return this.importStatement;
+      } else {
+        return null;
+      }
     }
 
   }
