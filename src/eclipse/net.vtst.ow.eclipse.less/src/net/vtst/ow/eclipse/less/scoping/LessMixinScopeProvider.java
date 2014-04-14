@@ -66,12 +66,11 @@ public class LessMixinScopeProvider {
    Results are memoized for interesting contexts.
    */
   private MixinScope getScopeRec(final EObject context, final MixinPath path) {
-    if (context == null) {
-      return new MixinScope(path);
-    } else if (context instanceof Block || context instanceof StyleSheet) {
+    assert context != null;  // We were return MixinScope(path);
+    if (context instanceof Block || context instanceof StyleSheet) {
       return cache.get(Tuples.create(LessMixinScopeProvider.class, context, path), context.eResource(), new Provider<MixinScope>() {
         public MixinScope get() {
-          MixinScope scope = new MixinScope(getScopeRec(context.eContainer(), path));
+          MixinScope scope = getScopeContainer(context.eContainer(), context, path);
           fillScope(scope, context, 0, new MixinScopeElement());
           return scope;
         }
@@ -80,7 +79,15 @@ public class LessMixinScopeProvider {
       return getScopeRec(context.eContainer(), path);
     }
   }
-  
+
+  private MixinScope getScopeContainer(final EObject container, final EObject context, final MixinPath path) {
+    if (container == null) {
+      return new MixinScope(path);
+    } else {
+      return new MixinScope(getScopeRec(container, path));
+    }
+  }
+
   /**
    Descending function.  Add elements to an existing scope.
    */
