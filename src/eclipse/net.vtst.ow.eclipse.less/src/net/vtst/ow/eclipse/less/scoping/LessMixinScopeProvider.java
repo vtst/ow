@@ -18,6 +18,7 @@ import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver.ResolvedImpo
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.util.IResourceScopeCache;
+import org.eclipse.xtext.util.Pair;
 import org.eclipse.xtext.util.Tuples;
 
 import com.google.inject.Inject;
@@ -64,6 +65,10 @@ public class LessMixinScopeProvider {
     return getScopeRec(context, null, path);
   }
   
+  private static <T1, T2, T3, T4> Pair<Pair<T1, T2>, Pair<T3, T4>> create4(T1 x1, T2 x2, T3 x3, T4 x4) {
+    return Tuples.create(Tuples.create(x1, x2), Tuples.create(x3, x4));
+  }
+  
   /**
    Ascending function.  Compute the scope of a context, and all its ancestors.
    Results are memoized for interesting contexts.
@@ -71,8 +76,7 @@ public class LessMixinScopeProvider {
   private MixinScope getScopeRec(final EObject context, final EObject statementToIgnore, final MixinPath path) {
     assert context != null;  // We were return MixinScope(path);
     if (context instanceof Block || context instanceof StyleSheet) {
-      // TODO: Make a clean 4-uplet.
-      return cache.get(Tuples.create(LessMixinScopeProvider.class, Tuples.create(context, statementToIgnore), path), context.eResource(), new Provider<MixinScope>() {
+      return cache.get(create4(LessMixinScopeProvider.class, context, statementToIgnore, path), context.eResource(), new Provider<MixinScope>() {
         public MixinScope get() {
           MixinScope scope = getScopeContainer(context.eContainer(), context, path);
           fillScope(scope, context, statementToIgnore, 0, new MixinScopeElement());
