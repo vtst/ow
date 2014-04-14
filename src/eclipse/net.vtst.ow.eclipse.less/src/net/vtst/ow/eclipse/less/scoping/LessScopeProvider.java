@@ -59,7 +59,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
     return styleSheet.eContents();
   }
   
-  private static <X> Iterable<X> removeElement(Iterable<X> iterable, final X element) {
+  public static <X> Iterable<X> removeElementFromIterable(Iterable<X> iterable, final X element) {
     if (element == null) {
       return Iterables.filter(iterable, new Predicate<X>(){
         public boolean apply(X input) {
@@ -129,7 +129,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
       public IScope get() {
         List<IEObjectDescription> variableDefinitions = new ArrayList<IEObjectDescription>();
         // Go through the variables bound by the statements
-        addVariableDefinitions(removeElement(statements, statementToIgnore), variableDefinitions);
+        addVariableDefinitions(removeElementFromIterable(statements, statementToIgnore), variableDefinitions);
         return MapBasedScope.createScope(computeVariableScope(context, ref), variableDefinitions);
       }
     });
