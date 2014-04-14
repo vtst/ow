@@ -43,6 +43,9 @@ public class LessMixinScopeProvider {
   @Inject
   private LessImportStatementResolver importStatementResolver;
 
+  @Inject
+  private LessImportingStatementFinder importingStatementFinder;
+
   /**
    * Main entry point.  Results are memoized.
    * @param mixin  A mixin.
@@ -52,73 +55,82 @@ public class LessMixinScopeProvider {
     assert !mixinHelper.isDefinition();
     return cache.get(Tuples.pair(LessMixinScopeProvider.class, mixinHelper.getMixin()), mixinHelper.getMixin().eResource(), new Provider<MixinScope>() {
       public MixinScope get() {
-        return getScopeRec(mixinHelper.getMixin().eContainer(), mixinHelper.getPath());
+        return getScopeRec(mixinHelper.getMixin().eContainer(), null, mixinHelper.getPath());
       }
     });      
   }
   
   public MixinScope getScopeForCompletionProposal(EObject context, MixinPath path) {
-    return getScopeRec(context, path);
+    return getScopeRec(context, null, path);
   }
   
   /**
    Ascending function.  Compute the scope of a context, and all its ancestors.
    Results are memoized for interesting contexts.
    */
-  private MixinScope getScopeRec(final EObject context, final MixinPath path) {
+  private MixinScope getScopeRec(final EObject context, final EObject statementToIgnore, final MixinPath path) {
     assert context != null;  // We were return MixinScope(path);
     if (context instanceof Block || context instanceof StyleSheet) {
-      return cache.get(Tuples.create(LessMixinScopeProvider.class, context, path), context.eResource(), new Provider<MixinScope>() {
+      // TODO: Make a clean 4-uplet.
+      return cache.get(Tuples.create(LessMixinScopeProvider.class, Tuples.create(context, statementToIgnore), path), context.eResource(), new Provider<MixinScope>() {
         public MixinScope get() {
           MixinScope scope = getScopeContainer(context.eContainer(), context, path);
-          fillScope(scope, context, 0, new MixinScopeElement());
+          fillScope(scope, context, statementToIgnore, 0, new MixinScopeElement());
           return scope;
         }
       });      
     } else {
-      return getScopeRec(context.eContainer(), path);
+      return getScopeRec(context.eContainer(), null, path);
     }
   }
 
   private MixinScope getScopeContainer(final EObject container, final EObject context, final MixinPath path) {
     if (container == null) {
+      if (context instanceof StyleSheet) {
+        ImportStatement importingStatement = importingStatementFinder.getImportingStatement((StyleSheet) context);
+        if (importingStatement != null)
+          // TODO: Ignore import statement.
+          return getScopeRec(importingStatement.eContainer(), importingStatement, path);
+      }
       return new MixinScope(path);
     } else {
-      return new MixinScope(getScopeRec(container, path));
+      return new MixinScope(getScopeRec(container, null, path));
     }
   }
 
   /**
    Descending function.  Add elements to an existing scope.
    */
-  private void fillScope(MixinScope scope, EObject context, int position, MixinScopeElement element) {
+  private void fillScope(MixinScope scope, EObject context, EObject statementToIgnore, int position, MixinScopeElement element) {
     if (context instanceof Block) {
-      fillScope(scope, (Block) context, position, element);
+      fillScope(scope, (Block) context, statementToIgnore, position, element);
     } else if (context instanceof StyleSheet) {
-      fillScope(scope, context.eContents(), position, element);
+      fillScope(scope, context.eContents(), statementToIgnore, position, element);
     } else {
       assert false;
     }
   }
 
-  private void fillScope(MixinScope scope, Block block, int position, MixinScopeElement element) {
-    fillScope(scope, BlockUtils.iterator(block), position, element);
+  private void fillScope(MixinScope scope, Block block, EObject statementToIgnore, int position, MixinScopeElement element) {
+    fillScope(scope, BlockUtils.iterator(block), statementToIgnore, position, element);
   }
   
   private void fillScope(
       MixinScope scope, 
-      Iterable<? extends EObject> statements, 
+      Iterable<? extends EObject> statements,
+      EObject statementToIgnore,
       int position,
       MixinScopeElement element) {
     if (position >= scope.getPath().size()) {
       scope.addFullMatch(element);
     } else {
       for (EObject obj : statements) {
+        if (obj.equals(statementToIgnore)) continue;
         if (obj instanceof ImportStatement) {
           ResolvedImportStatement resolvedImportStatement = importStatementResolver.resolve((ImportStatement) obj);
           if (!resolvedImportStatement.hasError()) {
             // There is no cycle, and the imported stylesheet is not null.
-            fillScope(scope, resolvedImportStatement.getImportedStyleSheet().getStatements(), position, element);
+            fillScope(scope, resolvedImportStatement.getImportedStyleSheet().getStatements(), null, position, element);
           }
         } else if (obj instanceof Mixin) {
           MixinUtils.Helper mixinHelper = MixinUtils.newHelper((Mixin) obj);
@@ -128,7 +140,7 @@ public class LessMixinScopeProvider {
             MixinScopeElement newElement = element.cloneAndExtends(selectorIdent, selector);
             scope.addAtPosition(position, newElement);          
             if (scope.getPath().isMatching(position, selectorIdent)) {
-              fillScope(scope, mixinHelper.getBody(), position + 1, newElement);
+              fillScope(scope, mixinHelper.getBody(), null, position + 1, newElement);
             }
           }
         } else if (obj instanceof ToplevelRuleSet) {
@@ -170,6 +182,6 @@ public class LessMixinScopeProvider {
         ++i;
       }
     }
-    fillScope(scope, block, position + i, newElement);
+    fillScope(scope, block, null, position + i, newElement);
   }
 }
