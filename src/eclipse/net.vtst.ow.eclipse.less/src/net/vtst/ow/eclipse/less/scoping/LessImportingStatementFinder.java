@@ -141,13 +141,18 @@ public class LessImportingStatementFinder implements IResourceChangeListener {
   // ResourceAdapter
     
   private ResourceAdapter getOrCreateResourceAdapter(StyleSheet styleSheet) {
+    // TODO: It seems styleSheet.eResource() might be null!
     ResourceAdapter adapter = (ResourceAdapter) EcoreUtil.getAdapter(styleSheet.eResource().eAdapters(), ResourceAdapter.class);
     if (adapter == null) {
       IProject project = LessProjectProperty.getProject(styleSheet.eResource());
       ProjectAdapter projectAdapter = this.getOrCreateProjectAdapter(styleSheet.eResource().getResourceSet(), project);
-      adapter = new ResourceAdapter(projectAdapter, styleSheet);
-      styleSheet.eResource().eAdapters().add(adapter);
-      adapter.update();
+      // The adapter might have been created by the project adapter, so let's check again.
+      adapter = (ResourceAdapter) EcoreUtil.getAdapter(styleSheet.eResource().eAdapters(), ResourceAdapter.class);
+      if (adapter == null) {
+        adapter = new ResourceAdapter(projectAdapter, styleSheet);
+        styleSheet.eResource().eAdapters().add(adapter);
+        adapter.update();
+      }
     }
     return adapter;
   }
@@ -201,6 +206,7 @@ public class LessImportingStatementFinder implements IResourceChangeListener {
       Integer count = this.importingStatementCounts.get(resource);
       this.importingStatementCounts.put(resource, count == null ? 1 : count + 1);
       this.importStatement = statement;
+      getImportingStatement();
     }
     
     // TODO: What happen when a resource is deleted? Is it counter removed in all resources it is importing?
