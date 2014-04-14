@@ -93,7 +93,6 @@ public class LessMixinScopeProvider {
       if (context instanceof StyleSheet) {
         ImportStatement importingStatement = importingStatementFinder.getImportingStatement((StyleSheet) context);
         if (importingStatement != null)
-          // TODO: Ignore import statement.
           return getScopeRec(importingStatement.eContainer(), importingStatement, path);
       }
       return new MixinScope(path);
