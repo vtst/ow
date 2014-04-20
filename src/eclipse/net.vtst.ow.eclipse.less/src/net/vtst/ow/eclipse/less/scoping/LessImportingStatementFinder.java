@@ -21,6 +21,7 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
 import org.eclipse.emf.ecore.resource.ResourceSet;
@@ -49,9 +50,9 @@ public class LessImportingStatementFinder implements IResourceChangeListener {
     registerAsListener();
   }
   
-  public ImportStatement getImportingStatement(StyleSheet styleSheet) {
+  public ImportStatement getImportingStatement(Resource resource) {
     try {
-      ResourceAdapter adapter = this.getOrCreateResourceAdapter(styleSheet);
+      ResourceAdapter adapter = this.getOrCreateResourceAdapter(resource);
       if (adapter.getProjectAdapter().hasRoots()) {
         return adapter.getImportingStatement();
       } else {
@@ -129,7 +130,7 @@ public class LessImportingStatementFinder implements IResourceChangeListener {
       for (IFile file : projectProperty.getRoots(project)) {
         this.hasRoots = true;
         StyleSheet styleSheet = getStyleSheet(URI.createURI(file.getLocationURI().toString()));
-        if (styleSheet != null) getOrCreateResourceAdapter(styleSheet);
+        if (styleSheet != null) getOrCreateResourceAdapter(styleSheet.eResource());
       }
     }
     
@@ -140,34 +141,34 @@ public class LessImportingStatementFinder implements IResourceChangeListener {
   // **************************************************************************
   // ResourceAdapter
     
-  private ResourceAdapter getOrCreateResourceAdapter(StyleSheet styleSheet) {
+  private ResourceAdapter getOrCreateResourceAdapter(Resource resource) {
     // TODO: It seems styleSheet.eResource() might be null!
-    ResourceAdapter adapter = (ResourceAdapter) EcoreUtil.getAdapter(styleSheet.eResource().eAdapters(), ResourceAdapter.class);
+    ResourceAdapter adapter = (ResourceAdapter) EcoreUtil.getAdapter(resource.eAdapters(), ResourceAdapter.class);
     if (adapter == null) {
-      IProject project = LessProjectProperty.getProject(styleSheet.eResource());
-      ProjectAdapter projectAdapter = this.getOrCreateProjectAdapter(styleSheet.eResource().getResourceSet(), project);
+      IProject project = LessProjectProperty.getProject(resource);
+      ProjectAdapter projectAdapter = this.getOrCreateProjectAdapter(resource.getResourceSet(), project);
       // The adapter might have been created by the project adapter, so let's check again.
-      adapter = (ResourceAdapter) EcoreUtil.getAdapter(styleSheet.eResource().eAdapters(), ResourceAdapter.class);
+      adapter = (ResourceAdapter) EcoreUtil.getAdapter(resource.eAdapters(), ResourceAdapter.class);
       if (adapter == null) {
-        adapter = new ResourceAdapter(projectAdapter, styleSheet);
-        styleSheet.eResource().eAdapters().add(adapter);
+        adapter = new ResourceAdapter(projectAdapter, resource);
+        resource.eAdapters().add(adapter);
         adapter.update();
       }
     }
     return adapter;
   }
-
+  
   private class ResourceAdapter extends EContentAdapter {
     
     private ProjectAdapter projectAdapter;
-    private StyleSheet styleSheet;
     private List<ResourceAdapter> importedResources = new ArrayList<ResourceAdapter>();
     private Map<Resource, Integer> importingStatementCounts = new HashMap<Resource, Integer>();
     private ImportStatement importStatement;
+    private Resource resource;
     
-    private ResourceAdapter(ProjectAdapter projectAdapter, StyleSheet styleSheet) {
+    private ResourceAdapter(ProjectAdapter projectAdapter, Resource resource) {
       this.projectAdapter = projectAdapter;
-      this.styleSheet = styleSheet;
+      this.resource = resource;
     }
     
     private ProjectAdapter getProjectAdapter() {
@@ -209,19 +210,30 @@ public class LessImportingStatementFinder implements IResourceChangeListener {
       getImportingStatement();
     }
     
+    private StyleSheet getStyleSheet() {
+      for (EObject obj : this.resource.getContents()) {
+        if (obj instanceof StyleSheet) return (StyleSheet) obj;
+      }
+      return null;
+    }
+    
     // TODO: What happen when a resource is deleted? Is it counter removed in all resources it is importing?
     private void update() {
       // Clear the importing statements
       for (ResourceAdapter adapter: this.importedResources) {
-        adapter.removeImportingStatement(this.styleSheet.eResource());
+        adapter.removeImportingStatement(this.resource);
       }
       this.importedResources.clear();
       // Add the importing statement
-      for (ResolvedImportStatement ris : importStatementResolver.getResolvedImportStatements(styleSheet)) {
-        if (!ris.hasError()) {
-          ResourceAdapter adapter = getOrCreateResourceAdapter(ris.getImportedStyleSheet());
-          importedResources.add(adapter);
-          adapter.addImportingStatement(this.styleSheet.eResource(), ris.getStatement());
+      StyleSheet styleSheet = this.getStyleSheet();
+      if (styleSheet != null) {
+        for (ResolvedImportStatement ris : importStatementResolver.getResolvedImportStatements(styleSheet)) {
+          if (!ris.hasError()) {
+            // TODO: This might be null?
+            ResourceAdapter adapter = getOrCreateResourceAdapter(ris.getImportedStyleSheet().eResource());
+            importedResources.add(adapter);
+            adapter.addImportingStatement(this.resource, ris.getStatement());
+          }
         }
       }
     }

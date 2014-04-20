@@ -91,7 +91,7 @@ public class LessMixinScopeProvider {
   private MixinScope getScopeContainer(final EObject container, final EObject context, final MixinPath path) {
     if (container == null) {
       if (context instanceof StyleSheet) {
-        ImportStatement importingStatement = importingStatementFinder.getImportingStatement((StyleSheet) context);
+        ImportStatement importingStatement = importingStatementFinder.getImportingStatement(context.eResource());
         if (importingStatement != null)
           return getScopeRec(importingStatement.eContainer(), importingStatement, path);
       }

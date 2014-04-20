@@ -93,7 +93,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
     EObject container = context.eContainer();
     if (container == null) {
       if (context instanceof StyleSheet) {
-        ImportStatement importingStatement = importingStatementFinder.getImportingStatement((StyleSheet) context);
+        ImportStatement importingStatement = importingStatementFinder.getImportingStatement(context.eResource());
         if (importingStatement != null) {
           EObject importingContainer = importingStatement.eContainer();
           if (importingContainer instanceof StyleSheet) {
