@@ -13,6 +13,8 @@ import net.vtst.ow.eclipse.less.less.Declaration;
 import net.vtst.ow.eclipse.less.less.Expr;
 import net.vtst.ow.eclipse.less.less.FontFaceStatement;
 import net.vtst.ow.eclipse.less.less.PageStatement;
+import net.vtst.ow.eclipse.less.less.Property;
+import net.vtst.ow.eclipse.less.less.RawProperty;
 import net.vtst.ow.eclipse.less.scoping.LessMixinScopeProvider;
 import net.vtst.ow.eclipse.less.scoping.MixinScope;
 import net.vtst.ow.eclipse.less.scoping.MixinScopeElement;
@@ -105,9 +107,12 @@ public class LessProposalProvider extends AbstractLessProposalProvider {
       RuleCall ruleCall,
       ContentAssistContext context,
       ICompletionProposalAcceptor acceptor) {
-    CssProfile.PropertyDef propertyDef = this.cssProfile.getProperty(model.getProperty());
-    addProposalsFromSet(propertyDef.keywords, LessImageHelper.PROPERTY_IDENT, context, acceptor);
-    addProposalsFromSet(propertyDef.strings, LessImageHelper.PROPERTY_IDENT, context, acceptor);
+    Property property = model.getProperty();
+    if (property instanceof RawProperty) {
+      CssProfile.PropertyDef propertyDef = this.cssProfile.getProperty(property.getIdent());
+      addProposalsFromSet(propertyDef.keywords, LessImageHelper.PROPERTY_IDENT, context, acceptor);
+      addProposalsFromSet(propertyDef.strings, LessImageHelper.PROPERTY_IDENT, context, acceptor);
+    }
   }
 
   // **************************************************************************

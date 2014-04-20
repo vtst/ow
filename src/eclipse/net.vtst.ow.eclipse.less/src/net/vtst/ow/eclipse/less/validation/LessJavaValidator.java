@@ -35,7 +35,9 @@ import net.vtst.ow.eclipse.less.less.MixinUtils;
 import net.vtst.ow.eclipse.less.less.MixinVarParameter;
 import net.vtst.ow.eclipse.less.less.NumberWithUnitTerm;
 import net.vtst.ow.eclipse.less.less.NumericLiteral;
+import net.vtst.ow.eclipse.less.less.Property;
 import net.vtst.ow.eclipse.less.less.PseudoClassNthSpecialCase;
+import net.vtst.ow.eclipse.less.less.RawProperty;
 import net.vtst.ow.eclipse.less.less.StringTerm;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
 import net.vtst.ow.eclipse.less.less.Term;
@@ -93,12 +95,15 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     for(EObject item: BlockUtils.iterator(block)) {
       if (!(item instanceof Declaration)) continue;
       Declaration declaration = (Declaration) item;
-      String propertyName = declaration.getProperty();
-      boolean isMerge = declaration.isMerge();
-      Boolean wasMerge = properties.put(propertyName, isMerge);
-      if (wasMerge != null && (!wasMerge.booleanValue() || !isMerge)) {
-          String message = String.format(messages.getString("duplicated_property"), propertyName);
-          warning(message, declaration, LessPackage.eINSTANCE.getDeclaration_Property(), 0);
+      Property property = declaration.getProperty();
+      if (property instanceof RawProperty) {
+        String propertyName = declaration.getProperty().getIdent();
+        boolean isMerge = declaration.isMerge();
+        Boolean wasMerge = properties.put(propertyName, isMerge);
+        if (wasMerge != null && (!wasMerge.booleanValue() || !isMerge)) {
+            String message = String.format(messages.getString("duplicated_property"), propertyName);
+            warning(message, declaration, LessPackage.eINSTANCE.getDeclaration_Property(), 0);
+        }
       }
     }
   }
