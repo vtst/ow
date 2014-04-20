@@ -237,7 +237,7 @@ CommandAttribute:
 
 Expr: Expr1;
 // This is maybe slightly more restrictive than the Soy syntax, but I think it is ok
-Expr1 returns Expr: expr+=Expr2 ('?' expr_true+=Expr2 =>':' expr_false+=Expr2)*;
+Expr1 returns Expr: expr+=Expr2 (('?' expr_true+=Expr2 =>':' expr_false+=Expr2) | ('?:' expr_false+=Expr2))*;
 Expr2 returns Expr: expr+=Expr3 (operator+=('or') expr+=Expr3)*;
 Expr3 returns Expr: expr+=Expr4 (operator+=('and') expr+=Expr4)*;
 Expr4 returns Expr: expr+=Expr5 (operator+=('==' | '!=') expr+=Expr5)*;
