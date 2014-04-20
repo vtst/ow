@@ -385,7 +385,7 @@ IDENT_OR_KEYWORD returns ecore::EString: IDENT_OR_KEYWORD_BUT_WHEN | 'when';
 // This rule does not end with OPT_SPACE, because of combinators
 Attrib:
   '[' OPT_SPACE attribute=IDENT_OR_KEYWORD OPT_SPACE 
-  (operator=('=' | '~=' | '^=' | '$=' | '|=' | '*=') OPT_SPACE ((value=IDENT_OR_KEYWORD | value=STRING) OPT_SPACE)?)? ']'
+  (operator=('=' | '~=' | '^=' | '$=' | '|=' | '*=') OPT_SPACE ((value=IDENT_OR_KEYWORD | value=(STRING | NUMBER)) OPT_SPACE)?)? ']'
 ;
 
 // This rule does not end with OPT_SPACE, because of combinators
