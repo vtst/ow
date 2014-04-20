@@ -218,6 +218,7 @@ AtVariableTerm:
   | {At2Variable} ident=AT2_IDENT
 ;
 
+AtVariableWithBraces: '@' '{' variable=[AtVariableRefTarget|IDENT_OR_KEYWORD_PREPEND_AT] '}';
 
 // ----------------------------------------------------------------------------
 // @ variable definitions
@@ -363,8 +364,7 @@ CommonSelector: HashOrClass | VariableSelector | Attrib | {ParentSelector} '&' I
 IDENT_OR_KEYWORD_PREPEND_AT returns ecore::EString: IDENT_OR_KEYWORD;
 VariableSelector: (class?=('.' | CLASS_IDENT) | hash?=('#' | HASH_IDENT)) tail=VariableSelectorTail;
 RootVariableSelector: IDENT_OR_KEYWORD? tail=VariableSelectorTail;
-VariableSelectorTail: (variable+=SelectorVariable IDENT_TAIL?)+;
-SelectorVariable: '@' '{' variable=[AtVariableRefTarget|IDENT_OR_KEYWORD_PREPEND_AT] '}';
+VariableSelectorTail: (variable+=AtVariableWithBraces IDENT_TAIL?)+;
 
 HashOrClass: Hash | Class;
 HashOrClassRef: ident=[HashOrClassRefTarget|HASH_OR_CLASS_IDENT];
@@ -408,19 +408,19 @@ PseudoClassFunctionArgument:
 ;
 
 PseudoClassNth:
-  {PseudoClassNth} (('+' | '-')? NUMBER? | variable+=SelectorVariable) 'n' (OPT_SPACE ('+' | '-') OPT_SPACE (NUMBER | variable+=SelectorVariable))?
+  {PseudoClassNth} (('+' | '-')? NUMBER? | variable+=AtVariableWithBraces) 'n' (OPT_SPACE ('+' | '-') OPT_SPACE (NUMBER | variable+=AtVariableWithBraces))?
   | {PseudoClassNth} ('+' | '-')? NUMBER
-  | {PseudoClassNth} variable+=SelectorVariable
+  | {PseudoClassNth} variable+=AtVariableWithBraces
   | {PseudoClassNth} ('odd' | 'even')
   | PseudoClassNthSpecialCase
 ;
 
 PseudoClassNthSpecialCase:
-  {PseudoClassNthSpecialCase} ident1=IDENT OPT_SPACE ('+' | '-') OPT_SPACE (NUMBER | variable+=SelectorVariable)  // -n+1
-  | {PseudoClassNthSpecialCase} (('+' | '-')? NUMBER | variable+=SelectorVariable) ident2=IDENT  // 1n-1, +1n-1, -1n-1
+  {PseudoClassNthSpecialCase} ident1=IDENT OPT_SPACE ('+' | '-') OPT_SPACE (NUMBER | variable+=AtVariableWithBraces)  // -n+1
+  | {PseudoClassNthSpecialCase} (('+' | '-')? NUMBER | variable+=AtVariableWithBraces) ident2=IDENT  // 1n-1, +1n-1, -1n-1
   | {PseudoClassNthSpecialCase} '+' ident3=IDENT  // +n-1
-  | {PseudoClassNthSpecialCase} ident4=IDENT (NUMBER | variable+=SelectorVariable)  // -n- 1
-  | {PseudoClassNthSpecialCase} variable+=SelectorVariable ident5=IDENT variable+=SelectorVariable  // @{var}n-@{var}
+  | {PseudoClassNthSpecialCase} ident4=IDENT (NUMBER | variable+=AtVariableWithBraces)  // -n- 1
+  | {PseudoClassNthSpecialCase} variable+=AtVariableWithBraces ident5=IDENT variable+=AtVariableWithBraces  // @{var}n-@{var}
 ;
 
 // ----------------------------------------------------------------------------
