@@ -363,7 +363,7 @@ CommonSelector: HashOrClass | VariableSelector | Attrib | {ParentSelector} '&' I
 IDENT_OR_KEYWORD_PREPEND_AT returns ecore::EString: IDENT_OR_KEYWORD;
 VariableSelector: (class?=('.' | CLASS_IDENT) | hash?=('#' | HASH_IDENT)) tail=VariableSelectorTail;
 RootVariableSelector: IDENT_OR_KEYWORD? tail=VariableSelectorTail;
-VariableSelectorTail: (variable+=SelectorVariable IDENT_OR_KEYWORD?)+;
+VariableSelectorTail: (variable+=SelectorVariable IDENT_TAIL?)+;
 SelectorVariable: '@' '{' variable=[AtVariableRefTarget|IDENT_OR_KEYWORD_PREPEND_AT] '}';
 
 HashOrClass: Hash | Class;
@@ -381,6 +381,7 @@ CLASS_IDENT returns ecore::EString: '.' IDENT_OR_KEYWORD;
 // We prevent 'when' at some places, otherwise it conflicts with guards in non-mixin selectors.
 IDENT_OR_KEYWORD_BUT_WHEN returns ecore::EString: IDENT | 'and' | 'even' | 'from' | 'important' | 'n' | 'not' | 'odd' | 'only' | 'to';
 IDENT_OR_KEYWORD returns ecore::EString: IDENT_OR_KEYWORD_BUT_WHEN | 'when';
+IDENT_TAIL: ('-'? NUMBER)? IDENT_OR_KEYWORD;
 
 // This rule does not end with OPT_SPACE, because of combinators
 Attrib:
