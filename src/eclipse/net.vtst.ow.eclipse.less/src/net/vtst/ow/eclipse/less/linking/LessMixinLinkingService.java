@@ -161,8 +161,11 @@ public class LessMixinLinkingService implements ILinkingService {
         // Check unicity of names.
         // Check definition of names.
         Set<String> providedNames = new HashSet<String>(parameters.getParameter().size());
+        int providedUnnamedParameter = 0;
         for (MixinParameter parameter : parameters.getParameter()) {
-          if (parameter.getIdent() != null) {
+          if (parameter.getIdent() == null) {
+            ++providedUnnamedParameter;
+          } else {
             String parameterName = parameter.getIdent().getIdent();
             if (!providedNames.add(parameterName)) {
               errors.add(new IllegalParameterLabel(parameter, "duplicated_parameter_label"));
@@ -176,7 +179,11 @@ public class LessMixinLinkingService implements ILinkingService {
         // Check that all required names are provided.
         for (Map.Entry<String, Boolean> entry : parameterNames.entrySet()) {
           if (entry.getValue() && !providedNames.contains(entry.getKey())) {
-            errors.add(new MissingParameter(parameters, entry.getKey()));
+            if (providedUnnamedParameter > 0) {
+              --providedUnnamedParameter;
+            } else {
+              errors.add(new MissingParameter(parameters, entry.getKey()));
+            }
           }
         }
       }
