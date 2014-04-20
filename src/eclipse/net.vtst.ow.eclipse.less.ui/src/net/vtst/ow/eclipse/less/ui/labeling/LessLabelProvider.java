@@ -7,20 +7,19 @@ import net.vtst.ow.eclipse.less.less.CharsetStatement;
 import net.vtst.ow.eclipse.less.less.FontFaceStatement;
 import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.less.InnerRuleSet;
-import net.vtst.ow.eclipse.less.less.InnerSelector;
 import net.vtst.ow.eclipse.less.less.MediaQuery;
 import net.vtst.ow.eclipse.less.less.MediaStatement;
 import net.vtst.ow.eclipse.less.less.PageStatement;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
 import net.vtst.ow.eclipse.less.less.TerminatedMixin;
 import net.vtst.ow.eclipse.less.less.ToplevelRuleSet;
-import net.vtst.ow.eclipse.less.less.ToplevelSelector;
 import net.vtst.ow.eclipse.less.less.VariableDefinition;
 import net.vtst.ow.eclipse.less.ui.LessImageHelper;
 import net.vtst.ow.eclipse.less.ui.LessUiMessages;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.jface.preference.JFacePreferences;
@@ -33,7 +32,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.TextStyle;
-import org.eclipse.xtext.nodemodel.ICompositeNode;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import org.eclipse.xtext.ui.label.DefaultEObjectLabelProvider;
 
@@ -108,18 +106,20 @@ public class LessLabelProvider extends DefaultEObjectLabelProvider {
 	  return obj.getLhs().getVariable().getIdent();
 	}
 	
+	private static String getTokenText(EObject obj) {
+	  return NodeModelUtils.getTokenText(NodeModelUtils.getNode(obj));
+	}
+	
+	private static String getTokenText(EList<? extends EObject> objs) {
+    StringBuilder buf = new StringBuilder();
+    for (EObject obj : objs) {
+      buf.append(getTokenText(obj));
+    }
+    return buf.toString();
+	}
+
 	String text(ToplevelRuleSet obj) {
-	  StringBuffer buf = new StringBuffer();
-	  boolean first = true;
-	  for(ToplevelSelector selector: obj.getSelector()) {
-	    ICompositeNode parserNode = NodeModelUtils.getNode(selector);
-	    if (parserNode != null) {
-	      if (first) first = false;
-	      else buf.append(", ");
-	      buf.append(parserNode.getText());
-	    }
-	  }
-    return stripString(buf.toString());
+	  return getTokenText(obj.getSelector());
 	}
 	
 	String image(StyleSheet obj) { return LessImageHelper.STYLESHEET;	}
@@ -134,24 +134,12 @@ public class LessLabelProvider extends DefaultEObjectLabelProvider {
   String image(InnerRuleSet obj) { return LessImageHelper.RULE_SET; }
 
   String text(InnerRuleSet obj) {
-    StringBuffer buf = new StringBuffer();
-    boolean first = true;
-    for(InnerSelector selector: obj.getSelector()) {
-      ICompositeNode parserNode = NodeModelUtils.getNode(selector);
-      if (parserNode != null) {
-        if (first) first = false;
-        else buf.append(", ");
-        buf.append(parserNode.getText());
-      }
-    }
-    return stripString(buf.toString());    
+    return getTokenText(obj.getSelector());
   }
 
   StyledString text(TerminatedMixin obj) {
     if (obj.getBody() == null) return null;
-    ICompositeNode parserNode = NodeModelUtils.getNode(obj.getSelectors());
-    if (parserNode == null) return null;
-    return new StyledString(stripString(parserNode.getText()), italicStyler);
+    return new StyledString(getTokenText(obj.getSelectors()), italicStyler);
 	}
 	
 	StyledString text(ImportStatement obj) {
