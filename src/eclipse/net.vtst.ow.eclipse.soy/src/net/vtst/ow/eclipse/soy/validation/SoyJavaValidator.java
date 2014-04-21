@@ -30,6 +30,7 @@ import net.vtst.ow.eclipse.soy.soy.Namespace;
 import net.vtst.ow.eclipse.soy.soy.PrintDirective;
 import net.vtst.ow.eclipse.soy.soy.PrintDirectiveDeclaration;
 import net.vtst.ow.eclipse.soy.soy.RegularCallCommand;
+import net.vtst.ow.eclipse.soy.soy.RegularTemplate;
 import net.vtst.ow.eclipse.soy.soy.SoyFile;
 import net.vtst.ow.eclipse.soy.soy.SoyPackage;
 import net.vtst.ow.eclipse.soy.soy.Template;
@@ -155,14 +156,24 @@ public class SoyJavaValidator extends AbstractSoyJavaValidator {
    */
   @Check
   @ConfigurableCheck(configurable = false)
-  public void checkTemplateCommandAttributes(Template template) {
-    doCheckCommandAttributes(template, template.getAttribute(), templateRequiredAttributes, templateOptionalAttributes);
+  public void checkRegularTemplateCommandAttributes(RegularTemplate template) {
+    doCheckCommandAttributes(template, template.getAttribute(), regularTemplateRequiredAttributes, regularTemplateOptionalAttributes);
   }
-  private static Set<String> templateRequiredAttributes = new HashSet<String>(
+  private static Set<String> regularTemplateRequiredAttributes = new HashSet<String>(
       Arrays.asList(new String[]{}));
-  private static Set<String> templateOptionalAttributes = new HashSet<String>(
+  private static Set<String> regularTemplateOptionalAttributes = new HashSet<String>(
       Arrays.asList(new String[]{"private", "autoescape"}));
-  
+
+  @Check
+  @ConfigurableCheck(configurable = false)
+  public void checkDelTemplateCommandAttributes(DelTemplate template) {
+    doCheckCommandAttributes(template, template.getAttribute(), delTemplateRequiredAttributes, delTemplateOptionalAttributes);
+  }
+  private static Set<String> delTemplateRequiredAttributes = new HashSet<String>(
+      Arrays.asList(new String[]{}));
+  private static Set<String> delTemplateOptionalAttributes = new HashSet<String>(
+      Arrays.asList(new String[]{"private", "autoescape", "variant"}));
+
   /**
    * Check the attributes of msg commands.
    */
@@ -181,14 +192,23 @@ public class SoyJavaValidator extends AbstractSoyJavaValidator {
    */
   @Check
   @ConfigurableCheck(configurable = false)
-  // This works for regular and del call commands
-  public void checkCallCommandAttributes(CallCommand callCommand) {
-    doCheckCommandAttributes(callCommand, callCommand.getAttribute(), callRequiredAttributes, callOptionalAttributes);
+  public void checkRegularCallCommandAttributes(RegularCallCommand callCommand) {
+    doCheckCommandAttributes(callCommand, callCommand.getAttribute(), regularCallRequiredAttributes, regularCallOptionalAttributes);
   }
-  private static Set<String> callRequiredAttributes = new HashSet<String>(
+  private static Set<String> regularCallRequiredAttributes = new HashSet<String>(
       Arrays.asList(new String[]{}));
-  private static Set<String> callOptionalAttributes = new HashSet<String>(
+  private static Set<String> regularCallOptionalAttributes = new HashSet<String>(
       Arrays.asList(new String[]{"data"}));
+
+  @Check
+  @ConfigurableCheck(configurable = false)
+  public void checkRegularCallCommandAttributes(DelCallCommand callCommand) {
+    doCheckCommandAttributes(callCommand, callCommand.getAttribute(), delCallRequiredAttributes, delCallOptionalAttributes);
+  }
+  private static Set<String> delCallRequiredAttributes = new HashSet<String>(
+      Arrays.asList(new String[]{}));
+  private static Set<String> delCallOptionalAttributes = new HashSet<String>(
+      Arrays.asList(new String[]{"data", "variant"}));
 
   /**
    * Helper function to check the attributes of a command.
