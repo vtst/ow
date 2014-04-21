@@ -576,7 +576,7 @@ terminal fragment STRING2: '\'' (!('\n' | '\r' /*| '\f'*/ | '\\' | '\'') | '\\' 
 terminal STRING : STRING1 | STRING2;
 
 terminal JS_EVALUATION : '`' (!'`')* '`';
-terminal HASH_IDENT : '#' ('_'|'a'..'z'|'A'..'Z'|'0'..'9'|'-')+;
+terminal HASH_IDENT : '#' IDENT_CHAR+;
 terminal NUMBER : (('0' .. '9')* '.')? ('0' .. '9')+;
 terminal ML_COMMENT : '/*' -> '*/';
 terminal SL_COMMENT   : '//' !('\n'|'\r')* ('\r'? '\n')?;
