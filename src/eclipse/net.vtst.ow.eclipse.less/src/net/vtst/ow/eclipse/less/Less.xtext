@@ -311,18 +311,24 @@ InnerRuleSet:
 // ----------------------------------------------------------------------------
 // Selectors
 
-// There is a trailing OPT_SPACE in this rule, because there is no in SimpleSelector
+// There is a OPT_SPACE after SimpleSelector, because there is no in SimpleSelector
 ToplevelSelector:
   selector+=SimpleSelector
-  ((combinator+=Combinator selector+=SimpleSelector)* OPT_SPACE
+  ((combinator+=Combinator selector+=SimpleSelector)* OPT_SPACE extend=Extend?
    | OPT_SPACE guards=MixinDefinitionGuards)
 ;
 
-// There is a trailing OPT_SPACE in this rule, because there is no in SimpleSelector
+// There is a OPT_SPACE after SimpleSelector, because there is no in SimpleSelector
 InnerSelector:
   combinator+=RootCombinator selector+=SimpleSelector
-  ((combinator+=Combinator selector+=SimpleSelector)* OPT_SPACE
+  ((combinator+=Combinator selector+=SimpleSelector)* OPT_SPACE extend=Extend?
    | OPT_SPACE guards=MixinDefinitionGuards)
+;
+
+// There is a OPT_SPACE after SimpleSelector, because there is no in SimpleSelector
+ExtendSelector:
+  selector+=SimpleSelector
+  (combinator+=Combinator selector+=SimpleSelector)* OPT_SPACE  
 ;
 
 Combinator:
@@ -379,7 +385,8 @@ HASH_IDENT returns ecore::EString: HASH_COLOR | HASH_OTHER;
 Class: ident=CLASS_IDENT;
 CLASS_IDENT returns ecore::EString: '.' IDENT_OR_KEYWORD;
 // We prevent 'when' at some places, otherwise it conflicts with guards in non-mixin selectors.
-IDENT_OR_KEYWORD_BUT_WHEN returns ecore::EString: IDENT | 'and' | 'even' | 'from' | 'important' | 'n' | 'not' | 'odd' | 'only' | 'to';
+KEYWORD_BUT_WHEN returns ecore::EString: 'all' | 'and' | 'extend' | 'even' | 'from' | 'important' | 'n' | 'not' | 'odd' | 'only' | 'to';
+IDENT_OR_KEYWORD_BUT_WHEN returns ecore::EString: IDENT | KEYWORD_BUT_WHEN;
 IDENT_OR_KEYWORD returns ecore::EString: IDENT_OR_KEYWORD_BUT_WHEN | 'when';
 OPT_IDENT_TAIL: ('-'? NUMBER)? IDENT_OR_KEYWORD?;
 
@@ -393,6 +400,10 @@ Attrib:
 Pseudo:
   PseudoWithoutNot
   | {PseudoClassNot} ':' 'not' '(' OPT_SPACE selector=SimpleSelectorInNot OPT_SPACE ')'
+;
+
+Extend:
+  ':' 'extend' '(' OPT_SPACE selector+=ExtendSelector (',' OPT_SPACE selector+=ExtendSelector)* ')' OPT_SPACE
 ;
 
 PseudoWithoutNot:
