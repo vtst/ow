@@ -70,6 +70,7 @@ InnerStatement:
 
 UnterminatedInnerStatement:
   Declaration
+//  | InnerExtend
   | UnterminatedToplevelOrInnerStatement
 ;
 
@@ -384,7 +385,7 @@ Hash: ident=HASH_IDENT;
 Class: ident=CLASS_IDENT;
 CLASS_IDENT returns ecore::EString: '.' IDENT_OR_KEYWORD;
 // We prevent 'when' at some places, otherwise it conflicts with guards in non-mixin selectors.
-KEYWORD_BUT_WHEN returns ecore::EString: 'all' | 'and' | 'extend' | 'even' | 'from' | 'important' | 'n' | 'not' | 'odd' | 'only' | 'to';
+KEYWORD_BUT_WHEN returns ecore::EString: 'and' | 'even' | 'from' | 'important' | 'n' | 'not' | 'odd' | 'only' | 'to';
 IDENT_OR_KEYWORD_BUT_WHEN returns ecore::EString: IDENT | KEYWORD_BUT_WHEN;
 IDENT_OR_KEYWORD returns ecore::EString: IDENT_OR_KEYWORD_BUT_WHEN | 'when';
 OPT_IDENT_TAIL: ('-'? NUMBER)? IDENT_OR_KEYWORD?;
@@ -401,9 +402,9 @@ Pseudo:
   | {PseudoClassNot} ':' 'not' '(' OPT_SPACE selector=SimpleSelectorInNot OPT_SPACE ')'
 ;
 
-Extend:
-  ':' 'extend' '(' OPT_SPACE selector+=ExtendSelector (',' OPT_SPACE selector+=ExtendSelector)* ')' OPT_SPACE
-;
+Extend: ':' 'extend' ExtendArg;
+// InnerExtend: '&' ':' 'extend' ExtendArg;
+ExtendArg: '(' OPT_SPACE selector+=ExtendSelector (',' OPT_SPACE selector+=ExtendSelector)* ')' OPT_SPACE;
 
 PseudoWithoutNot:
   {PseudoClassIdent} ':' ident=IDENT
