@@ -577,7 +577,7 @@ terminal STRING : STRING1 | STRING2;
 
 terminal JS_EVALUATION : '`' (!'`')* '`';
 terminal HASH_IDENT : '#' ('_'|'a'..'z'|'A'..'Z'|'0'..'9'|'-')+;
-terminal NUMBER :  (('0' .. '9')+) | (('0' .. '9')* '.' ('0' .. '9')+);
+terminal NUMBER : (('0' .. '9')* '.')? ('0' .. '9')+;
 terminal ML_COMMENT : '/*' -> '*/';
 terminal SL_COMMENT   : '//' !('\n'|'\r')* ('\r'? '\n')?;
 terminal WS : (' ' | '\t' | '\r' | '\n' /*| '\f'*/)+;
