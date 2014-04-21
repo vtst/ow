@@ -379,7 +379,6 @@ HASH_OR_CLASS_IDENT returns ecore::EString: HASH_IDENT | CLASS_IDENT;
 
 // This rule does not end with OPT_SPACE, because of combinators
 Hash: ident=HASH_IDENT;
-HASH_IDENT returns ecore::EString: HASH_COLOR | HASH_OTHER;
 
 // This rule does not end with OPT_SPACE, because of combinators
 Class: ident=CLASS_IDENT;
@@ -521,7 +520,7 @@ TerminalSimpleTerm:
 
 // This rule does not end with OPT_SPACE, because of operators in Expr
 FunctionTerm:
-  function=(IDENT_OR_KEYWORD_BUT_WHEN | PERCENT) 
+  function=(IDENT_OR_KEYWORD_BUT_WHEN | '%') 
   '(' OPT_SPACE (arg=IDENT_OR_KEYWORD OPT_SPACE '=' OPT_SPACE)? (expr=Expr)? ')'
 ;
 
@@ -530,7 +529,7 @@ NumericLiteral:
   {NumberTerm} value=NUMBER
   | {PercentageTerm} value=PERCENTAGE
   | {NumberWithUnitTerm} value=NUMBER unit=IDENT
-  | {HashColorTerm} value=HASH_COLOR
+  | {HashColorTerm} value=HASH_IDENT
 ;
 
 // This rule does not end with OPT_SPACE, because of operators in Expr
@@ -541,6 +540,9 @@ Uri:
 
 // ****************************************************************************
 // Pseudo-terminals
+
+PERCENTAGE returns ecore::EString: NUMBER '%';
+AT2_IDENT returns ecore::EString: '@' AT_IDENT;
 
 // This is WS*, not WS?, because whjte-spaces may be split by comments.
 OPT_SPACE returns ecore::EString:
@@ -568,20 +570,14 @@ terminal fragment IDENT_CHAR : ('_'|'a'..'z'|'A'..'Z'|'0'..'9'|'-');
 terminal fragment NMSTART: ('_'|'a'..'z'|'A'..'Z') /* | NON_ASCII */ | ESCAPE;
 terminal fragment NMCHAR: IDENT_CHAR /* | NON_ASCII */ | ESCAPE;
 terminal IDENT : '-'? NMSTART NMCHAR*;
-terminal PERCENT : '%';
-terminal AT_IDENT: '@' IDENT_CHAR+;
-terminal AT2_IDENT: '@' '@' IDENT_CHAR+;
+terminal AT_IDENT : '@' AT_IDENT;
 terminal fragment STRING1: '"' (!('\n' | '\r' /*| '\f'*/ | '\\' | '\"') | '\\' NL | ESCAPE)* '"';
 terminal fragment STRING2: '\'' (!('\n' | '\r' /*| '\f'*/ | '\\' | '\'') | '\\' NL | ESCAPE)* '\'';
 terminal STRING : STRING1 | STRING2;
 
 terminal JS_EVALUATION : '`' (!'`')* '`';
-terminal HASH_COLOR : '#' ('0'..'9'|'a'..'f'|'A'..'F')('0'..'9'|'a'..'f'|'A'..'F')('0'..'9'|'a'..'f'|'A'..'F')
-  (('0'..'9'|'a'..'f'|'A'..'F')('0'..'9'|'a'..'f'|'A'..'F')('0'..'9'|'a'..'f'|'A'..'F'))?
-;
-terminal HASH_OTHER : '#' ('_'|'a'..'z'|'A'..'Z'|'0'..'9'|'-')+;
+terminal HASH_IDENT : '#' ('_'|'a'..'z'|'A'..'Z'|'0'..'9'|'-')+;
 terminal NUMBER :  (('0' .. '9')+) | (('0' .. '9')* '.' ('0' .. '9')+);
-terminal PERCENTAGE : NUMBER '%';
 terminal ML_COMMENT : '/*' -> '*/';
 terminal SL_COMMENT   : '//' !('\n'|'\r')* ('\r'? '\n')?;
 terminal WS : (' ' | '\t' | '\r' | '\n' /*| '\f'*/)+;

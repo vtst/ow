@@ -18,6 +18,7 @@ import net.vtst.ow.eclipse.less.less.Block;
 import net.vtst.ow.eclipse.less.less.BlockContents;
 import net.vtst.ow.eclipse.less.less.BlockUtils;
 import net.vtst.ow.eclipse.less.less.Declaration;
+import net.vtst.ow.eclipse.less.less.HashColorTerm;
 import net.vtst.ow.eclipse.less.less.IdentTerm;
 import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.less.IncompleteToplevelStatement;
@@ -446,4 +447,13 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     }
   }
 
+  private static Pattern HASH_COLOR = Pattern.compile("#[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]([0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])?");
+
+  @Check
+  @ConfigurableCheck(configurable = false)
+  public void checkNumberWithUnitTerm(HashColorTerm term) {
+    if (term.getValue() != null && !(HASH_COLOR.matcher(term.getValue()).matches())) {
+      error(messages.getString("invalid_color_code"), term, null, 0);      
+    }
+  }
 }
