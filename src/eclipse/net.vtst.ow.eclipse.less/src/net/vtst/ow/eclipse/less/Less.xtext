@@ -224,7 +224,6 @@ AtVariableWithBraces: '@' '{' variable=[AtVariableRefTarget|IDENT_OR_KEYWORD_PRE
 // ----------------------------------------------------------------------------
 // @ variable definitions
 
-// There is a trailing OPT_SPACE in this rule, because there is no in Term
 VariableDefinition:
   lhs=VariableDefinitionLhs OPT_SPACE ':' OPT_SPACE expr=Expr
 ;
