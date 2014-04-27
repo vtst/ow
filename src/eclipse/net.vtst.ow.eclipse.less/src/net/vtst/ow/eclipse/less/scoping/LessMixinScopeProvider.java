@@ -1,7 +1,6 @@
 package net.vtst.ow.eclipse.less.scoping;
 
 import net.vtst.ow.eclipse.less.less.Block;
-import net.vtst.ow.eclipse.less.less.BlockUtils;
 import net.vtst.ow.eclipse.less.less.HashOrClass;
 import net.vtst.ow.eclipse.less.less.HashOrClassRef;
 import net.vtst.ow.eclipse.less.less.ImportStatement;

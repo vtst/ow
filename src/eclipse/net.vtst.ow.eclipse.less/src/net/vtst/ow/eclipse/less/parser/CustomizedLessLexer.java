@@ -5,8 +5,6 @@ import net.vtst.ow.eclipse.less.parser.antlr.internal.InternalLessParser;
 
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonToken;
-import org.antlr.runtime.IntStream;
-import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
 
 /**

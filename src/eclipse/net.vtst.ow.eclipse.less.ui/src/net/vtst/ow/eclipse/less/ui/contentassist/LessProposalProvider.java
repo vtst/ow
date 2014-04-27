@@ -7,7 +7,6 @@ import java.util.Set;
 
 import net.vtst.ow.eclipse.less.CssProfile;
 import net.vtst.ow.eclipse.less.less.Block;
-import net.vtst.ow.eclipse.less.less.BlockUtils;
 import net.vtst.ow.eclipse.less.less.Declaration;
 import net.vtst.ow.eclipse.less.less.Expr;
 import net.vtst.ow.eclipse.less.less.FontFaceStatement;

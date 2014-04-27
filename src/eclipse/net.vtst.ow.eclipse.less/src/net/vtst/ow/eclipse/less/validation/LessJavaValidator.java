@@ -15,7 +15,6 @@ import net.vtst.eclipse.easyxtext.validation.config.ConfigurableCheck;
 import net.vtst.eclipse.easyxtext.validation.config.ConfigurableDeclarativeValidator;
 import net.vtst.ow.eclipse.less.LessMessages;
 import net.vtst.ow.eclipse.less.less.Block;
-import net.vtst.ow.eclipse.less.less.BlockUtils;
 import net.vtst.ow.eclipse.less.less.Declaration;
 import net.vtst.ow.eclipse.less.less.HashColorTerm;
 import net.vtst.ow.eclipse.less.less.IdentTerm;

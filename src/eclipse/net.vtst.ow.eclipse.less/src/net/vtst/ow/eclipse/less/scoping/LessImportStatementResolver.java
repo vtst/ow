@@ -10,7 +10,6 @@ import java.util.Set;
 import net.vtst.ow.eclipse.less.LessMessages;
 import net.vtst.ow.eclipse.less.LessRuntimeModule;
 import net.vtst.ow.eclipse.less.less.Block;
-import net.vtst.ow.eclipse.less.less.BlockUtils;
 import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.less.InnerRuleSet;
 import net.vtst.ow.eclipse.less.less.LessPackage;
