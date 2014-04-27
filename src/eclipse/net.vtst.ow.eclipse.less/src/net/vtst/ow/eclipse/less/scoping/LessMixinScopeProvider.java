@@ -51,11 +51,11 @@ public class LessMixinScopeProvider {
    * @param mixin  A mixin.
    * @return The scope for the mixin, if this is a mixin call, null if this is a mixin definition.  
    */
-  public MixinScope getScope(final MixinUtils.Helper mixinHelper) {
-    assert !mixinHelper.isDefinition();
-    return cache.get(Tuples.pair(LessMixinScopeProvider.class, mixinHelper.getMixin()), mixinHelper.getMixin().eResource(), new Provider<MixinScope>() {
+  public MixinScope getScope(final Mixin mixin) {
+    assert MixinUtils.isCall(mixin);
+    return cache.get(Tuples.pair(LessMixinScopeProvider.class, mixin), mixin.eResource(), new Provider<MixinScope>() {
       public MixinScope get() {
-        return getScopeRec(mixinHelper.getMixin().eContainer(), null, mixinHelper.getPath());
+        return getScopeRec(mixin.eContainer(), null, MixinUtils.getPath(mixin));
       }
     });      
   }
@@ -135,14 +135,14 @@ public class LessMixinScopeProvider {
             fillScopeForStatements(scope, resolvedImportStatement.getImportedStyleSheet().getStatements(), null, position, element);
           }
         } else if (obj instanceof Mixin) {
-          MixinUtils.Helper mixinHelper = MixinUtils.newHelper((Mixin) obj);
-          if (mixinHelper.isDefinition() && mixinHelper.getSelectors().getSelector().size() == 1) {
-            HashOrClassRef selector = mixinHelper.getSelectors().getSelector().get(0);
+          Mixin mixin = (Mixin) obj;
+          if (MixinUtils.isDefinition(mixin) && mixin.getSelectors().getSelector().size() == 1) {
+            HashOrClassRef selector = mixin.getSelectors().getSelector().get(0);
             String selectorIdent = MixinUtils.getIdent(selector);
             MixinScopeElement newElement = element.cloneAndExtends(selectorIdent, selector);
             scope.addAtPosition(position, newElement);          
             if (scope.getPath().isMatching(position, selectorIdent)) {
-              fillScopeForBlock(scope, mixinHelper.getBody(), null, position + 1, newElement);
+              fillScopeForBlock(scope, mixin.getBody(), null, position + 1, newElement);
             }
           }
         } else if (obj instanceof ToplevelRuleSet) {

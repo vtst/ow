@@ -14,70 +14,16 @@ public class MixinUtils {
   // **************************************************************************
   // Helper class for accessing Mixin objects
   
-  public static abstract class Helper {
-    private Mixin mixin;
-    
-    public Helper(Mixin mixin) {
-      this.mixin = mixin;
-    }
-    
-    public abstract MixinSelectors getSelectors();
-    public abstract MixinParameters getParameters();
-    public abstract MixinDefinitionGuards getGuard();
-    public abstract Block getBody();
-    
-    public Mixin getMixin() {
-      return this.mixin;
-    }
-    
-    public boolean isDefinition() {
-      return this.getBody() != null;
-    }
-    
-    public boolean isCall() {
-      return this.getBody() == null;
-    }
-
-    public MixinPath getPath() { 
-      return new MixinPath(this.getSelectors().getSelector());
-    }
+  public static boolean isDefinition(Mixin mixin) {
+    return mixin.getBody() != null;
   }
   
-  public static class HelperForTerminatedMixin extends Helper {
-    private TerminatedMixin mixin;
-
-    public HelperForTerminatedMixin(TerminatedMixin mixin) {
-      super(mixin);
-      this.mixin = mixin;
-    }
-    
-    public MixinSelectors getSelectors() { return mixin.getSelectors(); }
-    public MixinParameters getParameters() { return mixin.getParameters(); }
-    public MixinDefinitionGuards getGuard() { return mixin.getGuards(); }
-    public Block getBody() { return mixin.getBody(); }
-  }
-  
-  public static class HelperForUnterminatedMixin extends Helper {
-    private UnterminatedMixin mixin;
-
-    public HelperForUnterminatedMixin(UnterminatedMixin mixin) {
-      super(mixin);
-      this.mixin = mixin;
-    }
-    
-    public MixinSelectors getSelectors() { return mixin.getSelectors(); }
-    public MixinParameters getParameters() { return null; }
-    public MixinDefinitionGuards getGuard() { return null; }
-    public Block getBody() { return null; }
+  public static boolean isCall(Mixin mixin) {
+    return mixin.getBody() == null;
   }
 
-
-  public static Helper newHelper(TerminatedMixin mixin) { return new HelperForTerminatedMixin(mixin); }
-  public static Helper newHelper(UnterminatedMixin mixin) { return new HelperForUnterminatedMixin(mixin); }
-  public static Helper newHelper(Mixin mixin) {
-    if (mixin instanceof UnterminatedMixin) return newHelper((UnterminatedMixin) mixin);
-    if (mixin instanceof TerminatedMixin) return newHelper((TerminatedMixin) mixin);
-    throw new RuntimeException("Unknown sub-class of Mixin");
+  public static MixinPath getPath(Mixin mixin) { 
+    return new MixinPath(mixin.getSelectors().getSelector());
   }
   
   // **************************************************************************
@@ -159,10 +105,7 @@ public class MixinUtils {
       if (!parameter.isHasDefaultValue()) {
         EObject mixin = LessUtils.getNthAncestor(container, 2);
         if (mixin instanceof Mixin) {
-          MixinUtils.Helper helper = MixinUtils.newHelper((Mixin) mixin);
-          if (helper.isDefinition()) {
-            return true;
-          }
+          if (MixinUtils.isDefinition((Mixin) mixin)) return true;
         }
       }
     }
@@ -174,8 +117,7 @@ public class MixinUtils {
     if (container instanceof MixinSelectors) {
       EObject mixin = container.eContainer();
       if (mixin instanceof Mixin) {
-        MixinUtils.Helper helper = MixinUtils.newHelper((Mixin) mixin);
-        if (helper.isDefinition()) return true;
+        if (MixinUtils.isDefinition((Mixin) mixin)) return true;
       }
     }
     return false;

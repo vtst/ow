@@ -13,8 +13,8 @@ import net.vtst.ow.eclipse.less.less.Block;
 import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.less.InnerRuleSet;
 import net.vtst.ow.eclipse.less.less.LessPackage;
+import net.vtst.ow.eclipse.less.less.Mixin;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
-import net.vtst.ow.eclipse.less.less.TerminatedMixin;
 import net.vtst.ow.eclipse.less.less.ToplevelRuleSet;
 import net.vtst.ow.eclipse.less.parser.LessValueConverterService;
 import net.vtst.ow.eclipse.less.properties.LessProjectProperty;
@@ -222,8 +222,8 @@ public class LessImportStatementResolver {
           visit(((ToplevelRuleSet) statement).getBlock());
         } else if (statement instanceof InnerRuleSet) {
           visit(((InnerRuleSet) statement).getBlock());
-        } else if (statement instanceof TerminatedMixin) {
-          visit(((TerminatedMixin) statement).getBody());        
+        } else if (statement instanceof Mixin) {
+          visit(((Mixin) statement).getBody());        
         }
       }
     }

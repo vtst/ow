@@ -9,9 +9,10 @@ import net.vtst.ow.eclipse.less.less.FontFaceStatement;
 import net.vtst.ow.eclipse.less.less.InnerRuleSet;
 import net.vtst.ow.eclipse.less.less.InnerStatement;
 import net.vtst.ow.eclipse.less.less.MediaStatement;
+import net.vtst.ow.eclipse.less.less.Mixin;
+import net.vtst.ow.eclipse.less.less.MixinUtils;
 import net.vtst.ow.eclipse.less.less.PageStatement;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
-import net.vtst.ow.eclipse.less.less.TerminatedMixin;
 import net.vtst.ow.eclipse.less.less.ToplevelRuleSet;
 import net.vtst.ow.eclipse.less.less.ToplevelStatement;
 
@@ -42,10 +43,10 @@ public class LessOutlineTreeProvider extends DefaultOutlineTreeProvider {
   }
   
   // Elements containing blocks
-  protected void _createChildren(IOutlineNode parentNode, TerminatedMixin obj) {
+  protected void _createChildren(IOutlineNode parentNode, Mixin obj) {
     createChildrenForBlock(parentNode, obj.getBody());
   }
-  protected boolean _isLeaf(TerminatedMixin obj) {
+  protected boolean _isLeaf(Mixin obj) {
     return isLeafForBlock(obj.getBody());
   }
   protected void _createChildren(IOutlineNode parentNode, ToplevelRuleSet obj) {
@@ -99,7 +100,7 @@ public class LessOutlineTreeProvider extends DefaultOutlineTreeProvider {
   }
   protected boolean innerStatementHasNode(EObject statement) {
     if (statement instanceof Declaration) return false;
-    if (statement instanceof TerminatedMixin) return (((TerminatedMixin) statement).getBody() != null);
+    if (statement instanceof Mixin) return MixinUtils.isDefinition((Mixin) statement); 
     return true;
   }
   

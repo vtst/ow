@@ -11,10 +11,10 @@ import net.vtst.ow.eclipse.less.less.AtVariableRefTarget;
 import net.vtst.ow.eclipse.less.less.Block;
 import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.less.LessPackage;
+import net.vtst.ow.eclipse.less.less.Mixin;
 import net.vtst.ow.eclipse.less.less.MixinParameter;
 import net.vtst.ow.eclipse.less.less.MixinUtils;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
-import net.vtst.ow.eclipse.less.less.TerminatedMixin;
 import net.vtst.ow.eclipse.less.less.VariableDefinition;
 import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver.ResolvedImportStatement;
 
@@ -106,12 +106,12 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
       return computeVariableScopeOfStatements(container, ((Block) container).getContent().getStatement(), null, ref);
     } else if (container instanceof StyleSheet) {
       return computeVariableScopeOfStatements(container, getStyleSheetStatements((StyleSheet) container), null, ref);
-    } else if (container instanceof TerminatedMixin) {
+    } else if (container instanceof Mixin) {
       EStructuralFeature containingFeature = context.eContainingFeature();
-      if (containingFeature.equals(LessPackage.eINSTANCE.getTerminatedMixin_Guards()) ||
-          containingFeature.equals(LessPackage.eINSTANCE.getTerminatedMixin_Body()) ||
-          containingFeature.equals(LessPackage.eINSTANCE.getTerminatedMixin_Parameters())) {
-        return computeVariableScopeOfMixinDefinition((TerminatedMixin) container, ref);
+      if (containingFeature.equals(LessPackage.eINSTANCE.getMixin_Guards()) ||
+          containingFeature.equals(LessPackage.eINSTANCE.getMixin_Body()) ||
+          containingFeature.equals(LessPackage.eINSTANCE.getMixin_Parameters())) {
+        return computeVariableScopeOfMixinDefinition((Mixin) container, ref);
       }
     }
     return computeVariableScope(container, ref);
@@ -133,7 +133,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
   /**
    * Compute the scope of a mixin definition, binding the parameters of the definition.
    */
-  public IScope computeVariableScopeOfMixinDefinition(final TerminatedMixin context, final EReference ref) {
+  public IScope computeVariableScopeOfMixinDefinition(final Mixin context, final EReference ref) {
     return cache.get(Tuples.pair(LessScopeProvider.class, context), context.eResource(), new Provider<IScope>() {
       public IScope get() {
         List<IEObjectDescription> variableDefinitions = new ArrayList<IEObjectDescription>();
@@ -162,7 +162,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
   
   /** Add the variables defined by a mixin.
    */
-  private void addVariableDefinitions(TerminatedMixin mixinDefinition, List<IEObjectDescription> variableDefinitions) {
+  private void addVariableDefinitions(Mixin mixinDefinition, List<IEObjectDescription> variableDefinitions) {
     for (MixinParameter parameter: mixinDefinition.getParameters().getParameter()) {
       AtVariableRefTarget variable = MixinUtils.getVariableBoundByMixinParameter(parameter);
       if (variable != null) variableDefinitions.add(getEObjectDescriptionFor(variable));
@@ -198,7 +198,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
   IScope scope_HashOrClassRefTarget(EObject context, EReference ref) {
     MixinContext mixinContext = new MixinContext(context);
     if (!mixinContext.isValid()) return IScope.NULLSCOPE;
-    MixinScope scope = mixinScopeProvider.getScope(mixinContext.getMixinHelper());
+    MixinScope scope = mixinScopeProvider.getScope(mixinContext.getMixin());
     return scope.getScope(mixinContext.getSelectorIndex());
   }
 

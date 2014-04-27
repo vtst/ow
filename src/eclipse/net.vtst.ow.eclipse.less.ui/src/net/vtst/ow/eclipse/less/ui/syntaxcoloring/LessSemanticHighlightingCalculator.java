@@ -11,11 +11,12 @@ import net.vtst.ow.eclipse.less.less.MediaQuery;
 import net.vtst.ow.eclipse.less.less.MixinDefinitionGuard;
 import net.vtst.ow.eclipse.less.less.MixinDefinitionGuards;
 import net.vtst.ow.eclipse.less.less.MixinSelectors;
+import net.vtst.ow.eclipse.less.less.MixinUtils;
 import net.vtst.ow.eclipse.less.less.NumericLiteral;
 import net.vtst.ow.eclipse.less.less.Property;
 import net.vtst.ow.eclipse.less.less.RootSelector;
 import net.vtst.ow.eclipse.less.less.SimpleSelector;
-import net.vtst.ow.eclipse.less.less.TerminatedMixin;
+import net.vtst.ow.eclipse.less.less.Mixin;
 import net.vtst.ow.eclipse.less.less.VariableSelector;
 import net.vtst.ow.eclipse.less.services.LessGrammarAccess;
 
@@ -38,7 +39,7 @@ public class LessSemanticHighlightingCalculator extends EasySemanticHighlighting
     EObject obj = node.getSemanticElement();
     if (obj instanceof MixinSelectors) {
       EObject container = obj.eContainer();
-      if (container instanceof TerminatedMixin && ((TerminatedMixin) container).getBody() != null) {
+      if (container instanceof Mixin && MixinUtils.isDefinition((Mixin) container)) {
         acceptor.addPosition(node.getOffset(), node.getLength(), highlightingConfig.SELECTOR.getId());
       }
       return true;

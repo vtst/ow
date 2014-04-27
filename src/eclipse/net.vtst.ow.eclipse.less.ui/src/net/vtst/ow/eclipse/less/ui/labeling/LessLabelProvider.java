@@ -9,9 +9,10 @@ import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.less.InnerRuleSet;
 import net.vtst.ow.eclipse.less.less.MediaQuery;
 import net.vtst.ow.eclipse.less.less.MediaStatement;
+import net.vtst.ow.eclipse.less.less.Mixin;
+import net.vtst.ow.eclipse.less.less.MixinUtils;
 import net.vtst.ow.eclipse.less.less.PageStatement;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
-import net.vtst.ow.eclipse.less.less.TerminatedMixin;
 import net.vtst.ow.eclipse.less.less.ToplevelRuleSet;
 import net.vtst.ow.eclipse.less.less.VariableDefinition;
 import net.vtst.ow.eclipse.less.ui.LessImageHelper;
@@ -123,7 +124,7 @@ public class LessLabelProvider extends DefaultEObjectLabelProvider {
 	}
 	
 	String image(StyleSheet obj) { return LessImageHelper.STYLESHEET;	}
-  String image(TerminatedMixin obj) { return LessImageHelper.MIXIN_DEFINITION; }
+  String image(Mixin obj) { return LessImageHelper.MIXIN_DEFINITION; }
   String image(VariableDefinition obj) { return LessImageHelper.VARIABLE_DEFINITION; }
   String image(ToplevelRuleSet obj) { return LessImageHelper.RULE_SET; }
   String image(ImportStatement obj) { return LessImageHelper.IMPORT_STATEMENT; }
@@ -137,9 +138,12 @@ public class LessLabelProvider extends DefaultEObjectLabelProvider {
     return getTokenText(obj.getSelector());
   }
 
-  StyledString text(TerminatedMixin obj) {
-    if (obj.getBody() == null) return null;
-    return new StyledString(getTokenText(obj.getSelectors()), italicStyler);
+  StyledString text(Mixin obj) {
+    if (MixinUtils.isDefinition(obj)) {
+      return new StyledString(getTokenText(obj.getSelectors()), italicStyler);
+    } else {
+      return null;
+    }    
 	}
 	
 	StyledString text(ImportStatement obj) {

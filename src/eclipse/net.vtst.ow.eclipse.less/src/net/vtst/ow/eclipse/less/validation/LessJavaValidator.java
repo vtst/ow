@@ -40,7 +40,6 @@ import net.vtst.ow.eclipse.less.less.RawProperty;
 import net.vtst.ow.eclipse.less.less.StringTerm;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
 import net.vtst.ow.eclipse.less.less.Term;
-import net.vtst.ow.eclipse.less.less.TerminatedMixin;
 import net.vtst.ow.eclipse.less.less.ToplevelRuleSet;
 import net.vtst.ow.eclipse.less.less.ToplevelSelector;
 import net.vtst.ow.eclipse.less.less.VariableDefinition;
@@ -173,15 +172,14 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   @Check
   @ConfigurableCheck(configurable = false)
   public void checkMixin(Mixin mixin) {
-    MixinUtils.Helper helper = MixinUtils.newHelper(mixin);
-    if (helper.isDefinition()) checkMixinDefinition(helper);
-    if (helper.isCall()) checkMixinCall(helper);
+    if (MixinUtils.isDefinition(mixin)) checkMixinDefinition(mixin);
+    if (MixinUtils.isCall(mixin)) checkMixinCall(mixin);
   }
   
-  private void checkMixinDefinition(MixinUtils.Helper helper) {
-    MixinParameters parameters = helper.getParameters();
+  private void checkMixinDefinition(Mixin mixin) {
+    MixinParameters parameters = mixin.getParameters();
     if (parameters != null) checkMixinDefinitionParameters(parameters);
-    MixinSelectors selectors = helper.getSelectors();
+    MixinSelectors selectors = mixin.getSelectors();
     if (selectors.getSelector().size() > 1) {
       error(messages.getString("unexpected_selector"), selectors, LessPackage.eINSTANCE.getMixinSelectors_Selector(), 1);      
     }
@@ -296,15 +294,15 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     }
   }
   
-  private void checkMixinCall(MixinUtils.Helper helper) {
-    MixinParameters parameters = helper.getParameters();
+  private void checkMixinCall(Mixin mixin) {
+    MixinParameters parameters = mixin.getParameters();
     if (parameters != null) checkMixinCallParameters_Syntax(parameters);
-    MixinLink linkingResult = mixinLinkingService.getLinkedMixin(helper);
+    MixinLink linkingResult = mixinLinkingService.getLinkedMixin(mixin);
     if (!linkingResult.isSuccess()) {
       List<ICheckMixinError> errors = linkingResult.getError();
       if (errors == null) {
         if (checkMixinCallParameters.get(this.getCurrentObject()))
-          warning(messages.getString("mixin_parameters_match_no_definition"), helper.getSelectors(), null, 0);
+          warning(messages.getString("mixin_parameters_match_no_definition"), mixin.getSelectors(), null, 0);
       } else {
         for (ICheckMixinError error : errors)
           error.report(messages, getMessageAcceptor());
@@ -322,10 +320,9 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   @ConfigurableCheck(configurable = false)
   public void checkTerminatedMixinsInKeyframesStatement(KeyframesStatement statement) {
     for (EObject item : statement.getContent().getStatement()) {
-      if (item instanceof TerminatedMixin) {
-        TerminatedMixin mixin = (TerminatedMixin) item;
-        MixinUtils.Helper helper = MixinUtils.newHelper(mixin);
-        if (helper.isDefinition()) {
+      if (item instanceof Mixin) {
+        Mixin mixin = (Mixin) item;
+        if (MixinUtils.isDefinition(mixin)) {
           error(messages.getString("unexpected_token"), mixin.getBody(), null, 0);          
         }
         if (mixin.getPriority() != null) {

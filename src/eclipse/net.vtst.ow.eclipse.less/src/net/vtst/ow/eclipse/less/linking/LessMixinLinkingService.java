@@ -12,12 +12,11 @@ import net.vtst.ow.eclipse.less.LessMessages;
 import net.vtst.ow.eclipse.less.less.HashOrClassRefTarget;
 import net.vtst.ow.eclipse.less.less.LessPackage;
 import net.vtst.ow.eclipse.less.less.LessUtils;
+import net.vtst.ow.eclipse.less.less.Mixin;
 import net.vtst.ow.eclipse.less.less.MixinParameter;
 import net.vtst.ow.eclipse.less.less.MixinParameters;
 import net.vtst.ow.eclipse.less.less.MixinUtils;
-import net.vtst.ow.eclipse.less.less.MixinUtils.Helper;
 import net.vtst.ow.eclipse.less.less.MixinVarParameter;
-import net.vtst.ow.eclipse.less.less.TerminatedMixin;
 import net.vtst.ow.eclipse.less.scoping.LessMixinScopeProvider;
 import net.vtst.ow.eclipse.less.scoping.MixinContext;
 import net.vtst.ow.eclipse.less.scoping.MixinScope;
@@ -82,13 +81,13 @@ public class LessMixinLinkingService implements ILinkingService {
   }
 
   public class IllegalNumberOfParameters implements ICheckMixinError {
-    private MixinUtils.Helper helper;
+    private Mixin mixin;
     private int expectedMin;
     private int expectedMax;
     private int provided;
     
-    public IllegalNumberOfParameters(Helper helper, int expectedMin, int expectedMax, int provided) {
-      this.helper = helper;
+    public IllegalNumberOfParameters(Mixin mixin, int expectedMin, int expectedMax, int provided) {
+      this.mixin = mixin;
       this.expectedMin = expectedMin;
       this.expectedMax = expectedMax;
       this.provided = provided;
@@ -108,7 +107,7 @@ public class LessMixinLinkingService implements ILinkingService {
     public void report(LessMessages messages, ValidationMessageAcceptor acceptor) {
       acceptor.acceptWarning(
           getErrorMessageForCheckMixinCallParameters(messages, this.expectedMin, this.expectedMax, provided),
-          helper.getSelectors(), null, 0, null);
+          mixin.getSelectors(), null, 0, null);
     }
   }
     
@@ -117,7 +116,7 @@ public class LessMixinLinkingService implements ILinkingService {
     public int maxNumberOfParameters = 0;
     public Map<String, Boolean> parameterNames = new HashMap<String, Boolean>();  // name -> required/optional
     
-    private Prototype(TerminatedMixin mixinDefinition) {
+    private Prototype(Mixin mixinDefinition) {
       if (mixinDefinition == null) return;
       EList<MixinParameter> parameters = mixinDefinition.getParameters().getParameter();
       for (MixinParameter parameter: parameters) {
@@ -135,8 +134,8 @@ public class LessMixinLinkingService implements ILinkingService {
       }
     }
     
-    private int getNumberOfParametersOfMixinCall(Helper helper) {
-      MixinParameters parameters = helper.getParameters();
+    private int getNumberOfParametersOfMixinCall(Mixin mixin) {
+      MixinParameters parameters = mixin.getParameters();
       if (parameters == null) return 0;
       int numberOfSemicolons = 0;
       for (String separator : parameters.getSep()) {
@@ -146,16 +145,16 @@ public class LessMixinLinkingService implements ILinkingService {
       else return parameters.getParameter().size();
     }
 
-    public List<ICheckMixinError> checkMixinCall(Helper helper) {
+    public List<ICheckMixinError> checkMixinCall(Mixin mixin) {
       List<ICheckMixinError> errors = new ArrayList<ICheckMixinError>();
       
       // Check the number of parameters
-      int provided = getNumberOfParametersOfMixinCall(helper);
+      int provided = getNumberOfParametersOfMixinCall(mixin);
       if (provided < this.minNumberOfParameters || provided > this.maxNumberOfParameters) {
-        errors.add(new IllegalNumberOfParameters(helper, this.minNumberOfParameters, this.maxNumberOfParameters, provided));
+        errors.add(new IllegalNumberOfParameters(mixin, this.minNumberOfParameters, this.maxNumberOfParameters, provided));
       }
       
-      MixinParameters parameters = helper.getParameters();
+      MixinParameters parameters = mixin.getParameters();
       if (parameters != null) {
         // Get the set of named of parameters.
         // Check unicity of names.
@@ -194,12 +193,12 @@ public class LessMixinLinkingService implements ILinkingService {
   public Prototype getPrototypeForMixinDefinition(final HashOrClassRefTarget hashOrClass) {
     return cache.get(Tuples.pair(Prototype.class, hashOrClass), hashOrClass.eResource(), new Provider<Prototype>() {
       public Prototype get() {
-        EObject mixinDefinition = LessUtils.getNthAncestor(hashOrClass, 2);
-        if ((mixinDefinition instanceof TerminatedMixin)) {
-          return new Prototype((TerminatedMixin) mixinDefinition);
-        } else {
-          return new Prototype(null);
+        EObject obj = LessUtils.getNthAncestor(hashOrClass, 2);
+        if (obj instanceof Mixin) {
+          Mixin mixin = (Mixin) obj;
+          if (MixinUtils.isDefinition(mixin)) return new Prototype(mixin);
         }
+        return new Prototype(null);
       }
     });
   }
@@ -253,7 +252,7 @@ public class LessMixinLinkingService implements ILinkingService {
   // This would require two implementations of Prototype.checkMixinCall.
   // TODO: Check there is no place we assume that the target of a mixin call is a mixin declaration.
   // It could also be a simple ruleset.
-  private MixinLink getBestFullMatch(MixinUtils.Helper mixinHelper, MixinScope mixinScope) {
+  private MixinLink getBestFullMatch(Mixin mixin, MixinScope mixinScope) {
     Iterable<MixinScopeElement> fullMatches = mixinScope.getFullMatches();
     MixinScopeElement bestMatch = null;
     MixinScopeElement lastMatch = null;
@@ -265,7 +264,7 @@ public class LessMixinLinkingService implements ILinkingService {
         ++numberOfMatches;
         LessMixinLinkingService.Prototype prototype = 
             getPrototypeForMixinDefinition((HashOrClassRefTarget) eObject);
-        lastErrors = prototype.checkMixinCall(mixinHelper);
+        lastErrors = prototype.checkMixinCall(mixin);
         lastMatch = fullMatch;
         if (lastErrors.isEmpty()) bestMatch = fullMatch;
       }
@@ -275,7 +274,7 @@ public class LessMixinLinkingService implements ILinkingService {
     else return null;
   }
   
-  private MixinLink getLongestMatch(MixinUtils.Helper mixinHelper, MixinScope mixinScope) {
+  private MixinLink getLongestMatch(Mixin mixin, MixinScope mixinScope) {
     int lastMatchingPosition = mixinScope.getLastMatchingPosition();
     if (lastMatchingPosition < 0) return new MixinLink();
     MixinScopeElement element = mixinScope.getLastElement(lastMatchingPosition);
@@ -283,13 +282,13 @@ public class LessMixinLinkingService implements ILinkingService {
     return new MixinLink(element, lastMatchingPosition + 1);
   }
 
-  public MixinLink getLinkedMixin(final MixinUtils.Helper mixinHelper) {
-    return cache.get(Tuples.pair(Prototype.class, mixinHelper.getMixin()), mixinHelper.getMixin().eResource(), new Provider<MixinLink>() {
+  public MixinLink getLinkedMixin(final Mixin mixin) {
+    return cache.get(Tuples.pair(Prototype.class, mixin), mixin.eResource(), new Provider<MixinLink>() {
       public MixinLink get() {
-        MixinScope mixinScope = mixinScopeProvider.getScope(mixinHelper);
-        MixinLink fullMatch = getBestFullMatch(mixinHelper, mixinScope);
+        MixinScope mixinScope = mixinScopeProvider.getScope(mixin);
+        MixinLink fullMatch = getBestFullMatch(mixin, mixinScope);
         if (fullMatch != null) return fullMatch;
-        return getLongestMatch(mixinHelper, mixinScope);
+        return getLongestMatch(mixin, mixinScope);
       }
     });    
   }
@@ -297,7 +296,7 @@ public class LessMixinLinkingService implements ILinkingService {
   public List<EObject> getLinkedObjects(EObject context, EReference ref, INode node) {
     MixinContext mixinContext = new MixinContext(context);
     if (!mixinContext.isValid()) return Collections.emptyList();
-    MixinLink linkingResult = getLinkedMixin(mixinContext.getMixinHelper());
+    MixinLink linkingResult = getLinkedMixin(mixinContext.getMixin());
     if (linkingResult.matchLength() > mixinContext.getSelectorIndex()) {
       return Collections.singletonList(linkingResult.getElement().getObject(mixinContext.getSelectorIndex()));
     } else {

@@ -7,6 +7,7 @@ import net.vtst.ow.eclipse.less.less.Block;
 import net.vtst.ow.eclipse.less.less.Combinator;
 import net.vtst.ow.eclipse.less.less.HashOrClass;
 import net.vtst.ow.eclipse.less.less.InnerSelector;
+import net.vtst.ow.eclipse.less.less.MixinUtils;
 import net.vtst.ow.eclipse.less.less.SimpleSelector;
 import net.vtst.ow.eclipse.less.less.SimpleSelectorWithoutRoot;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
@@ -155,7 +156,7 @@ public class MixinContentAssistContext {
 
     public boolean isValid() { return mixinContext.isValid(); }
 
-    public MixinPath getPath() { return mixinContext.getMixinHelper().getPath(); }
+    public MixinPath getPath() { return MixinUtils.getPath(mixinContext.getMixin()); }
 
     public int getIndex() { return mixinContext.getSelectorIndex(); }
   }

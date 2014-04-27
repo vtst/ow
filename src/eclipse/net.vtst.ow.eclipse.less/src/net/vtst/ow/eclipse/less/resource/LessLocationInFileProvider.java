@@ -6,7 +6,7 @@ package net.vtst.ow.eclipse.less.resource;
 import net.vtst.eclipse.easyxtext.resource.EasyLocationInFileProvider;
 import net.vtst.ow.eclipse.less.less.InnerRuleSet;
 import net.vtst.ow.eclipse.less.less.LessPackage;
-import net.vtst.ow.eclipse.less.less.TerminatedMixin;
+import net.vtst.ow.eclipse.less.less.Mixin;
 import net.vtst.ow.eclipse.less.less.ToplevelRuleSet;
 import net.vtst.ow.eclipse.less.less.VariableDefinition;
 
@@ -18,7 +18,7 @@ public class LessLocationInFileProvider extends EasyLocationInFileProvider {
     return LessPackage.eINSTANCE.getVariableDefinition_Lhs();
   }
 
-  protected EStructuralFeature _getIdentifierFeature(TerminatedMixin obj) {
+  protected EStructuralFeature _getIdentifierFeature(Mixin obj) {
     return LessPackage.eINSTANCE.getMixin_Selectors();
   }
   
