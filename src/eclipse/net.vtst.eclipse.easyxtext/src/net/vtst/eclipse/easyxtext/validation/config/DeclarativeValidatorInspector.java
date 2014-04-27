@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.vtst.eclipse.easyxtext.State;
+
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
@@ -71,7 +73,7 @@ public class DeclarativeValidatorInspector {
   /**
    * Converts a state into a boolean.
    */
-  private boolean stateToBoolean(CheckState state) {
+  private boolean stateToBoolean(State state) {
     switch (state) {
     case ENABLED: return true;
     case DISABLED: return false;
@@ -124,7 +126,7 @@ public class DeclarativeValidatorInspector {
       groupList.add(group);
     }
     if (annotation != null) {
-      if (annotation.defaultState() != CheckState.DEFAULT)
+      if (annotation.defaultState() != State.DEFAULT)
         group.enabledByDefault = stateToBoolean(annotation.defaultState());
       if (!annotation.group().isEmpty()) group.name = annotation.group();
       if (!annotation.label().isEmpty()) group.label = annotation.label();

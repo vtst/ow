@@ -5,6 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import net.vtst.eclipse.easyxtext.State;
+
 /**
  * Annotation for a check of an AbstractDeclarativeValidator that can be
  * configured by a ValidationPropertyPage.
@@ -23,7 +25,7 @@ public @interface ConfigurableCheck {
    * @return The default state of the check.  DEFAULT means that the default
    * for the validator (as defined by ConfigurableValidator) is used.
    */
-  CheckState defaultState() default CheckState.DEFAULT;
+  State defaultState() default State.DEFAULT;
   
   /**
    * @return The name of the configuration group for this check.  By default,
