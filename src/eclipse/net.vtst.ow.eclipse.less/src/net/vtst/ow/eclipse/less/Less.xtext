@@ -220,6 +220,7 @@ Mixin:
   TerminatedMixin | UnterminatedMixin
 ;
 
+// TODO: Delete hasFinalSemicolon.
 // The final ';' is made optional so that it can be omitted for final statements.
 // See LessJavaValidator.checkFinalSemicolonOfTerminatedMixin
 TerminatedMixin:
@@ -378,7 +379,7 @@ Pseudo:
 ;
 
 Extend: ':' 'extend' ExtendArg;
-// InnerExtend: '&' ':' 'extend' ExtendArg;
+InnerExtend: '&' ':' 'extend' ExtendArg ';';
 ExtendArg: '(' OPT_SPACE selector+=ExtendSelector (',' OPT_SPACE selector+=ExtendSelector)* ')' OPT_SPACE;
 
 PseudoWithoutNot:
