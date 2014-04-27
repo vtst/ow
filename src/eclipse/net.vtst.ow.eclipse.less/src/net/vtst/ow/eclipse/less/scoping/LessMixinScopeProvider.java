@@ -114,7 +114,7 @@ public class LessMixinScopeProvider {
   }
 
   private void fillScopeForBlock(MixinScope scope, Block block, EObject statementToIgnore, int position, MixinScopeElement element) {
-    fillScopeForStatements(scope, block.getStatement(), statementToIgnore, position, element);
+    fillScopeForStatements(scope, block.getContent().getStatement(), statementToIgnore, position, element);
   }
   
   private void fillScopeForStatements(

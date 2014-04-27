@@ -82,7 +82,7 @@ public class LessOutlineTreeProvider extends DefaultOutlineTreeProvider {
   // Common methods for all elements containing a block
   protected void createChildrenForBlock(IOutlineNode parentNode, Block block) {
     if (block == null) return;
-    for (InnerStatement statement: block.getStatement()) {
+    for (InnerStatement statement: block.getContent().getStatement()) {
       if (innerStatementHasNode(statement)) {
         createNode(parentNode, statement);
       }      
@@ -90,7 +90,7 @@ public class LessOutlineTreeProvider extends DefaultOutlineTreeProvider {
   }
   protected boolean isLeafForBlock(Block block) {
     if (block == null) return true;
-    for (InnerStatement statement: block.getStatement()) {
+    for (InnerStatement statement: block.getContent().getStatement()) {
       if (innerStatementHasNode(statement)) {
         return false;
       }      

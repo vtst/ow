@@ -97,13 +97,13 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
           if (importingContainer instanceof StyleSheet) {
             return computeVariableScopeOfStatements(importingContainer, getStyleSheetStatements((StyleSheet) importingContainer), importingStatement, ref);            
           } else if (importingContainer instanceof Block) {
-            return computeVariableScopeOfStatements(importingContainer, ((Block) importingContainer).getStatement(), importingStatement, ref);
+            return computeVariableScopeOfStatements(importingContainer, ((Block) importingContainer).getContent().getStatement(), importingStatement, ref);
           }
         }
         return IScope.NULLSCOPE;
       }
     } else if (container instanceof Block) {
-      return computeVariableScopeOfStatements(container, ((Block) container).getStatement(), null, ref);
+      return computeVariableScopeOfStatements(container, ((Block) container).getContent().getStatement(), null, ref);
     } else if (container instanceof StyleSheet) {
       return computeVariableScopeOfStatements(container, getStyleSheetStatements((StyleSheet) container), null, ref);
     } else if (container instanceof TerminatedMixin) {

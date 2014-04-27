@@ -211,7 +211,7 @@ public class LessImportStatementResolver {
     }
     
     private void visit(Block block) {
-      if (block != null) visit(block.getStatement());
+      if (block != null) visit(block.getContent().getStatement());
     }
 
     private void visit(Iterable<? extends EObject> statements) {

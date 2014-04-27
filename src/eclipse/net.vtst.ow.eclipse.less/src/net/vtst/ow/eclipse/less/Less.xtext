@@ -67,7 +67,11 @@ InnerStatement:
 ;
 
 Block:
-  {Block} '{' OPT_SPACE statement+=InnerStatement* '}' OPT_SPACE
+  {Block} '{' OPT_SPACE content=BlockContent '}' OPT_SPACE
+;
+
+BlockContent:
+  {BlockContent} statement+=InnerStatement*
 ;
 
 // ----------------------------------------------------------------------------
