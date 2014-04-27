@@ -7,7 +7,6 @@ import java.util.Set;
 
 import net.vtst.ow.eclipse.less.CssProfile;
 import net.vtst.ow.eclipse.less.less.Block;
-import net.vtst.ow.eclipse.less.less.BlockContents;
 import net.vtst.ow.eclipse.less.less.BlockUtils;
 import net.vtst.ow.eclipse.less.less.Declaration;
 import net.vtst.ow.eclipse.less.less.Expr;
@@ -59,14 +58,6 @@ public class LessProposalProvider extends AbstractLessProposalProvider {
 
   // **************************************************************************
   // Content assist for properties
-
-  public void complete_Property(
-      BlockContents model, 
-      RuleCall ruleCall,
-      ContentAssistContext context,
-      ICompletionProposalAcceptor acceptor) {
-    complete_Property(BlockUtils.getBlock(model), ruleCall, context, acceptor);
-  }
   
   public void complete_Property(
 		  Block model, 

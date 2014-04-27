@@ -10,8 +10,10 @@ import net.vtst.ow.eclipse.less.less.LessPackage;
 import net.vtst.ow.eclipse.less.linking.LessLinkingService;
 import net.vtst.ow.eclipse.less.linking.LessMixinLinkingService;
 import net.vtst.ow.eclipse.less.nature.LessProjectNature;
+import net.vtst.ow.eclipse.less.parser.CustomizedLessLexer;
 import net.vtst.ow.eclipse.less.parser.LessQualifiedNameConverter;
 import net.vtst.ow.eclipse.less.parser.LessValueConverterService;
+import net.vtst.ow.eclipse.less.parser.antlr.internal.InternalLessLexer;
 import net.vtst.ow.eclipse.less.resource.LessLocationInFileProvider;
 import net.vtst.ow.eclipse.less.resource.LessResourceDescriptionStrategy;
 import net.vtst.ow.eclipse.less.resource.LessSynchronizedXtextResourceSet;
@@ -28,10 +30,10 @@ import org.eclipse.xtext.naming.IQualifiedNameConverter;
 import org.eclipse.xtext.parsetree.reconstr.IHiddenTokenHelper;
 import org.eclipse.xtext.resource.IDefaultResourceDescriptionStrategy;
 import org.eclipse.xtext.resource.ILocationInFileProvider;
-import org.eclipse.xtext.resource.SynchronizedXtextResourceSet;
 import org.eclipse.xtext.resource.XtextResourceSet;
 
 import com.google.inject.Binder;
+import com.google.inject.Provider;
 
 /**
  * Use this class to register components to be used at runtime / without the Equinox extension registry.
@@ -50,9 +52,21 @@ public class LessRuntimeModule extends net.vtst.ow.eclipse.less.AbstractLessRunt
   public void configure(Binder binder) {
     super.configure(binder);
     binder.install(new EasyXtextModule());
+    binder.requestStaticInjection(CustomizedLessLexer.class);
     //binder.bind(LessHiddenTokenHelper.class).to(IHiddenTokenHelper.class);
   }
   
+  @Override
+  public Class<? extends org.eclipse.xtext.parser.antlr.Lexer> bindLexer() {
+    return CustomizedLessLexer.class;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Provider<InternalLessLexer> provideInternalLessLexer() {
+    return org.eclipse.xtext.parser.antlr.LexerProvider.create((Class<InternalLessLexer>) CustomizedLessLexer.class.asSubclass(InternalLessLexer.class));
+  }
+
   public EPackage bindEPackage() {
     return LessPackage.eINSTANCE;
   }

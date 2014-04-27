@@ -47,16 +47,12 @@ ToplevelOrInnerStatement:
   | PageStatement
   | FontFaceStatement
   | CharsetStatement
-;
-
-UnterminatedToplevelOrInnerStatement:
-  VariableDefinition
+  | VariableDefinition
   | UnterminatedMixin
 ;
   
 ToplevelStatement:
-  UnterminatedToplevelOrInnerStatement ';' OPT_SPACE
-  | ToplevelRuleSet
+    ToplevelRuleSet
   | ToplevelOrInnerStatement
   // This is required to avoid issues with syntax coloring when typing a variable definition.
   // There is a validation rule to report the error.
@@ -66,37 +62,12 @@ ToplevelStatement:
 InnerStatement:
   InnerRuleSet
   | ToplevelOrInnerStatement
-;
-
-UnterminatedInnerStatement:
-  Declaration
+  | Declaration
 //  | InnerExtend
-  | UnterminatedToplevelOrInnerStatement
 ;
-
-// Several statements include a block.  This rule would accept some ';' that are not legal.
-// They are detected by the LessJavaValidator.checkBlockSemicolons
-// The rule is written like that in order to meet the three following constraints:
-// 1. LL(*) grammar,
-// 2. All items of a Block linked to the same node.
-/*
-Block:
-  {Block} '{' OPT_SPACE 
-    (item+=InnerStatement)* 
-    (item+=UnterminatedInnerStatement 
-      (item+=BlockSemicolon (item+=InnerStatement)* (item+=UnterminatedInnerStatement)?)*
-    )?
-  '}' OPT_SPACE
-;
-*/
 
 Block:
-  {Block} '{' OPT_SPACE contents=BlockContents? '}' OPT_SPACE
-;
-
-BlockContents:
-  item=UnterminatedInnerStatement (';' OPT_SPACE next=BlockContents?)?
-  | item=InnerStatement next=BlockContents?
+  {Block} '{' OPT_SPACE statement+=InnerStatement* '}' OPT_SPACE
 ;
 
 // ----------------------------------------------------------------------------
@@ -225,7 +196,7 @@ AtVariableWithBraces: '@' '{' variable=[AtVariableRefTarget|IDENT_OR_KEYWORD_PRE
 // @ variable definitions
 
 VariableDefinition:
-  lhs=VariableDefinitionLhs OPT_SPACE ':' OPT_SPACE expr=Expr
+  lhs=VariableDefinitionLhs OPT_SPACE ':' OPT_SPACE expr=Expr ';' OPT_SPACE
 ;
 
 // This intermediate class is useful only for syntax highlighting purpose
@@ -252,8 +223,9 @@ TerminatedMixin:
   (priority=Priority (hasFinalSemicolon?=';' OPT_SPACE)? | guards=MixinDefinitionGuards? body=Block)
 ;
 
+// TODO: Merge with the default mixin case.
 UnterminatedMixin:
-  selectors=MixinSelectors priority=Priority
+  selectors=MixinSelectors priority=Priority ';' OPT_SPACE
 ;
 
 MixinSelectors:
@@ -438,7 +410,7 @@ PseudoClassNthSpecialCase:
 
 Declaration:
   star_property_hack?='*'? property=Property OPT_SPACE (merge?='+' OPT_SPACE)? ':' OPT_SPACE expr=Expr 
-  priority=Priority
+  priority=Priority ';' OPT_SPACE
 ;
 
 Priority:

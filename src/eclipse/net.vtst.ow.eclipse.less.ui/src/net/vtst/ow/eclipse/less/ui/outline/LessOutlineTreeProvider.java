@@ -4,10 +4,10 @@
 package net.vtst.ow.eclipse.less.ui.outline;
 
 import net.vtst.ow.eclipse.less.less.Block;
-import net.vtst.ow.eclipse.less.less.BlockUtils;
 import net.vtst.ow.eclipse.less.less.Declaration;
 import net.vtst.ow.eclipse.less.less.FontFaceStatement;
 import net.vtst.ow.eclipse.less.less.InnerRuleSet;
+import net.vtst.ow.eclipse.less.less.InnerStatement;
 import net.vtst.ow.eclipse.less.less.MediaStatement;
 import net.vtst.ow.eclipse.less.less.PageStatement;
 import net.vtst.ow.eclipse.less.less.StyleSheet;
@@ -82,24 +82,24 @@ public class LessOutlineTreeProvider extends DefaultOutlineTreeProvider {
   // Common methods for all elements containing a block
   protected void createChildrenForBlock(IOutlineNode parentNode, Block block) {
     if (block == null) return;
-    for (EObject item: BlockUtils.iterator(block)) {
-      if (BlockItemHasNode(item)) {
-        createNode(parentNode, item);
+    for (InnerStatement statement: block.getStatement()) {
+      if (innerStatementHasNode(statement)) {
+        createNode(parentNode, statement);
       }      
     }
   }
   protected boolean isLeafForBlock(Block block) {
     if (block == null) return true;
-    for (EObject item: BlockUtils.iterator(block)) {
-      if (BlockItemHasNode(item)) {
+    for (InnerStatement statement: block.getStatement()) {
+      if (innerStatementHasNode(statement)) {
         return false;
       }      
     }
     return true;
   }
-  protected boolean BlockItemHasNode(EObject item) {
-    if (item instanceof Declaration) return false;
-    if (item instanceof TerminatedMixin) return (((TerminatedMixin) item).getBody() != null);
+  protected boolean innerStatementHasNode(EObject statement) {
+    if (statement instanceof Declaration) return false;
+    if (statement instanceof TerminatedMixin) return (((TerminatedMixin) statement).getBody() != null);
     return true;
   }
   

@@ -9,7 +9,6 @@ import java.util.List;
 import net.vtst.ow.eclipse.less.less.AtVariableDef;
 import net.vtst.ow.eclipse.less.less.AtVariableRefTarget;
 import net.vtst.ow.eclipse.less.less.Block;
-import net.vtst.ow.eclipse.less.less.BlockContents;
 import net.vtst.ow.eclipse.less.less.BlockUtils;
 import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.less.LessPackage;
@@ -59,7 +58,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
     return styleSheet.eContents();
   }
   
-  public static <X> Iterable<X> removeElementFromIterable(Iterable<X> iterable, final X element) {
+  public static <X, Y extends X> Iterable<Y> removeElementFromIterable(Iterable<Y> iterable, final X element) {
     if (element == null) {
       return Iterables.filter(iterable, new Predicate<X>(){
         public boolean apply(X input) {
@@ -98,17 +97,14 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
           EObject importingContainer = importingStatement.eContainer();
           if (importingContainer instanceof StyleSheet) {
             return computeVariableScopeOfStatements(importingContainer, getStyleSheetStatements((StyleSheet) importingContainer), importingStatement, ref);            
-          } else {
-            while (importingContainer instanceof BlockContents) 
-              importingContainer = importingContainer.eContainer();
-            if (importingContainer instanceof Block) {
-              return computeVariableScopeOfStatements(importingContainer, BlockUtils.iterator((Block) importingContainer), importingStatement, ref);            }
+          } else if (importingContainer instanceof Block) {
+            return computeVariableScopeOfStatements(importingContainer, ((Block) importingContainer).getStatement(), importingStatement, ref);
           }
         }
         return IScope.NULLSCOPE;
       }
     } else if (container instanceof Block) {
-      return computeVariableScopeOfStatements(container, BlockUtils.iterator((Block) container), null, ref);
+      return computeVariableScopeOfStatements(container, ((Block) container).getStatement(), null, ref);
     } else if (container instanceof StyleSheet) {
       return computeVariableScopeOfStatements(container, getStyleSheetStatements((StyleSheet) container), null, ref);
     } else if (container instanceof TerminatedMixin) {
@@ -124,7 +120,7 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
     
   /** Compute the scope of a context, which contains the statements returned by iterable.
    */
-  public IScope computeVariableScopeOfStatements(final EObject context, final Iterable<EObject> statements, final EObject statementToIgnore, final EReference ref) {
+  public IScope computeVariableScopeOfStatements(final EObject context, final Iterable<? extends EObject> statements, final EObject statementToIgnore, final EReference ref) {
     return cache.get(Tuples.create(LessScopeProvider.class, context, statementToIgnore), context.eResource(), new Provider<IScope>() {
       public IScope get() {
         List<IEObjectDescription> variableDefinitions = new ArrayList<IEObjectDescription>();

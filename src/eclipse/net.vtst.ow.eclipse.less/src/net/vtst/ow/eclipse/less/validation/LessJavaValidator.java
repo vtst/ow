@@ -15,7 +15,6 @@ import net.vtst.eclipse.easyxtext.validation.config.ConfigurableCheck;
 import net.vtst.eclipse.easyxtext.validation.config.ConfigurableDeclarativeValidator;
 import net.vtst.ow.eclipse.less.LessMessages;
 import net.vtst.ow.eclipse.less.less.Block;
-import net.vtst.ow.eclipse.less.less.BlockContents;
 import net.vtst.ow.eclipse.less.less.BlockUtils;
 import net.vtst.ow.eclipse.less.less.Declaration;
 import net.vtst.ow.eclipse.less.less.HashColorTerm;
@@ -24,6 +23,7 @@ import net.vtst.ow.eclipse.less.less.ImportStatement;
 import net.vtst.ow.eclipse.less.less.IncompleteToplevelStatement;
 import net.vtst.ow.eclipse.less.less.InnerRuleSet;
 import net.vtst.ow.eclipse.less.less.InnerSelector;
+import net.vtst.ow.eclipse.less.less.InnerStatement;
 import net.vtst.ow.eclipse.less.less.KeyframesContents;
 import net.vtst.ow.eclipse.less.less.KeyframesStatement;
 import net.vtst.ow.eclipse.less.less.LessPackage;
@@ -93,7 +93,7 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   @Check
   public void checkBlockUniqueProperties(Block block) {
     Map<String, Boolean> properties = new HashMap<String, Boolean>();  // Property name -> isMerged
-    for(EObject item: BlockUtils.iterator(block)) {
+    for(InnerStatement item: block.getStatement()) {
       if (!(item instanceof Declaration)) continue;
       Declaration declaration = (Declaration) item;
       Property property = declaration.getProperty();
@@ -123,7 +123,7 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   @Check
   @ConfigurableCheck(group = "checkUniqueVariables")
   public void checkBlockUniqueVariables(Block block) {
-    checkUniqueVariables(BlockUtils.iterator(block));
+    checkUniqueVariables(block.getStatement());
   }
   
   // Check for multiple variables in stylesheet
@@ -133,7 +133,7 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     checkUniqueVariables(styleSheet.eContents());
   }
   
-  public void checkUniqueVariables(Iterable<EObject> iterable) {
+  public void checkUniqueVariables(Iterable<? extends EObject> iterable) {
     Set<String> names = new HashSet<String>();
     for (EObject obj: iterable) {
       if (obj instanceof VariableDefinition) {
@@ -172,24 +172,25 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     }
   }
 
-  @Check
-  @ConfigurableCheck(configurable = false)
-  public void checkFinalSemicolonOfTerminatedMixin(TerminatedMixin mixin) {
-    if (mixin.getBody() != null || mixin.isHasFinalSemicolon()) return;
-    EObject parent = mixin.eContainer();
-    if (parent instanceof BlockContents) {
-      if (((BlockContents) parent).getNext() != null) {
-        error(messages.getString("missing_semicolon_after_mixin_call"), mixin, LessPackage.eINSTANCE.getTerminatedMixin_Parameters(), 0);
-      }
-    } else if (parent instanceof StyleSheet) {
-      StyleSheet styleSheet = (StyleSheet) parent;
-      if (!mixin.equals(styleSheet.getStatements().get(styleSheet.getStatements().size() - 1))) {
-        error(messages.getString("missing_semicolon_after_mixin_call"), mixin, LessPackage.eINSTANCE.getTerminatedMixin_Parameters(), 0);        
-      }
-    } else {
-      throw new RuntimeException("Unknown class for a parent of a TerminatedMixin");
-    }
-  }
+// TODO: Implement new version.
+//  @Check
+//  @ConfigurableCheck(configurable = false)
+//  public void checkFinalSemicolonOfTerminatedMixin(TerminatedMixin mixin) {
+//    if (mixin.getBody() != null || mixin.isHasFinalSemicolon()) return;
+//    EObject parent = mixin.eContainer();
+//    if (parent instanceof BlockContents) {
+//      if (((BlockContents) parent).getNext() != null) {
+//        error(messages.getString("missing_semicolon_after_mixin_call"), mixin, LessPackage.eINSTANCE.getTerminatedMixin_Parameters(), 0);
+//      }
+//    } else if (parent instanceof StyleSheet) {
+//      StyleSheet styleSheet = (StyleSheet) parent;
+//      if (!mixin.equals(styleSheet.getStatements().get(styleSheet.getStatements().size() - 1))) {
+//        error(messages.getString("missing_semicolon_after_mixin_call"), mixin, LessPackage.eINSTANCE.getTerminatedMixin_Parameters(), 0);        
+//      }
+//    } else {
+//      throw new RuntimeException("Unknown class for a parent of a TerminatedMixin");
+//    }
+//  }
   
   @Check
   @ConfigurableCheck(configurable = false)

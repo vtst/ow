@@ -106,19 +106,19 @@ public class LessMixinScopeProvider {
    */
   private void fillScope(MixinScope scope, EObject context, EObject statementToIgnore, int position, MixinScopeElement element) {
     if (context instanceof Block) {
-      fillScope(scope, (Block) context, statementToIgnore, position, element);
+      fillScopeForBlock(scope, (Block) context, statementToIgnore, position, element);
     } else if (context instanceof StyleSheet) {
-      fillScope(scope, context.eContents(), statementToIgnore, position, element);
+      fillScopeForStatements(scope, context.eContents(), statementToIgnore, position, element);
     } else {
       assert false;
     }
   }
 
-  private void fillScope(MixinScope scope, Block block, EObject statementToIgnore, int position, MixinScopeElement element) {
-    fillScope(scope, BlockUtils.iterator(block), statementToIgnore, position, element);
+  private void fillScopeForBlock(MixinScope scope, Block block, EObject statementToIgnore, int position, MixinScopeElement element) {
+    fillScopeForStatements(scope, block.getStatement(), statementToIgnore, position, element);
   }
   
-  private void fillScope(
+  private void fillScopeForStatements(
       MixinScope scope, 
       Iterable<? extends EObject> statements,
       EObject statementToIgnore,
@@ -133,7 +133,7 @@ public class LessMixinScopeProvider {
           ResolvedImportStatement resolvedImportStatement = importStatementResolver.resolve((ImportStatement) obj);
           if (!resolvedImportStatement.hasError()) {
             // There is no cycle, and the imported stylesheet is not null.
-            fillScope(scope, resolvedImportStatement.getImportedStyleSheet().getStatements(), null, position, element);
+            fillScopeForStatements(scope, resolvedImportStatement.getImportedStyleSheet().getStatements(), null, position, element);
           }
         } else if (obj instanceof Mixin) {
           MixinUtils.Helper mixinHelper = MixinUtils.newHelper((Mixin) obj);
@@ -143,7 +143,7 @@ public class LessMixinScopeProvider {
             MixinScopeElement newElement = element.cloneAndExtends(selectorIdent, selector);
             scope.addAtPosition(position, newElement);          
             if (scope.getPath().isMatching(position, selectorIdent)) {
-              fillScope(scope, mixinHelper.getBody(), null, position + 1, newElement);
+              fillScopeForBlock(scope, mixinHelper.getBody(), null, position + 1, newElement);
             }
           }
         } else if (obj instanceof ToplevelRuleSet) {
@@ -185,6 +185,6 @@ public class LessMixinScopeProvider {
         ++i;
       }
     }
-    fillScope(scope, block, null, position + i, newElement);
+    fillScopeForBlock(scope, block, null, position + i, newElement);
   }
 }
