@@ -21,5 +21,19 @@ public class LessLinkingDiagnosticMessageProvider extends EasyDeclarativeLinking
   
   @Inject
   private LessJavaValidator validator;
-    
+  
+  public DiagnosticMessage getUnresolvedProxyMessage_AtVariableRefTarget(ILinkingDiagnosticContext context) {
+    if (!validator.checkVariableLinking.get(context.getContext())) return null;
+    if (MixinUtils.isBoundByMixinDefinitionParameter(context.getContext())) return null;
+    String message = String.format(messages.getString("unresolved_variable"), context.getLinkText());
+    return new DiagnosticMessage(message, Severity.ERROR, Diagnostic.LINKING_DIAGNOSTIC);      
+  }
+  
+  public DiagnosticMessage getUnresolvedProxyMessage_HashOrClassRefTarget(ILinkingDiagnosticContext context) {
+    if (!validator.checkMixinLinking.get(context.getContext())) return null;
+    if (MixinUtils.isBoundByMixinDefinitionSelector(context.getContext())) return null;
+    String message = String.format(messages.getString("unresolved_mixin"), context.getLinkText());
+    return new DiagnosticMessage(message, Severity.ERROR, Diagnostic.LINKING_DIAGNOSTIC);            
+  }
+  
 }
