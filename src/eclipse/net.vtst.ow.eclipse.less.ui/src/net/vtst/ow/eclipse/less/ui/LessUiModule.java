@@ -3,6 +3,7 @@
 
 package net.vtst.ow.eclipse.less.ui;
 
+import net.vtst.eclipse.easyxtext.ui.editor.autoedit.DefaultEasyAutoEditStrategyProvider;
 import net.vtst.eclipse.easyxtext.util.IEasyMessages;
 import net.vtst.ow.eclipse.less.ui.folding.LessFoldingRegionProvider;
 import net.vtst.ow.eclipse.less.ui.folding.LessFoldingStructureProvider;
@@ -13,6 +14,7 @@ import net.vtst.ow.eclipse.less.ui.syntaxcoloring.LessSemanticHighlightingCalcul
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.xtext.ui.IImageHelper;
+import org.eclipse.xtext.ui.editor.autoedit.AbstractEditStrategyProvider;
 import org.eclipse.xtext.ui.editor.folding.IFoldingRegionProvider;
 import org.eclipse.xtext.ui.editor.folding.IFoldingStructureProvider;
 import org.eclipse.xtext.ui.editor.syntaxcoloring.AbstractAntlrTokenToAttributeIdMapper;
@@ -34,8 +36,14 @@ public class LessUiModule extends net.vtst.ow.eclipse.less.ui.AbstractLessUiModu
     return LessUiMessages.class;
   }
   
+  // Editor
+  
   public Class<? extends org.eclipse.xtext.ui.editor.IXtextEditorCallback> bindIXtextEditorCallback() {
     return net.vtst.eclipse.easyxtext.ui.nature.NatureAddingEditorCallback.class;
+  }
+  
+  public Class<? extends AbstractEditStrategyProvider> bindAbstractEditStrategyProvider() {
+    return DefaultEasyAutoEditStrategyProvider.class;
   }
     
   // Image helper

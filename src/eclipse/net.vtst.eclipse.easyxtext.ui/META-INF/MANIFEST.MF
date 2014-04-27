@@ -14,7 +14,9 @@ Require-Bundle: org.eclipse.ui,
  net.vtst.eclipse.easyxtext;bundle-version="1.0.12"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Export-Package: net.vtst.eclipse.easyxtext.ui.folding,
+Export-Package: net.vtst.eclipse.easyxtext.ui,
+ net.vtst.eclipse.easyxtext.ui.editor.autoedit,
+ net.vtst.eclipse.easyxtext.ui.folding,
  net.vtst.eclipse.easyxtext.ui.launching,
  net.vtst.eclipse.easyxtext.ui.launching.attributes,
  net.vtst.eclipse.easyxtext.ui.launching.tab,

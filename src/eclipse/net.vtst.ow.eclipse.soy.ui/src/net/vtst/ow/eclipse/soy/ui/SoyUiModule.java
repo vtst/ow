@@ -3,6 +3,7 @@
  */
 package net.vtst.ow.eclipse.soy.ui;
 
+import net.vtst.eclipse.easyxtext.ui.editor.autoedit.DefaultEasyAutoEditStrategyProvider;
 import net.vtst.eclipse.easyxtext.util.IEasyMessages;
 import net.vtst.ow.eclipse.soy.ui.folding.SoyFoldingRegionProvider;
 import net.vtst.ow.eclipse.soy.ui.syntaxcoloring.SoyAntlrTokenToAttributeIdMapper;
@@ -12,6 +13,7 @@ import net.vtst.ow.eclipse.soy.ui.syntaxcoloring.SoySemanticHighlightingCalculat
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.xtext.resource.containers.IAllContainersState;
 import org.eclipse.xtext.ui.IImageHelper;
+import org.eclipse.xtext.ui.editor.autoedit.AbstractEditStrategyProvider;
 import org.eclipse.xtext.ui.editor.folding.IFoldingRegionProvider;
 import org.eclipse.xtext.ui.editor.syntaxcoloring.AbstractAntlrTokenToAttributeIdMapper;
 import org.eclipse.xtext.ui.editor.syntaxcoloring.IHighlightingConfiguration;
@@ -34,8 +36,14 @@ public class SoyUiModule extends net.vtst.ow.eclipse.soy.ui.AbstractSoyUiModule 
     return SoyUiMessages.class;
   }
   
+  // Editor
+  
   public Class<? extends org.eclipse.xtext.ui.editor.IXtextEditorCallback> bindIXtextEditorCallback() {
     return net.vtst.eclipse.easyxtext.ui.nature.NatureAddingEditorCallback.class;
+  }
+  
+  public Class<? extends AbstractEditStrategyProvider> bindAbstractEditStrategyProvider() {
+    return DefaultEasyAutoEditStrategyProvider.class;
   }
 	
   // This is to replace the default generated parser, by the customized version.

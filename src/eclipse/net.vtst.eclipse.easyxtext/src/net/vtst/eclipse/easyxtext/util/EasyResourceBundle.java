@@ -19,11 +19,9 @@ import java.util.ResourceBundle;
 public abstract class EasyResourceBundle implements IEasyMessages {
 
   private ResourceBundle bundle;
-  private EasyResourceBundle delegate = null;
 
   public EasyResourceBundle() {
     bundle = getBundle();
-    delegate = getDelegate();
   }
 
   public abstract ResourceBundle getBundle();
@@ -49,10 +47,10 @@ public abstract class EasyResourceBundle implements IEasyMessages {
     try {
       return bundle.getString(key);
     } catch (MissingResourceException e) {
-      if (delegate == null)
+      if (getDelegate() == null)
         return "!" + key + "!";
       else
-        return delegate.getString(key);
+        return getDelegate().getString(key);
     }
   }
 
@@ -69,10 +67,10 @@ public abstract class EasyResourceBundle implements IEasyMessages {
     try {
       return String.format(bundle.getString(key), (Object[]) strings);
     } catch (MissingResourceException e) {
-      if (delegate == null)
+      if (getDelegate() == null)
         return "!" + key + "!";
       else
-        return delegate.getString(key);
+        return getDelegate().getString(key);
     }
   }
 

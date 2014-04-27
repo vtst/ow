@@ -5,13 +5,24 @@ package net.vtst.ow.eclipse.less.ui;
 
 import java.util.ResourceBundle;
 
+import net.vtst.eclipse.easyxtext.ui.EasyXtextUiMessages;
 import net.vtst.eclipse.easyxtext.util.EasyResourceBundle;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class LessUiMessages extends EasyResourceBundle {
+    
   public ResourceBundle getBundle() {
     return ResourceBundle.getBundle("net.vtst.ow.eclipse.less.ui.LessUiMessages");
   }
+  
+  @Inject
+  private EasyXtextUiMessages easyXtextUiMessages;
+
+  public EasyResourceBundle getDelegate() {
+    return easyXtextUiMessages;
+  }
+  
 }

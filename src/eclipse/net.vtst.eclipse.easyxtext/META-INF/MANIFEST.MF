@@ -12,7 +12,8 @@ Require-Bundle: org.eclipse.ui,
  org.apache.log4j;bundle-version="1.2.15"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Export-Package: net.vtst.eclipse.easyxtext.guice,
+Export-Package: net.vtst.eclipse.easyxtext,
+ net.vtst.eclipse.easyxtext.guice,
  net.vtst.eclipse.easyxtext.nature,
  net.vtst.eclipse.easyxtext.parser,
  net.vtst.eclipse.easyxtext.resource,
