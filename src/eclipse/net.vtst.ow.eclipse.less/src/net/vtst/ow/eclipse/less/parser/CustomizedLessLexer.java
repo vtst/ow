@@ -66,7 +66,7 @@ public class CustomizedLessLexer extends InternalLessLexer {
     return type == TOKEN_CLOSING_BRACE || type == TOKEN_OPENING_BRACE || type == TOKEN_SEMI_COLON;
   }
     
-  // Adds ';' before '}' which are not preceded by either ';' or '}'
+  // Adds ';' before '}' which are not preceded by either ';' or '}' or '{'
   public Token nextToken() {
     if (tokenToEmit == null) {
       Token nextToken = super.nextToken();
