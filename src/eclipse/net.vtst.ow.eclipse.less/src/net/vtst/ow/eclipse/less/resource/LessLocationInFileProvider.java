@@ -19,7 +19,7 @@ public class LessLocationInFileProvider extends EasyLocationInFileProvider {
   }
 
   protected EStructuralFeature _getIdentifierFeature(TerminatedMixin obj) {
-    return LessPackage.eINSTANCE.getTerminatedMixin_Selectors();
+    return LessPackage.eINSTANCE.getMixin_Selectors();
   }
   
   protected EStructuralFeature _getIdentifierFeature(ToplevelRuleSet obj) {

@@ -23,7 +23,6 @@ import net.vtst.ow.eclipse.less.less.IncompleteToplevelStatement;
 import net.vtst.ow.eclipse.less.less.InnerRuleSet;
 import net.vtst.ow.eclipse.less.less.InnerSelector;
 import net.vtst.ow.eclipse.less.less.InnerStatement;
-import net.vtst.ow.eclipse.less.less.KeyframesContents;
 import net.vtst.ow.eclipse.less.less.KeyframesStatement;
 import net.vtst.ow.eclipse.less.less.LessPackage;
 import net.vtst.ow.eclipse.less.less.Mixin;
@@ -322,9 +321,7 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
   @Check
   @ConfigurableCheck(configurable = false)
   public void checkTerminatedMixinsInKeyframesStatement(KeyframesStatement statement) {
-    KeyframesContents contents = statement.getContents();
-    while (contents != null) {
-      EObject item = contents.getItem();
+    for (EObject item : statement.getContent().getStatement()) {
       if (item instanceof TerminatedMixin) {
         TerminatedMixin mixin = (TerminatedMixin) item;
         MixinUtils.Helper helper = MixinUtils.newHelper(mixin);
@@ -335,7 +332,6 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
           error(messages.getString("unexpected_token"), mixin.getPriority(), null, 0);
         }
       }
-      contents = contents.getNext();
     }
   }
 

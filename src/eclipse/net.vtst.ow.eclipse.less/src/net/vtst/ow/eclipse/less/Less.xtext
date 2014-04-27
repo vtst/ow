@@ -38,7 +38,7 @@ StyleSheet:
 ;
 
 ToplevelOrInnerStatement:
-  TerminatedMixin
+  Mixin
   // LESS accepts @ statements within other blocks, and move them at top level.
   | ImportStatement
   | KeyframesStatement
@@ -48,7 +48,6 @@ ToplevelOrInnerStatement:
   | FontFaceStatement
   | CharsetStatement
   | VariableDefinition
-  | UnterminatedMixin
 ;
   
 ToplevelStatement:
@@ -137,21 +136,16 @@ ViewportSymbol:
 // See http://www.w3.org/TR/css3-animations/#keyframes
 
 KeyframesStatement:
-  {KeyframesStatement} KeyframesSymbol SPACE ident=IDENT OPT_SPACE '{' OPT_SPACE contents=KeyframesContents? '}' OPT_SPACE
+  {KeyframesStatement} KeyframesSymbol SPACE ident=IDENT OPT_SPACE '{' OPT_SPACE content=KeyframesContent '}' OPT_SPACE
 ;
 
-KeyframesContents:
-  item=UnterminatedKeyframesStatement (';' OPT_SPACE next=KeyframesContents?)?
-  | item=TerminatedKeyframesStatement next=KeyframesContents?
+KeyframesContent:
+  statement+=KeyframesInnerStatement+
 ;
 
-UnterminatedKeyframesStatement:
-  UnterminatedMixin
-;
-
-TerminatedKeyframesStatement:
+KeyframesInnerStatement:
   KeyframesBlock
-  | TerminatedMixin
+  | Mixin
 ;
 
 KeyframesSymbol:
