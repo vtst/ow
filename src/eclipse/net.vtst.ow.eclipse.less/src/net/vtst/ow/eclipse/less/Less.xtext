@@ -225,7 +225,7 @@ Mixin:
 // See LessJavaValidator.checkFinalSemicolonOfTerminatedMixin
 TerminatedMixin:
   selectors=MixinSelectors parameters=MixinParameters
-  (priority=Priority (hasFinalSemicolon?=';' OPT_SPACE)? | guards=MixinDefinitionGuards? body=Block)
+  (priority=Priority ';' | guards=MixinDefinitionGuards? body=Block)
 ;
 
 // TODO: Merge with the default mixin case.

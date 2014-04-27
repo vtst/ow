@@ -171,26 +171,6 @@ public class LessJavaValidator extends AbstractLessJavaValidator {
     }
   }
 
-// TODO: Implement new version.
-//  @Check
-//  @ConfigurableCheck(configurable = false)
-//  public void checkFinalSemicolonOfTerminatedMixin(TerminatedMixin mixin) {
-//    if (mixin.getBody() != null || mixin.isHasFinalSemicolon()) return;
-//    EObject parent = mixin.eContainer();
-//    if (parent instanceof BlockContents) {
-//      if (((BlockContents) parent).getNext() != null) {
-//        error(messages.getString("missing_semicolon_after_mixin_call"), mixin, LessPackage.eINSTANCE.getTerminatedMixin_Parameters(), 0);
-//      }
-//    } else if (parent instanceof StyleSheet) {
-//      StyleSheet styleSheet = (StyleSheet) parent;
-//      if (!mixin.equals(styleSheet.getStatements().get(styleSheet.getStatements().size() - 1))) {
-//        error(messages.getString("missing_semicolon_after_mixin_call"), mixin, LessPackage.eINSTANCE.getTerminatedMixin_Parameters(), 0);        
-//      }
-//    } else {
-//      throw new RuntimeException("Unknown class for a parent of a TerminatedMixin");
-//    }
-//  }
-  
   @Check
   @ConfigurableCheck(configurable = false)
   public void checkMixin(Mixin mixin) {
