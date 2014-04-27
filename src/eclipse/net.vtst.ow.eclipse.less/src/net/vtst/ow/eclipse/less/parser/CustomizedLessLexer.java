@@ -63,6 +63,20 @@ public class CustomizedLessLexer extends InternalLessLexer {
   private boolean isBlockSeparator(int type) {
     return type == TOKEN_CLOSING_BRACE || type == TOKEN_OPENING_BRACE || type == TOKEN_SEMI_COLON;
   }
+  
+  private int getStartIndex(Token token) {
+    if (token instanceof CommonToken) return ((CommonToken) token).getStartIndex();
+    else return 0;
+  }
+  
+  private Token createSemiColon(Token nextToken) {
+    CommonToken newToken = new CommonToken(nextToken);
+    newToken.setType(TOKEN_SEMI_COLON);
+    newToken.setStartIndex(getStartIndex(nextToken));
+    newToken.setStopIndex(newToken.getStopIndex());
+    newToken.setText("");
+    return newToken;
+  }
     
   // Adds ';' before '}' which are not preceded by either ';' or '}' or '{'
   public Token nextToken() {
@@ -76,8 +90,7 @@ public class CustomizedLessLexer extends InternalLessLexer {
         lastToken = nextToken;
       } else {
         tokenToEmit = nextToken;
-        lastToken = new CommonToken(nextToken);
-        lastToken.setType(TOKEN_SEMI_COLON);
+        lastToken = createSemiColon(nextToken);
       }      
     } else {
       lastToken = tokenToEmit;
