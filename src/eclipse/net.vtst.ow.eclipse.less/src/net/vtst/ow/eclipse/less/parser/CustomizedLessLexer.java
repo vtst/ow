@@ -73,7 +73,7 @@ public class CustomizedLessLexer extends InternalLessLexer {
     CommonToken newToken = new CommonToken(nextToken);
     newToken.setType(TOKEN_SEMI_COLON);
     newToken.setStartIndex(getStartIndex(nextToken));
-    newToken.setStopIndex(newToken.getStopIndex());
+    newToken.setStopIndex(newToken.getStopIndex() - 1);
     newToken.setText("");
     return newToken;
   }
