@@ -25,6 +25,7 @@ public class LessAntlrTokenToAttributeIdMapper extends EasyAntlrTokenToAttribute
     bindTerminalRule(grammar.getML_COMMENTRule(), highlightingConfig.COMMENT);
     bindTerminalRule(grammar.getSL_COMMENTRule(), highlightingConfig.COMMENT);
     bindTerminalRule(grammar.getAT_IDENTRule(), highlightingConfig.VARIABLE_USE);
+    bindTerminalRule(grammar.getAMP_COLON_EXTENDRule(), highlightingConfig.MIXIN_CALL);
     bindKeyword("@", highlightingConfig.VARIABLE_USE);
     bindKeyword("@import", highlightingConfig.AT_KEYWORD);
     bindKeyword("@import-multiple", highlightingConfig.AT_KEYWORD);

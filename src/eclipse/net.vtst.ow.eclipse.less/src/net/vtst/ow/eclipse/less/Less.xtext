@@ -62,7 +62,7 @@ InnerStatement:
   InnerRuleSet
   | ToplevelOrInnerStatement
   | Declaration
-//  | InnerExtend
+  | InnerExtend
 ;
 
 Block:
@@ -364,7 +364,8 @@ Pseudo:
 ;
 
 Extend: ':' 'extend' ExtendArg;
-InnerExtend: '&' ':' 'extend' ExtendArg ';';
+// There is a special terminal for '&:extend', see CustomizedLessLexer.
+InnerExtend: AMP_COLON_EXTEND OPT_SPACE ExtendArg ';' OPT_SPACE;
 ExtendArg: '(' OPT_SPACE selector+=ExtendSelector (',' OPT_SPACE selector+=ExtendSelector)* ')' OPT_SPACE;
 
 PseudoWithoutNot:
@@ -545,3 +546,4 @@ terminal SL_COMMENT   : '//' !('\n'|'\r')* ('\r'? '\n')?;
 terminal WS : (' ' | '\t' | '\r' | '\n' /*| '\f'*/)+;
 terminal URL : 'url(' (!('"' | "'") (!')')*) ')';
 terminal ANY_OTHER: .;
+terminal AMP_COLON_EXTEND: '*//*-A';  // Fake terminal used by the CustomizedLessLexer
