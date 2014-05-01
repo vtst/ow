@@ -239,6 +239,9 @@ public class CustomizedSoyLexer extends InternalSoyLexer {
    * @return  true if the string has been consumed.
    */
   private boolean consumeAndMatch(String text) {
+    // TODO: I think this method is buggy, because it consumes the characters even if they do not match.
+    // It works because it is call in the specific situation where the first character is different in all
+    // alternatives.
     int i = 0;
     int n = text.length();
     while (true) {
