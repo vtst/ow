@@ -55,10 +55,20 @@ public class LessImportStatementResolver {
   
   private static String FORMAT_INLINE = "inline";
   private static String FORMAT_REFERENCE = "reference";
+  private static String FORMAT_ONCE = "once";
+  private static String FORMAT_MULTIPLE = "multiple";
   
+  // All supported formats.
   private static Set<String> SUPPORTED_FORMATS = new HashSet<String>(
       Arrays.asList(new String[]{
-          LessRuntimeModule.LESS_EXTENSION, LessRuntimeModule.CSS_EXTENSION, FORMAT_INLINE, FORMAT_REFERENCE}));
+          LessRuntimeModule.LESS_EXTENSION, LessRuntimeModule.CSS_EXTENSION,
+          FORMAT_INLINE, FORMAT_REFERENCE, FORMAT_ONCE, FORMAT_MULTIPLE}));
+
+  // Imports with this format are ignored by the plugin.
+  private static Set<String> IGNORED_FORMATS = new HashSet<String>(
+      Arrays.asList(new String[]{
+          LessRuntimeModule.CSS_EXTENSION,
+          FORMAT_INLINE}));
   
   // **************************************************************************
   // Containers
@@ -155,7 +165,7 @@ public class LessImportStatementResolver {
         this.isLocalAndLess = LessRuntimeModule.LESS_EXTENSION.equals(this.uri.fileExtension()) && isLocalURI(this.uri);
       } else {
         if (SUPPORTED_FORMATS.contains(statement.getFormat())) {
-          this.isLocalAndLess = LessRuntimeModule.LESS_EXTENSION.equals(statement.getFormat()) && isLocalURI(this.uri);
+          this.isLocalAndLess = !IGNORED_FORMATS.contains(statement.getFormat()) && isLocalURI(this.uri);
         } else {
           this.error = new ImportStatementError(ImportStatementErrorLevel.ERROR, LessPackage.eINSTANCE.getImportStatement_Format(), "import_statement_error_unknown_format", statement.getFormat());
           return;
