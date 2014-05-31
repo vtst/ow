@@ -31,41 +31,44 @@ public class DefaultEasyAutoEditStrategyProvider extends EasyEditStrategyProvide
   @Inject
   protected CompoundMultiLineTerminalsEditStrategy.Factory compoundMultiLineTerminals;
   
-  @ConfigureAutoEdit
-  protected void compoundBracesBlocks(IEditStrategyAcceptor acceptor) {
-    acceptor.accept(compoundMultiLineTerminals.newInstanceFor("{", "}").and("[", "]").and("(", ")"), IDocument.DEFAULT_CONTENT_TYPE);
-  }
-
-  @ConfigureAutoEdit
+  @ConfigureAutoEdit(order=1)
   protected void indentationEditStrategy(IEditStrategyAcceptor acceptor) {
+    System.out.println("*** indentationEditStrategy");
     acceptor.accept(defaultIndentLineAutoEditStrategy.get(), IDocument.DEFAULT_CONTENT_TYPE);
     acceptor.accept(defaultIndentLineAutoEditStrategy.get(), TerminalsTokenTypeToPartitionMapper.COMMENT_PARTITION);
     acceptor.accept(defaultIndentLineAutoEditStrategy.get(), TerminalsTokenTypeToPartitionMapper.SL_COMMENT_PARTITION);
   }
 
-  @ConfigureAutoEdit
+  @ConfigureAutoEdit(order=6)
   protected void multilineComments(IEditStrategyAcceptor acceptor) {
     acceptor.accept(singleLineTerminals.newInstance("/*", " */"),IDocument.DEFAULT_CONTENT_TYPE);
     acceptor.accept(multiLineTerminals.newInstance("/*"," * ", " */"),IDocument.DEFAULT_CONTENT_TYPE);
     acceptor.accept(multiLineTerminals.newInstance("/*"," * ", " */"),TerminalsTokenTypeToPartitionMapper.COMMENT_PARTITION);
   }
 
-  @ConfigureAutoEdit
+  @ConfigureAutoEdit(order=5)
   protected void curlyBracesBlock(IEditStrategyAcceptor acceptor) {
+    System.out.println("*** curlyBracesBlock");
     acceptor.accept(singleLineTerminals.newInstance("{", "}"),IDocument.DEFAULT_CONTENT_TYPE);
   }
+  
+  @ConfigureAutoEdit(order=7)
+  protected void compoundBracesBlocks(IEditStrategyAcceptor acceptor) {
+    System.out.println("*** compoundBracesBlocks");
+    acceptor.accept(compoundMultiLineTerminals.newInstanceFor("{", "}").and("[", "]").and("(", ")"), IDocument.DEFAULT_CONTENT_TYPE);
+  }
 
-  @ConfigureAutoEdit
+  @ConfigureAutoEdit(order=4)
   protected void squareBrackets(IEditStrategyAcceptor acceptor) {
     acceptor.accept(singleLineTerminals.newInstance("[", "]"),IDocument.DEFAULT_CONTENT_TYPE);
   }
 
-  @ConfigureAutoEdit
+  @ConfigureAutoEdit(order=3)
   protected void parenthesis(IEditStrategyAcceptor acceptor) {
     acceptor.accept(singleLineTerminals.newInstance("(", ")"),IDocument.DEFAULT_CONTENT_TYPE);
   }
   
-  @ConfigureAutoEdit
+  @ConfigureAutoEdit(order=2)
   protected void stringLiteral(IEditStrategyAcceptor acceptor) {
     acceptor.accept(partitionInsert.newInstance("\"","\""),IDocument.DEFAULT_CONTENT_TYPE);
     acceptor.accept(partitionInsert.newInstance("'","'"),IDocument.DEFAULT_CONTENT_TYPE);

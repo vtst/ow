@@ -17,4 +17,9 @@ public @interface ConfigureAutoEdit {
    * @return The default state of the check.
    */
   boolean defaultState() default true;
+  
+  /**
+   * @return Rank.
+   */
+  int order() default 0;
 }

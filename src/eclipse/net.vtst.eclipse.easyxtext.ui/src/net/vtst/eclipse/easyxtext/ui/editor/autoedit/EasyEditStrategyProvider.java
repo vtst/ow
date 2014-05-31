@@ -3,6 +3,12 @@ package net.vtst.eclipse.easyxtext.ui.editor.autoedit;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import javax.swing.SortingFocusTraversalPolicy;
 
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -60,7 +66,21 @@ public class EasyEditStrategyProvider extends AbstractEditStrategyProvider {
       }      
       cls = cls.getSuperclass();
     }
+    sortMethods(methods);
     return methods;
+  }
+  
+  private static void sortMethods(List<Method> methods) {
+    Collections.sort(methods, new Comparator<Method>() {
+      @Override
+      public int compare(Method method1, Method method2) {
+        ConfigureAutoEdit annot1 = method1.getAnnotation(ConfigureAutoEdit.class);
+        ConfigureAutoEdit annot2 = method2.getAnnotation(ConfigureAutoEdit.class);
+        int delta = annot1.order() - annot2.order();
+        if (delta != 0) return delta;
+        else return method1.getName().compareTo(method2.getName());
+      }
+    });;
   }
   
   @Override
