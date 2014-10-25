@@ -11,12 +11,12 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.xtext.ui.editor.AbstractDirtyStateAwareEditorCallback;
 import org.eclipse.xtext.ui.editor.XtextEditor;
+import org.eclipse.xtext.ui.editor.IXtextEditorCallback;
 
 import com.google.inject.Inject;
 
-public class NatureAddingEditorCallback extends AbstractDirtyStateAwareEditorCallback {
+public class NatureAddingEditorCallback extends IXtextEditorCallback.NullImpl {
   
   private static final String QUALIFIER = "net.vtst.eclipse.easyxtext.ui.nature.NatureAddingEditorCallback";
   private static final String DISABLE = "DISABLE";
@@ -58,7 +58,7 @@ public class NatureAddingEditorCallback extends AbstractDirtyStateAwareEditorCal
       }
     } catch (CoreException e) {
       ErrorDialog.openError(
-          getShell(),
+          editor.getSite().getShell(),
           messages.format("add_nature_to_project_title", getNature().getName()),
           messages.getString("add_nature_to_project_error"),
           e.getStatus());
