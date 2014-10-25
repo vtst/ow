@@ -188,7 +188,8 @@ AtVariableTerm:
   | {At2Variable} ident=AT2_IDENT
 ;
 
-AtVariableWithBraces: '@' '{' variable=[AtVariableRefTarget|IDENT_OR_KEYWORD_PREPEND_AT] '}';
+// The extra ';' before '}' is genereated by CustomizedLessLexer.
+AtVariableWithBraces: '@' '{' variable=[AtVariableRefTarget|IDENT_OR_KEYWORD_PREPEND_AT] ';' '}';
 
 // ----------------------------------------------------------------------------
 // @ variable definitions
