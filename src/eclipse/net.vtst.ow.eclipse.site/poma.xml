@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>net.vtst.ow</groupId>
+    <artifactId>eclipse</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+  <groupId>net.vtst.ow</groupId>
+  <artifactId>net.vtst.ow.eclipse.site.aggregator</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <modules>
+    <module>../net.vtst.eclipse.easy.ui</module>
+    <module>../net.vtst.eclipse.easyxtext</module>
+    <module>../net.vtst.eclipse.easyxtext.ui</module>
+    <module>../net.vtst.ow.eclipse.js.closure</module>
+    <module>../net.vtst.ow.eclipse.js.closure.feature</module>
+    <module>../net.vtst.ow.eclipse.less</module>
+    <module>../net.vtst.ow.eclipse.less.feature</module>
+    <module>../net.vtst.ow.eclipse.less.ui</module>
+    <module>../net.vtst.ow.eclipse.soy</module>
+    <module>../net.vtst.ow.eclipse.soy.feature</module>
+    <module>../net.vtst.ow.eclipse.soy.ui</module>
+    <module>.</module>
+  </modules>
+</project>

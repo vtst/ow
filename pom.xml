@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" 
+	xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>net.vtst.ow</groupId>
+	<artifactId>net.vtst.ow.parent</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>Various Eclipse plugins for web development by Vincent Simonet (parent)</name>
+
+	<organization>
+		<name>Vincent Simonet</name>
+		<url>https://github.com/vtst/ow</url>
+	</organization>
+	<!-- http://maven.apache.org/scm/git.html -->
+	<scm>
+		<url>https://github.com/vtst/ow/</url>
+		<connection>scm:git:https://github.com/vtst/ow.git</connection>
+		<developerConnection>scm:git:https://github.com/vtst/ow.git</developerConnection>
+	</scm>
+    <issueManagement>
+    	<system>GitHub</system>
+    	<url>https://github.com/vtst/ow/issues</url>
+    </issueManagement>
+    <ciManagement>
+    	<system>Travis CI</system>
+    	<url>http://travis-ci.org/vtst/ow</url>
+    </ciManagement>    
+
+	<developers>
+		<developer>
+			<id>vtst</id>
+			<name>Vincent Simonet</name>
+			<email></email>
+			<organization></organization>
+			<roles>
+				<role>Lead Developer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+	</developers>
+	<contributors>
+		<contributor>
+			<name>Paul Verest</name>
+			<organization>Nodeclipse organization</organization>
+			<organizationUrl>http://www.nodeclipse.org/</organizationUrl>
+			<timezone>+8</timezone>
+		</contributor>
+	</contributors>
+
+	<prerequisites>
+		<maven>3.0</maven>
+	</prerequisites>
+
+	<properties>
+		<tycho-version>0.20.0</tycho-version>
+
+		<!-- PROJECT SETTINGS -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
+
+	<modules>
+		<module>src/closure</module>
+		<module>src/eclipse</module>
+	</modules>
+
+	<repositories>
+		<!-- ECLIPSE 3.7 
+		<repository>
+			<id>eclipse-indigo</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/releases/indigo</url>
+		</repository>
+		-->
+		<!-- -->
+		<repository>
+			<id>kepler</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/releases/kepler</url>
+		</repository>
+		 
+	</repositories>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<extensions>true</extensions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-compiler-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<environments>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>x86_64</arch>
+						</environment>
+					</environments>
+				</configuration>
+			</plugin>
+			
+		</plugins>
+	</build>
+
+
+</project>
