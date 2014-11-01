@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 1.0.21
+Bundle-Version: 1.0.22
 Bundle-SymbolicName: net.vtst.ow.eclipse.less; singleton:=true
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.xtext;bundle-version="2.6.0";visibility:=reexport,
@@ -18,10 +18,11 @@ Require-Bundle: org.eclipse.xtext;bundle-version="2.6.0";visibility:=reexport,
  org.antlr.runtime,
  org.eclipse.xtext.common.types,
  org.eclipse.debug.core;bundle-version="3.7.0",
- net.vtst.eclipse.easyxtext;bundle-version="1.0.14",
+ net.vtst.eclipse.easyxtext;bundle-version="1.0.15",
  org.eclipse.jface;bundle-version="3.9.1",
  org.eclipse.core.runtime;bundle-version="3.9.0",
- org.objectweb.asm;bundle-version="[5.0.1,6.0.0)";resolution:=optional
+ org.objectweb.asm;bundle-version="[5.0.1,6.0.0)";resolution:=optional,
+ org.eclipse.xtext.xbase.lib
 Import-Package: org.apache.commons.logging,
  org.apache.log4j,
  org.eclipse.core.runtime;version="3.4.0",

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 1.0.21
+Bundle-Version: 1.0.22
 Bundle-SymbolicName: net.vtst.ow.eclipse.less.ui; singleton:=true
 Bundle-ActivationPolicy: lazy
 Require-Bundle: net.vtst.ow.eclipse.less;visibility:=reexport,
@@ -12,14 +12,14 @@ Require-Bundle: net.vtst.ow.eclipse.less;visibility:=reexport,
  org.eclipse.ui.editors;bundle-version="3.5.0",
  org.eclipse.ui.ide;bundle-version="3.5.0",
  org.eclipse.xtext.builder,
- org.eclipse.xtext.ui;bundle-version="2.6.0",
+ org.eclipse.xtext.ui;bundle-version="2.7.2",
  org.eclipse.xtext.ui.shared,
  org.antlr.runtime,
  org.eclipse.xtext.common.types.ui,
  org.eclipse.xtext.ui.codetemplates.ui,
  org.eclipse.compare,
- net.vtst.eclipse.easyxtext.ui;bundle-version="1.0.14",
- net.vtst.eclipse.easyxtext;bundle-version="1.0.14",
+ net.vtst.eclipse.easyxtext.ui;bundle-version="1.0.15",
+ net.vtst.eclipse.easyxtext;bundle-version="1.0.15",
  org.eclipse.swt,
  org.eclipse.core.resources
 Import-Package: org.apache.commons.logging,
