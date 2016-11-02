@@ -540,7 +540,9 @@ terminal fragment STRING2: '\'' (!('\n' | '\r' /*| '\f'*/ | '\\' | '\'') | '\\' 
 terminal STRING : STRING1 | STRING2;
 
 terminal JS_EVALUATION : '`' (!'`')* '`';
-terminal HASH_IDENT : '#' IDENT_CHAR+;
+// ori: terminal HASH_IDENT : '#' IDENT_CHAR+;
+// in CSS identifiers are allowed to contain colons; a colon has to be escaped as '\:' 
+terminal HASH_IDENT : '#' (IDENT_CHAR | '\\:')+;
 terminal NUMBER : (('0' .. '9')* '.')? ('0' .. '9')+;
 terminal ML_COMMENT : '/*' -> '*/';
 terminal SL_COMMENT   : '//' !('\n'|'\r')* ('\r'? '\n')?;

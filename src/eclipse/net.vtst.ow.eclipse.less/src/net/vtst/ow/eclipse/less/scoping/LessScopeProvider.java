@@ -6,18 +6,6 @@ package net.vtst.ow.eclipse.less.scoping;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.vtst.ow.eclipse.less.less.AtVariableDef;
-import net.vtst.ow.eclipse.less.less.AtVariableRefTarget;
-import net.vtst.ow.eclipse.less.less.Block;
-import net.vtst.ow.eclipse.less.less.ImportStatement;
-import net.vtst.ow.eclipse.less.less.LessPackage;
-import net.vtst.ow.eclipse.less.less.Mixin;
-import net.vtst.ow.eclipse.less.less.MixinParameter;
-import net.vtst.ow.eclipse.less.less.MixinUtils;
-import net.vtst.ow.eclipse.less.less.StyleSheet;
-import net.vtst.ow.eclipse.less.less.VariableDefinition;
-import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver.ResolvedImportStatement;
-
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
@@ -34,6 +22,22 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+
+import net.vtst.ow.eclipse.less.ModelUtils;
+import net.vtst.ow.eclipse.less.less.AtVariableDef;
+import net.vtst.ow.eclipse.less.less.AtVariableRefTarget;
+import net.vtst.ow.eclipse.less.less.Block;
+import net.vtst.ow.eclipse.less.less.HashOrClassRef;
+import net.vtst.ow.eclipse.less.less.ImportStatement;
+import net.vtst.ow.eclipse.less.less.LessPackage;
+import net.vtst.ow.eclipse.less.less.Mixin;
+import net.vtst.ow.eclipse.less.less.MixinParameter;
+import net.vtst.ow.eclipse.less.less.MixinUtils;
+import net.vtst.ow.eclipse.less.less.StyleSheet;
+import net.vtst.ow.eclipse.less.less.VariableDefinition;
+import net.vtst.ow.eclipse.less.linking.LessMixinLinkingService;
+import net.vtst.ow.eclipse.less.linking.LessMixinLinkingService.MixinLink;
+import net.vtst.ow.eclipse.less.scoping.LessImportStatementResolver.ResolvedImportStatement;
 
 public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
   
@@ -52,6 +56,9 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
 
   @Inject
   private LessMixinScopeProvider mixinScopeProvider;  
+  
+  @Inject
+  private LessMixinLinkingService mixinLinkingService;  
       
   private Iterable<EObject> getStyleSheetStatements(StyleSheet styleSheet) {
     return styleSheet.eContents();
@@ -156,10 +163,15 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
           // There is no cycle, and the imported stylesheet is not null.
           addVariableDefinitions(resolvedImportStatement.getImportedStyleSheet().getStatements(), variableDefinitions);
         }
+      // fix BEGIN
+      // MixinUtils.isCall((Mixin)statement) should be redundant, but we do it to be sure
+      } else if (statement instanceof Mixin && MixinUtils.isCall((Mixin)statement)) {
+    	  addVariablesDefinitionsOfCalledMixin((Mixin)statement, variableDefinitions);
       }
-    }    
+      // fix END
+    }
   }
-  
+
   /** Add the variables defined by a mixin.
    */
   private void addVariableDefinitions(Mixin mixinDefinition, List<IEObjectDescription> variableDefinitions) {
@@ -169,7 +181,43 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
     }
     variableDefinitions.add(EObjectDescription.create(QualifiedName.create(ARGUMENTS_VARIABLE_NAME), mixinDefinition));
   }
-  
+
+	/**
+	 * In newer LESS versrions (since 1.4) it's possible to use a mixin as a
+	 * function call (see
+	 * http://lesscss.org/features/#mixins-as-functions-feature): the variables
+	 * defined inside the mixin body are accessible in a calling mixin. So we
+	 * add these variables for a Mixin call.
+	 * 
+	 * @param mixinStatement
+	 *            the statement which calls a Mixin
+	 * @param variableDefinitions
+	 *            the list of variable definitions which should be used to add
+	 *            the direct variables of called Mixin
+	 */
+	private void addVariablesDefinitionsOfCalledMixin(Mixin mixinStatement, List<IEObjectDescription> variableDefinitions) {
+		  MixinLink linkedMixin = mixinLinkingService.getLinkedMixin(mixinStatement);
+		  if (linkedMixin.isSuccess() && linkedMixin.getElement().size() > 0) {
+			  EObject object = linkedMixin.getElement().getObject(0);
+			  if (object instanceof HashOrClassRef) {
+				  HashOrClassRef hashOrClassRef = (HashOrClassRef) object;
+				  Mixin referencedMixin = ModelUtils.goUpTo(hashOrClassRef, Mixin.class);
+		    	  if (referencedMixin != null) {
+		    		  if (referencedMixin.getBody() != null && referencedMixin.getBody().getContent() != null) {
+		    			  // we don't call addVariableDefinitions() recursivley because variables of called
+		    			  // mixins aren't visible recursivly in calling scope. The direct variables of
+		    			  // called mixins are visible only.
+						  for (EObject innerStatement : referencedMixin.getBody().getContent().getStatement()) {
+							 if (innerStatement instanceof VariableDefinition) {
+								 variableDefinitions.add(getEObjectDescriptionFor(((VariableDefinition) innerStatement).getLhs().getVariable()));
+							 }
+						  }
+		       		  }
+		    	  }
+			  }
+		  }
+	}
+
   /** Create the object description for a variable definition ident.
    */
   private IEObjectDescription getEObjectDescriptionFor(AtVariableRefTarget atVariable) {
@@ -201,5 +249,4 @@ public class LessScopeProvider extends AbstractDeclarativeScopeProvider {
     MixinScope scope = mixinScopeProvider.getScope(mixinContext.getMixin());
     return scope.getScope(mixinContext.getSelectorIndex());
   }
-
 }
