@@ -131,6 +131,7 @@ public class JSUnit implements DependencyInfo {
     Set<String> newProvidedNames = new HashSet<String>();
     Set<String> newRequiredNames = new HashSet<String>();
     GetDependenciesNodeTraversal.run(compiler, root, newProvidedNames, newRequiredNames);
+    GetImplicitDependenciesNodeTraversal.run(compiler, root, newRequiredNames);
     if (newProvidedNames.equals(providedNames) &&
         newRequiredNames.equals(requiredNames)) {
       return false;
